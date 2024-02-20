@@ -3,6 +3,7 @@
 
 namespace ME
 {
+	class MenuObject;
 	class MenuObjectHierarchy : public ME::WindowBase
 	{
 	public:
@@ -11,6 +12,7 @@ namespace ME
 		void Show(const UpdateContext& aContext) override;
 
 	private:
-
+		size_t mySelectedIndex;
+		void PushMenuObjectToInspector();
 	};
 }

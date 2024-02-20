@@ -20,8 +20,9 @@ namespace ME
 		virtual void Update() override;
 		virtual void Render() override;
 
-		Vector2f GetPosition() const;
-		Vector2f GetSize() const;
+		Vector2f& GetPosition();
+		Vector2f& GetSize();
+
 		Vector2f GetTextureSize() const; 
 
 		void SetTexture(Texture* aTexture);

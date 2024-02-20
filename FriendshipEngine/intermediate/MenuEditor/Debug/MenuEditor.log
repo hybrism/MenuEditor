@@ -1,47 +1,58 @@
-﻿  MenuObjectHierarchy.cpp
-  MenuEditor.vcxproj -> E:\SPECIALISERING\FriendshipEngine\bin\Debug\MenuEditor_Debug.exe
+﻿  MenuEditor.cpp
+  InspectorWindow.cpp
+Engine_Debug.lib(DDSTextureLoader.obj) : warning LNK4099: PDB '' was not found with 'Engine_Debug.lib(DDSTextureLoader.obj)' or at ''; linking object as if no debug info
+Engine_Debug.lib(Mouse.obj) : warning LNK4099: PDB '' was not found with 'Engine_Debug.lib(Mouse.obj)' or at ''; linking object as if no debug info
+Engine_Debug.lib(pch.obj) : warning LNK4099: PDB '' was not found with 'Engine_Debug.lib(pch.obj)' or at ''; linking object as if no debug info
+Engine_Debug.lib(fbxdebug.obj) : warning LNK4099: PDB '' was not found with 'Engine_Debug.lib(fbxdebug.obj)' or at ''; linking object as if no debug info
+Engine_Debug.lib(fbxalloc.obj) : warning LNK4099: PDB '' was not found with 'Engine_Debug.lib(fbxalloc.obj)' or at ''; linking object as if no debug info
+Engine_Debug.lib(fbxstring.obj) : warning LNK4099: PDB '' was not found with 'Engine_Debug.lib(fbxstring.obj)' or at ''; linking object as if no debug info
+Engine_Debug.lib(fbxutils.obj) : warning LNK4099: PDB '' was not found with 'Engine_Debug.lib(fbxutils.obj)' or at ''; linking object as if no debug info
+Engine_Debug.lib(fbxfolder.obj) : warning LNK4099: PDB '' was not found with 'Engine_Debug.lib(fbxfolder.obj)' or at ''; linking object as if no debug info
+Engine_Debug.lib(fbxstatus.obj) : warning LNK4099: PDB '' was not found with 'Engine_Debug.lib(fbxstatus.obj)' or at ''; linking object as if no debug info
+  MenuEditor.vcxproj -> C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\Debug\MenuEditor_Debug.exe
 
 Project Performance Summary:
-        9 ms  E:\SPECIALISERING\FriendshipEngine\source\engine\ecs\ECS.vcxproj   4 calls
+        8 ms  C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\engine\ecs\ECS.vcxproj   4 calls
                   1 ms  GetTargetPath                              1 calls
-                  1 ms  GetNativeManifest                          1 calls
+                  0 ms  GetNativeManifest                          1 calls
                   6 ms  GetProjectInfoForReference                 1 calls
                   1 ms  GetCopyToOutputDirectoryItems              1 calls
-       15 ms  E:\SPECIALISERING\FriendshipEngine\source\engine\engine\Engine.vcxproj  12 calls
-                  1 ms  GetTargetPath                              3 calls
+       13 ms  C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\engine\engine\Engine.vcxproj  12 calls
+                  0 ms  GetTargetPath                              3 calls
                   0 ms  GetNativeManifest                          3 calls
-                 12 ms  GetProjectInfoForReference                 3 calls
+                 11 ms  GetProjectInfoForReference                 3 calls
                   2 ms  GetCopyToOutputDirectoryItems              3 calls
-       16 ms  E:\SPECIALISERING\FriendshipEngine\source\external\External.vcxproj  12 calls
-                  1 ms  GetTargetPath                              3 calls
+       14 ms  C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\external\External.vcxproj  12 calls
+                  0 ms  GetTargetPath                              3 calls
                   1 ms  GetNativeManifest                          3 calls
-                 12 ms  GetProjectInfoForReference                 3 calls
+                 11 ms  GetProjectInfoForReference                 3 calls
                   2 ms  GetCopyToOutputDirectoryItems              3 calls
-       17 ms  E:\SPECIALISERING\FriendshipEngine\source\engine\application\Application.vcxproj   8 calls
-                  1 ms  GetTargetPath                              2 calls
+       18 ms  C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\engine\application\Application.vcxproj   8 calls
+                  0 ms  GetTargetPath                              2 calls
                   1 ms  GetNativeManifest                          2 calls
-                 12 ms  GetProjectInfoForReference                 2 calls
+                 14 ms  GetProjectInfoForReference                 2 calls
                   3 ms  GetCopyToOutputDirectoryItems              2 calls
-       27 ms  E:\SPECIALISERING\FriendshipEngine\source\editor\shared\Shared.vcxproj   4 calls
+       25 ms  C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\editor\shared\Shared.vcxproj   4 calls
+                  1 ms  GetTargetPath                              1 calls
+                  0 ms  GetNativeManifest                          1 calls
+                 18 ms  GetProjectInfoForReference                 1 calls
+                  6 ms  GetCopyToOutputDirectoryItems              1 calls
+       55 ms  C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\engine\assets\Assets.vcxproj   4 calls
                   1 ms  GetTargetPath                              1 calls
                   1 ms  GetNativeManifest                          1 calls
-                 19 ms  GetProjectInfoForReference                 1 calls
-                  6 ms  GetCopyToOutputDirectoryItems              1 calls
-       47 ms  E:\SPECIALISERING\FriendshipEngine\source\engine\assets\Assets.vcxproj   4 calls
-                  0 ms  GetTargetPath                              1 calls
-                  1 ms  GetNativeManifest                          1 calls
-                 40 ms  GetProjectInfoForReference                 1 calls
-                  6 ms  GetCopyToOutputDirectoryItems              1 calls
-     1577 ms  E:\SPECIALISERING\FriendshipEngine\source\editor\menuEditor\MenuEditor.vcxproj   1 calls
-               1577 ms  Build                                      1 calls
+                 46 ms  GetProjectInfoForReference                 1 calls
+                  7 ms  GetCopyToOutputDirectoryItems              1 calls
+     3211 ms  C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\editor\menuEditor\MenuEditor.vcxproj   1 calls
+               3211 ms  Build                                      1 calls
 
 Target Performance Summary:
         0 ms  _ClCompile                                 1 calls
-        0 ms  PreLinkEvent                               1 calls
         0 ms  DoLinkOutputFilesMatch                     1 calls
         0 ms  PrepareResourceNames                       1 calls
         0 ms  CreateCustomManifestResourceNames          1 calls
         0 ms  SplitResourcesByCulture                    1 calls
+        0 ms  ComputeManifestInputsTargets               1 calls
+        0 ms  ComputeReferenceLinkInputs                 1 calls
         0 ms  ComputeResolveLinkObj                      1 calls
         0 ms  ComputeLinkInputsFromProject               1 calls
         0 ms  ComputeCLGeneratedLinkInputs               1 calls
@@ -49,8 +60,8 @@ Target Performance Summary:
         0 ms  ComputeRCGeneratedLinkInputs               1 calls
         0 ms  ComputeRCOutputs                           1 calls
         0 ms  BeforeLink                                 1 calls
-        0 ms  ComputeLinkSwitches                        1 calls
         0 ms  ComputeLegacyManifestEmbedding             1 calls
+        0 ms  BuildLinkTraverse                          1 calls
         0 ms  BuildCompile                               1 calls
         0 ms  _BuildCompileAction                        1 calls
         0 ms  AfterBuildCompileEvent                     1 calls
@@ -58,16 +69,16 @@ Target Performance Summary:
         0 ms  AfterResourceCompile                       1 calls
         0 ms  MakeDirsForResourceCompile                 1 calls
         0 ms  BeforeResourceCompile                      1 calls
+        0 ms  FinalizeBuildStatus                        1 calls
         0 ms  AfterClCompile                             1 calls
         0 ms  VcpkgCheckManifestRoot                     1 calls
         0 ms  VcpkgTripletSelection                      1 calls
         0 ms  SelectClCompile                            1 calls
-        0 ms  GetProjectInfoForReference                 6 calls
-        0 ms  BuildLinkTraverse                          1 calls
-        0 ms  AddLibrariesToProjectsInfoForReference     6 calls
-        0 ms  AfterLink                                  1 calls
-        0 ms  _ALink                                     1 calls
-        0 ms  IncrementalClean                           1 calls
+        0 ms  PreLinkEvent                               1 calls
+        0 ms  ComputeReferenceCLInput                    1 calls
+        0 ms  ComputeLinkSwitches                        1 calls
+        0 ms  _Link                                      1 calls
+        0 ms  _CleanGetCurrentAndPriorFileWrites         1 calls
         0 ms  AfterBuild                                 1 calls
         0 ms  BuildLink                                  1 calls
         0 ms  _BuildLinkAction                           1 calls
@@ -79,8 +90,8 @@ Target Performance Summary:
         0 ms  GetCopyToOutputDirectoryXamlAppDefs        7 calls
         0 ms  _PopulateCommonStateForGetCopyToOutputDirectoryItems   7 calls
         0 ms  _Deploy                                    1 calls
-        0 ms  _Link                                      1 calls
         0 ms  _Appverifier                               1 calls
+        0 ms  CreateSatelliteAssemblies                  1 calls
         0 ms  _GenerateSatelliteAssemblyInputs           1 calls
         0 ms  MakeDirsForFxc                             1 calls
         0 ms  SatelliteDllsProjectOutputGroup            1 calls
@@ -89,118 +100,117 @@ Target Performance Summary:
         0 ms  MakeDirsForBscMake                         1 calls
         0 ms  ComputeCLCompileGeneratedSbrFiles          1 calls
         0 ms  _XdcMake                                   1 calls
-        0 ms  MakeDirsForXdcMake                         1 calls
+        0 ms  ComputeCLCompileGeneratedXDCFiles          1 calls
         0 ms  ResolvedXDCMake                            1 calls
         0 ms  RegisterOutput                             1 calls
         0 ms  _Manifest                                  1 calls
-        0 ms  CreateSatelliteAssemblies                  1 calls
-        0 ms  GetResolvedLinkLibs                        6 calls
+        0 ms  _ALink                                     1 calls
+        0 ms  AfterLink                                  1 calls
+        0 ms  GetProjectInfoForReference                 6 calls
         0 ms  Build                                      1 calls
-        0 ms  AddDeployRecipeFileToProjectsInfoForReference   6 calls
-        0 ms  ComputeMIDLGeneratedCompileInputs          7 calls
-        0 ms  MakeDirsForMidl                            1 calls
-        0 ms  _Xsd                                       1 calls
+        0 ms  ResolveReferences                          7 calls
         0 ms  CustomBuild                                1 calls
+        0 ms  _PrepareForBuild                           1 calls
         0 ms  ComputeCustomBuildOutput                   1 calls
-        0 ms  PrepareProjectReferences                   7 calls
         0 ms  _SelectedFiles                             1 calls
         0 ms  PreBuildEvent                              1 calls
         0 ms  BeforeBuildGenerateSources                 1 calls
+        0 ms  BuildGenerateSourcesTraverse               1 calls
         0 ms  BeforeResolveReferences                    7 calls
-        0 ms  ResolveReferences                          7 calls
+        0 ms  AddLibrariesToProjectsInfoForReference     6 calls
         0 ms  AfterResolveReferences                     7 calls
-        0 ms  IgnoreJavaScriptOutputAssembly             7 calls
         0 ms  ExpandSDKReferences                        7 calls
-        0 ms  GetFrameworkPaths                          7 calls
+        0 ms  ResolveSDKReferences                       7 calls
+        0 ms  SetCABuildNativeEnvironmentVariables       7 calls
         0 ms  _AddOutputPathToGlobalPropertiesToRemove   7 calls
-        0 ms  _RemoveNameMetadataFromProjectReferenceItems   3 calls
-        0 ms  AfterMidl                                  1 calls
-        0 ms  _Midl                                      1 calls
+        0 ms  AddExternalIncludDirectoriesToPaths        7 calls
+        0 ms  GetFrameworkPaths                          7 calls
+        0 ms  GetTargetPath                              6 calls
+        0 ms  GetResolvedWinMD                           7 calls
+        0 ms  PrepareProjectReferences                   7 calls
+        0 ms  _Xsd                                       1 calls
+        0 ms  MakeDirsForMidl                            1 calls
         0 ms  SelectCustomBuild                          1 calls
-        0 ms  AfterBuildGenerateSourcesEvent             1 calls
-        0 ms  GetPublicIncludeDirectories                6 calls
+        0 ms  _RemoveNameMetadataFromProjectReferenceItems   3 calls
         0 ms  DisableProjectReferenceRecursionForClInputs   6 calls
-        0 ms  _PrepareForBuild                           1 calls
+        0 ms  SetTelemetryEnvironmentVariables           1 calls
         0 ms  AddPublicIncludeDirectoriesToProjectsInfoForReference   6 calls
-        0 ms  BeforeClCompile                            1 calls
+        0 ms  AddPublicBMIsToProjectsInfoForReference    6 calls
         0 ms  FindReferenceAssembliesForReferences       1 calls
+        0 ms  ComputeCLInputPDBName                      7 calls
+        0 ms  BeforeClCompile                            1 calls
         0 ms  BuildCompileTraverse                       1 calls
+        0 ms  AddDeployRecipeFileToProjectsInfoForReference   6 calls
         0 ms  BuildGenerateSources                       1 calls
         0 ms  _BuildGenerateSourcesAction                1 calls
-        0 ms  AddPublicBMIsToProjectsInfoForReference    6 calls
+        0 ms  AfterBuildGenerateSourcesEvent             1 calls
         0 ms  AfterBuildGenerateSources                  1 calls
-        1 ms  ComputeCLOutputs                           1 calls
+        0 ms  ResolvedLinkLib                            7 calls
+        0 ms  _Midl                                      1 calls
+        0 ms  AfterMidl                                  1 calls
+        0 ms  GetPublicIncludeDirectories                6 calls
         1 ms  _CalculatePostXamarinTelemetry             1 calls
-        1 ms  ComputeManifestInputsTargets               1 calls
-        1 ms  _PrepareForReferenceResolution             7 calls
-        1 ms  BuildGenerateSourcesTraverse               1 calls
-        1 ms  ComputeCLCompileGeneratedXDCFiles          1 calls
-        1 ms  ComputeCLInputPDBName                      7 calls
-        1 ms  GetReferenceAssemblyPaths                  7 calls
-        1 ms  SetCABuildNativeEnvironmentVariables       7 calls
-        1 ms  ComputeLinkImportLibraryOutputsForClean    1 calls
-        1 ms  MakeDirsForCl                              1 calls
+        1 ms  ComputeCLOutputs                           1 calls
+        1 ms  IgnoreJavaScriptOutputAssembly             7 calls
         1 ms  ResolveAssemblyReferences                  7 calls
-        1 ms  SetTelemetryEnvironmentVariables           1 calls
-        1 ms  GetTargetPathWithTargetPlatformMoniker     6 calls
-        1 ms  GetTargetPath                              6 calls
-        1 ms  MakeDirsForLink                            1 calls
-        1 ms  ResolvedLinkLib                            7 calls
-        1 ms  CopyFileToFolders                          1 calls
-        1 ms  _CleanGetCurrentAndPriorFileWrites         1 calls
-        1 ms  AddExternalIncludDirectoriesToPaths        7 calls
+        1 ms  IncrementalClean                           1 calls
         1 ms  ContentFilesProjectOutputGroup             1 calls
-        1 ms  ComputeReferenceCLInput                    1 calls
-        2 ms  _GetCopyToOutputDirectoryItemsFromThisProject   7 calls
+        1 ms  MakeDirsForLink                            1 calls
+        1 ms  InitializeBuildStatus                      1 calls
+        1 ms  GetTargetPathWithTargetPlatformMoniker     6 calls
+        1 ms  GetNativeManifest                          6 calls
+        1 ms  CopyFileToFolders                          1 calls
+        1 ms  ComputeStdModulesCompileInputs             7 calls
+        1 ms  MakeDirsForCl                              1 calls
+        1 ms  _GetCopyToOutputDirectoryItemsFromThisProject   7 calls
+        1 ms  MakeDirsForXdcMake                         1 calls
+        1 ms  ComputeMIDLGeneratedCompileInputs          7 calls
+        1 ms  TlogCleanup                                1 calls
+        1 ms  CreateRecipeFile                           1 calls
+        1 ms  ComputeLinkImportLibraryOutputsForClean    1 calls
+        2 ms  _CheckWindowsSDKInstalled                  7 calls
         2 ms  _SplitProjectReferencesByFileExistence     7 calls
-        2 ms  GetResolvedWinMD                           7 calls
-        3 ms  ResolveSDKReferences                       7 calls
-        3 ms  _CheckWindowsSDKInstalled                  7 calls
-        3 ms  FinalizeBuildStatus                        1 calls
-        3 ms  ComputeReferenceLinkInputs                 1 calls
-        3 ms  TlogCleanup                                1 calls
+        2 ms  GetResolvedLinkLibs                        6 calls
+        2 ms  _PrepareForReferenceResolution             7 calls
+        3 ms  GetReferenceAssemblyPaths                  7 calls
+        3 ms  _CheckForInvalidConfigurationAndPlatform   7 calls
         4 ms  AssignProjectConfiguration                 7 calls
-        4 ms  GetNativeManifest                          6 calls
-        4 ms  CreateRecipeFile                           1 calls
-        5 ms  InitializeBuildStatus                      1 calls
-        5 ms  _CheckForInvalidConfigurationAndPlatform   7 calls
+        5 ms  SetBuildDefaultEnvironmentVariables        7 calls
         5 ms  _GetProjectReferenceTargetFrameworkProperties   7 calls
-        5 ms  ComputeStdModulesCompileInputs             7 calls
-        5 ms  AssignTargetPaths                          7 calls
-        8 ms  SetBuildDefaultEnvironmentVariables        7 calls
-       11 ms  FixupCLCompileOptions                      7 calls
-       15 ms  PrepareForBuild                            7 calls
-       20 ms  _GetCopyToOutputDirectoryItemsFromTransitiveProjectReferences   7 calls
+        6 ms  AssignTargetPaths                          7 calls
+       12 ms  FixupCLCompileOptions                      7 calls
+       18 ms  _GetCopyToOutputDirectoryItemsFromTransitiveProjectReferences   7 calls
+       18 ms  PrepareForBuild                            7 calls
        26 ms  GetCopyToOutputDirectoryItems              7 calls
-       54 ms  GetReferencedVCProjectsInfo                7 calls
-       87 ms  ResolveProjectReferences                   7 calls
-      390 ms  AppLocalFromInstalled                      1 calls
-      467 ms  Link                                       1 calls
-      561 ms  ClCompile                                  1 calls
+       61 ms  GetReferencedVCProjectsInfo                7 calls
+       92 ms  ResolveProjectReferences                   7 calls
+      327 ms  Link                                       1 calls
+      366 ms  AppLocalFromInstalled                      1 calls
+     2376 ms  ClCompile                                  1 calls
 
 Task Performance Summary:
+        0 ms  GetOutOfDateItems                          3 calls
         0 ms  RemoveDuplicates                           2 calls
-        0 ms  FindUnderPath                              5 calls
-        0 ms  ResolveNonMSBuildProjectOutput             3 calls
-        0 ms  SetRidAgnosticValueForProjects             7 calls
         0 ms  ConvertToAbsolutePath                      1 calls
+        0 ms  ResolveNonMSBuildProjectOutput             3 calls
         0 ms  AssignCulture                              1 calls
-        0 ms  CheckVCToolsetVersion                      7 calls
+        0 ms  Delete                                     2 calls
+        0 ms  Touch                                      2 calls
+        0 ms  WriteLinesToFile                           1 calls
         0 ms  VCMessage                                  7 calls
-        0 ms  ReadLinesFromFile                          3 calls
         1 ms  Message                                   40 calls
-        1 ms  Delete                                     2 calls
-        1 ms  GetOutOfDateItems                          3 calls
-        2 ms  MakeDir                                   22 calls
-        3 ms  WriteLinesToFile                           1 calls
+        1 ms  FindUnderPath                              5 calls
+        1 ms  ReadLinesFromFile                          3 calls
+        1 ms  CheckVCToolsetVersion                      7 calls
+        1 ms  CleanupStaleTlogItems                      1 calls
+        1 ms  SetRidAgnosticValueForProjects             7 calls
+        1 ms  GenerateDesktopDeployRecipe                1 calls
+        2 ms  AssignTargetPath                          49 calls
         3 ms  AssignProjectConfiguration                 7 calls
-        3 ms  AssignTargetPath                          49 calls
-        3 ms  CleanupStaleTlogItems                      1 calls
-        4 ms  Touch                                      2 calls
-        4 ms  GenerateDesktopDeployRecipe                1 calls
-        5 ms  SetEnv                                    53 calls
-       24 ms  CallTarget                                14 calls
-      155 ms  MSBuild                                   16 calls
-      390 ms  Exec                                       2 calls
-      466 ms  Link                                       1 calls
-      560 ms  CL                                         2 calls
+        4 ms  MakeDir                                   22 calls
+        4 ms  SetEnv                                    53 calls
+       22 ms  CallTarget                                14 calls
+      170 ms  MSBuild                                   16 calls
+      323 ms  Link                                       1 calls
+      364 ms  Exec                                       2 calls
+     2375 ms  CL                                         2 calls

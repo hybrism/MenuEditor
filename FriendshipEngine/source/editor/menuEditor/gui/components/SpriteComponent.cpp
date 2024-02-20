@@ -13,6 +13,9 @@ void ME::SpriteComponent::Update()
 
 void ME::SpriteComponent::Render()
 {
+	if (!mySharedData.texture)
+		return;
+
 	//TODO: Don't do this for all components
 	GraphicsEngine* ge = GraphicsEngine::GetInstance();
 	SpriteDrawer& spriteDrawer = ge->GetSpriteDrawer();
@@ -21,12 +24,12 @@ void ME::SpriteComponent::Render()
 	spriteDrawer.Draw(mySharedData, myInstance);
 }
 
-Vector2f ME::SpriteComponent::GetPosition() const
+Vector2f& ME::SpriteComponent::GetPosition()
 {
 	return myInstance.position;
 }
 
-Vector2f ME::SpriteComponent::GetSize() const
+Vector2f& ME::SpriteComponent::GetSize()
 {
 	return myInstance.scale;
 }

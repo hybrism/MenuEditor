@@ -15,9 +15,8 @@ namespace ME
 	protected:
 		Component(MenuObject& aParent) :
 			myParent(aParent) {}
-		~Component() {}
+		virtual ~Component() {}
 
 		MenuObject& myParent;
-
 	};
 }

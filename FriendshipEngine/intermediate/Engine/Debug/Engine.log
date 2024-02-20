@@ -1,18 +1,77 @@
-﻿  Engine.cpp
+﻿  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\debug_line_PS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\missing_texture_PS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\missing_texture_deferred_PS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\fullscreen_PS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\fullscreen_VS.cso
+C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\engine\engine\shaders\fullscreen\post_process_PS.hlsl(10,36-55): warning X3556: integer divides may be much slower, try using uints if possible.
+  
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\post_process_PS.cso
+C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\engine\engine\shaders\fullscreen\post_process_VS.hlsl(3,19-42): warning X3578: Output value 'main' is not completely initialized
+  
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\post_process_VS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\post_process_tone_map_PS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\post_process_vignette_PS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_bounding_lights_PS.cso
+C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\engine\engine\shaders\pbr\pbr_default_PS.hlsl(72,21-43): warning X3203: signed/unsigned mismatch, unsigned assumed
+  
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_default_PS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_default_VS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_default_instanced_VS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_deferred_PS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_directional_light_PS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_g_buffer_PS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_silhouette_PS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_skinned_VS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_skinned_instanced_VS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\instanced_3D_sprite_VS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\instanced_sprite_VS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\sprite_PS.cso
+C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\engine\engine\shaders\sprite\sprite_VS.hlsl(27,5-32): warning X3206: implicit truncation of vector type
+C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\engine\engine\shaders\sprite\sprite_VS.hlsl(16,25-54): warning X3578: Output value 'main' is not completely initialized
+  
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\sprite_VS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\test_vfx_PS.cso
+  compilation object save succeeded; see C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\vfx_default_VS.cso
+  pch.cpp
+  -------Friendship is everything <3 (Engine) !-------------
+  Engine.cpp
+  DebugCamera.cpp
+  DebugLine.cpp
+  AnimationController.cpp
+  AnimationPlayer.cpp
+  Skeleton.cpp
+  Camera.cpp
+  DepthBuffer.cpp
+  DirectionalLightManager.cpp
   DxBuffer.cpp
+  GBuffer.cpp
   GraphicsEngine.cpp
+  LightManager.cpp
   PostProcess.cpp
+  SpherePrimitive.cpp
+  Texture.cpp
   Mesh.cpp
   MeshDrawer.cpp
+  SharedMesh.cpp
   SkeletalMesh.cpp
+  DeferredRenderer.cpp
+  ForwardRenderer.cpp
   SpriteDrawer.cpp
+  VFXDatabase.cpp
   VFXManager.cpp
+  Transform.cpp
   PixelShader.cpp
   Shader.cpp
   VertexShader.cpp
   TextService.cpp
+  fontfile.cpp
+  parser.cpp
   text.cpp
+  textfile.cpp
+  token.cpp
   Error.cpp
+  InputManager.cpp
+  StringHelper.cpp
 PhysX_64.lib(PhysX_64.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in d3d11.lib(d3d11.dll); second definition ignored
 PhysXCommon_64.lib(PhysXCommon_64.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in d3d11.lib(d3d11.dll); second definition ignored
 PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "__declspec(dllimport) public: static unsigned int const physx::PxSyncImpl::waitForever" (__imp_?waitForever@PxSyncImpl@physx@@2IB) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
@@ -105,26 +164,20 @@ PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: __cdecl phy
 PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::Gu::AABBTreeBounds::AABBTreeBounds(void)" (__imp_??0AABBTreeBounds@Gu@physx@@QEAA@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
 PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: __cdecl physx::Gu::AABBTreeBounds::AABBTreeBounds(void)" (??0AABBTreeBounds@Gu@physx@@QEAA@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
 PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in d3d11.lib(d3d11.dll); second definition ignored
-  Engine.vcxproj -> E:\SPECIALISERING\FriendshipEngine\bin\Debug\Engine_Debug.lib
+  Engine.vcxproj -> C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\Debug\Engine_Debug.lib
 
 Project Performance Summary:
-    34010 ms  E:\SPECIALISERING\FriendshipEngine\source\engine\engine\Engine.vcxproj   1 calls
-              34010 ms  Build                                      1 calls
+     9643 ms  C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\source\engine\engine\Engine.vcxproj   1 calls
+               9643 ms  Build                                      1 calls
 
 Target Performance Summary:
-        0 ms  MakeDirsForResourceCompile                 1 calls
-        0 ms  _ALink                                     1 calls
-        0 ms  ComputeLegacyManifestEmbedding             1 calls
-        0 ms  BuildLinkTraverse                          1 calls
-        0 ms  BuildCompile                               1 calls
-        0 ms  _BuildCompileAction                        1 calls
-        0 ms  AfterBuildCompileEvent                     1 calls
-        0 ms  _Lib                                       1 calls
+        0 ms  Build                                      1 calls
         0 ms  AfterLib                                   1 calls
         0 ms  PreLinkEvent                               1 calls
         0 ms  DoLibOutputFilesMatch                      1 calls
-        0 ms  _Manifest                                  1 calls
-        0 ms  MakeDirsForLib                             1 calls
+        0 ms  ComputeLibInputsFromProject                1 calls
+        0 ms  ComputeCLGeneratedLibInputs                1 calls
+        0 ms  ComputeCLOutputs                           1 calls
         0 ms  ComputeRCGeneratedLibInputs                1 calls
         0 ms  ComputeRCOutputs                           1 calls
         0 ms  ComputeLibAdditionalOptions                1 calls
@@ -134,133 +187,139 @@ Target Performance Summary:
         0 ms  BeforeResourceCompile                      1 calls
         0 ms  _ClCompile                                 1 calls
         0 ms  AfterClCompile                             1 calls
-        0 ms  VcpkgCheckManifestRoot                     1 calls
-        0 ms  ComputeLibInputsFromProject                1 calls
-        0 ms  RegisterOutput                             1 calls
-        0 ms  ResolvedXDCMake                            1 calls
-        0 ms  MakeDirsForXdcMake                         1 calls
-        0 ms  AfterBuild                                 1 calls
-        0 ms  BuildLink                                  1 calls
-        0 ms  _BuildLinkAction                           1 calls
-        0 ms  PostBuildEvent                             1 calls
-        0 ms  PrepareForRun                              1 calls
-        0 ms  CopyFilesToOutputDirectory                 1 calls
-        0 ms  _CheckForCompileOutputs                    1 calls
         0 ms  _CopySourceItemsToOutputDirectory          1 calls
-        0 ms  _GetCopyToOutputDirectoryItemsFromThisProject   1 calls
-        0 ms  _GetCopyToOutputDirectoryItemsFromTransitiveProjectReferences   1 calls
-        0 ms  GetCopyToOutputDirectoryXamlAppDefs        1 calls
-        0 ms  _PopulateCommonStateForGetCopyToOutputDirectoryItems   1 calls
-        0 ms  _Deploy                                    1 calls
+        0 ms  VcpkgCheckManifestRoot                     1 calls
+        0 ms  VcpkgTripletSelection                      1 calls
+        0 ms  SelectClCompile                            1 calls
+        0 ms  _CheckForCompileOutputs                    1 calls
         0 ms  _Appverifier                               1 calls
+        0 ms  _Lib                                       1 calls
+        0 ms  ComputeReferenceCLInput                    1 calls
+        0 ms  AfterBuildCompileEvent                     1 calls
+        0 ms  BuildCompile                               1 calls
         0 ms  CreateSatelliteAssemblies                  1 calls
+        0 ms  _GenerateSatelliteAssemblyInputs           1 calls
+        0 ms  _PopulateCommonStateForGetCopyToOutputDirectoryItems   1 calls
         0 ms  SatelliteDllsProjectOutputGroup            1 calls
         0 ms  PrepareResourceNames                       1 calls
         0 ms  CreateCustomManifestResourceNames          1 calls
+        0 ms  SplitResourcesByCulture                    1 calls
+        0 ms  GetCopyToOutputDirectoryXamlAppDefs        1 calls
         0 ms  BuiltProjectOutputGroup                    1 calls
         0 ms  _BscMake                                   1 calls
         0 ms  MakeDirsForBscMake                         1 calls
         0 ms  ComputeCLCompileGeneratedSbrFiles          1 calls
         0 ms  _XdcMake                                   1 calls
-        0 ms  VcpkgTripletSelection                      1 calls
-        0 ms  MakeDirsForCl                              1 calls
-        0 ms  Build                                      1 calls
-        0 ms  CopyFileToFolders                          1 calls
-        0 ms  AssignProjectConfiguration                 1 calls
-        0 ms  SetBuildDefaultEnvironmentVariables        1 calls
-        0 ms  _SplitProjectReferencesByFileExistence     1 calls
-        0 ms  _AddOutputPathToGlobalPropertiesToRemove   1 calls
-        0 ms  ComputeCustomBuildOutput                   1 calls
-        0 ms  SelectCustomBuild                          1 calls
-        0 ms  _SelectedFiles                             1 calls
-        0 ms  PreBuildEvent                              1 calls
-        0 ms  IgnoreJavaScriptOutputAssembly             1 calls
-        0 ms  BeforeBuildGenerateSources                 1 calls
-        0 ms  BuildGenerateSourcesTraverse               1 calls
-        0 ms  PrepareProjectReferences                   1 calls
+        0 ms  MakeDirsForXdcMake                         1 calls
+        0 ms  ComputeCLCompileGeneratedXDCFiles          1 calls
+        0 ms  ResolvedXDCMake                            1 calls
+        0 ms  _GetCopyToOutputDirectoryItemsFromTransitiveProjectReferences   1 calls
+        0 ms  _Manifest                                  1 calls
+        0 ms  _ALink                                     1 calls
+        0 ms  ComputeLegacyManifestEmbedding             1 calls
+        0 ms  BuildLinkTraverse                          1 calls
+        0 ms  _BuildCompileAction                        1 calls
+        0 ms  GetReferencedVCProjectsInfo                1 calls
         0 ms  ComputeStdModulesCompileInputs             1 calls
+        0 ms  ComputeCLInputPDBName                      1 calls
         0 ms  ResolveReferences                          1 calls
         0 ms  AfterResolveReferences                     1 calls
         0 ms  ResolveAssemblyReferences                  1 calls
         0 ms  ExpandSDKReferences                        1 calls
         0 ms  ResolveSDKReferences                       1 calls
-        0 ms  AddExternalIncludDirectoriesToPaths        1 calls
-        0 ms  GetFrameworkPaths                          1 calls
-        0 ms  GetReferenceAssemblyPaths                  1 calls
-        0 ms  MakeDirsForMidl                            1 calls
-        0 ms  ComputeReferenceCLInput                    1 calls
-        0 ms  _CheckWindowsSDKInstalled                  1 calls
-        0 ms  GetReferencedVCProjectsInfo                1 calls
-        0 ms  FindReferenceAssembliesForReferences       1 calls
+        0 ms  _BuildLinkAction                           1 calls
         0 ms  SetCABuildNativeEnvironmentVariables       1 calls
+        0 ms  _CheckWindowsSDKInstalled                  1 calls
+        0 ms  GetResolvedWinMD                           1 calls
+        0 ms  BuildLink                                  1 calls
+        0 ms  AddExternalIncludDirectoriesToPaths        1 calls
+        0 ms  GetReferenceAssemblyPaths                  1 calls
+        0 ms  GetFrameworkPaths                          1 calls
+        0 ms  PrepareProjectReferences                   1 calls
+        0 ms  AfterBuild                                 1 calls
+        0 ms  _AddOutputPathToGlobalPropertiesToRemove   1 calls
+        0 ms  IgnoreJavaScriptOutputAssembly             1 calls
+        0 ms  BeforeResolveReferences                    1 calls
+        0 ms  _PrepareForReferenceResolution             1 calls
+        0 ms  _PrepareForBuild                           1 calls
+        0 ms  IncrementalClean                           1 calls
+        0 ms  FindReferenceAssembliesForReferences       1 calls
+        0 ms  BeforeBuildGenerateSources                 1 calls
+        0 ms  PostBuildEvent                             1 calls
+        0 ms  ComputeMIDLGeneratedCompileInputs          1 calls
         0 ms  BeforeClCompile                            1 calls
         0 ms  BuildCompileTraverse                       1 calls
-        0 ms  _Xsd                                       1 calls
-        0 ms  _PrepareForBuild                           1 calls
+        0 ms  BuildGenerateSources                       1 calls
         0 ms  _BuildGenerateSourcesAction                1 calls
         0 ms  AfterBuildGenerateSourcesEvent             1 calls
         0 ms  AfterBuildGenerateSources                  1 calls
         0 ms  _Midl                                      1 calls
         0 ms  AfterMidl                                  1 calls
-        0 ms  _PrepareForReferenceResolution             1 calls
-        0 ms  BeforeResolveReferences                    1 calls
-        0 ms  ComputeMIDLGeneratedCompileInputs          1 calls
-        0 ms  BuildGenerateSources                       1 calls
-        1 ms  _CheckForInvalidConfigurationAndPlatform   1 calls
-        1 ms  SetTelemetryEnvironmentVariables           1 calls
-        1 ms  _GenerateSatelliteAssemblyInputs           1 calls
-        1 ms  FxExport                                   1 calls
-        1 ms  IncrementalClean                           1 calls
-        1 ms  _GetProjectReferenceTargetFrameworkProperties   1 calls
-        1 ms  GetResolvedWinMD                           1 calls
-        1 ms  _CleanGetCurrentAndPriorFileWrites         1 calls
-        1 ms  ComputeCLCompileGeneratedXDCFiles          1 calls
-        1 ms  MakeDirsForFxc                             1 calls
-        1 ms  ComputeCLOutputs                           1 calls
-        1 ms  CustomBuild                                1 calls
-        1 ms  SplitResourcesByCulture                    1 calls
-        1 ms  ComputeCLGeneratedLibInputs                1 calls
+        0 ms  PreBuildEvent                              1 calls
+        0 ms  MakeDirsForMidl                            1 calls
+        0 ms  _Xsd                                       1 calls
+        0 ms  _Deploy                                    1 calls
+        0 ms  CopyFileToFolders                          1 calls
+        0 ms  CopyFilesToOutputDirectory                 1 calls
+        0 ms  PrepareForRun                              1 calls
+        0 ms  ComputeCustomBuildOutput                   1 calls
+        0 ms  SelectCustomBuild                          1 calls
+        0 ms  _SelectedFiles                             1 calls
         1 ms  _CalculatePostXamarinTelemetry             1 calls
+        1 ms  FxExport                                   1 calls
+        1 ms  RegisterOutput                             1 calls
+        1 ms  _GetCopyToOutputDirectoryItemsFromThisProject   1 calls
+        1 ms  AssignProjectConfiguration                 1 calls
+        1 ms  BuildGenerateSourcesTraverse               1 calls
+        1 ms  FinalizeBuildStatus                        1 calls
+        1 ms  MakeDirsForLib                             1 calls
         1 ms  ResolveProjectReferences                   1 calls
-        1 ms  SelectClCompile                            1 calls
-        1 ms  ComputeCLInputPDBName                      1 calls
+        1 ms  MakeDirsForCl                              1 calls
+        1 ms  MakeDirsForFxc                             1 calls
+        1 ms  _SplitProjectReferencesByFileExistence     1 calls
+        2 ms  MakeDirsForResourceCompile                 1 calls
+        2 ms  InitializeBuildStatus                      1 calls
         2 ms  GetCopyToOutputDirectoryItems              1 calls
-        2 ms  AssignTargetPaths                          1 calls
-        2 ms  PrepareForBuild                            1 calls
-        3 ms  FinalizeBuildStatus                        1 calls
-        6 ms  ContentFilesProjectOutputGroup             1 calls
-        6 ms  InitializeBuildStatus                      1 calls
-        7 ms  FixupCLCompileOptions                      1 calls
-        7 ms  TlogCleanup                                1 calls
-       18 ms  CreateRecipeFile                           1 calls
-       51 ms  FxCompile                                  1 calls
-      479 ms  AppLocalFromInstalled                      1 calls
-     5594 ms  ClCompile                                  1 calls
-    27812 ms  Lib                                        1 calls
+        2 ms  _CleanGetCurrentAndPriorFileWrites         1 calls
+        4 ms  AssignTargetPaths                          1 calls
+        5 ms  SetTelemetryEnvironmentVariables           1 calls
+        5 ms  FixupCLCompileOptions                      1 calls
+        7 ms  _CheckForInvalidConfigurationAndPlatform   1 calls
+        7 ms  PrepareForBuild                            1 calls
+        8 ms  ContentFilesProjectOutputGroup             1 calls
+        8 ms  CustomBuild                                1 calls
+       10 ms  SetBuildDefaultEnvironmentVariables        1 calls
+       11 ms  TlogCleanup                                1 calls
+       14 ms  CreateRecipeFile                           1 calls
+       45 ms  _GetProjectReferenceTargetFrameworkProperties   1 calls
+      694 ms  AppLocalFromInstalled                      1 calls
+     2581 ms  FxCompile                                  1 calls
+     2701 ms  ClCompile                                  1 calls
+     3520 ms  Lib                                        1 calls
 
 Task Performance Summary:
-        0 ms  CallTarget                                 2 calls
-        0 ms  AssignProjectConfiguration                 1 calls
-        0 ms  MSBuild                                    1 calls
-        0 ms  SetRidAgnosticValueForProjects             1 calls
-        0 ms  MakeDir                                   10 calls
-        0 ms  CheckVCToolsetVersion                      1 calls
-        0 ms  VCMessage                                  1 calls
-        0 ms  ReadLinesFromFile                          3 calls
-        0 ms  AssignCulture                              1 calls
-        0 ms  ConvertToAbsolutePath                      1 calls
+        0 ms  Message                                   28 calls
         0 ms  FindUnderPath                              5 calls
+        0 ms  AssignProjectConfiguration                 1 calls
+        0 ms  SetRidAgnosticValueForProjects             1 calls
+        0 ms  AssignCulture                              1 calls
+        0 ms  Touch                                      2 calls
         0 ms  RemoveDuplicates                           2 calls
-        1 ms  SetEnv                                    11 calls
-        1 ms  GetOutOfDateItems                          3 calls
-        1 ms  Message                                   28 calls
-        2 ms  Delete                                     2 calls
-        2 ms  WriteLinesToFile                           1 calls
-        3 ms  AssignTargetPath                           8 calls
-        4 ms  Touch                                      2 calls
-        7 ms  CleanupStaleTlogItems                      1 calls
-       18 ms  GenerateDesktopDeployRecipe                1 calls
-       50 ms  FXC                                       25 calls
-      477 ms  Exec                                       2 calls
-     5590 ms  CL                                         2 calls
-    27810 ms  LIB                                        1 calls
+        0 ms  ConvertToAbsolutePath                      1 calls
+        1 ms  MSBuild                                    1 calls
+        1 ms  CallTarget                                 2 calls
+        1 ms  Delete                                     3 calls
+        1 ms  CheckVCToolsetVersion                      1 calls
+        1 ms  WriteLinesToFile                           1 calls
+        1 ms  MakeDir                                   10 calls
+        2 ms  VCMessage                                  1 calls
+        2 ms  ReadLinesFromFile                          3 calls
+        4 ms  AssignTargetPath                           8 calls
+        7 ms  GetOutOfDateItems                          3 calls
+       11 ms  CleanupStaleTlogItems                      1 calls
+       12 ms  SetEnv                                    11 calls
+       14 ms  GenerateDesktopDeployRecipe                1 calls
+      693 ms  Exec                                       2 calls
+     2579 ms  FXC                                       25 calls
+     2696 ms  CL                                         2 calls
+     3518 ms  LIB                                        1 calls

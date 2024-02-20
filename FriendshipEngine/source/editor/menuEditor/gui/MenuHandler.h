@@ -26,7 +26,6 @@ public:
 
 	ME::ObjectManager myObjectManager;
 
-
 private:
 	std::string myName;
 	std::stack<MenuState*> myStateStack;

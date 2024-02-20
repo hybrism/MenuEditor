@@ -1,13 +1,17 @@
 #include "MenuObjectHierarchy.h"
 
+#include <engine/utility/Error.h>
 #include <shared/postMaster/PostMaster.h>
 #include <imgui/imgui.h>
 
 #include "../gui/MenuHandler.h"
+#include "../gui/menuObject/MenuObject.h"
 
 ME::MenuObjectHierarchy::MenuObjectHierarchy(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
 	: WindowBase(aHandle, aOpen, aFlags)
-{}
+{
+	mySelectedIndex = INT_MAX;
+}
 
 void ME::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 {
@@ -26,14 +30,21 @@ void ME::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 			for (size_t i = 0; i < aContext.menuHandler->myObjectManager.myObjects.size(); i++)
 			{
 				MenuObject& object = aContext.menuHandler->myObjectManager.myObjects[i];
-								
-
-				ImGui::Text("Object!");
-
-				//TODO: Om ett object är selectat, skicka det till inspectorwindow?
+				
+				std::string displayName = std::to_string(i) + " " + object.GetName();
+				if (ImGui::Selectable(displayName.c_str(), i == mySelectedIndex))
+				{
+					mySelectedIndex = i;
+					PushMenuObjectToInspector();
+				}
 			}
 			ImGui::EndChild();
 		}
 	}
 	ImGui::End();
+}
+
+void ME::MenuObjectHierarchy::PushMenuObjectToInspector()
+{
+	FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::PushEntityToInspector, mySelectedIndex });
 }

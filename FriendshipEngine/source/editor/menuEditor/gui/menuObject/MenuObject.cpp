@@ -1,6 +1,9 @@
 #include "MenuObject.h"
 
-ME::MenuObject::MenuObject(const unsigned int aID) : myID(aID) {}
+ME::MenuObject::MenuObject(const unsigned int aID) 
+	: myID(aID)
+	, myName("untitled")
+{}
 
 void ME::MenuObject::Init()
 {

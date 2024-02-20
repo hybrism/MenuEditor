@@ -7,6 +7,7 @@ namespace ME
 	class ObjectManager
 	{
 		friend class MenuObjectHierarchy;
+		friend class InspectorWindow;
 	
 	public:
 		ObjectManager();
