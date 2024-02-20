@@ -1,0 +1,229 @@
+{
+  "buttons": {
+    "scale": {
+      "x": 1.0,
+      "y": 1.0
+    },
+    "textures": [
+      [
+        "s_startGameButton_off.dds",
+        "s_startGameButton_on.dds"
+      ],
+      [
+        "s_levelSelectButton_off.dds",
+        "s_levelSelectButton_on.dds"
+      ],
+      [
+        "s_settingsButton_off.dds",
+        "s_settingsButton_on.dds"
+      ],
+      [
+        "s_creditsButton_off.dds",
+        "s_creditsButton_on.dds"
+      ],
+      [
+        "s_backButton_off.dds",
+        "s_backButton_on.dds"
+      ],
+      [
+        "s_exitGameButton_off.dds",
+        "s_exitGameButton_on.dds"
+      ],
+      [
+        "s_resumeButton_off.dds",
+        "s_resumeButton_on.dds"
+      ],
+      [
+        "s_minusButton_off.dds",
+        "s_minusButton_on.dds",
+        "s_plusButton_off.dds",
+        "s_plusButton_on.dds"
+      ],
+      [
+        "s_minusButton_off.dds",
+        "s_minusButton_on.dds",
+        "s_plusButton_off.dds",
+        "s_plusButton_on.dds"
+      ],
+      [
+        "s_mainMenuButton_off.dds",
+        "s_mainMenuButton_on.dds"
+      ],
+      [
+        "s_villageButton_off.dds",
+        "s_villageButton_on.dds"
+      ],
+      [
+        "s_swampButton_off.dds",
+        "s_swampButton_on.dds"
+      ],
+      [
+        "s_deepSwampButton_off.dds",
+        "s_deepSwampButton_on.dds"
+      ],
+      [
+        "s_caveButton_off.dds",
+        "s_caveButton_on.dds"
+      ],
+      [
+        "s_bossArenaButton_off.dds",
+        "s_bossArenaButton_on.dds"
+      ]
+    ]
+  },
+  "mainMenu": {
+    "background": {
+      "path": "s_background.dds",
+      "pos": {
+        "x": 0.49687498807907104,
+        "y": 0.5
+      },
+      "scale": {
+        "x": 5.0,
+        "y": 5.0
+      }
+    },
+    "menuData": [
+      {
+        "spacing": 0.0972222238779068,
+        "sprites": [
+          {
+            "path": "s_gameLogo.dds",
+            "pos": {
+              "x": 0.17624999582767487,
+              "y": 0.7933333516120911
+            },
+            "scale": {
+              "x": 0.3499999940395355,
+              "y": 0.3499999940395355
+            }
+          }
+        ],
+        "stateType": "mainMenu",
+        "topPos": 0.5309259295463562,
+        "xAlignment": 0.17031249403953552
+      },
+      {
+        "spacing": 0.0,
+        "stateType": "pauseMenu",
+        "topPos": 0.0,
+        "xAlignment": 0.0
+      },
+      {
+        "spacing": 0.12870369851589203,
+        "stateType": "settings",
+        "topPos": 0.6333333253860474,
+        "xAlignment": 0.5
+      },
+      {
+        "spacing": 0.10370370000600815,
+        "sprites": [
+          {
+            "path": "s_levelSelect_background.dds",
+            "pos": {
+              "x": 0.5,
+              "y": 0.5
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            }
+          }
+        ],
+        "stateType": "levelSelect",
+        "topPos": 0.7379629611968994,
+        "xAlignment": 0.1458333283662796
+      },
+      {
+        "spacing": 0.2888889014720917,
+        "sprites": [
+          {
+            "path": "s_credits.dds",
+            "pos": {
+              "x": 0.5,
+              "y": 0.5
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            }
+          }
+        ],
+        "stateType": "credits",
+        "topPos": 0.1433333307504654,
+        "xAlignment": 0.878125011920929
+      }
+    ]
+  },
+  "pauseMenu": {
+    "background": {
+      "path": "s_background.dds",
+      "pos": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "scale": {
+        "x": 15.0,
+        "y": 15.0
+      }
+    },
+    "menuData": [
+      {
+        "spacing": 0.0,
+        "stateType": "mainMenu",
+        "topPos": 0.0,
+        "xAlignment": 0.0
+      },
+      {
+        "spacing": 0.1133333370089531,
+        "sprites": [
+          {
+            "path": "s_pauseMenu_background.dds",
+            "pos": {
+              "x": 0.5,
+              "y": 0.5
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            }
+          }
+        ],
+        "stateType": "pauseMenu",
+        "topPos": 0.5829629302024841,
+        "xAlignment": 0.5
+      },
+      {
+        "spacing": 0.10999999940395355,
+        "sprites": [
+          {
+            "path": "s_pauseMenu_background.dds",
+            "pos": {
+              "x": 0.5,
+              "y": 0.5
+            },
+            "scale": {
+              "x": 1.0,
+              "y": 1.0
+            }
+          }
+        ],
+        "stateType": "settings",
+        "topPos": 0.5866666436195374,
+        "xAlignment": 0.503125011920929
+      },
+      {
+        "spacing": 0.0,
+        "stateType": "levelSelect",
+        "topPos": 0.0,
+        "xAlignment": 0.0
+      },
+      {
+        "spacing": 0.0,
+        "stateType": "credits",
+        "topPos": 0.0,
+        "xAlignment": 0.0
+      }
+    ]
+  }
+}

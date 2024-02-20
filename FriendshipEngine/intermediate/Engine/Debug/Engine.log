@@ -1,0 +1,266 @@
+﻿  Engine.cpp
+  DxBuffer.cpp
+  GraphicsEngine.cpp
+  PostProcess.cpp
+  Mesh.cpp
+  MeshDrawer.cpp
+  SkeletalMesh.cpp
+  SpriteDrawer.cpp
+  VFXManager.cpp
+  PixelShader.cpp
+  Shader.cpp
+  VertexShader.cpp
+  TextService.cpp
+  text.cpp
+  Error.cpp
+PhysX_64.lib(PhysX_64.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in d3d11.lib(d3d11.dll); second definition ignored
+PhysXCommon_64.lib(PhysXCommon_64.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in d3d11.lib(d3d11.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "__declspec(dllimport) public: static unsigned int const physx::PxSyncImpl::waitForever" (__imp_?waitForever@PxSyncImpl@physx@@2IB) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "__declspec(dllimport) const physx::PxFoundation::`vftable'" (__imp_??_7PxFoundation@physx@@6B@) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::PxThreadImpl & __cdecl physx::PxThreadImpl::operator=(class physx::PxThreadImpl const &)" (__imp_??4PxThreadImpl@physx@@QEAAAEAV01@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "public: class physx::PxThreadImpl & __cdecl physx::PxThreadImpl::operator=(class physx::PxThreadImpl const &)" (??4PxThreadImpl@physx@@QEAAAEAV01@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::PxSyncImpl & __cdecl physx::PxSyncImpl::operator=(class physx::PxSyncImpl const &)" (__imp_??4PxSyncImpl@physx@@QEAAAEAV01@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "public: class physx::PxSyncImpl & __cdecl physx::PxSyncImpl::operator=(class physx::PxSyncImpl const &)" (??4PxSyncImpl@physx@@QEAAAEAV01@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "__declspec(dllimport) public: struct physx::PxSListImpl & __cdecl physx::PxSListImpl::operator=(struct physx::PxSListImpl const &)" (__imp_??4PxSListImpl@physx@@QEAAAEAU01@AEBU01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "public: struct physx::PxSListImpl & __cdecl physx::PxSListImpl::operator=(struct physx::PxSListImpl const &)" (??4PxSListImpl@physx@@QEAAAEAU01@AEBU01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::PxMutexImpl & __cdecl physx::PxMutexImpl::operator=(class physx::PxMutexImpl const &)" (__imp_??4PxMutexImpl@physx@@QEAAAEAV01@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "public: class physx::PxMutexImpl & __cdecl physx::PxMutexImpl::operator=(class physx::PxMutexImpl const &)" (??4PxMutexImpl@physx@@QEAAAEAV01@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::PxFoundation & __cdecl physx::PxFoundation::operator=(class physx::PxFoundation const &)" (__imp_??4PxFoundation@physx@@QEAAAEAV01@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "public: class physx::PxFoundation & __cdecl physx::PxFoundation::operator=(class physx::PxFoundation const &)" (??4PxFoundation@physx@@QEAAAEAV01@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::PxFPUGuard & __cdecl physx::PxFPUGuard::operator=(class physx::PxFPUGuard const &)" (__imp_??4PxFPUGuard@physx@@QEAAAEAV01@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "public: class physx::PxFPUGuard & __cdecl physx::PxFPUGuard::operator=(class physx::PxFPUGuard const &)" (??4PxFPUGuard@physx@@QEAAAEAV01@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "__declspec(dllimport) protected: virtual __cdecl physx::PxFoundation::~PxFoundation(void)" (__imp_??1PxFoundation@physx@@MEAA@XZ) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "protected: virtual __cdecl physx::PxFoundation::~PxFoundation(void)" (??1PxFoundation@physx@@MEAA@XZ) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::PxFoundation::PxFoundation(void)" (__imp_??0PxFoundation@physx@@QEAA@XZ) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "public: __cdecl physx::PxFoundation::PxFoundation(void)" (??0PxFoundation@physx@@QEAA@XZ) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::PxFoundation::PxFoundation(class physx::PxFoundation const &)" (__imp_??0PxFoundation@physx@@QEAA@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: "public: __cdecl physx::PxFoundation::PxFoundation(class physx::PxFoundation const &)" (??0PxFoundation@physx@@QEAA@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXFoundation_64.lib(PhysXFoundation_64.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in d3d11.lib(d3d11.dll); second definition ignored
+PVDRuntime_64.lib(PVDRuntime_64.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in d3d11.lib(d3d11.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: void __cdecl physx::Gu::AABBTreeBounds::takeOwnership(void)" (__imp_?takeOwnership@AABBTreeBounds@Gu@physx@@QEAAXXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: void __cdecl physx::Gu::AABBTreeBounds::takeOwnership(void)" (?takeOwnership@AABBTreeBounds@Gu@physx@@QEAAXXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: void __cdecl physx::Gu::AABBTreeBuildNode::setNbRunTimePrimitives(unsigned int)" (__imp_?setNbRunTimePrimitives@AABBTreeBuildNode@Gu@physx@@QEAAXI@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: void __cdecl physx::Gu::AABBTreeBuildNode::setNbRunTimePrimitives(unsigned int)" (?setNbRunTimePrimitives@AABBTreeBuildNode@Gu@physx@@QEAAXI@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: void __cdecl physx::Gu::AABBTreeBounds::setBounds(class physx::PxBounds3 *)" (__imp_?setBounds@AABBTreeBounds@Gu@physx@@QEAAXPEAVPxBounds3@3@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: void __cdecl physx::Gu::AABBTreeBounds::setBounds(class physx::PxBounds3 *)" (?setBounds@AABBTreeBounds@Gu@physx@@QEAAXPEAVPxBounds3@3@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: void __cdecl physx::Gu::AABBTreeBuildParams::reset(void)" (__imp_?reset@AABBTreeBuildParams@Gu@physx@@QEAAXXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: void __cdecl physx::Gu::AABBTreeBuildParams::reset(void)" (?reset@AABBTreeBuildParams@Gu@physx@@QEAAXXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: bool __cdecl physx::Gu::AABBTreeBounds::ownsMemory(void)const " (__imp_?ownsMemory@AABBTreeBounds@Gu@physx@@QEBA_NXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: bool __cdecl physx::Gu::AABBTreeBounds::ownsMemory(void)const " (?ownsMemory@AABBTreeBounds@Gu@physx@@QEBA_NXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: void __cdecl physx::Gu::AABBTreeBounds::moveFrom(class physx::Gu::AABBTreeBounds &)" (__imp_?moveFrom@AABBTreeBounds@Gu@physx@@QEAAXAEAV123@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: void __cdecl physx::Gu::AABBTreeBounds::moveFrom(class physx::Gu::AABBTreeBounds &)" (?moveFrom@AABBTreeBounds@Gu@physx@@QEAAXAEAV123@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: bool __cdecl physx::Gu::AABBTreeBuildNode::isLeaf(void)const " (__imp_?isLeaf@AABBTreeBuildNode@Gu@physx@@QEBA_NXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: bool __cdecl physx::Gu::AABBTreeBuildNode::isLeaf(void)const " (?isLeaf@AABBTreeBuildNode@Gu@physx@@QEBA_NXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: unsigned int const * __cdecl physx::Gu::AABBTreeBuildNode::getPrimitives(unsigned int const *)const " (__imp_?getPrimitives@AABBTreeBuildNode@Gu@physx@@QEBAPEBIPEBI@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: unsigned int const * __cdecl physx::Gu::AABBTreeBuildNode::getPrimitives(unsigned int const *)const " (?getPrimitives@AABBTreeBuildNode@Gu@physx@@QEBAPEBIPEBI@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: unsigned int * __cdecl physx::Gu::AABBTreeBuildNode::getPrimitives(unsigned int *)" (__imp_?getPrimitives@AABBTreeBuildNode@Gu@physx@@QEAAPEAIPEAI@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: unsigned int * __cdecl physx::Gu::AABBTreeBuildNode::getPrimitives(unsigned int *)" (?getPrimitives@AABBTreeBuildNode@Gu@physx@@QEAAPEAIPEAI@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::Gu::AABBTreeBuildNode const * __cdecl physx::Gu::AABBTreeBuildNode::getPos(void)const " (__imp_?getPos@AABBTreeBuildNode@Gu@physx@@QEBAPEBV123@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: class physx::Gu::AABBTreeBuildNode const * __cdecl physx::Gu::AABBTreeBuildNode::getPos(void)const " (?getPos@AABBTreeBuildNode@Gu@physx@@QEBAPEBV123@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::Gu::AABBTreeBuildNode const * __cdecl physx::Gu::AABBTreeBuildNode::getNeg(void)const " (__imp_?getNeg@AABBTreeBuildNode@Gu@physx@@QEBAPEBV123@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: class physx::Gu::AABBTreeBuildNode const * __cdecl physx::Gu::AABBTreeBuildNode::getNeg(void)const " (?getNeg@AABBTreeBuildNode@Gu@physx@@QEBAPEBV123@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: unsigned int __cdecl physx::Gu::AABBTreeBuildNode::getNbRuntimePrimitives(void)const " (__imp_?getNbRuntimePrimitives@AABBTreeBuildNode@Gu@physx@@QEBAIXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: unsigned int __cdecl physx::Gu::AABBTreeBuildNode::getNbRuntimePrimitives(void)const " (?getNbRuntimePrimitives@AABBTreeBuildNode@Gu@physx@@QEBAIXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: unsigned int __cdecl physx::Gu::AABBTreeBuildNode::getNbPrimitives(void)const " (__imp_?getNbPrimitives@AABBTreeBuildNode@Gu@physx@@QEBAIXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: unsigned int __cdecl physx::Gu::AABBTreeBuildNode::getNbPrimitives(void)const " (?getNbPrimitives@AABBTreeBuildNode@Gu@physx@@QEBAIXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::PxBounds3 const * __cdecl physx::Gu::AABBTreeBounds::getBounds(void)const " (__imp_?getBounds@AABBTreeBounds@Gu@physx@@QEBAPEBVPxBounds3@3@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: class physx::PxBounds3 const * __cdecl physx::Gu::AABBTreeBounds::getBounds(void)const " (?getBounds@AABBTreeBounds@Gu@physx@@QEBAPEBVPxBounds3@3@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::PxBounds3 * __cdecl physx::Gu::AABBTreeBounds::getBounds(void)" (__imp_?getBounds@AABBTreeBounds@Gu@physx@@QEAAPEAVPxBounds3@3@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: class physx::PxBounds3 * __cdecl physx::Gu::AABBTreeBounds::getBounds(void)" (?getBounds@AABBTreeBounds@Gu@physx@@QEAAPEAVPxBounds3@3@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::PxBounds3 const & __cdecl physx::Gu::AABBTreeBuildNode::getAABB(void)const " (__imp_?getAABB@AABBTreeBuildNode@Gu@physx@@QEBAAEBVPxBounds3@3@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: class physx::PxBounds3 const & __cdecl physx::Gu::AABBTreeBuildNode::getAABB(void)const " (?getAABB@AABBTreeBuildNode@Gu@physx@@QEBAAEBVPxBounds3@3@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: void __cdecl physx::Gu::AABBTreeBuildParams::`default constructor closure'(void)" (__imp_??_FAABBTreeBuildParams@Gu@physx@@QEAAXXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: void __cdecl physx::Gu::AABBTreeBuildParams::`default constructor closure'(void)" (??_FAABBTreeBuildParams@Gu@physx@@QEAAXXZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) const physx::PxFoundation::`vftable'" (__imp_??_7PxFoundation@physx@@6B@) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::PxFoundation & __cdecl physx::PxFoundation::operator=(class physx::PxFoundation const &)" (__imp_??4PxFoundation@physx@@QEAAAEAV01@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: class physx::PxFoundation & __cdecl physx::PxFoundation::operator=(class physx::PxFoundation const &)" (??4PxFoundation@physx@@QEAAAEAV01@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::Gu::NodeAllocator & __cdecl physx::Gu::NodeAllocator::operator=(class physx::Gu::NodeAllocator const &)" (__imp_??4NodeAllocator@Gu@physx@@QEAAAEAV012@AEBV012@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: class physx::Gu::NodeAllocator & __cdecl physx::Gu::NodeAllocator::operator=(class physx::Gu::NodeAllocator const &)" (??4NodeAllocator@Gu@physx@@QEAAAEAV012@AEBV012@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::Gu::AABBTreeBuildParams & __cdecl physx::Gu::AABBTreeBuildParams::operator=(class physx::Gu::AABBTreeBuildParams const &)" (__imp_??4AABBTreeBuildParams@Gu@physx@@QEAAAEAV012@AEBV012@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: class physx::Gu::AABBTreeBuildParams & __cdecl physx::Gu::AABBTreeBuildParams::operator=(class physx::Gu::AABBTreeBuildParams const &)" (??4AABBTreeBuildParams@Gu@physx@@QEAAAEAV012@AEBV012@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::Gu::AABBTreeBuildNode & __cdecl physx::Gu::AABBTreeBuildNode::operator=(class physx::Gu::AABBTreeBuildNode const &)" (__imp_??4AABBTreeBuildNode@Gu@physx@@QEAAAEAV012@AEBV012@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: class physx::Gu::AABBTreeBuildNode & __cdecl physx::Gu::AABBTreeBuildNode::operator=(class physx::Gu::AABBTreeBuildNode const &)" (??4AABBTreeBuildNode@Gu@physx@@QEAAAEAV012@AEBV012@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: class physx::Gu::AABBTreeBounds & __cdecl physx::Gu::AABBTreeBounds::operator=(class physx::Gu::AABBTreeBounds const &)" (__imp_??4AABBTreeBounds@Gu@physx@@QEAAAEAV012@AEBV012@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: class physx::Gu::AABBTreeBounds & __cdecl physx::Gu::AABBTreeBounds::operator=(class physx::Gu::AABBTreeBounds const &)" (??4AABBTreeBounds@Gu@physx@@QEAAAEAV012@AEBV012@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) protected: virtual __cdecl physx::PxFoundation::~PxFoundation(void)" (__imp_??1PxFoundation@physx@@MEAA@XZ) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "protected: virtual __cdecl physx::PxFoundation::~PxFoundation(void)" (??1PxFoundation@physx@@MEAA@XZ) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::Gu::AABBTreeBuildParams::~AABBTreeBuildParams(void)" (__imp_??1AABBTreeBuildParams@Gu@physx@@QEAA@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: __cdecl physx::Gu::AABBTreeBuildParams::~AABBTreeBuildParams(void)" (??1AABBTreeBuildParams@Gu@physx@@QEAA@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::Gu::AABBTreeBuildNode::~AABBTreeBuildNode(void)" (__imp_??1AABBTreeBuildNode@Gu@physx@@QEAA@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: __cdecl physx::Gu::AABBTreeBuildNode::~AABBTreeBuildNode(void)" (??1AABBTreeBuildNode@Gu@physx@@QEAA@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::Gu::AABBTreeBounds::~AABBTreeBounds(void)" (__imp_??1AABBTreeBounds@Gu@physx@@QEAA@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: __cdecl physx::Gu::AABBTreeBounds::~AABBTreeBounds(void)" (??1AABBTreeBounds@Gu@physx@@QEAA@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::PxFoundation::PxFoundation(void)" (__imp_??0PxFoundation@physx@@QEAA@XZ) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: __cdecl physx::PxFoundation::PxFoundation(void)" (??0PxFoundation@physx@@QEAA@XZ) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::PxFoundation::PxFoundation(class physx::PxFoundation const &)" (__imp_??0PxFoundation@physx@@QEAA@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: __cdecl physx::PxFoundation::PxFoundation(class physx::PxFoundation const &)" (??0PxFoundation@physx@@QEAA@AEBV01@@Z) already defined in PhysX_64.lib(PhysX_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::Gu::NodeAllocator::NodeAllocator(class physx::Gu::NodeAllocator const &)" (__imp_??0NodeAllocator@Gu@physx@@QEAA@AEBV012@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: __cdecl physx::Gu::NodeAllocator::NodeAllocator(class physx::Gu::NodeAllocator const &)" (??0NodeAllocator@Gu@physx@@QEAA@AEBV012@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::Gu::AABBTreeBuildParams::AABBTreeBuildParams(unsigned int,unsigned int,class physx::Gu::AABBTreeBounds const *,enum physx::Gu::BVHBuildStrategy)" (__imp_??0AABBTreeBuildParams@Gu@physx@@QEAA@IIPEBVAABBTreeBounds@12@W4BVHBuildStrategy@12@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: __cdecl physx::Gu::AABBTreeBuildParams::AABBTreeBuildParams(unsigned int,unsigned int,class physx::Gu::AABBTreeBounds const *,enum physx::Gu::BVHBuildStrategy)" (??0AABBTreeBuildParams@Gu@physx@@QEAA@IIPEBVAABBTreeBounds@12@W4BVHBuildStrategy@12@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::Gu::AABBTreeBuildNode::AABBTreeBuildNode(void)" (__imp_??0AABBTreeBuildNode@Gu@physx@@QEAA@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: __cdecl physx::Gu::AABBTreeBuildNode::AABBTreeBuildNode(void)" (??0AABBTreeBuildNode@Gu@physx@@QEAA@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::Gu::AABBTreeBuildNode::AABBTreeBuildNode(class physx::Gu::AABBTreeBuildNode const &)" (__imp_??0AABBTreeBuildNode@Gu@physx@@QEAA@AEBV012@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: __cdecl physx::Gu::AABBTreeBuildNode::AABBTreeBuildNode(class physx::Gu::AABBTreeBuildNode const &)" (??0AABBTreeBuildNode@Gu@physx@@QEAA@AEBV012@@Z) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "__declspec(dllimport) public: __cdecl physx::Gu::AABBTreeBounds::AABBTreeBounds(void)" (__imp_??0AABBTreeBounds@Gu@physx@@QEAA@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: "public: __cdecl physx::Gu::AABBTreeBounds::AABBTreeBounds(void)" (??0AABBTreeBounds@Gu@physx@@QEAA@XZ) already defined in PhysXCommon_64.lib(PhysXCommon_64.dll); second definition ignored
+PhysXCooking_64.lib(PhysXCooking_64.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in d3d11.lib(d3d11.dll); second definition ignored
+  Engine.vcxproj -> E:\SPECIALISERING\FriendshipEngine\bin\Debug\Engine_Debug.lib
+
+Project Performance Summary:
+    34010 ms  E:\SPECIALISERING\FriendshipEngine\source\engine\engine\Engine.vcxproj   1 calls
+              34010 ms  Build                                      1 calls
+
+Target Performance Summary:
+        0 ms  MakeDirsForResourceCompile                 1 calls
+        0 ms  _ALink                                     1 calls
+        0 ms  ComputeLegacyManifestEmbedding             1 calls
+        0 ms  BuildLinkTraverse                          1 calls
+        0 ms  BuildCompile                               1 calls
+        0 ms  _BuildCompileAction                        1 calls
+        0 ms  AfterBuildCompileEvent                     1 calls
+        0 ms  _Lib                                       1 calls
+        0 ms  AfterLib                                   1 calls
+        0 ms  PreLinkEvent                               1 calls
+        0 ms  DoLibOutputFilesMatch                      1 calls
+        0 ms  _Manifest                                  1 calls
+        0 ms  MakeDirsForLib                             1 calls
+        0 ms  ComputeRCGeneratedLibInputs                1 calls
+        0 ms  ComputeRCOutputs                           1 calls
+        0 ms  ComputeLibAdditionalOptions                1 calls
+        0 ms  BeforeLib                                  1 calls
+        0 ms  _ResourceCompile                           1 calls
+        0 ms  AfterResourceCompile                       1 calls
+        0 ms  BeforeResourceCompile                      1 calls
+        0 ms  _ClCompile                                 1 calls
+        0 ms  AfterClCompile                             1 calls
+        0 ms  VcpkgCheckManifestRoot                     1 calls
+        0 ms  ComputeLibInputsFromProject                1 calls
+        0 ms  RegisterOutput                             1 calls
+        0 ms  ResolvedXDCMake                            1 calls
+        0 ms  MakeDirsForXdcMake                         1 calls
+        0 ms  AfterBuild                                 1 calls
+        0 ms  BuildLink                                  1 calls
+        0 ms  _BuildLinkAction                           1 calls
+        0 ms  PostBuildEvent                             1 calls
+        0 ms  PrepareForRun                              1 calls
+        0 ms  CopyFilesToOutputDirectory                 1 calls
+        0 ms  _CheckForCompileOutputs                    1 calls
+        0 ms  _CopySourceItemsToOutputDirectory          1 calls
+        0 ms  _GetCopyToOutputDirectoryItemsFromThisProject   1 calls
+        0 ms  _GetCopyToOutputDirectoryItemsFromTransitiveProjectReferences   1 calls
+        0 ms  GetCopyToOutputDirectoryXamlAppDefs        1 calls
+        0 ms  _PopulateCommonStateForGetCopyToOutputDirectoryItems   1 calls
+        0 ms  _Deploy                                    1 calls
+        0 ms  _Appverifier                               1 calls
+        0 ms  CreateSatelliteAssemblies                  1 calls
+        0 ms  SatelliteDllsProjectOutputGroup            1 calls
+        0 ms  PrepareResourceNames                       1 calls
+        0 ms  CreateCustomManifestResourceNames          1 calls
+        0 ms  BuiltProjectOutputGroup                    1 calls
+        0 ms  _BscMake                                   1 calls
+        0 ms  MakeDirsForBscMake                         1 calls
+        0 ms  ComputeCLCompileGeneratedSbrFiles          1 calls
+        0 ms  _XdcMake                                   1 calls
+        0 ms  VcpkgTripletSelection                      1 calls
+        0 ms  MakeDirsForCl                              1 calls
+        0 ms  Build                                      1 calls
+        0 ms  CopyFileToFolders                          1 calls
+        0 ms  AssignProjectConfiguration                 1 calls
+        0 ms  SetBuildDefaultEnvironmentVariables        1 calls
+        0 ms  _SplitProjectReferencesByFileExistence     1 calls
+        0 ms  _AddOutputPathToGlobalPropertiesToRemove   1 calls
+        0 ms  ComputeCustomBuildOutput                   1 calls
+        0 ms  SelectCustomBuild                          1 calls
+        0 ms  _SelectedFiles                             1 calls
+        0 ms  PreBuildEvent                              1 calls
+        0 ms  IgnoreJavaScriptOutputAssembly             1 calls
+        0 ms  BeforeBuildGenerateSources                 1 calls
+        0 ms  BuildGenerateSourcesTraverse               1 calls
+        0 ms  PrepareProjectReferences                   1 calls
+        0 ms  ComputeStdModulesCompileInputs             1 calls
+        0 ms  ResolveReferences                          1 calls
+        0 ms  AfterResolveReferences                     1 calls
+        0 ms  ResolveAssemblyReferences                  1 calls
+        0 ms  ExpandSDKReferences                        1 calls
+        0 ms  ResolveSDKReferences                       1 calls
+        0 ms  AddExternalIncludDirectoriesToPaths        1 calls
+        0 ms  GetFrameworkPaths                          1 calls
+        0 ms  GetReferenceAssemblyPaths                  1 calls
+        0 ms  MakeDirsForMidl                            1 calls
+        0 ms  ComputeReferenceCLInput                    1 calls
+        0 ms  _CheckWindowsSDKInstalled                  1 calls
+        0 ms  GetReferencedVCProjectsInfo                1 calls
+        0 ms  FindReferenceAssembliesForReferences       1 calls
+        0 ms  SetCABuildNativeEnvironmentVariables       1 calls
+        0 ms  BeforeClCompile                            1 calls
+        0 ms  BuildCompileTraverse                       1 calls
+        0 ms  _Xsd                                       1 calls
+        0 ms  _PrepareForBuild                           1 calls
+        0 ms  _BuildGenerateSourcesAction                1 calls
+        0 ms  AfterBuildGenerateSourcesEvent             1 calls
+        0 ms  AfterBuildGenerateSources                  1 calls
+        0 ms  _Midl                                      1 calls
+        0 ms  AfterMidl                                  1 calls
+        0 ms  _PrepareForReferenceResolution             1 calls
+        0 ms  BeforeResolveReferences                    1 calls
+        0 ms  ComputeMIDLGeneratedCompileInputs          1 calls
+        0 ms  BuildGenerateSources                       1 calls
+        1 ms  _CheckForInvalidConfigurationAndPlatform   1 calls
+        1 ms  SetTelemetryEnvironmentVariables           1 calls
+        1 ms  _GenerateSatelliteAssemblyInputs           1 calls
+        1 ms  FxExport                                   1 calls
+        1 ms  IncrementalClean                           1 calls
+        1 ms  _GetProjectReferenceTargetFrameworkProperties   1 calls
+        1 ms  GetResolvedWinMD                           1 calls
+        1 ms  _CleanGetCurrentAndPriorFileWrites         1 calls
+        1 ms  ComputeCLCompileGeneratedXDCFiles          1 calls
+        1 ms  MakeDirsForFxc                             1 calls
+        1 ms  ComputeCLOutputs                           1 calls
+        1 ms  CustomBuild                                1 calls
+        1 ms  SplitResourcesByCulture                    1 calls
+        1 ms  ComputeCLGeneratedLibInputs                1 calls
+        1 ms  _CalculatePostXamarinTelemetry             1 calls
+        1 ms  ResolveProjectReferences                   1 calls
+        1 ms  SelectClCompile                            1 calls
+        1 ms  ComputeCLInputPDBName                      1 calls
+        2 ms  GetCopyToOutputDirectoryItems              1 calls
+        2 ms  AssignTargetPaths                          1 calls
+        2 ms  PrepareForBuild                            1 calls
+        3 ms  FinalizeBuildStatus                        1 calls
+        6 ms  ContentFilesProjectOutputGroup             1 calls
+        6 ms  InitializeBuildStatus                      1 calls
+        7 ms  FixupCLCompileOptions                      1 calls
+        7 ms  TlogCleanup                                1 calls
+       18 ms  CreateRecipeFile                           1 calls
+       51 ms  FxCompile                                  1 calls
+      479 ms  AppLocalFromInstalled                      1 calls
+     5594 ms  ClCompile                                  1 calls
+    27812 ms  Lib                                        1 calls
+
+Task Performance Summary:
+        0 ms  CallTarget                                 2 calls
+        0 ms  AssignProjectConfiguration                 1 calls
+        0 ms  MSBuild                                    1 calls
+        0 ms  SetRidAgnosticValueForProjects             1 calls
+        0 ms  MakeDir                                   10 calls
+        0 ms  CheckVCToolsetVersion                      1 calls
+        0 ms  VCMessage                                  1 calls
+        0 ms  ReadLinesFromFile                          3 calls
+        0 ms  AssignCulture                              1 calls
+        0 ms  ConvertToAbsolutePath                      1 calls
+        0 ms  FindUnderPath                              5 calls
+        0 ms  RemoveDuplicates                           2 calls
+        1 ms  SetEnv                                    11 calls
+        1 ms  GetOutOfDateItems                          3 calls
+        1 ms  Message                                   28 calls
+        2 ms  Delete                                     2 calls
+        2 ms  WriteLinesToFile                           1 calls
+        3 ms  AssignTargetPath                           8 calls
+        4 ms  Touch                                      2 calls
+        7 ms  CleanupStaleTlogItems                      1 calls
+       18 ms  GenerateDesktopDeployRecipe                1 calls
+       50 ms  FXC                                       25 calls
+      477 ms  Exec                                       2 calls
+     5590 ms  CL                                         2 calls
+    27810 ms  LIB                                        1 calls

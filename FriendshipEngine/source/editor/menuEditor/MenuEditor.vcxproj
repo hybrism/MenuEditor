@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{416EDCBC-2D26-1E0A-962D-F7658204B9FA}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>MenuEditor</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\..\..\bin\Debug\</OutDir>
+    <IntDir>..\..\..\intermediate\MenuEditor\Debug\</IntDir>
+    <TargetName>MenuEditor_Debug</TargetName>
+    <TargetExt>.exe</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\..\bin\Release\</OutDir>
+    <IntDir>..\..\..\intermediate\MenuEditor\Release\</IntDir>
+    <TargetName>MenuEditor_Release</TargetName>
+    <TargetExt>.exe</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\external;..\..\external\imgui;..\..\engine;..;..\..\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\..\..\dependencies\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PreprocessorDefinitions>_RELEASE;WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\external;..\..\external\imgui;..\..\engine;..;..\..\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>..\..\..\dependencies\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="MenuEditor.h" />
+    <ClInclude Include="MenuEditorLauncher.h" />
+    <ClInclude Include="UpdateContext.h" />
+    <ClInclude Include="gui\MenuHandler.h" />
+    <ClInclude Include="gui\components\Collider2DComponent.h" />
+    <ClInclude Include="gui\components\Component.h" />
+    <ClInclude Include="gui\components\SpriteComponent.h" />
+    <ClInclude Include="gui\components\TextComponent.h" />
+    <ClInclude Include="gui\menuEditorOld\MenuEditor.h" />
+    <ClInclude Include="gui\menuObject\MenuObject.h" />
+    <ClInclude Include="gui\menuObject\ObjectManager.h" />
+    <ClInclude Include="windows\AssetsWindow.h" />
+    <ClInclude Include="windows\ConsoleWindow.h" />
+    <ClInclude Include="windows\InspectorWindow.h" />
+    <ClInclude Include="windows\MenuObjectHierarchy.h" />
+    <ClInclude Include="windows\MenuViewWindow.h" />
+    <ClInclude Include="windows\Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MenuEditor.cpp" />
+    <ClCompile Include="MenuEditorLauncher.cpp" />
+    <ClCompile Include="gui\MenuHandler.cpp" />
+    <ClCompile Include="gui\components\Collider2DComponent.cpp" />
+    <ClCompile Include="gui\components\SpriteComponent.cpp" />
+    <ClCompile Include="gui\components\TextComponent.cpp" />
+    <ClCompile Include="gui\menuEditorOld\MenuEditor.cpp">
+      <ObjectFileName>$(IntDir)\MenuEditor1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="gui\menuObject\MenuObject.cpp" />
+    <ClCompile Include="gui\menuObject\ObjectManager.cpp" />
+    <ClCompile Include="windows\AssetsWindow.cpp" />
+    <ClCompile Include="windows\ConsoleWindow.cpp" />
+    <ClCompile Include="windows\InspectorWindow.cpp" />
+    <ClCompile Include="windows\MenuObjectHierarchy.cpp" />
+    <ClCompile Include="windows\MenuViewWindow.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\external\External.vcxproj">
+      <Project>{089DB854-F469-1360-1D83-010809AF48EE}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\engine\engine\Engine.vcxproj">
+      <Project>{DBC7D3B0-C769-FE86-B024-12DB9C6585D7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\engine\application\Application.vcxproj">
+      <Project>{D9DE78AF-4594-F1A4-CE88-EB7B3A3DE8A8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\engine\assets\Assets.vcxproj">
+      <Project>{3824E0A7-24C6-0A7E-0D81-1ED2F9C191CE}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\shared\Shared.vcxproj">
+      <Project>{7C480CD1-68EA-36A7-51A5-4AFB3DE6BDF7}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

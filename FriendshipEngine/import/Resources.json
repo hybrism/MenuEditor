@@ -1,0 +1,684 @@
+{
+    "meshes": [
+        {
+            "meshID": -1151437936,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingBlock_10x10x14.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1567330038,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingBlock_10x10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 445252023,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingBlock_10x2x14.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 2422055,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingBlock_10x2x7_sloped.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 445216414,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingBlock_10x5x14.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -2133591266,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingBlock_5x10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 169438439,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingBlock_5x2x14.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1151399233,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingBlock_5x2x7_sloped.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 103753974,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingBlock_5x5x14.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 2095842544,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingBlock_5x5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -886958050,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_10x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1633832364,
+            "assetPath": "Meshes/Buildings/PlasterWood Buildings/sm_buildingDetails_5x7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 2032625024,
+            "assetPath": "Meshes/sm_arrow.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1750605473,
+            "assetPath": "Meshes/sm_barrel.fbx",
+            "defaultTextureID": 0
+        },
+        {
+            "meshID": -2001646120,
+            "assetPath": "Meshes/sm_clocktower.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 655644762,
+            "assetPath": "Meshes/sm_crate.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1876450427,
+            "assetPath": "Meshes/sm_enemy.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1015365448,
+            "assetPath": "Meshes/sm_jumpableFence.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 2077708445,
+            "assetPath": "Meshes/sm_jumpableWall.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1590111780,
+            "assetPath": "Meshes/sm_openDoorframe.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1617316806,
+            "assetPath": "Meshes/sm_planks_2m.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1617322948,
+            "assetPath": "Meshes/sm_planks_4m.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -194568619,
+            "assetPath": "Meshes/sm_plankToBeCut.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 24600929,
+            "assetPath": "Meshes/sm_playerArms.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1685216329,
+            "assetPath": "Meshes/sm_scaffolding_2m.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 877355620,
+            "assetPath": "Meshes/sm_scaffolding_3m.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -153961089,
+            "assetPath": "Meshes/sm_scaffolding_4m.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1947515046,
+            "assetPath": "Meshes/sm_slidableFence.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 667418497,
+            "assetPath": "Meshes/sm_slidableWall.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 302349853,
+            "assetPath": "Meshes/sm_table.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1107556455,
+            "assetPath": "Meshes/sm_walkway.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1203454218,
+            "assetPath": "Meshes/sm_washLine.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1993816594,
+            "assetPath": "Meshes/VFX/sm_aoe1.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1993811347,
+            "assetPath": "Meshes/VFX/sm_aoe2.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1993818772,
+            "assetPath": "Meshes/VFX/sm_aoe3.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 661626491,
+            "assetPath": "Meshes/VFX/sm_beam.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -866980869,
+            "assetPath": "Meshes/VFX/sm_fogWall_1x1.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 103020310,
+            "assetPath": "Meshes/VFX/sm_fogWall_1x2.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1928636915,
+            "assetPath": "Meshes/VFX/sm_forceField.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 600898047,
+            "assetPath": "Meshes/VFX/sm_heavyAttack.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -837854704,
+            "assetPath": "Meshes/VFX/sm_LightAttack.fbx",
+            "defaultTextureID": -1
+        }
+    ],
+    "textures": [
+        {
+            "textureID": 0,
+            "albedoPath": "Textures/t_barrel_c.dds",
+            "fxPath": "Textures/t_barrel_fx.dds",
+            "normalPath": "Textures/t_barrel_m.dds",
+            "materialPath": "Textures/t_barrel_n.dds"
+        }
+    ],
+    "animations": []
+}

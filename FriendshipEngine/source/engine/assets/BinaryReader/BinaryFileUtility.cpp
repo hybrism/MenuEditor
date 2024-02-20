@@ -1,0 +1,66 @@
+#include "pch.h"
+#include "BinaryFileUtility.h"
+#include <filesystem>
+
+#include <engine/graphics/Vertex.h>
+#include <engine/graphics/animation/Skeleton.h>
+#include <engine/Paths.h>
+
+void BinaryFileUtility::ReadStringFromFile(std::ifstream& aFile, std::string& outString)
+{
+	size_t size = 0;
+	aFile.read(reinterpret_cast<char*>(&size), sizeof(size_t));
+
+	std::vector<char> buffer(size + 1);
+	aFile.read(reinterpret_cast<char*>(buffer.data()), size);
+	buffer[size] = '\0';
+
+	outString = std::string(buffer.data());
+}
+
+void BinaryFileUtility::WriteStringToFile(std::ofstream& aFile, const std::string& aString)
+{
+	size_t size = aString.size();
+	aFile.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
+	aFile.write(reinterpret_cast<const char*>(aString.c_str()), sizeof(char) * size);
+}
+
+void BinaryFileUtility::WriteBoneToFile(std::ofstream& aFile, Bone& aBone)
+{
+	WriteStringToFile(aFile, aBone.name);
+	WriteStringToFile(aFile, aBone.fullName);
+	aFile.write(reinterpret_cast<const char*>(&aBone.parentId), sizeof(int));
+	aFile.write(reinterpret_cast<const char*>(&aBone.inverseBindPose), sizeof(DirectX::XMMATRIX));
+
+	size_t size = aBone.childrenIds.size();
+	aFile.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
+	aFile.write(reinterpret_cast<const char*>(aBone.childrenIds.data()), sizeof(unsigned int) * size);
+}
+
+void BinaryFileUtility::ReadBoneFromFile(std::ifstream& file, Skeleton* aSkeleton, Bone& outBone)
+{
+	Bone& b = outBone;
+
+	ReadStringFromFile(file, b.name);
+	ReadStringFromFile(file, b.fullName);
+	int id = aSkeleton->boneNameToIndexMap.at(b.name);
+	b.id = id;
+	file.read(reinterpret_cast<char*>(&b.parentId), sizeof(int));
+	file.read(reinterpret_cast<char*>(&b.inverseBindPose), sizeof(DirectX::XMMATRIX));
+
+	size_t size = 0;
+	file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
+
+	b.childrenIds.resize(size);
+	file.read(reinterpret_cast<char*>(b.childrenIds.data()), sizeof(unsigned int) * size);
+}
+
+std::string BinaryFileUtility::GetModelFilePathFromName(const std::string& aName)
+{
+	return RELATIVE_CUSTOM_MESH_DATA_PATH + aName + ".bestie";
+}
+
+std::string BinaryFileUtility::GetAnimationFilePathFromName(const std::string& aName)
+{
+	return RELATIVE_CUSTOM_ANIMATION_DATA_PATH + aName + ".bff";
+}

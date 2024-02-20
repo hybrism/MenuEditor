@@ -1,0 +1,45 @@
+#pragma once
+
+
+#include "../../../engine/math/Vector3.h"
+#include "../../../engine/math/Vector4.h"
+#include "../../../engine/math/VectorFwd.h"
+
+class DepthBuffer;
+class Camera;
+
+
+struct PointLight
+{
+	PointLight(Vector3f aPosition, Vector3f aColor, float aRange, float aIntensity)
+	{
+		myPos = aPosition;
+		myRange = aRange;
+		myColor = aColor;
+		myIntensity = aIntensity;
+	};
+
+	Vector3f myPos;
+	float myRange;
+	Vector3f myColor;
+	float myIntensity;
+};
+
+struct DirectionalLight
+{
+	DirectionalLight(Vector3f aDirection, Vector3f aColor, float aIntensity)
+	{
+		myColor = aColor;
+		myDirection = aDirection;
+		myIntensity = aIntensity;
+
+		myDirectionalLightCamera = nullptr;
+	}	
+
+	Vector3f myColor;
+	Vector3f myDirection;
+	float myIntensity;
+
+	DepthBuffer* myShadowMapDepthBuffer;
+	Camera* myDirectionalLightCamera = nullptr;
+};

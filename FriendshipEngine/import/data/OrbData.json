@@ -1,0 +1,16 @@
+{
+  "OrbSettings": [
+
+    {
+      "OrbSpeedSetting": {
+        "ChasingSpeed": 200,
+        "CatchingSpeed": 11,
+        "RegainSpeed": 12
+      }
+
+    }
+
+  ]
+
+
+}

@@ -1,0 +1,850 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{089DB854-F469-1360-1D83-010809AF48EE}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>External</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\..\bin\Debug\</OutDir>
+    <IntDir>..\..\intermediate\External\Debug\</IntDir>
+    <TargetName>External_Debug</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\..\bin\Release\</OutDir>
+    <IntDir>..\..\intermediate\External\Release\</IntDir>
+    <TargetName>External_Release</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;source;imgui;fbxsdk;PhysX;directxtk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SDLCheck>true</SDLCheck>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;source;imgui;fbxsdk;PhysX;directxtk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SDLCheck>true</SDLCheck>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="PhysX\PxActor.h" />
+    <ClInclude Include="PhysX\PxActorData.h" />
+    <ClInclude Include="PhysX\PxAggregate.h" />
+    <ClInclude Include="PhysX\PxAnisotropy.h" />
+    <ClInclude Include="PhysX\PxArrayConverter.h" />
+    <ClInclude Include="PhysX\PxArticulationFlag.h" />
+    <ClInclude Include="PhysX\PxArticulationJointReducedCoordinate.h" />
+    <ClInclude Include="PhysX\PxArticulationLink.h" />
+    <ClInclude Include="PhysX\PxArticulationReducedCoordinate.h" />
+    <ClInclude Include="PhysX\PxArticulationTendon.h" />
+    <ClInclude Include="PhysX\PxArticulationTendonData.h" />
+    <ClInclude Include="PhysX\PxAttachment.h" />
+    <ClInclude Include="PhysX\PxBaseMaterial.h" />
+    <ClInclude Include="PhysX\PxBroadPhase.h" />
+    <ClInclude Include="PhysX\PxClient.h" />
+    <ClInclude Include="PhysX\PxConeLimitedConstraint.h" />
+    <ClInclude Include="PhysX\PxConfig.h" />
+    <ClInclude Include="PhysX\PxConstraint.h" />
+    <ClInclude Include="PhysX\PxConstraintDesc.h" />
+    <ClInclude Include="PhysX\PxContact.h" />
+    <ClInclude Include="PhysX\PxContactModifyCallback.h" />
+    <ClInclude Include="PhysX\PxDeletionListener.h" />
+    <ClInclude Include="PhysX\PxFEMClothFlags.h" />
+    <ClInclude Include="PhysX\PxFEMClothMaterial.h" />
+    <ClInclude Include="PhysX\PxFEMMaterial.h" />
+    <ClInclude Include="PhysX\PxFEMParameter.h" />
+    <ClInclude Include="PhysX\PxFEMSoftBodyMaterial.h" />
+    <ClInclude Include="PhysX\PxFLIPMaterial.h" />
+    <ClInclude Include="PhysX\PxFiltering.h" />
+    <ClInclude Include="PhysX\PxForceMode.h" />
+    <ClInclude Include="PhysX\PxHairSystemFlag.h" />
+    <ClInclude Include="PhysX\PxImmediateMode.h" />
+    <ClInclude Include="PhysX\PxIsosurfaceExtraction.h" />
+    <ClInclude Include="PhysX\PxLineStripSkinning.h" />
+    <ClInclude Include="PhysX\PxLockedData.h" />
+    <ClInclude Include="PhysX\PxMPMMaterial.h" />
+    <ClInclude Include="PhysX\PxMaterial.h" />
+    <ClInclude Include="PhysX\PxNodeIndex.h" />
+    <ClInclude Include="PhysX\PxPBDMaterial.h" />
+    <ClInclude Include="PhysX\PxPBDParticleSystem.h" />
+    <ClInclude Include="PhysX\PxParticleBuffer.h" />
+    <ClInclude Include="PhysX\PxParticleGpu.h" />
+    <ClInclude Include="PhysX\PxParticleMaterial.h" />
+    <ClInclude Include="PhysX\PxParticleNeighborhoodProvider.h" />
+    <ClInclude Include="PhysX\PxParticleSolverType.h" />
+    <ClInclude Include="PhysX\PxParticleSystem.h" />
+    <ClInclude Include="PhysX\PxParticleSystemFlag.h" />
+    <ClInclude Include="PhysX\PxPhysXConfig.h" />
+    <ClInclude Include="PhysX\PxPhysics.h" />
+    <ClInclude Include="PhysX\PxPhysicsAPI.h" />
+    <ClInclude Include="PhysX\PxPhysicsSerialization.h" />
+    <ClInclude Include="PhysX\PxPruningStructure.h" />
+    <ClInclude Include="PhysX\PxQueryFiltering.h" />
+    <ClInclude Include="PhysX\PxQueryReport.h" />
+    <ClInclude Include="PhysX\PxRigidActor.h" />
+    <ClInclude Include="PhysX\PxRigidBody.h" />
+    <ClInclude Include="PhysX\PxRigidDynamic.h" />
+    <ClInclude Include="PhysX\PxRigidStatic.h" />
+    <ClInclude Include="PhysX\PxSDFBuilder.h" />
+    <ClInclude Include="PhysX\PxScene.h" />
+    <ClInclude Include="PhysX\PxSceneDesc.h" />
+    <ClInclude Include="PhysX\PxSceneLock.h" />
+    <ClInclude Include="PhysX\PxSceneQueryDesc.h" />
+    <ClInclude Include="PhysX\PxSceneQuerySystem.h" />
+    <ClInclude Include="PhysX\PxShape.h" />
+    <ClInclude Include="PhysX\PxSimulationEventCallback.h" />
+    <ClInclude Include="PhysX\PxSimulationStatistics.h" />
+    <ClInclude Include="PhysX\PxSmoothing.h" />
+    <ClInclude Include="PhysX\PxSoftBody.h" />
+    <ClInclude Include="PhysX\PxSoftBodyFlag.h" />
+    <ClInclude Include="PhysX\PxSparseGridParams.h" />
+    <ClInclude Include="PhysX\PxVisualizationParameter.h" />
+    <ClInclude Include="PhysX\characterkinematic\PxBoxController.h" />
+    <ClInclude Include="PhysX\characterkinematic\PxCapsuleController.h" />
+    <ClInclude Include="PhysX\characterkinematic\PxController.h" />
+    <ClInclude Include="PhysX\characterkinematic\PxControllerBehavior.h" />
+    <ClInclude Include="PhysX\characterkinematic\PxControllerManager.h" />
+    <ClInclude Include="PhysX\characterkinematic\PxControllerObstacles.h" />
+    <ClInclude Include="PhysX\characterkinematic\PxExtended.h" />
+    <ClInclude Include="PhysX\collision\PxCollisionDefs.h" />
+    <ClInclude Include="PhysX\common\PxBase.h" />
+    <ClInclude Include="PhysX\common\PxCollection.h" />
+    <ClInclude Include="PhysX\common\PxCoreUtilityTypes.h" />
+    <ClInclude Include="PhysX\common\PxInsertionCallback.h" />
+    <ClInclude Include="PhysX\common\PxMetaData.h" />
+    <ClInclude Include="PhysX\common\PxMetaDataFlags.h" />
+    <ClInclude Include="PhysX\common\PxPhysXCommonConfig.h" />
+    <ClInclude Include="PhysX\common\PxProfileZone.h" />
+    <ClInclude Include="PhysX\common\PxRenderBuffer.h" />
+    <ClInclude Include="PhysX\common\PxRenderOutput.h" />
+    <ClInclude Include="PhysX\common\PxSerialFramework.h" />
+    <ClInclude Include="PhysX\common\PxSerializer.h" />
+    <ClInclude Include="PhysX\common\PxStringTable.h" />
+    <ClInclude Include="PhysX\common\PxTolerancesScale.h" />
+    <ClInclude Include="PhysX\common\PxTypeInfo.h" />
+    <ClInclude Include="PhysX\common\windows\PxWindowsDelayLoadHook.h" />
+    <ClInclude Include="PhysX\cooking\PxBVH33MidphaseDesc.h" />
+    <ClInclude Include="PhysX\cooking\PxBVH34MidphaseDesc.h" />
+    <ClInclude Include="PhysX\cooking\PxBVHDesc.h" />
+    <ClInclude Include="PhysX\cooking\PxConvexMeshDesc.h" />
+    <ClInclude Include="PhysX\cooking\PxCooking.h" />
+    <ClInclude Include="PhysX\cooking\PxCookingInternal.h" />
+    <ClInclude Include="PhysX\cooking\PxMidphaseDesc.h" />
+    <ClInclude Include="PhysX\cooking\PxSDFDesc.h" />
+    <ClInclude Include="PhysX\cooking\PxTetrahedronMeshDesc.h" />
+    <ClInclude Include="PhysX\cooking\PxTriangleMeshDesc.h" />
+    <ClInclude Include="PhysX\cooking\Pxc.h" />
+    <ClInclude Include="PhysX\cudamanager\PxCudaContext.h" />
+    <ClInclude Include="PhysX\cudamanager\PxCudaContextManager.h" />
+    <ClInclude Include="PhysX\cudamanager\PxCudaTypes.h" />
+    <ClInclude Include="PhysX\extensions\PxBinaryConverter.h" />
+    <ClInclude Include="PhysX\extensions\PxBroadPhaseExt.h" />
+    <ClInclude Include="PhysX\extensions\PxCollectionExt.h" />
+    <ClInclude Include="PhysX\extensions\PxConstraintExt.h" />
+    <ClInclude Include="PhysX\extensions\PxContactJoint.h" />
+    <ClInclude Include="PhysX\extensions\PxConvexMeshExt.h" />
+    <ClInclude Include="PhysX\extensions\PxCustomGeometryExt.h" />
+    <ClInclude Include="PhysX\extensions\PxCustomSceneQuerySystem.h" />
+    <ClInclude Include="PhysX\extensions\PxD6Joint.h" />
+    <ClInclude Include="PhysX\extensions\PxD6JointCreate.h" />
+    <ClInclude Include="PhysX\extensions\PxDefaultAllocator.h" />
+    <ClInclude Include="PhysX\extensions\PxDefaultCpuDispatcher.h" />
+    <ClInclude Include="PhysX\extensions\PxDefaultErrorCallback.h" />
+    <ClInclude Include="PhysX\extensions\PxDefaultSimulationFilterShader.h" />
+    <ClInclude Include="PhysX\extensions\PxDefaultStreams.h" />
+    <ClInclude Include="PhysX\extensions\PxDistanceJoint.h" />
+    <ClInclude Include="PhysX\extensions\PxExtensionsAPI.h" />
+    <ClInclude Include="PhysX\extensions\PxFixedJoint.h" />
+    <ClInclude Include="PhysX\extensions\PxGearJoint.h" />
+    <ClInclude Include="PhysX\extensions\PxGjkQueryExt.h" />
+    <ClInclude Include="PhysX\extensions\PxJoint.h" />
+    <ClInclude Include="PhysX\extensions\PxJointLimit.h" />
+    <ClInclude Include="PhysX\extensions\PxMassProperties.h" />
+    <ClInclude Include="PhysX\extensions\PxParticleClothCooker.h" />
+    <ClInclude Include="PhysX\extensions\PxParticleExt.h" />
+    <ClInclude Include="PhysX\extensions\PxPrismaticJoint.h" />
+    <ClInclude Include="PhysX\extensions\PxRackAndPinionJoint.h" />
+    <ClInclude Include="PhysX\extensions\PxRaycastCCD.h" />
+    <ClInclude Include="PhysX\extensions\PxRemeshingExt.h" />
+    <ClInclude Include="PhysX\extensions\PxRepXSerializer.h" />
+    <ClInclude Include="PhysX\extensions\PxRepXSimpleType.h" />
+    <ClInclude Include="PhysX\extensions\PxRevoluteJoint.h" />
+    <ClInclude Include="PhysX\extensions\PxRigidActorExt.h" />
+    <ClInclude Include="PhysX\extensions\PxRigidBodyExt.h" />
+    <ClInclude Include="PhysX\extensions\PxSamplingExt.h" />
+    <ClInclude Include="PhysX\extensions\PxSceneQueryExt.h" />
+    <ClInclude Include="PhysX\extensions\PxSceneQuerySystemExt.h" />
+    <ClInclude Include="PhysX\extensions\PxSerialization.h" />
+    <ClInclude Include="PhysX\extensions\PxShapeExt.h" />
+    <ClInclude Include="PhysX\extensions\PxSimpleFactory.h" />
+    <ClInclude Include="PhysX\extensions\PxSmoothNormals.h" />
+    <ClInclude Include="PhysX\extensions\PxSoftBodyExt.h" />
+    <ClInclude Include="PhysX\extensions\PxSphericalJoint.h" />
+    <ClInclude Include="PhysX\extensions\PxStringTableExt.h" />
+    <ClInclude Include="PhysX\extensions\PxTetMakerExt.h" />
+    <ClInclude Include="PhysX\extensions\PxTetrahedronMeshAnalysisResult.h" />
+    <ClInclude Include="PhysX\extensions\PxTetrahedronMeshExt.h" />
+    <ClInclude Include="PhysX\extensions\PxTriangleMeshAnalysisResult.h" />
+    <ClInclude Include="PhysX\extensions\PxTriangleMeshExt.h" />
+    <ClInclude Include="PhysX\filebuf\PxFileBuf.h" />
+    <ClInclude Include="PhysX\foundation\Px.h" />
+    <ClInclude Include="PhysX\foundation\PxAlignedMalloc.h" />
+    <ClInclude Include="PhysX\foundation\PxAlloca.h" />
+    <ClInclude Include="PhysX\foundation\PxAllocator.h" />
+    <ClInclude Include="PhysX\foundation\PxAllocatorCallback.h" />
+    <ClInclude Include="PhysX\foundation\PxAoS.h" />
+    <ClInclude Include="PhysX\foundation\PxArray.h" />
+    <ClInclude Include="PhysX\foundation\PxAssert.h" />
+    <ClInclude Include="PhysX\foundation\PxAtomic.h" />
+    <ClInclude Include="PhysX\foundation\PxBasicTemplates.h" />
+    <ClInclude Include="PhysX\foundation\PxBitAndData.h" />
+    <ClInclude Include="PhysX\foundation\PxBitMap.h" />
+    <ClInclude Include="PhysX\foundation\PxBitUtils.h" />
+    <ClInclude Include="PhysX\foundation\PxBounds3.h" />
+    <ClInclude Include="PhysX\foundation\PxBroadcast.h" />
+    <ClInclude Include="PhysX\foundation\PxErrorCallback.h" />
+    <ClInclude Include="PhysX\foundation\PxErrors.h" />
+    <ClInclude Include="PhysX\foundation\PxFPU.h" />
+    <ClInclude Include="PhysX\foundation\PxFlags.h" />
+    <ClInclude Include="PhysX\foundation\PxFoundation.h" />
+    <ClInclude Include="PhysX\foundation\PxFoundationConfig.h" />
+    <ClInclude Include="PhysX\foundation\PxHash.h" />
+    <ClInclude Include="PhysX\foundation\PxHashInternals.h" />
+    <ClInclude Include="PhysX\foundation\PxHashMap.h" />
+    <ClInclude Include="PhysX\foundation\PxHashSet.h" />
+    <ClInclude Include="PhysX\foundation\PxIO.h" />
+    <ClInclude Include="PhysX\foundation\PxInlineAllocator.h" />
+    <ClInclude Include="PhysX\foundation\PxInlineAoS.h" />
+    <ClInclude Include="PhysX\foundation\PxInlineArray.h" />
+    <ClInclude Include="PhysX\foundation\PxIntrinsics.h" />
+    <ClInclude Include="PhysX\foundation\PxMat33.h" />
+    <ClInclude Include="PhysX\foundation\PxMat34.h" />
+    <ClInclude Include="PhysX\foundation\PxMat44.h" />
+    <ClInclude Include="PhysX\foundation\PxMath.h" />
+    <ClInclude Include="PhysX\foundation\PxMathIntrinsics.h" />
+    <ClInclude Include="PhysX\foundation\PxMathUtils.h" />
+    <ClInclude Include="PhysX\foundation\PxMemory.h" />
+    <ClInclude Include="PhysX\foundation\PxMutex.h" />
+    <ClInclude Include="PhysX\foundation\PxPhysicsVersion.h" />
+    <ClInclude Include="PhysX\foundation\PxPinnedArray.h" />
+    <ClInclude Include="PhysX\foundation\PxPlane.h" />
+    <ClInclude Include="PhysX\foundation\PxPool.h" />
+    <ClInclude Include="PhysX\foundation\PxPreprocessor.h" />
+    <ClInclude Include="PhysX\foundation\PxProfiler.h" />
+    <ClInclude Include="PhysX\foundation\PxQuat.h" />
+    <ClInclude Include="PhysX\foundation\PxSIMDHelpers.h" />
+    <ClInclude Include="PhysX\foundation\PxSList.h" />
+    <ClInclude Include="PhysX\foundation\PxSimpleTypes.h" />
+    <ClInclude Include="PhysX\foundation\PxSocket.h" />
+    <ClInclude Include="PhysX\foundation\PxSort.h" />
+    <ClInclude Include="PhysX\foundation\PxSortInternals.h" />
+    <ClInclude Include="PhysX\foundation\PxStrideIterator.h" />
+    <ClInclude Include="PhysX\foundation\PxString.h" />
+    <ClInclude Include="PhysX\foundation\PxSync.h" />
+    <ClInclude Include="PhysX\foundation\PxTempAllocator.h" />
+    <ClInclude Include="PhysX\foundation\PxThread.h" />
+    <ClInclude Include="PhysX\foundation\PxTime.h" />
+    <ClInclude Include="PhysX\foundation\PxTransform.h" />
+    <ClInclude Include="PhysX\foundation\PxUnionCast.h" />
+    <ClInclude Include="PhysX\foundation\PxUserAllocated.h" />
+    <ClInclude Include="PhysX\foundation\PxUtilities.h" />
+    <ClInclude Include="PhysX\foundation\PxVec2.h" />
+    <ClInclude Include="PhysX\foundation\PxVec3.h" />
+    <ClInclude Include="PhysX\foundation\PxVec4.h" />
+    <ClInclude Include="PhysX\foundation\PxVecMath.h" />
+    <ClInclude Include="PhysX\foundation\PxVecMathAoSScalar.h" />
+    <ClInclude Include="PhysX\foundation\PxVecMathAoSScalarInline.h" />
+    <ClInclude Include="PhysX\foundation\PxVecMathSSE.h" />
+    <ClInclude Include="PhysX\foundation\PxVecQuat.h" />
+    <ClInclude Include="PhysX\foundation\PxVecTransform.h" />
+    <ClInclude Include="PhysX\foundation\unix\PxUnixAoS.h" />
+    <ClInclude Include="PhysX\foundation\unix\PxUnixFPU.h" />
+    <ClInclude Include="PhysX\foundation\unix\PxUnixInlineAoS.h" />
+    <ClInclude Include="PhysX\foundation\unix\PxUnixIntrinsics.h" />
+    <ClInclude Include="PhysX\foundation\unix\PxUnixMathIntrinsics.h" />
+    <ClInclude Include="PhysX\foundation\unix\PxUnixTrigConstants.h" />
+    <ClInclude Include="PhysX\foundation\unix\neon\PxUnixNeonAoS.h" />
+    <ClInclude Include="PhysX\foundation\unix\neon\PxUnixNeonInlineAoS.h" />
+    <ClInclude Include="PhysX\foundation\unix\sse2\PxUnixSse2AoS.h" />
+    <ClInclude Include="PhysX\foundation\unix\sse2\PxUnixSse2InlineAoS.h" />
+    <ClInclude Include="PhysX\foundation\windows\PxWindowsAoS.h" />
+    <ClInclude Include="PhysX\foundation\windows\PxWindowsFPU.h" />
+    <ClInclude Include="PhysX\foundation\windows\PxWindowsInclude.h" />
+    <ClInclude Include="PhysX\foundation\windows\PxWindowsInlineAoS.h" />
+    <ClInclude Include="PhysX\foundation\windows\PxWindowsIntrinsics.h" />
+    <ClInclude Include="PhysX\foundation\windows\PxWindowsMathIntrinsics.h" />
+    <ClInclude Include="PhysX\foundation\windows\PxWindowsTrigConstants.h" />
+    <ClInclude Include="PhysX\geometry\PxBVH.h" />
+    <ClInclude Include="PhysX\geometry\PxBVHBuildStrategy.h" />
+    <ClInclude Include="PhysX\geometry\PxBoxGeometry.h" />
+    <ClInclude Include="PhysX\geometry\PxCapsuleGeometry.h" />
+    <ClInclude Include="PhysX\geometry\PxConvexMesh.h" />
+    <ClInclude Include="PhysX\geometry\PxConvexMeshGeometry.h" />
+    <ClInclude Include="PhysX\geometry\PxCustomGeometry.h" />
+    <ClInclude Include="PhysX\geometry\PxGeometry.h" />
+    <ClInclude Include="PhysX\geometry\PxGeometryHelpers.h" />
+    <ClInclude Include="PhysX\geometry\PxGeometryHit.h" />
+    <ClInclude Include="PhysX\geometry\PxGeometryInternal.h" />
+    <ClInclude Include="PhysX\geometry\PxGeometryQuery.h" />
+    <ClInclude Include="PhysX\geometry\PxGeometryQueryContext.h" />
+    <ClInclude Include="PhysX\geometry\PxGeometryQueryFlags.h" />
+    <ClInclude Include="PhysX\geometry\PxGjkQuery.h" />
+    <ClInclude Include="PhysX\geometry\PxHairSystemDesc.h" />
+    <ClInclude Include="PhysX\geometry\PxHairSystemGeometry.h" />
+    <ClInclude Include="PhysX\geometry\PxHeightField.h" />
+    <ClInclude Include="PhysX\geometry\PxHeightFieldDesc.h" />
+    <ClInclude Include="PhysX\geometry\PxHeightFieldFlag.h" />
+    <ClInclude Include="PhysX\geometry\PxHeightFieldGeometry.h" />
+    <ClInclude Include="PhysX\geometry\PxHeightFieldSample.h" />
+    <ClInclude Include="PhysX\geometry\PxMeshQuery.h" />
+    <ClInclude Include="PhysX\geometry\PxMeshScale.h" />
+    <ClInclude Include="PhysX\geometry\PxParticleSystemGeometry.h" />
+    <ClInclude Include="PhysX\geometry\PxPlaneGeometry.h" />
+    <ClInclude Include="PhysX\geometry\PxReportCallback.h" />
+    <ClInclude Include="PhysX\geometry\PxSimpleTriangleMesh.h" />
+    <ClInclude Include="PhysX\geometry\PxSphereGeometry.h" />
+    <ClInclude Include="PhysX\geometry\PxTetrahedron.h" />
+    <ClInclude Include="PhysX\geometry\PxTetrahedronMesh.h" />
+    <ClInclude Include="PhysX\geometry\PxTetrahedronMeshGeometry.h" />
+    <ClInclude Include="PhysX\geometry\PxTriangle.h" />
+    <ClInclude Include="PhysX\geometry\PxTriangleMesh.h" />
+    <ClInclude Include="PhysX\geometry\PxTriangleMeshGeometry.h" />
+    <ClInclude Include="PhysX\geomutils\PxContactBuffer.h" />
+    <ClInclude Include="PhysX\geomutils\PxContactPoint.h" />
+    <ClInclude Include="PhysX\gpu\PxGpu.h" />
+    <ClInclude Include="PhysX\gpu\PxPhysicsGpu.h" />
+    <ClInclude Include="PhysX\omnipvd\PxOmniPvd.h" />
+    <ClInclude Include="PhysX\pvd\PxPvd.h" />
+    <ClInclude Include="PhysX\pvd\PxPvdSceneClient.h" />
+    <ClInclude Include="PhysX\pvd\PxPvdTransport.h" />
+    <ClInclude Include="PhysX\solver\PxSolverDefs.h" />
+    <ClInclude Include="PhysX\task\PxCpuDispatcher.h" />
+    <ClInclude Include="PhysX\task\PxTask.h" />
+    <ClInclude Include="PhysX\task\PxTaskManager.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleComponents.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleDrive.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleDrive4W.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleDriveNW.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleDriveTank.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleNoDrive.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleSDK.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleShaders.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleTireFriction.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleUpdate.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleUtil.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleUtilControl.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleUtilSetup.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleUtilTelemetry.h" />
+    <ClInclude Include="PhysX\vehicle\PxVehicleWheels.h" />
+    <ClInclude Include="PhysX\vehicle2\PxVehicleAPI.h" />
+    <ClInclude Include="PhysX\vehicle2\PxVehicleComponent.h" />
+    <ClInclude Include="PhysX\vehicle2\PxVehicleComponentSequence.h" />
+    <ClInclude Include="PhysX\vehicle2\PxVehicleFunctions.h" />
+    <ClInclude Include="PhysX\vehicle2\PxVehicleLimits.h" />
+    <ClInclude Include="PhysX\vehicle2\PxVehicleMaths.h" />
+    <ClInclude Include="PhysX\vehicle2\PxVehicleParams.h" />
+    <ClInclude Include="PhysX\vehicle2\braking\PxVehicleBrakingFunctions.h" />
+    <ClInclude Include="PhysX\vehicle2\braking\PxVehicleBrakingParams.h" />
+    <ClInclude Include="PhysX\vehicle2\commands\PxVehicleCommandHelpers.h" />
+    <ClInclude Include="PhysX\vehicle2\commands\PxVehicleCommandParams.h" />
+    <ClInclude Include="PhysX\vehicle2\commands\PxVehicleCommandStates.h" />
+    <ClInclude Include="PhysX\vehicle2\drivetrain\PxVehicleDrivetrainComponents.h" />
+    <ClInclude Include="PhysX\vehicle2\drivetrain\PxVehicleDrivetrainFunctions.h" />
+    <ClInclude Include="PhysX\vehicle2\drivetrain\PxVehicleDrivetrainHelpers.h" />
+    <ClInclude Include="PhysX\vehicle2\drivetrain\PxVehicleDrivetrainParams.h" />
+    <ClInclude Include="PhysX\vehicle2\drivetrain\PxVehicleDrivetrainStates.h" />
+    <ClInclude Include="PhysX\vehicle2\physxActor\PxVehiclePhysXActorComponents.h" />
+    <ClInclude Include="PhysX\vehicle2\physxActor\PxVehiclePhysXActorFunctions.h" />
+    <ClInclude Include="PhysX\vehicle2\physxActor\PxVehiclePhysXActorHelpers.h" />
+    <ClInclude Include="PhysX\vehicle2\physxActor\PxVehiclePhysXActorStates.h" />
+    <ClInclude Include="PhysX\vehicle2\physxConstraints\PxVehiclePhysXConstraintComponents.h" />
+    <ClInclude Include="PhysX\vehicle2\physxConstraints\PxVehiclePhysXConstraintFunctions.h" />
+    <ClInclude Include="PhysX\vehicle2\physxConstraints\PxVehiclePhysXConstraintHelpers.h" />
+    <ClInclude Include="PhysX\vehicle2\physxConstraints\PxVehiclePhysXConstraintParams.h" />
+    <ClInclude Include="PhysX\vehicle2\physxConstraints\PxVehiclePhysXConstraintStates.h" />
+    <ClInclude Include="PhysX\vehicle2\physxRoadGeometry\PxVehiclePhysXRoadGeometryComponents.h" />
+    <ClInclude Include="PhysX\vehicle2\physxRoadGeometry\PxVehiclePhysXRoadGeometryFunctions.h" />
+    <ClInclude Include="PhysX\vehicle2\physxRoadGeometry\PxVehiclePhysXRoadGeometryHelpers.h" />
+    <ClInclude Include="PhysX\vehicle2\physxRoadGeometry\PxVehiclePhysXRoadGeometryParams.h" />
+    <ClInclude Include="PhysX\vehicle2\physxRoadGeometry\PxVehiclePhysXRoadGeometryState.h" />
+    <ClInclude Include="PhysX\vehicle2\pvd\PxVehiclePvdComponents.h" />
+    <ClInclude Include="PhysX\vehicle2\pvd\PxVehiclePvdFunctions.h" />
+    <ClInclude Include="PhysX\vehicle2\pvd\PxVehiclePvdHelpers.h" />
+    <ClInclude Include="PhysX\vehicle2\rigidBody\PxVehicleRigidBodyComponents.h" />
+    <ClInclude Include="PhysX\vehicle2\rigidBody\PxVehicleRigidBodyFunctions.h" />
+    <ClInclude Include="PhysX\vehicle2\rigidBody\PxVehicleRigidBodyParams.h" />
+    <ClInclude Include="PhysX\vehicle2\rigidBody\PxVehicleRigidBodyStates.h" />
+    <ClInclude Include="PhysX\vehicle2\roadGeometry\PxVehicleRoadGeometryState.h" />
+    <ClInclude Include="PhysX\vehicle2\steering\PxVehicleSteeringFunctions.h" />
+    <ClInclude Include="PhysX\vehicle2\steering\PxVehicleSteeringParams.h" />
+    <ClInclude Include="PhysX\vehicle2\suspension\PxVehicleSuspensionComponents.h" />
+    <ClInclude Include="PhysX\vehicle2\suspension\PxVehicleSuspensionFunctions.h" />
+    <ClInclude Include="PhysX\vehicle2\suspension\PxVehicleSuspensionHelpers.h" />
+    <ClInclude Include="PhysX\vehicle2\suspension\PxVehicleSuspensionParams.h" />
+    <ClInclude Include="PhysX\vehicle2\suspension\PxVehicleSuspensionStates.h" />
+    <ClInclude Include="PhysX\vehicle2\tire\PxVehicleTireComponents.h" />
+    <ClInclude Include="PhysX\vehicle2\tire\PxVehicleTireFunctions.h" />
+    <ClInclude Include="PhysX\vehicle2\tire\PxVehicleTireHelpers.h" />
+    <ClInclude Include="PhysX\vehicle2\tire\PxVehicleTireParams.h" />
+    <ClInclude Include="PhysX\vehicle2\tire\PxVehicleTireStates.h" />
+    <ClInclude Include="PhysX\vehicle2\wheel\PxVehicleWheelComponents.h" />
+    <ClInclude Include="PhysX\vehicle2\wheel\PxVehicleWheelFunctions.h" />
+    <ClInclude Include="PhysX\vehicle2\wheel\PxVehicleWheelHelpers.h" />
+    <ClInclude Include="PhysX\vehicle2\wheel\PxVehicleWheelParams.h" />
+    <ClInclude Include="PhysX\vehicle2\wheel\PxVehicleWheelStates.h" />
+    <ClInclude Include="directxtk\Audio.h" />
+    <ClInclude Include="directxtk\BufferHelpers.h" />
+    <ClInclude Include="directxtk\CommonStates.h" />
+    <ClInclude Include="directxtk\DDSTextureLoader.h" />
+    <ClInclude Include="directxtk\DirectXHelpers.h" />
+    <ClInclude Include="directxtk\Effects.h" />
+    <ClInclude Include="directxtk\GamePad.h" />
+    <ClInclude Include="directxtk\GeometricPrimitive.h" />
+    <ClInclude Include="directxtk\GraphicsMemory.h" />
+    <ClInclude Include="directxtk\Keyboard.h" />
+    <ClInclude Include="directxtk\Model.h" />
+    <ClInclude Include="directxtk\Mouse.h" />
+    <ClInclude Include="directxtk\PostProcess.h" />
+    <ClInclude Include="directxtk\PrimitiveBatch.h" />
+    <ClInclude Include="directxtk\ScreenGrab.h" />
+    <ClInclude Include="directxtk\SimpleMath.h" />
+    <ClInclude Include="directxtk\SimpleMath.inl" />
+    <ClInclude Include="directxtk\SpriteBatch.h" />
+    <ClInclude Include="directxtk\SpriteFont.h" />
+    <ClInclude Include="directxtk\VertexTypes.h" />
+    <ClInclude Include="directxtk\WICTextureLoader.h" />
+    <ClInclude Include="fbxsdk.h" />
+    <ClInclude Include="fbxsdk\core\arch\fbxalloc.h" />
+    <ClInclude Include="fbxsdk\core\arch\fbxarch.h" />
+    <ClInclude Include="fbxsdk\core\arch\fbxdebug.h" />
+    <ClInclude Include="fbxsdk\core\arch\fbxnew.h" />
+    <ClInclude Include="fbxsdk\core\arch\fbxstdcompliant.h" />
+    <ClInclude Include="fbxsdk\core\arch\fbxtypes.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxarray.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxbitset.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxcharptrset.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxcontainerallocators.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxdynamicarray.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxfile.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxfolder.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxhashmap.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxintrusivelist.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxmap.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxmemorypool.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxmultimap.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxpair.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxredblacktree.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxset.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxstatus.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxstring.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxstringlist.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxtime.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxtimecode.h" />
+    <ClInclude Include="fbxsdk\core\base\fbxutils.h" />
+    <ClInclude Include="fbxsdk\core\fbxclassid.h" />
+    <ClInclude Include="fbxsdk\core\fbxconnectionpoint.h" />
+    <ClInclude Include="fbxsdk\core\fbxdatatypes.h" />
+    <ClInclude Include="fbxsdk\core\fbxemitter.h" />
+    <ClInclude Include="fbxsdk\core\fbxevent.h" />
+    <ClInclude Include="fbxsdk\core\fbxeventhandler.h" />
+    <ClInclude Include="fbxsdk\core\fbxlistener.h" />
+    <ClInclude Include="fbxsdk\core\fbxloadingstrategy.h" />
+    <ClInclude Include="fbxsdk\core\fbxmanager.h" />
+    <ClInclude Include="fbxsdk\core\fbxmodule.h" />
+    <ClInclude Include="fbxsdk\core\fbxobject.h" />
+    <ClInclude Include="fbxsdk\core\fbxperipheral.h" />
+    <ClInclude Include="fbxsdk\core\fbxplugin.h" />
+    <ClInclude Include="fbxsdk\core\fbxplugincontainer.h" />
+    <ClInclude Include="fbxsdk\core\fbxproperty.h" />
+    <ClInclude Include="fbxsdk\core\fbxpropertydef.h" />
+    <ClInclude Include="fbxsdk\core\fbxpropertyhandle.h" />
+    <ClInclude Include="fbxsdk\core\fbxpropertypage.h" />
+    <ClInclude Include="fbxsdk\core\fbxpropertytypes.h" />
+    <ClInclude Include="fbxsdk\core\fbxquery.h" />
+    <ClInclude Include="fbxsdk\core\fbxqueryevent.h" />
+    <ClInclude Include="fbxsdk\core\fbxscopedloadingdirectory.h" />
+    <ClInclude Include="fbxsdk\core\fbxscopedloadingfilename.h" />
+    <ClInclude Include="fbxsdk\core\fbxstream.h" />
+    <ClInclude Include="fbxsdk\core\fbxsymbol.h" />
+    <ClInclude Include="fbxsdk\core\fbxsystemunit.h" />
+    <ClInclude Include="fbxsdk\core\fbxxref.h" />
+    <ClInclude Include="fbxsdk\core\math\fbxaffinematrix.h" />
+    <ClInclude Include="fbxsdk\core\math\fbxdualquaternion.h" />
+    <ClInclude Include="fbxsdk\core\math\fbxmath.h" />
+    <ClInclude Include="fbxsdk\core\math\fbxmatrix.h" />
+    <ClInclude Include="fbxsdk\core\math\fbxquaternion.h" />
+    <ClInclude Include="fbxsdk\core\math\fbxtransforms.h" />
+    <ClInclude Include="fbxsdk\core\math\fbxvector2.h" />
+    <ClInclude Include="fbxsdk\core\math\fbxvector4.h" />
+    <ClInclude Include="fbxsdk\core\sync\fbxatomic.h" />
+    <ClInclude Include="fbxsdk\core\sync\fbxclock.h" />
+    <ClInclude Include="fbxsdk\core\sync\fbxsync.h" />
+    <ClInclude Include="fbxsdk\core\sync\fbxthread.h" />
+    <ClInclude Include="fbxsdk\fbxsdk_def.h" />
+    <ClInclude Include="fbxsdk\fbxsdk_nsbegin.h" />
+    <ClInclude Include="fbxsdk\fbxsdk_nsend.h" />
+    <ClInclude Include="fbxsdk\fbxsdk_version.h" />
+    <ClInclude Include="fbxsdk\fileio\collada\fbxcolladaanimationelement.h" />
+    <ClInclude Include="fbxsdk\fileio\collada\fbxcolladaelement.h" />
+    <ClInclude Include="fbxsdk\fileio\collada\fbxcolladaiostream.h" />
+    <ClInclude Include="fbxsdk\fileio\collada\fbxcolladanamespace.h" />
+    <ClInclude Include="fbxsdk\fileio\collada\fbxcolladatokens.h" />
+    <ClInclude Include="fbxsdk\fileio\collada\fbxcolladautils.h" />
+    <ClInclude Include="fbxsdk\fileio\collada\fbxreadercollada14.h" />
+    <ClInclude Include="fbxsdk\fileio\collada\fbxwritercollada14.h" />
+    <ClInclude Include="fbxsdk\fileio\fbx\fbxio.h" />
+    <ClInclude Include="fbxsdk\fileio\fbx\fbxreaderfbx5.h" />
+    <ClInclude Include="fbxsdk\fileio\fbx\fbxreaderfbx6.h" />
+    <ClInclude Include="fbxsdk\fileio\fbx\fbxreaderfbx7.h" />
+    <ClInclude Include="fbxsdk\fileio\fbx\fbxwriterfbx5.h" />
+    <ClInclude Include="fbxsdk\fileio\fbx\fbxwriterfbx6.h" />
+    <ClInclude Include="fbxsdk\fileio\fbx\fbxwriterfbx7.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxbase64coder.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxcallbacks.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxexporter.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxexternaldocreflistener.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxfiletokens.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxglobalcamerasettings.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxgloballightsettings.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxglobalsettings.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxgobo.h" />
+    <ClInclude Include="fbxsdk\fileio\fbximporter.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxiobase.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxiopluginregistry.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxiosettings.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxiosettingspath.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxprogress.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxreader.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxstatistics.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxstatisticsfbx.h" />
+    <ClInclude Include="fbxsdk\fileio\fbxwriter.h" />
+    <ClInclude Include="fbxsdk\scene\animation\fbxanimcurve.h" />
+    <ClInclude Include="fbxsdk\scene\animation\fbxanimcurvebase.h" />
+    <ClInclude Include="fbxsdk\scene\animation\fbxanimcurvefilters.h" />
+    <ClInclude Include="fbxsdk\scene\animation\fbxanimcurvenode.h" />
+    <ClInclude Include="fbxsdk\scene\animation\fbxanimevalclassic.h" />
+    <ClInclude Include="fbxsdk\scene\animation\fbxanimevalstate.h" />
+    <ClInclude Include="fbxsdk\scene\animation\fbxanimevaluator.h" />
+    <ClInclude Include="fbxsdk\scene\animation\fbxanimlayer.h" />
+    <ClInclude Include="fbxsdk\scene\animation\fbxanimstack.h" />
+    <ClInclude Include="fbxsdk\scene\animation\fbxanimutilities.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxcharacter.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxcharacternodename.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxcharacterpose.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxconstraint.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxconstraintaim.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxconstraintcustom.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxconstraintparent.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxconstraintposition.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxconstraintrotation.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxconstraintscale.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxconstraintsinglechainik.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxconstraintutils.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxcontrolset.h" />
+    <ClInclude Include="fbxsdk\scene\constraint\fbxhik2fbxcharacter.h" />
+    <ClInclude Include="fbxsdk\scene\fbxaudio.h" />
+    <ClInclude Include="fbxsdk\scene\fbxaudiolayer.h" />
+    <ClInclude Include="fbxsdk\scene\fbxaxissystem.h" />
+    <ClInclude Include="fbxsdk\scene\fbxcollection.h" />
+    <ClInclude Include="fbxsdk\scene\fbxcollectionexclusive.h" />
+    <ClInclude Include="fbxsdk\scene\fbxcontainer.h" />
+    <ClInclude Include="fbxsdk\scene\fbxcontainertemplate.h" />
+    <ClInclude Include="fbxsdk\scene\fbxdisplaylayer.h" />
+    <ClInclude Include="fbxsdk\scene\fbxdocument.h" />
+    <ClInclude Include="fbxsdk\scene\fbxdocumentinfo.h" />
+    <ClInclude Include="fbxsdk\scene\fbxenvironment.h" />
+    <ClInclude Include="fbxsdk\scene\fbxgroupname.h" />
+    <ClInclude Include="fbxsdk\scene\fbxlibrary.h" />
+    <ClInclude Include="fbxsdk\scene\fbxmediaclip.h" />
+    <ClInclude Include="fbxsdk\scene\fbxobjectfilter.h" />
+    <ClInclude Include="fbxsdk\scene\fbxobjectmetadata.h" />
+    <ClInclude Include="fbxsdk\scene\fbxobjectscontainer.h" />
+    <ClInclude Include="fbxsdk\scene\fbxpose.h" />
+    <ClInclude Include="fbxsdk\scene\fbxreference.h" />
+    <ClInclude Include="fbxsdk\scene\fbxscene.h" />
+    <ClInclude Include="fbxsdk\scene\fbxselectionnode.h" />
+    <ClInclude Include="fbxsdk\scene\fbxselectionset.h" />
+    <ClInclude Include="fbxsdk\scene\fbxtakeinfo.h" />
+    <ClInclude Include="fbxsdk\scene\fbxthumbnail.h" />
+    <ClInclude Include="fbxsdk\scene\fbxvideo.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxblendshape.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxblendshapechannel.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxcache.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxcachedeffect.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxcamera.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxcamerastereo.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxcameraswitcher.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxcluster.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxdeformer.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxgenericnode.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxgeometry.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxgeometrybase.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxgeometryweightedmap.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxlayer.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxlayercontainer.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxlight.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxlimitsutilities.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxline.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxlodgroup.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxmarker.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxmesh.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxnode.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxnodeattribute.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxnull.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxnurbs.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxnurbscurve.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxnurbssurface.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxopticalreference.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxpatch.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxproceduralgeometry.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxshape.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxskeleton.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxskin.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxsubdeformer.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxsubdiv.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxtrimnurbssurface.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxvertexcachedeformer.h" />
+    <ClInclude Include="fbxsdk\scene\geometry\fbxweightedmapping.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxbindingoperator.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxbindingsentryview.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxbindingtable.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxbindingtablebase.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxbindingtableentry.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxconstantentryview.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxentryview.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxfiletexture.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbximplementation.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbximplementationfilter.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbximplementationutils.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxlayeredtexture.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxlayerentryview.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxoperatorentryview.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxproceduraltexture.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxpropertyentryview.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxsemanticentryview.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxshadingconventions.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxsurfacelambert.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxsurfacematerial.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxsurfacematerialutils.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxsurfacephong.h" />
+    <ClInclude Include="fbxsdk\scene\shading\fbxtexture.h" />
+    <ClInclude Include="fbxsdk\utils\fbxclonemanager.h" />
+    <ClInclude Include="fbxsdk\utils\fbxdeformationsevaluator.h" />
+    <ClInclude Include="fbxsdk\utils\fbxembeddedfilesaccumulator.h" />
+    <ClInclude Include="fbxsdk\utils\fbxgeometryconverter.h" />
+    <ClInclude Include="fbxsdk\utils\fbxmanipulators.h" />
+    <ClInclude Include="fbxsdk\utils\fbxmaterialconverter.h" />
+    <ClInclude Include="fbxsdk\utils\fbxnamehandler.h" />
+    <ClInclude Include="fbxsdk\utils\fbxprocessor.h" />
+    <ClInclude Include="fbxsdk\utils\fbxprocessorshaderdependency.h" />
+    <ClInclude Include="fbxsdk\utils\fbxprocessorxref.h" />
+    <ClInclude Include="fbxsdk\utils\fbxprocessorxrefuserlib.h" />
+    <ClInclude Include="fbxsdk\utils\fbxrenamingstrategy.h" />
+    <ClInclude Include="fbxsdk\utils\fbxrenamingstrategybase.h" />
+    <ClInclude Include="fbxsdk\utils\fbxrenamingstrategyfbx5.h" />
+    <ClInclude Include="fbxsdk\utils\fbxrenamingstrategyfbx6.h" />
+    <ClInclude Include="fbxsdk\utils\fbxrenamingstrategyfbx7.h" />
+    <ClInclude Include="fbxsdk\utils\fbxrenamingstrategyutilities.h" />
+    <ClInclude Include="fbxsdk\utils\fbxrootnodeutility.h" />
+    <ClInclude Include="fbxsdk\utils\fbxscenecheckutility.h" />
+    <ClInclude Include="fbxsdk\utils\fbxusernotification.h" />
+    <ClInclude Include="fmod\fmod.h" />
+    <ClInclude Include="fmod\fmod.hpp" />
+    <ClInclude Include="fmod\fmod_codec.h" />
+    <ClInclude Include="fmod\fmod_common.h" />
+    <ClInclude Include="fmod\fmod_dsp.h" />
+    <ClInclude Include="fmod\fmod_dsp_effects.h" />
+    <ClInclude Include="fmod\fmod_errors.h" />
+    <ClInclude Include="fmod\fmod_output.h" />
+    <ClInclude Include="fmod\fmod_studio.h" />
+    <ClInclude Include="fmod\fmod_studio.hpp" />
+    <ClInclude Include="fmod\fmod_studio_common.h" />
+    <ClInclude Include="fmod\fmod_studio_guids.hpp" />
+    <ClInclude Include="freetype\config\ftconfig.h" />
+    <ClInclude Include="freetype\config\ftheader.h" />
+    <ClInclude Include="freetype\config\ftmodule.h" />
+    <ClInclude Include="freetype\config\ftoption.h" />
+    <ClInclude Include="freetype\config\ftstdlib.h" />
+    <ClInclude Include="freetype\freetype.h" />
+    <ClInclude Include="freetype\ftadvanc.h" />
+    <ClInclude Include="freetype\ftautoh.h" />
+    <ClInclude Include="freetype\ftbbox.h" />
+    <ClInclude Include="freetype\ftbdf.h" />
+    <ClInclude Include="freetype\ftbitmap.h" />
+    <ClInclude Include="freetype\ftbzip2.h" />
+    <ClInclude Include="freetype\ftcache.h" />
+    <ClInclude Include="freetype\ftcffdrv.h" />
+    <ClInclude Include="freetype\ftchapters.h" />
+    <ClInclude Include="freetype\ftcid.h" />
+    <ClInclude Include="freetype\fterrdef.h" />
+    <ClInclude Include="freetype\fterrors.h" />
+    <ClInclude Include="freetype\ftfntfmt.h" />
+    <ClInclude Include="freetype\ftgasp.h" />
+    <ClInclude Include="freetype\ftglyph.h" />
+    <ClInclude Include="freetype\ftgxval.h" />
+    <ClInclude Include="freetype\ftgzip.h" />
+    <ClInclude Include="freetype\ftimage.h" />
+    <ClInclude Include="freetype\ftincrem.h" />
+    <ClInclude Include="freetype\ftlcdfil.h" />
+    <ClInclude Include="freetype\ftlist.h" />
+    <ClInclude Include="freetype\ftlzw.h" />
+    <ClInclude Include="freetype\ftmac.h" />
+    <ClInclude Include="freetype\ftmm.h" />
+    <ClInclude Include="freetype\ftmodapi.h" />
+    <ClInclude Include="freetype\ftmoderr.h" />
+    <ClInclude Include="freetype\ftotval.h" />
+    <ClInclude Include="freetype\ftoutln.h" />
+    <ClInclude Include="freetype\ftpfr.h" />
+    <ClInclude Include="freetype\ftrender.h" />
+    <ClInclude Include="freetype\ftsizes.h" />
+    <ClInclude Include="freetype\ftsnames.h" />
+    <ClInclude Include="freetype\ftstroke.h" />
+    <ClInclude Include="freetype\ftsynth.h" />
+    <ClInclude Include="freetype\ftsystem.h" />
+    <ClInclude Include="freetype\fttrigon.h" />
+    <ClInclude Include="freetype\ftttdrv.h" />
+    <ClInclude Include="freetype\fttypes.h" />
+    <ClInclude Include="freetype\ftwinfnt.h" />
+    <ClInclude Include="freetype\internal\autohint.h" />
+    <ClInclude Include="freetype\internal\ftcalc.h" />
+    <ClInclude Include="freetype\internal\ftdebug.h" />
+    <ClInclude Include="freetype\internal\ftdriver.h" />
+    <ClInclude Include="freetype\internal\ftgloadr.h" />
+    <ClInclude Include="freetype\internal\fthash.h" />
+    <ClInclude Include="freetype\internal\ftmemory.h" />
+    <ClInclude Include="freetype\internal\ftobjs.h" />
+    <ClInclude Include="freetype\internal\ftpic.h" />
+    <ClInclude Include="freetype\internal\ftrfork.h" />
+    <ClInclude Include="freetype\internal\ftserv.h" />
+    <ClInclude Include="freetype\internal\ftstream.h" />
+    <ClInclude Include="freetype\internal\fttrace.h" />
+    <ClInclude Include="freetype\internal\ftvalid.h" />
+    <ClInclude Include="freetype\internal\internal.h" />
+    <ClInclude Include="freetype\internal\psaux.h" />
+    <ClInclude Include="freetype\internal\pshints.h" />
+    <ClInclude Include="freetype\internal\services\svbdf.h" />
+    <ClInclude Include="freetype\internal\services\svcid.h" />
+    <ClInclude Include="freetype\internal\services\svfntfmt.h" />
+    <ClInclude Include="freetype\internal\services\svgldict.h" />
+    <ClInclude Include="freetype\internal\services\svgxval.h" />
+    <ClInclude Include="freetype\internal\services\svkern.h" />
+    <ClInclude Include="freetype\internal\services\svmm.h" />
+    <ClInclude Include="freetype\internal\services\svotval.h" />
+    <ClInclude Include="freetype\internal\services\svpfr.h" />
+    <ClInclude Include="freetype\internal\services\svpostnm.h" />
+    <ClInclude Include="freetype\internal\services\svprop.h" />
+    <ClInclude Include="freetype\internal\services\svpscmap.h" />
+    <ClInclude Include="freetype\internal\services\svpsinfo.h" />
+    <ClInclude Include="freetype\internal\services\svsfnt.h" />
+    <ClInclude Include="freetype\internal\services\svttcmap.h" />
+    <ClInclude Include="freetype\internal\services\svtteng.h" />
+    <ClInclude Include="freetype\internal\services\svttglyf.h" />
+    <ClInclude Include="freetype\internal\services\svwinfnt.h" />
+    <ClInclude Include="freetype\internal\sfnt.h" />
+    <ClInclude Include="freetype\internal\t1types.h" />
+    <ClInclude Include="freetype\internal\tttypes.h" />
+    <ClInclude Include="freetype\t1tables.h" />
+    <ClInclude Include="freetype\ttnameid.h" />
+    <ClInclude Include="freetype\tttables.h" />
+    <ClInclude Include="freetype\tttags.h" />
+    <ClInclude Include="freetype\ttunpat.h" />
+    <ClInclude Include="ft2build.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="imgui\imgui_impl_win32.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="imgui\misc\cpp\imgui_stdlib.h" />
+    <ClInclude Include="imgui\misc\freetype\imgui_freetype.h" />
+    <ClInclude Include="imgui\misc\single_file\imgui_single_file.h" />
+    <ClInclude Include="imnodes\imnodes.h" />
+    <ClInclude Include="imnodes\imnodes_internal.h" />
+    <ClInclude Include="nlohmann\json.hpp" />
+    <ClInclude Include="nlohmann\json_fwd.hpp" />
+    <ClInclude Include="stb\stb_image.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="imgui\imgui_tables.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="imgui\misc\cpp\imgui_stdlib.cpp" />
+    <ClCompile Include="imgui\misc\fonts\binary_to_compressed_c.cpp" />
+    <ClCompile Include="imgui\misc\freetype\imgui_freetype.cpp" />
+    <ClCompile Include="imnodes\imnodes.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
