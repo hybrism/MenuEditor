@@ -1,29 +1,25 @@
 #pragma once
-#include <vector>
+#include <array>
 #include "MenuObject.h"
 
-namespace ME
+class ObjectManager
 {
-	class ObjectManager
-	{
-		friend class MenuObjectHierarchy;
-		friend class InspectorWindow;
-	
-	public:
-		ObjectManager();
+	friend class MenuHandler;
 
-		void Update();
-		void Render();
+public:
+	ObjectManager();
 
-		MenuObject& CreateNew();
+	void Update();
+	void Render();
 
+	MenuObject& CreateNew();
+	void ClearAll();
 
-	private:
-		//TODO: Göra till en Array? Indexet är ID:t
-		std::vector<MenuObject> myObjects;
+	//TODO: Not make it public (?)
+	std::vector<MenuObject> myObjects;
 
-		unsigned int myIdCounter;
-		size_t myLastObjectIndex;
+private:
+	unsigned int myIdCounter;
+	size_t myLastObjectIndex;
 
-	};
-}
+};

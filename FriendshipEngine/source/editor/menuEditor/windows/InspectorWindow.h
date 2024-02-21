@@ -2,9 +2,10 @@
 #include "Window.h"
 #include <shared/postMaster/Observer.h>
 
+class MenuObject;
+
 namespace ME
 {
-	class MenuObject;
 	class InspectorWindow : public ME::WindowBase, public FE::Observer
 	{
 	public:

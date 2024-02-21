@@ -1,13 +1,13 @@
 #include "ObjectManager.h"
 #include "MenuObject.h"
 
-ME::ObjectManager::ObjectManager()
+ObjectManager::ObjectManager()
 {
     myIdCounter = 0;
     myLastObjectIndex = 0;
 }
 
-void ME::ObjectManager::Update()
+void ObjectManager::Update()
 {
     for (size_t i = 0; i < myObjects.size(); i++)
     {
@@ -15,7 +15,7 @@ void ME::ObjectManager::Update()
     }
 }
 
-void ME::ObjectManager::Render()
+void ObjectManager::Render()
 {
     for (size_t i = 0; i < myObjects.size(); i++)
     {
@@ -23,7 +23,7 @@ void ME::ObjectManager::Render()
     }
 }
 
-ME::MenuObject& ME::ObjectManager::CreateNew()
+MenuObject& ObjectManager::CreateNew()
 {
     myObjects.push_back(MenuObject(myIdCounter));
     
@@ -31,4 +31,11 @@ ME::MenuObject& ME::ObjectManager::CreateNew()
     myLastObjectIndex = myObjects.size() - 1;
 
     return myObjects[myLastObjectIndex];
+}
+
+void ObjectManager::ClearAll()
+{
+    myObjects.clear();
+    myIdCounter = 0;
+    myLastObjectIndex = 0;
 }

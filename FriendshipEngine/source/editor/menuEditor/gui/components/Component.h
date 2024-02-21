@@ -1,22 +1,19 @@
 #pragma once
 
-namespace ME
+class MenuObject;
+class Component
 {
-	class MenuObject;
-	class Component
-	{
-	public:
-		virtual void Init() {};
-		virtual void Update() {};
-		virtual void Render() {};
+public:
+	virtual void Init() {};
+	virtual void Update() {};
+	virtual void Render() {};
 
-		MenuObject& GetParent() const { return myParent; }
+	MenuObject& GetParent() const { return myParent; }
 
-	protected:
-		Component(MenuObject& aParent) :
-			myParent(aParent) {}
-		virtual ~Component() {}
+protected:
+	Component(MenuObject& aParent) :
+		myParent(aParent) {}
+	virtual ~Component() {}
 
-		MenuObject& myParent;
-	};
-}
+	MenuObject& myParent;
+};

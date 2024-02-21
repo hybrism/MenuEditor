@@ -28,6 +28,7 @@
 
 # Executables
 *.exe
+!FriendshipEngine/premake/premake5.exe
 *.out
 *.app
 
@@ -36,3 +37,4 @@
 /FriendshipEngine/bin/*
 /FriendshipEngine/dependencies/*
 /FriendshipEngine/intermediate/*
+

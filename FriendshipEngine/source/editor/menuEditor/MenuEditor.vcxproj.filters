@@ -18,6 +18,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MenuCommon.h" />
     <ClInclude Include="MenuEditor.h" />
     <ClInclude Include="MenuEditorLauncher.h" />
     <ClInclude Include="UpdateContext.h" />

@@ -1,14 +1,14 @@
 #include "TextComponent.h"
 #include <engine/utility/Error.h>
 
-void ME::TextComponent::Init()
+void TextComponent::Init()
 {
 }
 
-void ME::TextComponent::Update()
+void TextComponent::Update()
 {
 }
 
-void ME::TextComponent::Render()
+void TextComponent::Render()
 {
 }

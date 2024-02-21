@@ -1,11 +1,11 @@
 #include "MenuObject.h"
 
-ME::MenuObject::MenuObject(const unsigned int aID) 
+MenuObject::MenuObject(const unsigned int aID) 
 	: myID(aID)
 	, myName("untitled")
 {}
 
-void ME::MenuObject::Init()
+void MenuObject::Init()
 {
 	for (size_t i = 0; i < myComponents.size(); i++)
 	{
@@ -13,7 +13,7 @@ void ME::MenuObject::Init()
 	}
 }
 
-void ME::MenuObject::Update()
+void MenuObject::Update()
 {
 	for (size_t i = 0; i < myComponents.size(); i++)
 	{
@@ -21,7 +21,7 @@ void ME::MenuObject::Update()
 	}
 }
 
-void ME::MenuObject::Render()
+void MenuObject::Render()
 {
 	for (size_t i = 0; i < myComponents.size(); i++)
 	{

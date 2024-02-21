@@ -14,23 +14,26 @@ struct MenuState
 	std::vector<unsigned int> objects;
 };
 
+class TextureFactory;
 class MenuHandler
 {
 public:
 	MenuHandler();
 	~MenuHandler();
 
-	void Init(const std::string& aMenuFile);
+	void Init(const std::string& aMenuFile, TextureFactory* aTextureFactory);
 	void Update();
 	void Render();
 
-	ME::ObjectManager myObjectManager;
+	ObjectManager myObjectManager;
+	void LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory);
+	void SaveToJson();
 
 private:
 	std::string myName;
+	std::string myFileName;
+
 	std::stack<MenuState*> myStateStack;
 	std::array<MenuState, MAX_STATES> myStates;
 
-	void LoadFromJson(const std::string& aMenuFile);
-	void SaveToJson();
 };

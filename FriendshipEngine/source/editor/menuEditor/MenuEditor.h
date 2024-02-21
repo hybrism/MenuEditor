@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <map>
 #include <engine/math/Vector.h>
 #include <shared/postMaster/Observer.h>
 #include <assets/TextureFactory.h>
@@ -19,16 +20,12 @@ namespace ME
 		Count
 	};
 
-	const std::string RELATIVE_MENUEDITOR_ASSETS = "../../content/menuEditor/";
-	const std::string SPRITES = "sprites/";
-	const std::string MENU_PATH = "menus/";
-	const std::string FONT_PATH = "fonts/";
-
 	class MenuEditor : public FE::Observer
 	{
 		struct Assets
 		{
 			std::vector<Texture*> textures;
+			std::vector<std::string> textureIDtoPath;
 			std::vector<std::string> fontFiles;
 			std::vector<std::string> saveFiles;
 		} myAssets;
@@ -50,7 +47,6 @@ namespace ME
 		void Dockspace();
 		void MenuBar();
 		void Popups();
-		void SaveFile();
 
 	private:
 		ObjectManager myObjectManager;

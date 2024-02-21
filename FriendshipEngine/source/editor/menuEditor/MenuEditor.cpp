@@ -2,6 +2,7 @@
 #include <string>
 #include <d3d11.h>
 #include <filesystem>
+#include <fstream>
 
 //ImGui
 #include <imgui/imgui.h>
@@ -20,6 +21,7 @@
 #include <shared/postMaster/PostMaster.h>
 
 #include "UpdateContext.h"
+#include "MenuCommon.h"
 
 #include "windows/AssetsWindow.h"
 #include "windows/ConsoleWindow.h"
@@ -67,6 +69,7 @@ void ME::MenuEditor::Init()
 		if (ext == ".dds")
 		{
 			myAssets.textures.push_back(myTextureFactory.CreateTexture(spriteAssetPath + entry.path().filename().string(), false));
+			myAssets.textureIDtoPath.push_back(entry.path().filename().string());
 		}
 	}
 
@@ -94,7 +97,7 @@ void ME::MenuEditor::Init()
 		}
 	}
 
-	myMenuHandler.Init("testMenu");
+	myMenuHandler.Init("testMenu.json", &myTextureFactory);
 }
 
 void ME::MenuEditor::Update(float)
@@ -104,6 +107,7 @@ void ME::MenuEditor::Update(float)
 
 	UpdateContext updateContext;
 	updateContext.textures = myAssets.textures;
+	updateContext.textureIDtoPath = myAssets.textureIDtoPath;
 	updateContext.menuHandler = &myMenuHandler;
 
 	for (size_t i = 0; i < (int)ME::ID::Count; i++)
@@ -207,19 +211,30 @@ void ME::MenuEditor::MenuBar()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("Create New..."))
+
+			if (ImGui::BeginMenu("Open"))
 			{
-				myPopups[(int)ePopup::CreateNew] = true;
+				for (size_t i = 0; i < myAssets.saveFiles.size(); i++)
+				{
+					if (ImGui::MenuItem(myAssets.saveFiles[i].c_str()))
+						myMenuHandler.LoadFromJson(myAssets.saveFiles[i], &myTextureFactory);
+				}
+				ImGui::EndMenu();
 			}
 
-			if (ImGui::MenuItem("Save..."))
+			if (ImGui::MenuItem("Save"))
 			{
-				
+				myMenuHandler.SaveToJson();
 			}
 
 			if (ImGui::MenuItem("Save As..."))
 			{
 				myPopups[(int)ePopup::SaveFileAs] = true;
+			}
+
+			if (ImGui::MenuItem("Create New..."))
+			{
+				myPopups[(int)ePopup::CreateNew] = true;
 			}
 
 			ImGui::Separator();
@@ -261,13 +276,25 @@ void ME::MenuEditor::Popups()
 	{
 		ImGui::Text("Enter Menu name: ");
 		ImGui::InputText("##", &newMenuName, ImGuiInputTextFlags_AutoSelectAll);
-	
+
 		if (ImGui::Button("Create", ImVec2(120, 0)))
 		{
 			ImGui::CloseCurrentPopup();
 			myPopups[(int)ePopup::CreateNew] = false;
 
 			//TODO: Add functionality to create new JSON
+			size_t n = newMenuName.find(".json");
+			if (n == std::string::npos)
+				newMenuName += ".json";
+
+			std::string path = ME::RELATIVE_MENUEDITOR_ASSETS + ME::MENU_PATH + newMenuName;
+			nlohmann::json menu;
+			std::ofstream dataFile(path);
+			dataFile << menu;
+			dataFile.close();
+
+			myMenuHandler.Init(newMenuName, &myTextureFactory);
+
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Cancel", ImVec2(120, 0)))
@@ -278,23 +305,6 @@ void ME::MenuEditor::Popups()
 
 		ImGui::EndPopup();
 	}
-}
-
-void ME::MenuEditor::SaveFile()
-{
-	std::string basePath = RELATIVE_MENUEDITOR_ASSETS + MENU_PATH;
-	basePath;
-
-	//std::filesystem::path menuPath = std::filesystem::path(basePath) / std::filesystem::path(myActiveMenu).replace_extension(".json");
-
-	//nlohmann::json menuData;
-
-	//script.WriteToJson(menuData);
-
-	//std::ofstream out(menuPath);
-	//out << menuData.json;
-	//out.close();
-
 }
 
 void ME::MenuEditor::RecieveMessage(const FE::Message& aMessage)

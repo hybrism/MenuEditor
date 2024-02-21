@@ -1,9 +1,10 @@
 #pragma once
 #include "Window.h"
 
+class MenuObject;
+
 namespace ME
 {
-	class MenuObject;
 	class MenuObjectHierarchy : public ME::WindowBase
 	{
 	public:
