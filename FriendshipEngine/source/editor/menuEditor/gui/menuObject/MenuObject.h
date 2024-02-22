@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <engine/math/Vector.h>
 
 #include "../components/Component.h"
 
@@ -28,12 +29,16 @@ public:
 	virtual void Render();
 
 	void SetName(const std::string& aName) { myName = aName; }
+	void SetPosition(const Vector2f& aPosition) { myPosition = aPosition; }
 
 	std::string GetName() const { return myName; }
+	Vector2f GetPosition() const { return myPosition; }
 
 private:
 	std::vector<std::shared_ptr<Component>> myComponents;
+
 	std::string myName;
+	Vector2f myPosition;
 };
 
 template<class T>

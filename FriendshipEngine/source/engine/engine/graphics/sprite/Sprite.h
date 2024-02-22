@@ -54,6 +54,6 @@ struct Sprite3DInstanceData
 
 struct SpriteSharedData
 {
-	const Texture* texture = nullptr;
+	Texture* texture = nullptr;
 	VertexShader* myCustomShader = nullptr;
 };

@@ -28,7 +28,7 @@ public:
 	float& GetRotation();
 	bool& GetIsHidden();
 
-	const Texture* GetTexture() const;
+	Texture* GetTexture() const;
 	Vector2f GetTextureSize() const;
 	std::string GetTexturePath();
 

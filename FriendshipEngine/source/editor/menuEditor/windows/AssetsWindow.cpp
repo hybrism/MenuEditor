@@ -14,10 +14,22 @@ void ME::AssetsWindow::Show(const UpdateContext& aContext)
 
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
-		for (size_t i = 0; i < aContext.textures.size(); i++)
+		if (ImGui::BeginChild("Textures", ImGui::GetContentRegionAvail(), true))
 		{
-			ImGui::SameLine();
-			ImGui::Image(aContext.textures[i]->GetShaderResourceView(), ImVec2(64, 64));
+			for (size_t i = 0; i < aContext.textures.size(); i++)
+			{
+				std::string textureName = aContext.textureIDtoPath[i];
+
+				ImGui::MenuItem(textureName.c_str());
+				if (ImGui::BeginItemTooltip())
+				{
+					Vector2f texSize = aContext.textures[i]->GetTextureSize();
+					ImGui::Image(aContext.textures[i]->GetShaderResourceView(), ImVec2(texSize.x, texSize.y));
+
+					ImGui::EndTooltip();
+				}
+			}
+			ImGui::EndChild();
 		}
 	}
 	ImGui::End();

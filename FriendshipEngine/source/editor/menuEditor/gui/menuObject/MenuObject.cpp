@@ -3,6 +3,7 @@
 MenuObject::MenuObject(const unsigned int aID) 
 	: myID(aID)
 	, myName("untitled")
+	, myPosition(100.f, 100.f) //TODO: Set to screen center
 {}
 
 void MenuObject::Init()

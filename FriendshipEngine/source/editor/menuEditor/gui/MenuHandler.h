@@ -26,6 +26,8 @@ public:
 	void Render();
 
 	ObjectManager myObjectManager;
+
+	//TODO: Move these to a "MenuLoader"
 	void LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory);
 	void SaveToJson();
 

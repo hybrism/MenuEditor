@@ -11,6 +11,5 @@ namespace ME
 		void Show(const UpdateContext& aContext) override;
 
 	private:
-
 	};
 }

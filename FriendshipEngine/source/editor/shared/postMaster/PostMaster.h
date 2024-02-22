@@ -17,6 +17,7 @@ namespace FE
 		PrintToConsole,
 		PushEntityToInspector,
 		NewLevelLoaded,
+		NewMenuLoaded,
 		Count
 	};
 

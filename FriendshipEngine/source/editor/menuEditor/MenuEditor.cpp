@@ -123,6 +123,10 @@ void ME::MenuEditor::Update(float)
 
 void ME::MenuEditor::Render()
 {
+	auto ge = GraphicsEngine::GetInstance();
+	ge->SetBlendState(BlendState::AlphaBlend);
+	ge->GetContext()->OMSetRenderTargets(1, ge->GetBackBuffer().GetAddressOf(), nullptr);
+
 	myMenuHandler.Render();
 }
 

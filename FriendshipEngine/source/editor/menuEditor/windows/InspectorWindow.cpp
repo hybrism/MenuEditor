@@ -7,6 +7,7 @@
 
 #include "../UpdateContext.h"
 #include "../gui/components/SpriteComponent.h"
+#include "../gui/components/TextComponent.h"
 
 #include <shared/postMaster/PostMaster.h>
 
@@ -14,8 +15,10 @@ ME::InspectorWindow::InspectorWindow(const std::string& aHandle, bool aOpen, ImG
 	: WindowBase(aHandle, aOpen, aFlags)
 {
 	mySelectedIndex = INT_MAX;
-	myNewObjectSelected = false;
+	myIsNewObjectSelected = false;
+
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::PushEntityToInspector);
+	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::NewMenuLoaded);
 }
 
 void ME::InspectorWindow::Show(const UpdateContext& aContext)
@@ -23,12 +26,12 @@ void ME::InspectorWindow::Show(const UpdateContext& aContext)
 	if (!myData.isOpen)
 		return;
 
-	if (myNewObjectSelected)
+	if (myIsNewObjectSelected)
 	{
 		//Get values from object
 		myObjectName = aContext.menuHandler->myObjectManager.myObjects[mySelectedIndex].GetName();
 
-		myNewObjectSelected = false;
+		myIsNewObjectSelected = false;
 	}
 
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
@@ -50,19 +53,21 @@ void ME::InspectorWindow::Show(const UpdateContext& aContext)
 		}
 
 		if (selectedObject.HasComponent<SpriteComponent>())
-		{
+			EditSpriteComponent(aContext, selectedObject);
 
-			EditSpriteData(selectedObject);
-
-		}
+		if (selectedObject.HasComponent<TextComponent>())
+			EditTextComponent(selectedObject);
 
 		if (ImGui::Button("Add Component", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
 		{
 			//Display popup where you can select which component to add
 
-			SpriteComponent& sprite = selectedObject.AddComponent<SpriteComponent>();
+			//SpriteComponent& sprite = selectedObject.AddComponent<SpriteComponent>();
 
-			sprite.SetTexture(aContext.textures[0], aContext.textureIDtoPath[0]);
+			//sprite.SetTexture(aContext.textures[0], aContext.textureIDtoPath[0]);
+
+			TextComponent& text = selectedObject.AddComponent<TextComponent>();
+			text.SetText("Hello World!");
 		}
 
 		ImGui::PopID();
@@ -77,7 +82,12 @@ void ME::InspectorWindow::RecieveMessage(const FE::Message& aMessage)
 	case FE::eMessageType::PushEntityToInspector:
 	{
 		mySelectedIndex = std::any_cast<size_t>(aMessage.myMessage);
-		myNewObjectSelected = true;
+		myIsNewObjectSelected = true;
+		break;
+	}
+	case FE::eMessageType::NewMenuLoaded:
+	{
+		mySelectedIndex = INT_MAX;
 		break;
 	}
 	default:
@@ -85,15 +95,31 @@ void ME::InspectorWindow::RecieveMessage(const FE::Message& aMessage)
 	}
 }
 
-void ME::InspectorWindow::EditSpriteData(MenuObject& aObject)
+void ME::InspectorWindow::EditSpriteComponent(const UpdateContext& aContext, MenuObject& aObject)
 {
-
 	SpriteComponent& sprite = aObject.GetComponent<SpriteComponent>();
-
+	ImGui::PushID("Sprite");
 	ImGui::SeparatorText("Sprite");
 
 	Vector2f texSize = sprite.GetTextureSize();
 	ImGui::Text("Texture size x: %i y: %i", (int)texSize.x, (int)texSize.y);
+	Texture* currentItem = sprite.GetTexture();
+
+	if (ImGui::BeginCombo("Select Texture", sprite.GetTexturePath().c_str()))
+	{
+		for (size_t i = 0; i < aContext.textures.size(); i++)
+		{
+			bool isSelected = (currentItem == aContext.textures[i]);
+
+			if (ImGui::Selectable(aContext.textureIDtoPath[i].c_str(), isSelected))
+				sprite.SetTexture(aContext.textures[i], aContext.textureIDtoPath[i]);
+
+			if (isSelected)
+				ImGui::SetItemDefaultFocus();
+		}
+
+		ImGui::EndCombo();
+	}
 
 	ImGui::Spacing();
 
@@ -102,6 +128,7 @@ void ME::InspectorWindow::EditSpriteData(MenuObject& aObject)
 	ImGui::DragFloat2("Pivot", &sprite.GetPivot().x, 0.001f, 0.f, 1.f);
 	ImGui::DragFloat2("ScaleMultiplier", &sprite.GetScaleMultiplier().x);
 	ImGui::ColorEdit4("Color", &sprite.GetColor().x);
+
 	//ImGui::DragFloat("Rotation", &sprite.GetRotation(), 0.01f);
 	ClipValue& clip = sprite.GetClipValue();
 	ImGui::SetNextItemWidth(50.f);
@@ -116,4 +143,27 @@ void ME::InspectorWindow::EditSpriteData(MenuObject& aObject)
 	ImGui::DragFloat("Down", &clip.down, 0.01f, 0.f, 1.f);
 	ImGui::Checkbox("Is Hidden", &sprite.GetIsHidden());
 
+	ImGui::PopID();
+}
+
+void ME::InspectorWindow::EditTextComponent(MenuObject& aObject)
+{
+	TextComponent& text = aObject.GetComponent<TextComponent>();
+	ImGui::PushID("Text");
+	ImGui::SeparatorText("Text");
+
+	std::string string = text.GetText();
+	Vector2f position = text.GetPosition();
+	Vector4f color = text.GetColor();
+
+	if (ImGui::InputText("Text", &string))
+		text.SetText(string);
+
+	if (ImGui::DragFloat2("Position", &position.x))
+		text.SetPosition(position);
+
+	if (ImGui::ColorEdit4("Color", &color.x))
+		text.SetColor(color);
+
+	ImGui::PopID();
 }

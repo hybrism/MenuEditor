@@ -14,7 +14,7 @@ namespace ME
 		void Show(const UpdateContext& aContext) override;
 
 	private:
-		bool myNewObjectSelected;
+		bool myIsNewObjectSelected;
 
 		size_t mySelectedIndex;
 		std::string myObjectName;
@@ -23,6 +23,7 @@ namespace ME
 		void RecieveMessage(const FE::Message& aMessage) override;
 
 	private:
-		void EditSpriteData(MenuObject& aObject);
+		void EditSpriteComponent(const UpdateContext& aContext, MenuObject& aObject);
+		void EditTextComponent(MenuObject& aObject);
 	};
 }

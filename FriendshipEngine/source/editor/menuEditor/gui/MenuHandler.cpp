@@ -6,6 +6,7 @@
 #include <nlohmann/json.hpp>
 #include <engine/utility/Error.h>
 #include <assets/TextureFactory.h>
+#include <shared/postMaster/PostMaster.h>
 
 #include "../MenuCommon.h"
 
@@ -26,6 +27,7 @@ MenuHandler::~MenuHandler()
 void MenuHandler::Init(const std::string& aMenuFile, TextureFactory* aTextureFactory)
 {
 	LoadFromJson(aMenuFile, aTextureFactory);
+	FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::NewMenuLoaded, aMenuFile });
 }
 
 void MenuHandler::Update()

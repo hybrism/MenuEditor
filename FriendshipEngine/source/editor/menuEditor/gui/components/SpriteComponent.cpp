@@ -17,10 +17,7 @@ void SpriteComponent::Render()
 		return;
 
 	//TODO: Don't do this for all components
-	GraphicsEngine* ge = GraphicsEngine::GetInstance();
-	SpriteDrawer& spriteDrawer = ge->GetSpriteDrawer();
-
-	ge->PrepareForSpriteRender();
+	SpriteDrawer& spriteDrawer = GraphicsEngine::GetInstance()->GetSpriteDrawer();
 	spriteDrawer.Draw(mySharedData, myInstance);
 }
 
@@ -69,7 +66,7 @@ bool& SpriteComponent::GetIsHidden()
 	return myInstance.myIsHidden;
 }
 
-const Texture* SpriteComponent::GetTexture() const
+Texture* SpriteComponent::GetTexture() const
 {
 	return mySharedData.texture;
 }

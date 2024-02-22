@@ -432,7 +432,7 @@ TextService::TextService()
 void TextService::Init()
 {
 	// Initialize texts
-	Text text = Text(L"BarlowSemiCondensed-Regular.ttf", FontSize_24);
+	Text text = Text(L"ProggyClean.ttf", FontSize_24);
 
 	FT_Init_FreeType(&myLibrary);
 }
