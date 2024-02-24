@@ -4,7 +4,7 @@
 // --- Engine settings ---
 #define EDITOR_VIEWPORT_SIZE 1
 #define SHOW_CONSOLE_WINDOW 1
-
+#define USE_FE_CONSOLE 1
 
 // --- Editor settings ---
 #define START_IN_PLAYER_MODE 0

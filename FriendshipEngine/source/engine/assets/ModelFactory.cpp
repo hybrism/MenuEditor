@@ -32,7 +32,7 @@ void ModelFactory::LoadMeshNodes(FbxNode* aRootNode, std::vector<FbxNode*>& outM
 
 SharedMeshPackage ModelFactory::LoadMesh(const std::string& aFilePath, AssetDatabase* aAssetDatabase)
 {
-	SharedMeshPackage package = BinaryMeshFactory::LoadMeshFromFile(aFilePath, aAssetDatabase);
+	SharedMeshPackage package = BinaryMeshFactory::LoadMeshFromFile(aFilePath, RELATIVE_CUSTOM_MESH_DATA_PATH, aAssetDatabase);
 
 #ifdef _DEBUG
 	if (package.meshData.size() == 0)
@@ -41,8 +41,9 @@ SharedMeshPackage ModelFactory::LoadMesh(const std::string& aFilePath, AssetData
 
 		assert(meshPackage.meshData.size() > 0 && "No mesh data found in FBX file");
 
-		BinaryMeshFactory::WriteMeshToFile(meshPackage);
-		package = BinaryMeshFactory::LoadMeshFromFile(aFilePath, aAssetDatabase);
+		BinaryMeshFactory::WriteMeshToFile(meshPackage, RELATIVE_CUSTOM_MESH_DATA_PATH);
+		BinaryMeshFactory::WriteMeshToFile(meshPackage, RELATIVE_CUSTOM_MESH_DATA_RELEASE_PATH);
+		package = BinaryMeshFactory::LoadMeshFromFile(aFilePath, RELATIVE_CUSTOM_MESH_DATA_PATH, aAssetDatabase);
 	}
 #endif
 

@@ -1,5 +1,7 @@
 #pragma once
 #include "SceneCommon.h"
+#include "../scripting/ScriptRuntimeInstance.h"
+
 class World;
 class PhysXSceneManager;
 
@@ -21,8 +23,10 @@ protected:
 	eLevel myLevel = eLevel::Count;
 
 	World* myWorld = nullptr;
+	
+	std::vector<std::unique_ptr<ScriptRuntimeInstance>> myScripts;
 
-	virtual void InitComponents() {};
+	virtual void InitComponents() { __noop; };
 	virtual void InitSystems(PhysXSceneManager& aPhysXManager) { aPhysXManager; }
-
+	virtual void InitScripts(const std::string& aLevelName) { aLevelName; };
 };

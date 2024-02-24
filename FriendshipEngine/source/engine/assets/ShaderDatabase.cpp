@@ -3,6 +3,7 @@
 #include "ShaderDatabase.h"
 
 #include <engine/graphics/RenderDefines.h>
+#include <engine/graphics/GraphicsData.h>
 #include <engine/graphics/animation/Pose.h>
 #include <engine/shaders/PixelShader.h>
 #include <engine/shaders/VertexShader.h>
@@ -141,9 +142,18 @@ void ShaderDatabase::LoadFullscreenShaders()
 	}
 	// Post Process
 	{
-		myPixelShaders[static_cast<size_t>(PsType::PostProcess)].Init("post_process", PsType::PostProcess);
-		myPixelShaders[static_cast<size_t>(PsType::ToneMap)].Init("post_process_tone_map", PsType::ToneMap);
+		{
+			D3D11_BUFFER_DESC bufferDescription = { 0 };
+			bufferDescription.Usage = D3D11_USAGE_DYNAMIC;
+			bufferDescription.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			bufferDescription.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			bufferDescription.ByteWidth = sizeof(PostProcessBufferData);
+
+			myPixelShaders[static_cast<size_t>(PsType::PostProcess)].Init("post_process", PsType::PostProcess, &bufferDescription);
+		}
+
 		myPixelShaders[static_cast<size_t>(PsType::Vignette)].Init("post_process_vignette", PsType::Vignette);
+		myPixelShaders[static_cast<size_t>(PsType::ToneMap)].Init("post_process_tone_map", PsType::ToneMap);
 	}
 #pragma endregion //!PS
 }

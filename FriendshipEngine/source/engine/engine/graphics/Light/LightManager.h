@@ -1,16 +1,17 @@
 #pragma once
 #include "LightStructs.h"
 //#include <graphics\GraphicsData.h>
-#include "assets\FactoryStructs.h"
+#include <assets\FactoryStructs.h>
 #include <vector>
-#include "engine\graphics\GraphicsData.h"
+#include "../GraphicsData.h"
+#include "../RenderTarget.h"
 	
 struct RenderTarget;
 struct ID3D11Buffer;
 class SharedMesh;
 class VertexShader;
 class PixelShader;
-
+class Camera;
 
 class LightManager
 {
@@ -38,13 +39,14 @@ public:
 	void EndShadowRendering();
 	void EndOfRenderPassReset();
 
-
+	void SetResourcesOnSlot();
+	void ClearAllResources();
 private:
 	LightBufferData myLightData;
 	ComPtr<ID3D11Buffer> myLightBuffer;
 
-	RenderTarget* myPointLightsRenderTarget;
-	RenderTarget* myDirectionalLightRenderTarget;
+	RenderTarget myPointLightsRenderTarget;
+	RenderTarget myDirectionalLightRenderTarget;
 
 	SharedMesh* myLightSphereMesh;
 
@@ -54,4 +56,5 @@ private:
 
 	//DirectionalLight
 	DirectionalLight* myDirectionalLight = nullptr;
+	Camera* myLastUsedCamera = nullptr;
 };

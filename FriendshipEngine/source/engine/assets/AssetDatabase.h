@@ -1,11 +1,13 @@
 #pragma once
 #include <unordered_map>
 #include <cassert>
+#include <vector>
 
 #include "AssetDefines.h"
 #include "FactoryStructs.h"
 
 #include <nlohmann\json_fwd.hpp>
+#include <engine\graphics\Light\LightStructs.h>
 
 class SharedMesh;
 class TextureFactory;
@@ -96,6 +98,12 @@ public:
 		return myInstance->GetAnimation(aMeshId, myInstance->myAnimationNameToIndex.at(aAnimationName));
 	}
 
+	static size_t GetAnimationIndex(const std::string& aAnimationName)
+	{
+		assert(myInstance->myAnimationNameToIndex.find(aAnimationName) != myInstance->myAnimationNameToIndex.end() && "Animation name does not exist");
+		return myInstance->myAnimationNameToIndex.at(aAnimationName);
+	}
+
 	static size_t GetTextureIndex(const std::string& aMaterialName)
 	{
 		assert(myInstance->myMaterialNameToTextureIndex.find(aMaterialName) != myInstance->myMaterialNameToTextureIndex.end() && "Material name does not exist");
@@ -147,6 +155,15 @@ public:
 	static std::unordered_map<size_t, std::vector<Animation*>> GetAnimationMap() { return myInstance->myAnimations; }
 
 	static volatile bool HasLoadedAssets() { return myInstance->myHasLoadedAssets; }
+
+
+
+	//LIGHTS
+	static void StoreDirectionalLight(DirectionalLight aDirectionalLight);
+	static void StorePointLight(PointLight aPointLight);
+	static DirectionalLight& GetDirectionalLight();
+	static std::vector<PointLight>& GetPointLight();
+
 private:
 	AssetDatabase();
 
@@ -172,4 +189,10 @@ private:
 	TextureFactory* myTextureFactory;
 	volatile bool myHasLoadedAssets = false;
 	static AssetDatabase* myInstance;
+
+
+	//LIGHT
+	std::vector<int> test;
+	std::vector<PointLight> myStoredPointLightInformation;
+	DirectionalLight myStoredDirectionalLightInformation;
 };

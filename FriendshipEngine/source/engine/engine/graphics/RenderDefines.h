@@ -17,13 +17,14 @@ enum class ShaderTextureSlot : int
     Cubemap = 0,
     Albedo = 1,
 	Normal = 2,
-    Material = 3,
-    Emissive = 4,
-    Slot5 = 5, //TGE: Below 4 is the standard texture slots, keep above it! (: register( t4 ); in the shader)
-	Slot6 = 6,  //"enum class GBufferTexture", in "GBuffer.h" uses enum slots 0 - 6
-    ShadowMap = 7,
-	DirectionalLight = 8,
-	LightBound = 9,
+	VertexNormal = 3,
+    Material = 4,
+    Emissive = 5,
+    Slot5 = 6, //TGE: Below 4 is the standard texture slots, keep above it! (: register( t4 ); in the shader)
+	Slot6 = 7,  //"enum class GBufferTexture", in "GBuffer.h" uses enum slots 0 - 6
+    ShadowMap = 8,
+	DirectionalLight = 9,
+	LightBound = 10,
 };
 
 enum class ShaderDataBufferIndex

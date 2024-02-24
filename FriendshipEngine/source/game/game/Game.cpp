@@ -12,18 +12,23 @@
 #include <engine/graphics/PostProcess.h>
 #include <engine/graphics/renderer/DeferredRenderer.h>
 #include <engine/graphics/renderer/ForwardRenderer.h>
-#include <engine/graphics/DirectionalLightManager.h>
+#include <engine\graphics\Light\LightManager.h>
+//#include "audio/AudioManager.h"
+//#include "audio/FMODImplementation.h"
 
 Game::Game() : mySceneManager(), myPostProcess()
 {
 	auto camera = GraphicsEngine::GetInstance()->GetCamera();
-	camera->SetPosition({ 0, 50, -75.0f });
+	camera->GetTransform().SetPosition({ 0, 50, -75.0f });
 
 	AssetDatabase::CreateInstance();
+	//AudioManager::GetInstance()->Create();
+	//AudioManager::GetInstance()->Init();
 }
 
 Game::~Game()
 {
+	//AudioManager::GetInstance()->Destroy();
 	AssetDatabase::DestroyInstance();
 
 	if (myAssetLoadingThread.joinable())
@@ -43,6 +48,7 @@ void Game::Init()
 
 	myPostProcess.Init();
 	mySceneManager.Init();
+	myLightManager.Init({0,-1,0}, { 118.f / 256.f, 75.f / 256.f, 35.f / 256.f ,0 });
 }
 
 void Game::Update(const float& dt)
@@ -59,22 +65,34 @@ void Game::Render()
 
 	{
 		GraphicsEngine* ge = GraphicsEngine::GetInstance();
+		GBuffer& gBuffer = ge->GetGBuffer();
 		DeferredRenderer& deferred = ge->GetDeferredRenderer();
 		ForwardRenderer& forward = ge->GetForwardRenderer();
 
 		// Shadows
+		myLightManager.BeginShadowRendering();
 		deferred.DoShadowRenderPass();
 		forward.DoShadowRenderPass();
+		myLightManager.EndShadowRendering();
 
-		// GBuffer before PostProcess is applied (different RenderTarget)
 		deferred.DoGBufferPass();
 
-		// PostProcessing
+
+		//Light
 		myPostProcess.FirstFrame();
 		{
+			gBuffer.SetAllAsResources(1);
+
+			myLightManager.LightRender();
+			myLightManager.SetResourcesOnSlot();
+
 			deferred.DoFinalPass();
 			forward.DoRenderPass();
+
+			gBuffer.ClearAllResources(1);
+			myLightManager.ClearAllResources();
 		}
 		myPostProcess.Render();
+
 	}
 }

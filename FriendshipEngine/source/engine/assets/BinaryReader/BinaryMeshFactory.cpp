@@ -15,16 +15,16 @@
 #include <ModelFactory.h>
 
 
-void BinaryMeshFactory::WriteMeshToFile(MeshDataPackage& aData)
+void BinaryMeshFactory::WriteMeshToFile(MeshDataPackage& aData, std::string aFolderPath)
 {
-	std::string path = BinaryFileUtility::GetModelFilePathFromName(aData.name);
+	std::string path = aFolderPath + BinaryFileUtility::GetModelFileName(aData.name);
 	std::ofstream file(path, std::ios::binary | std::ios::out);
 
 	if (!file.is_open()) {
 		PrintE("Mesh \"" + aData.name + "\" doesn't have a binary model file. Generating file...");
 
-		if (!std::filesystem::exists(RELATIVE_CUSTOM_MESH_DATA_PATH)) {
-			std::filesystem::create_directory(RELATIVE_CUSTOM_MESH_DATA_PATH);
+		if (!std::filesystem::exists(aFolderPath)) {
+			std::filesystem::create_directory(aFolderPath);
 		}
 
 		file.open(path, std::ios::binary | std::ios::out | std::ios::trunc);
@@ -258,9 +258,9 @@ MeshDataPackage BinaryMeshFactory::GetMeshDataFromFile(const std::string& aFileP
 	return data;
 }
 
-SharedMeshPackage BinaryMeshFactory::LoadMeshFromFile(const std::string& aFilePath, AssetDatabase* aAssetDatabase)
+SharedMeshPackage BinaryMeshFactory::LoadMeshFromFile(const std::string& aFilePath, const std::string& aFolderPath, AssetDatabase* aAssetDatabase)
 {
-	std::string path = BinaryFileUtility::GetModelFilePathFromName(aAssetDatabase->GetNameFromPath(aFilePath));
+	std::string path = aFolderPath + BinaryFileUtility::GetModelFileName(aAssetDatabase->GetNameFromPath(aFilePath));
 
 	MeshDataPackage meshDataContainer = GetMeshDataFromFile(path);
 

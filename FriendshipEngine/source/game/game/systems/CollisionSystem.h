@@ -23,19 +23,15 @@ private:
 	bool LayerCheck(Entity aFirstEntity, Entity aSecondEntity);
 
 	void DrawAllColliders();
-	void GenerateDebugLines(Entity aEntity);
-	void UpdateDebugLines(Entity aEntity);
-	void DrawSpecificCollider(Entity aEntity);
 
 	void SetupCollisionLayers();
 
-	void CheckHoveredEnemies();
-	Ray<float> CreateRayFromMousePosition(Vector2<float> aMousePosition);
+	Ray<float> CreateRayFromMousePosition();
+
 private:
 	const float myDistanceToCheckCollision = 300.f;
 
-	bool lineMade = false;
-	float checkHoverTimer = 0;
-	DebugLine* ray = nullptr;
 	std::map<eCollisionLayer, Bitmask> myCollisionLayers;
+
+	std::vector<DebugLine> myLines;
 };

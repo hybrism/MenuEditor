@@ -4,7 +4,6 @@
 #include "MenuEditor.h"
 
 class Engine;
-
 class MenuEditorLauncher : public Application
 {
 public:
@@ -20,6 +19,7 @@ private:
 	void EndFrame() override;
 
 	Engine* myEngine = nullptr;
+
 	ME::MenuEditor myMenuEditor;
 };
 

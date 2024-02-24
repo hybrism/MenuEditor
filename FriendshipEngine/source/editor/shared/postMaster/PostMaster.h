@@ -13,11 +13,9 @@ namespace FE
 	enum class eMessageType
 	{
 		MeshDropped,
-		DdsDropped,
 		PrintToConsole,
 		PushEntityToInspector,
 		NewLevelLoaded,
-		NewMenuLoaded,
 		Count
 	};
 

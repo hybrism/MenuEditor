@@ -3,9 +3,9 @@
 #include <variant>
 #include <engine/math/Vector.h>
 #include <string>
+#include <ecs/entity/Entity.h>
 
 class NodeEntity;
-
 class ScriptRuntimeInstance;
 struct ScriptUpdateContext;
 class ScriptCreationContext;
@@ -36,6 +36,7 @@ enum class ScriptLinkDataType
 	Int,
 	Float,
 	String,
+	Entity,
 	Count
 };
 
@@ -46,12 +47,13 @@ constexpr char* ScriptLinkDataTypeNames[(size_t)ScriptLinkDataType::Count] =
 	"Bool",
 	"Int",
 	"Float",
-	"String"
+	"String",
+	"Entity"
 };
 
 struct ScriptLinkData
 {
-	std::variant<std::monostate, bool, int, float, ScriptStringId> data;
+	std::variant<std::monostate, bool, int, float, ScriptStringId, Entity> data;
 
 	void LoadFromJson(ScriptLinkDataType type, const ScriptJson& json);
 	void WriteToJson(ScriptLinkDataType type, ScriptJson& data) const;

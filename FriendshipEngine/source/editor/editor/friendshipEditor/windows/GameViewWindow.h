@@ -18,6 +18,5 @@ namespace FE
 		void Show(const EditorUpdateContext& aContext) override;
 
 	private:
-
 	};
 }

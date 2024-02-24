@@ -10,11 +10,15 @@
 #include "factory/EventFactory.h"
 #include "factory/ProjectileFactory.h"
 
+#include <engine/utility/InputManager.h>
+
 SceneManager::SceneManager()
 {
 	//TODO: Add levels here when we have more
+	myGameLevels[(int)eLevel::Lvl3_FamilyHeirloom] = "lvl_familyHeirloom.json";
+	myGameLevels[(int)eLevel::AxelFeatureGym] = "lvl_familyHeirloom.json";
 	myGameLevels[(int)eLevel::FeatureGym] = "FeatureGym.json";
-	myGameLevels[(int)eLevel::AssetGym] = "AssetGym.json";
+	myGameLevels[(int)eLevel::AssetGym] = "lvl_assetGym.json";
 
 	myScenes[(int)eSceneType::MainMenu] = new MainMenuScene();
 	myScenes[(int)eSceneType::Game] = new GameScene();
@@ -42,7 +46,10 @@ void SceneManager::Init()
 #endif //START_WITH_MAINMENU END
 	LoadSceneInternal({ eSceneType::Game, eLevel::FeatureGym });
 #else // _DEBUG
-	LoadSceneInternal({ eSceneType::MainMenu });
+	//LoadSceneInternal({ eSceneType::MainMenu });
+
+	LoadSceneInternal({ eSceneType::Game, "lvl_familyHeirloom.json" });
+
 #endif
 }
 
@@ -50,6 +57,9 @@ bool SceneManager::Update(float dt)
 {
 	if (mySceneStack.empty())
 		return false;
+
+	if (InputManager::GetInstance()->IsKeyPressed('R'))
+		LoadSceneInternal({ eSceneType::Game, eLevel::AxelFeatureGym });
 
 	if (!GetCurrentScene()->Update(dt))
 	{
@@ -100,32 +110,30 @@ void SceneManager::LoadSceneInternal(const SceneParameter& aData)
 	//TODO: FLYTTA TILL EGEN FUNKTION vvv
 	if (std::holds_alternative<eLevel>(aData.gameLevel))
 	{
-		LoadLevel(myGameLevels[(int)std::get<eLevel>(aData.gameLevel)]);
+		LoadLevelInternal(myGameLevels[(int)std::get<eLevel>(aData.gameLevel)]);
 		return;
 	}
 
 	if (std::holds_alternative<std::string>(aData.gameLevel))
 	{
-		LoadLevel(std::get<std::string>(aData.gameLevel));
+		LoadLevelInternal(std::get<std::string>(aData.gameLevel));
 		return;
 	}
 	// ^^^
 
 	//TODO: VISA LOADINGSCREEN PÅ EN ANNAN TRÅD TILLS SCENEN LADDAT KLART
-
 }
 
-void SceneManager::LoadLevel(const std::string& aSceneName)
+void SceneManager::LoadLevelInternal(const std::string& aLevelName)
 {
 	myPhysXManager.Init(); //TODO: Namechange?
 
-	myUnityImporter.LoadComponents(aSceneName, GetCurrentWorld(), myPhysXManager);
+	myUnityImporter.LoadComponents(aLevelName, GetCurrentWorld(), myPhysXManager);
 
-	//TODO: Load scriptmanager
+	GetCurrentScene()->InitScripts(aLevelName);
 
 	//TODO: Move this or rename functions
-	//TODO: Projectilefactory is a potential memoryleak factory :(
-	ProjectileFactory::GetInstance().Init(29, myPhysXManager);
+	ProjectileFactory::GetInstance().Init(GetCurrentWorld(), 29, myPhysXManager);
 	EventFactory::GetInstance().Init(mySceneStack.top()->myWorld);
 
 	GetCurrentScene()->myWorld->InitSystems();

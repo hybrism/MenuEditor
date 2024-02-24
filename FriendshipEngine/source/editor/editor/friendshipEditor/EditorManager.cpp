@@ -39,9 +39,11 @@ void EditorManager::Init(Game* aGame)
 	}
 }
 
-void EditorManager::Update(const EditorUpdateContext& aContext)
+void EditorManager::Update(EditorUpdateContext aContext)
 {
 	Dockspace();
+
+	aContext.editorManager = this;
 
 	for (size_t i = 0; i < (int)FE::ID::Count; i++)
 	{
@@ -146,6 +148,7 @@ void EditorManager::Dockspace()
 		ImGuiID sceneHierarchyID = 0;
 		ImGuiID inspectorID = 0;
 		ImGuiID gameviewID = 0;
+		ImGuiID vertexPainterID = 0;
 
 		ImGui::DockBuilderSplitNode(topAreaID, ImGuiDir_Left, ratioFirstTopWindowSplit, &sceneHierarchyID, &topRightAreaID);
 		ImGui::DockBuilderSplitNode(topRightAreaID, ImGuiDir_Left, ratioSecondTopWindowSplit, &gameviewID, &inspectorID);
@@ -156,6 +159,7 @@ void EditorManager::Dockspace()
 		ImGui::DockBuilderDockWindow(myWindows[FE::ID::EditorView]->myData.handle.c_str(), gameviewID);
 		ImGui::DockBuilderDockWindow(myWindows[FE::ID::AssetDatabase]->myData.handle.c_str(), assetDatabaseID);
 		ImGui::DockBuilderDockWindow(myWindows[FE::ID::Console]->myData.handle.c_str(), consoleID);
+		ImGui::DockBuilderDockWindow(myWindows[FE::ID::VertexPainter]->myData.handle.c_str(), vertexPainterID);
 
 		ImGui::DockBuilderFinish(dockspaceID);
 
@@ -169,6 +173,16 @@ void EditorManager::MenuBar()
 {
 	if (ImGui::BeginMainMenuBar())
 	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Exit", "Shift+Esc"))
+			{
+				PostQuitMessage(0);
+			}
+
+			ImGui::EndMenu();
+		}
+
 		if (ImGui::BeginMenu("Windows"))
 		{
 			for (int windowIndex = 0; windowIndex < (int)FE::ID::Count; windowIndex++)

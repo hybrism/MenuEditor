@@ -5,6 +5,7 @@
 #include <wrl/client.h>
 #include <array>
 #include <memory>
+#include "RenderTarget.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -34,7 +35,11 @@ public:
 	void SetAsResourceOnSlot(GBufferTexture aTexture, unsigned int aSlot);
 	void SetAllAsResources(const unsigned int& aStartSlot);
 	void ClearAllResources(const unsigned int& aStartSlot);
+#ifdef _DEBUG
+	void CopyToStaging();
+#endif
 public: // temp
+	std::array<RenderTarget, (int)GBufferTexture::Count> myRenderTargets;
 	std::array<ComPtr<ID3D11Texture2D>, (int)GBufferTexture::Count> myTextures;
 	std::array<ComPtr<ID3D11RenderTargetView>, (int)GBufferTexture::Count> myRTVs;
 	std::array<ComPtr<ID3D11ShaderResourceView>, (int)GBufferTexture::Count> mySRVs;

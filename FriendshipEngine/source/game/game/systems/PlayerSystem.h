@@ -3,9 +3,14 @@
 #include <engine/graphics/Camera.h>
 #include <engine/math/AABB3D.h>
 
+#include "playerStates/PlayerStatesInclude.h"
+#include <physics/PhysXSceneManager.h>
+
 struct PlayerComponent;
 enum class ePlayerState;
 class PhysXSceneManager;
+
+
 
 #include <engine/graphics/vfx/VFXManager.h>
 class PlayerSystem : public System
@@ -25,9 +30,16 @@ private:
 	void VaultCollision(Entity entity, float dt);
 	void Slide(Entity entity, float dt);
 
+	void SetPlayerState(PlayerComponent& aPlayerComponent, const ePlayerClassStates& aPlayerState);
+	void CreatePlayerStates();
+	void DeletePlayerStates();
 	VFXManager manager;
 	vfxid_t testEffectId;
 	void TestVfxBlob(const float& dt);
 
 	PhysXSceneManager* myPhysXSceneManager;
+	std::array<PlayerState*, static_cast<size_t>(ePlayerClassStates::Count)> myPlayerStateArray;
+
+
+	PxControllerFilters filter;
 };

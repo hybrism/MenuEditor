@@ -2,6 +2,7 @@
 #include <thread>
 #include "scene/SceneManager.h"
 #include <engine/graphics/PostProcess.h>
+#include "engine\graphics\Light\LightManager.h"
 
 
 class Game
@@ -20,5 +21,5 @@ private:
 
 	SceneManager mySceneManager;
 	PostProcess myPostProcess;
-
+	LightManager myLightManager;
 };

@@ -4,10 +4,7 @@
 #include <string>
 #include <unordered_map>
 
-struct Frame
-{
-	std::unordered_map<int, Transform> localTransforms;
-};
+typedef Pose Frame;
 
 struct Animation
 {

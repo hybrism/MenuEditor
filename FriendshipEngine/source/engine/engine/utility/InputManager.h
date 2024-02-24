@@ -37,31 +37,28 @@ public:
 	bool IsKeyPressed(const int aKeyCode) const { return myCurrentState[aKeyCode] && !myPreviousState[aKeyCode]; }
 	bool IsKeyReleased(const int aKeyCode) const { return !myCurrentState[aKeyCode] && myPreviousState[aKeyCode]; }
 
-	int ScrollWheelValue() const { return myMouse->GetState().scrollWheelValue; }
+	int ScrollWheelValue() const { return myPreviousMouseState.scrollWheelValue; }
 	
 	POINT GetCurrentMousePosition() const
 	{
-		auto state = myMouse->GetState();
-		return { state.x, state.y };
+		return { myPreviousMouseState.x, myPreviousMouseState.y };
 	}
 
 	Vector2i GetCurrentMousePositionVector2i() const
 	{
-		auto state = myMouse->GetState();
-		return Vector2i(-state.x, state.y);
+		return Vector2i(-myPreviousMouseState.x, myPreviousMouseState.y);
 	}
 
 	Vector2f GetCurrentMousePositionVector2f() const
 	{
-		auto state = myMouse->GetState();
-		return Vector2f((float)state.x, (float)state.y);
+		return Vector2f((float)myPreviousMouseState.x, (float)myPreviousMouseState.y);
 	}
 
 	//void SetMouseMode(DirectX::Mouse::Mode aMode) { aMode; }
 	void SetMouseMode(DirectX::Mouse::Mode aMode) { myMouse->SetMode(aMode); }
 
-	bool IsScrollGoingUp() const { return myMouse->GetState().scrollWheelValue < 0; }
-	bool IsScrollGoingDown() const { return myMouse->GetState().scrollWheelValue > 0; }
+	bool IsScrollGoingUp() const { return myPreviousMouseState.scrollWheelValue < 0; }
+	bool IsScrollGoingDown() const { return myPreviousMouseState.scrollWheelValue > 0; }
 
 	//POINT GetTentativeMousePosition() const { return myTentativeMousePosition; }
 	
@@ -99,6 +96,8 @@ private:
 
 	//bool myMouseWheelStateUp;
 	//bool myMouseWheelStateDown;
+	
+	DirectX::Mouse::State myPreviousMouseState;
 	std::unique_ptr<DirectX::Mouse> myMouse;
 	static InputManager* myInstance;
 };

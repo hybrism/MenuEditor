@@ -7,13 +7,14 @@
 
 Animation* AnimationFactory::LoadAnimation(const std::string& aFilePath, AssetDatabase* aAssetDatabase)
 {
-	Animation* anim = BinaryAnimationFactory::LoadAnimationFromFile(aFilePath, aAssetDatabase);
+	Animation* anim = BinaryAnimationFactory::LoadAnimationFromFile(aFilePath, RELATIVE_CUSTOM_ANIMATION_DATA_PATH, aAssetDatabase);
 
 #ifdef _DEBUG
 	if (anim == nullptr)
 	{
 		anim = LoadAnimationFromFBX(aFilePath);
-		BinaryAnimationFactory::WriteAnimationToFile(anim);
+		BinaryAnimationFactory::WriteAnimationToFile(anim, RELATIVE_CUSTOM_ANIMATION_DATA_PATH);
+		BinaryAnimationFactory::WriteAnimationToFile(anim, RELATIVE_CUSTOM_ANIMATION_RELEASE_DATA_PATH);
 	}
 #endif
 
@@ -138,13 +139,13 @@ Animation* AnimationFactory::LoadAnimationFromFBX(const std::string& aFilePath)
 
 		for (size_t f = 0; f < returnAnimation->frames.size(); f++)
 		{
-			returnAnimation->frames[f].localTransforms.reserve(animation.frames[f].LocalTransforms.size());
+			returnAnimation->frames[f].count = animation.frames[f].LocalTransforms.size();
 
 			for (const auto& [boneName, boneTransform] : animation.frames[f].LocalTransforms)
 			{
 				DirectX::XMMATRIX localMatrix = boneTransform;
 
-				returnAnimation->frames[f].localTransforms.emplace(skeleton.boneNameToIndexMap.at(boneName), Transform(localMatrix));
+				returnAnimation->frames[f].jointTransforms[skeleton.boneNameToIndexMap.at(boneName)] = localMatrix;
 			}
 		}
 

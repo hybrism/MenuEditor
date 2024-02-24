@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "AnimationController.h"
+#include "Animation.h"
 #include <assets/AssetDatabase.h>
 
 AnimationController::AnimationController(AssetDatabase* aAssetDatabase, const size_t& aMeshId)
@@ -15,7 +16,7 @@ AnimationController::~AnimationController()
 	myAssetDatabase = nullptr;
 }
 
-void AnimationController::Update(const float& aDeltaTime, AnimationData& aData)
+void AnimationController::Update(const float& aDeltaTime, Animation& aAnimation, AnimationData& aData)
 {
 	aData.previousStateIndex = aData.currentStateIndex;
 	if (aData.transitionIndex == -1) { return; }
@@ -28,6 +29,16 @@ void AnimationController::Update(const float& aDeltaTime, AnimationData& aData)
 	if (aData.exitTimer < transition->exitTime) { return; }
 
 	aData.transitionTimer += aDeltaTime;
+	if (transition->duration > 0)
+	{
+		float amount = aData.transitionTimer / transition->duration;
+		if (!transition->fixedDuration)
+		{ 
+			amount *= aAnimation.duration;
+		}
+
+		aData.blendFactor = std::min(amount, 1.0f);
+	}
 
 	if (aData.transitionTimer < transition->duration) { return; }
 	//{
@@ -40,7 +51,7 @@ void AnimationController::Update(const float& aDeltaTime, AnimationData& aData)
 	aData.transitionTimer = 0.0f;
 	aData.exitTimer = 0.0f;
 	aData.transitionIndex = -1;
-
+	aData.blendFactor = 0.0f;
 
 	//myStates[myCurrentAnimation].Update(aDeltaTime);
 }
@@ -112,6 +123,7 @@ void AnimationController::RunTransitionCheck(AnimationData& aData, AnimationData
 			aData.transitionIndex = static_cast<int>(i);
 			aData.transitionTimer = 0.0f;
 			aData.exitTimer = 0.0f;
+			aData.time[1] = 0.0f;
 			break;
 		}
 	}
@@ -128,21 +140,21 @@ bool AnimationController::IsAnimationConditionMet(
 	switch (aCondition.type)
 	{
 	case AnimationConditionType::eIsEqual:
-		return type.f == aCondition.target;
+		return type.f == aCondition.target || type.i == aCondition.target;
 	case AnimationConditionType::eIsNotEqual:
-		return type.f != aCondition.target;
+		return type.f != aCondition.target || type.i != aCondition.target;
 	case AnimationConditionType::eIsGreaterThan:
-		return type.f > aCondition.target;
+		return type.f > aCondition.target || type.i > aCondition.target;
 	case AnimationConditionType::eIsGreaterThanOrEqual:
-		return type.f >= aCondition.target;
+		return type.f >= aCondition.target || type.i >= aCondition.target;
 	case AnimationConditionType::eIsLessThan:
-		return type.f < aCondition.target;
+		return type.f < aCondition.target || type.i < aCondition.target;
 	case AnimationConditionType::eIsLessThanOrEqual:
-		return type.f <= aCondition.target;
+		return type.f <= aCondition.target || type.i <= aCondition.target;
 	case AnimationConditionType::eIsTrue:
-		return type.i == 1;
+		return type.b;
 	case AnimationConditionType::eIsFalse:
-		return type.i == 0;
+		return !type.b;
 	default:
 		break;
 	}

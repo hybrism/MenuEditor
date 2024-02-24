@@ -10,11 +10,8 @@ GBuffer::~GBuffer() { }
 
 GBuffer GBuffer::Create(const Vector2i& aSize)
 {
-	GBuffer buffer;
-	auto* graphicsEngine = GraphicsEngine::GetInstance();
-	auto& device = graphicsEngine->GetDevice();
+	GBuffer buffer{};
 
-	HRESULT result;
 	std::array<DXGI_FORMAT, (int)GBufferTexture::Count> textureFormats =
 	{
 		DXGI_FORMAT_R32G32B32A32_FLOAT,// World Position
@@ -40,27 +37,11 @@ GBuffer GBuffer::Create(const Vector2i& aSize)
 	for (unsigned int idx = 0; idx < (int)GBufferTexture::Count; idx++)
 	{
 		desc.Format = textureFormats[idx];
+		buffer.myRenderTargets[idx] = RenderTarget::Create(desc);
 
-		result = device->CreateTexture2D(
-			&desc,
-			nullptr,
-			&buffer.myTextures[idx]
-		);
-		assert(SUCCEEDED(result));
-
-		result = device->CreateRenderTargetView(
-			buffer.myTextures[idx].Get(),
-			nullptr,
-			buffer.myRTVs[idx].GetAddressOf()
-		);
-		assert(SUCCEEDED(result));
-
-		result = device->CreateShaderResourceView(
-			buffer.myTextures[idx].Get(),
-			nullptr,
-			buffer.mySRVs[idx].GetAddressOf()
-		);
-		assert(SUCCEEDED(result));
+		buffer.myTextures[idx] = buffer.myRenderTargets[idx].myTexture;
+		buffer.myRTVs[idx] = buffer.myRenderTargets[idx].RTV;
+		buffer.mySRVs[idx] = buffer.myRenderTargets[idx].SRV;
 	}
 
 	buffer.myViewport = std::make_shared<D3D11_VIEWPORT>(
@@ -120,3 +101,13 @@ void GBuffer::ClearAllResources(const unsigned int& aStartSlot)
 		context->PSSetShaderResources(aStartSlot + idx, 1, &nullSRV);
 	}
 }
+
+#ifdef _DEBUG
+void GBuffer::CopyToStaging()
+{
+	for (unsigned int idx = 0; idx < (int)GBufferTexture::Count; idx++)
+	{
+		myRenderTargets[idx].CopyToStaging();
+	}	
+}
+#endif

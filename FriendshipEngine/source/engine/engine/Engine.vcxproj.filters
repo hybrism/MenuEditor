@@ -129,6 +129,9 @@
     <ClInclude Include="graphics\RenderTarget.h">
       <Filter>graphics</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\StagingTexture.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
     <ClInclude Include="graphics\Texture.h">
       <Filter>graphics</Filter>
     </ClInclude>
@@ -312,6 +315,12 @@
     </ClCompile>
     <ClCompile Include="graphics\PrimitiveMeshes\SpherePrimitive.cpp">
       <Filter>graphics\PrimitiveMeshes</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\RenderTarget.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\StagingTexture.cpp">
+      <Filter>graphics</Filter>
     </ClCompile>
     <ClCompile Include="graphics\Texture.cpp">
       <Filter>graphics</Filter>

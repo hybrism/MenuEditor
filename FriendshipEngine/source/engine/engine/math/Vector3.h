@@ -43,7 +43,8 @@ public:
 
 	//Gets the distance between 2 Vector3
 	static T Distance(const Vector3<T>& aVector0, const Vector3<T>& aVector1);
-
+	static Vector3<T> Cross(const Vector3<T>& aVector0, const Vector3<T>& aVector1);
+	static T Dot(const Vector3<T>& aVector0, const Vector3<T>& aVector1);
 
 
 	//Returns the squared length of the vector
@@ -127,11 +128,29 @@ public:
 	}
 };
 
+template <class T> Vector3<T> Vector3<T>::Cross(const Vector3<T>& aVector0, const Vector3<T>& aVector1)
+{
+	return Vector3<T>(
+		aVector0.y * aVector1.z - aVector0.z * aVector1.y,
+		aVector0.z * aVector1.x - aVector0.x * aVector1.z,
+		aVector0.x * aVector1.y - aVector0.y * aVector1.x
+	);
+};
+
 template <class T> T Vector3<T>::Distance(const Vector3<T>& aVector0, const Vector3<T>& aVector1)
 {
 	const Vector3<T> direction = aVector1 - aVector0;
 	return direction.Length();
 };
+
+template <class T> T Vector3<T>::Dot(const Vector3<T>& aVector0, const Vector3<T>& aVector1)
+{
+	T ax = (aVector0.x * aVector1.x);
+	T ay = (aVector0.y * aVector1.y);
+	T az = (aVector0.z * aVector1.z);
+	return ax + ay + az;
+};
+
 //Returns the vector sum of aVector0 and aVector1
 template <class T> Vector3<T> operator+(const Vector3<T>& aVector0, const Vector3<T>& aVector1)
 {

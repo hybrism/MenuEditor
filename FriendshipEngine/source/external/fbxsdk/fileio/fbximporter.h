@@ -303,7 +303,7 @@ public:
 
 	/** \return     \c true if the file format is a recognized FBX format.
 	  */
-	bool IsFbx();
+	bool IsFBX();
 	//@}
 
 /*****************************************************************************************************************************

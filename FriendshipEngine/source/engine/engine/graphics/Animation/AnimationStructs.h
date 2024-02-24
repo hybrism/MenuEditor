@@ -8,15 +8,16 @@ union AnimationDataParameter
 {
 	float f;
 	int i;
+	bool b;
 };
 
 typedef AnimationDataParameter AnimationDataParameterContainer[ANIMATION_DATA_PARAMETER_COUNT];
 
 struct AnimationData
 {
-	Pose localSpacePose;
+	Pose localSpacePose = {};
 
-	float time = 0.0f;
+	float time[2] = { 0.0f, 0.0f };
 	float speed = 1.0f;
 
 	int transitionIndex = -1;
@@ -25,5 +26,11 @@ struct AnimationData
 	int nextStateIndex = -1;
 	float exitTimer = 0.0f;
 	float transitionTimer = 0.0f;
+	float blendFactor = 0.0f;
+
+	bool IsTransitioning() const
+	{
+		return transitionIndex != -1;
+	}
 };
 

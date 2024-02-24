@@ -2,6 +2,7 @@
 #include <wrl/client.h>
 #include <d3d11.h>
 #include "../math/VectorFwd.h"
+#include "StagingTexture.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -9,19 +10,18 @@ struct ID3D11DepthStencilView;
 struct ID3D11Texture2D;
 struct D3D11_VIEWPORT;
 
-class DepthBuffer
+class DepthBuffer : public StagingTexture
 {
 public:
 	static DepthBuffer Create(const Vector2i& aSize);
-	static DepthBuffer* CreateNewPointer(const Vector2i& aSize);
 
 	void Clear(float aClearDepthValue = 1.0f, unsigned char aClearStencilValue = 0);
-	inline ID3D11DepthStencilView* GetDepthStencilView() { return myDepth.Get(); };
-
 	void SetAsActiveTarget();
 
+	Vector2i GetSize() const;
+	inline ID3D11DepthStencilView* GetDepthStencilView() { return myDepth.Get(); };
 	ComPtr<ID3D11ShaderResourceView> mySRV;
 private:
-	ComPtr<ID3D11DepthStencilView> myDepth = 0;
 	D3D11_VIEWPORT myViewport = {};
+	ComPtr<ID3D11DepthStencilView> myDepth = 0;
 };

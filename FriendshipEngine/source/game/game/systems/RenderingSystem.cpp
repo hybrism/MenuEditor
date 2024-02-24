@@ -12,6 +12,7 @@
 #include "../component/AnimationDataComponent.h"
 #include <engine/graphics\GraphicsEngine.h>
 #include <engine/graphics\GBuffer.h>
+#include "utility\GameHelperFunctions.h"
 //#include <engine/graphics/DirectionalLightManager.h>
 
 #include <engine/graphics/PostProcess.h>
@@ -63,12 +64,13 @@ void RenderingSystem::Render()
 
 	for (auto& entity : myEntities)
 	{
-		auto& transform = myWorld->GetComponent<TransformComponent>(entity);
 		auto& meshComponent = myWorld->GetComponent<MeshComponent>(entity);
 		auto& meshes = AssetDatabase::GetMesh(meshComponent.id);
 
 		for (auto& mesh : meshes.meshData)
 		{
+			Transform hierarchyTransform = GetWorldTransform(myWorld,entity);
+
 			if (meshComponent.type == MeshType::Skeletal)
 			{
 				auto& anim = myWorld->GetComponent<AnimationDataComponent>(entity);
@@ -76,11 +78,12 @@ void RenderingSystem::Render()
 				deferredRenderer.Render(
 					static_cast<SkeletalMesh*>(mesh),
 					MeshInstanceRenderData{
-						SkeletalMeshInstanceData { transform.transform, anim.localSpacePose },
+						SkeletalMeshInstanceData { hierarchyTransform, anim.localSpacePose },
 						mesh->GetVertexShader()->GetType(),
 						mesh->GetPixelShader()->GetType(),
-						RenderMode::TRIANGLELIST,
-					}
+						RenderMode::TRIANGLELIST
+					},
+					meshComponent.shouldDisregardDepth
 				);
 				continue;
 			}
@@ -88,7 +91,7 @@ void RenderingSystem::Render()
 			deferredRenderer.Render(
 				static_cast<Mesh*>(mesh),
 				{
-					StaticMeshInstanceData{ transform.transform },
+					StaticMeshInstanceData{ hierarchyTransform },
 					mesh->GetVertexShader()->GetType(),
 					mesh->GetPixelShader()->GetType(),
 					RenderMode::TRIANGLELIST,

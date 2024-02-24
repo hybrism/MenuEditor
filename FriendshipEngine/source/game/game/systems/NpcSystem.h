@@ -7,7 +7,7 @@
 
 struct NpcComponent;
 struct TransformComponent;
-
+enum class npcState;
 
 class NpcSystem : public System
 {

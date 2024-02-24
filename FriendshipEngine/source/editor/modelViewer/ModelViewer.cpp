@@ -14,7 +14,6 @@
 #include <engine/graphics/model/SkeletalMesh.h>
 #include <engine/graphics/model/MeshDrawer.h>
 #include <engine/graphics/DirectionalLightManager.h>
-#include <engine/debug/DebugCamera.h>
 
 //Assets
 #include <assets/ModelFactory.h>
@@ -58,20 +57,20 @@ void ModelViewer::Init()
 	//SET VALUES TO LIGHT AND CAMERA
 	auto graphicsEngine = GraphicsEngine::GetInstance();
 	//DirectionalLightManager* lightManager = graphicsEngine->GetDirectionalLightManager();
-	Camera* camera = graphicsEngine->GetCamera();
-	camera->SetPosition(myInitialValues[(int)eInitialValues::CameraPosition]);
-	camera->SetRotation(myInitialValues[(int)eInitialValues::CameraRotation]);
+	
+	graphicsEngine->GetCamera()->GetTransform().SetPosition(myInitialValues[(int)eInitialValues::CameraPosition]);
+	graphicsEngine->GetCamera()->GetTransform().SetEulerAngles(myInitialValues[(int)eInitialValues::CameraRotation]);
 	//lightManager->SetColor(myInitialValues[(int)eInitialValues::LightColor]);
 	//lightManager->SetDirection(myInitialValues[(int)eInitialValues::LightDirection]);
 
 	//LOAD ICONS
 	std::wstring assetPath = StringHelper::s2ws(RELATIVE_MODELVIEWER_ASSET_PATH);
-	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_home.dds", mySpriteTextures[(int)eIcon::Home]);
-	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_light.dds", mySpriteTextures[(int)eIcon::Light]);
-	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_camera.dds", mySpriteTextures[(int)eIcon::Camera]);
-	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_mesh.dds", mySpriteTextures[(int)eIcon::Mesh]);
-	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_file.dds", mySpriteTextures[(int)eIcon::LoadedMeshes]);
-	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_goose.dds", mySpriteTextures[(int)eIcon::Goose]);
+	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_home.dds", myIcons[(int)eIcon::Home]);
+	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_light.dds", myIcons[(int)eIcon::Light]);
+	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_camera.dds", myIcons[(int)eIcon::Camera]);
+	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_mesh.dds", myIcons[(int)eIcon::Mesh]);
+	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_file.dds", myIcons[(int)eIcon::LoadedMeshes]);
+	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_goose.dds", myIcons[(int)eIcon::Goose]);
 
 	//GET CUBEMAP-PATHS
 	for (const auto& entry : std::filesystem::directory_iterator(RELATIVE_CUBEMAP_ASSET_PATH))
@@ -95,7 +94,6 @@ void ModelViewer::Init()
 
 void ModelViewer::Update(float dt)
 {
-	DebugCamera::DebugCameraControl(*GraphicsEngine::GetInstance()->GetCamera(), dt);
 	RotateCameraWithMouse(dt);
 
 	SettingsWindow();
@@ -198,27 +196,27 @@ void ModelViewer::SettingsWindow()
 	ImGui::SetNextWindowPos(ImGui::GetMainViewport()->Pos, ImGuiCond_Appearing);
 	if (ImGui::Begin("ModelViewer", 0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar))
 	{
-		if (ImGui::ImageButton("Mesh", mySpriteTextures[(int)eIcon::Mesh].Get(), ImVec2(64, 64)))
+		if (ImGui::ImageButton("Mesh", myIcons[(int)eIcon::Mesh].Get(), ImVec2(64, 64)))
 			ImGui::OpenPopup("Mesh and Textures");
 		ImGui::SetItemTooltip("Edit mesh position and view textures");
 
-		if (ImGui::ImageButton("Light", mySpriteTextures[(int)eIcon::Light].Get(), ImVec2(64, 64)))
+		if (ImGui::ImageButton("Light", myIcons[(int)eIcon::Light].Get(), ImVec2(64, 64)))
 			ImGui::OpenPopup("LightSettings");
 		ImGui::SetItemTooltip("Edit directional light and cubemap");
 
-		if (ImGui::ImageButton("Camera", mySpriteTextures[(int)eIcon::Camera].Get(), ImVec2(64, 64)))
+		if (ImGui::ImageButton("Camera", myIcons[(int)eIcon::Camera].Get(), ImVec2(64, 64)))
 			ImGui::OpenPopup("CameraSettings");
 		ImGui::SetItemTooltip("Edit camera transform");
 
-		if (ImGui::ImageButton("Home", mySpriteTextures[(int)eIcon::Home].Get(), ImVec2(64, 64)))
+		if (ImGui::ImageButton("Home", myIcons[(int)eIcon::Home].Get(), ImVec2(64, 64)))
 			myPopups[(int)eWindowType::ResetToDefaultValues] = true;
 		ImGui::SetItemTooltip("Reset values to default");
 
-		if (ImGui::ImageButton("LoadedMeshes", mySpriteTextures[(int)eIcon::LoadedMeshes].Get(), ImVec2(64, 64)))
+		if (ImGui::ImageButton("LoadedMeshes", myIcons[(int)eIcon::LoadedMeshes].Get(), ImVec2(64, 64)))
 			ImGui::OpenPopup("LoadedMeshes");
 		ImGui::SetItemTooltip("View and load previous Meshes");
 
-		if (ImGui::ImageButton("Goose", mySpriteTextures[(int)eIcon::Goose].Get(), ImVec2(64, 64)))
+		if (ImGui::ImageButton("Goose", myIcons[(int)eIcon::Goose].Get(), ImVec2(64, 64)))
 		{
 			//TODO: Play freebird 
 		}
@@ -285,18 +283,18 @@ void ModelViewer::CameraSettings()
 		auto graphicsEngine = GraphicsEngine::GetInstance();
 		auto camera = graphicsEngine->GetCamera();
 
-		Vector3f cameraPosition = camera->GetPosition();
-		Vector3f cameraRotation = camera->GetRotation();
+		Vector3f cameraPosition = camera->GetTransform().GetPosition();
+		Vector3f cameraRotation = camera->GetTransform().GetEulerRotation();
 
 
 		ImGui::SeparatorText("Camera"); ImGui::Spacing();
 
 		if (ImGui::DragFloat3("Camera position", &cameraPosition.x))
-			camera->SetPosition(cameraPosition);
+			camera->GetTransform().SetPosition(cameraPosition);
 		ImGui::Spacing();
 
 		if (ImGui::DragFloat3("Camera rotation", &cameraRotation.x))
-			camera->SetRotation(cameraRotation);
+			camera->GetTransform().SetEulerAngles(cameraRotation);
 		ImGui::Spacing();
 
 		if (ImGui::Button("Set Camera to Default position", ImVec2(ImGui::GetContentRegionAvail().x, 18)))
@@ -485,8 +483,8 @@ void ModelViewer::SetCameraToDefault()
 {
 	auto graphicsEngine = GraphicsEngine::GetInstance();
 	auto camera = graphicsEngine->GetCamera();
-	camera->SetPosition(myInitialValues[(int)eInitialValues::CameraPosition]);
-	camera->SetRotation(myInitialValues[(int)eInitialValues::CameraRotation]);
+	camera->GetTransform().SetPosition(myInitialValues[(int)eInitialValues::CameraPosition]);
+	camera->GetTransform().SetEulerAngles(myInitialValues[(int)eInitialValues::CameraRotation]);
 	myCameraPitch = 0;
 	myCameraYaw = 0;
 }
@@ -642,7 +640,7 @@ void ModelViewer::RotateCameraWithMouse(float dt)
 		myCameraYaw -= mouseMovement.x * rotation_rate_x;
 		myCameraPitch += mouseMovement.y * rotation_rate_y;
 
-		camera->SetRotation({ myCameraPitch, myCameraYaw, 0 });
+		camera->GetTransform().SetEulerAngles({ myCameraPitch, myCameraYaw, 0 });
 	}
 
 	myPreviousMousePosition = myCurrentMousePosition;

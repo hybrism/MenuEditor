@@ -14,6 +14,8 @@
 
 AssetDatabase* AssetDatabase::myInstance = nullptr;
 
+
+
 AssetDatabase::AssetDatabase()
 {
 	myTextureFactory = new TextureFactory();
@@ -253,4 +255,26 @@ void AssetDatabase::ReadAnimations(const nlohmann::json& jsonObject)
 		}
 	}
 #endif
+}
+
+
+
+void AssetDatabase::StoreDirectionalLight(DirectionalLight aDirectionalLight)
+{
+	myInstance->myStoredDirectionalLightInformation = aDirectionalLight;
+}
+
+void AssetDatabase::StorePointLight(PointLight aPointLight)
+{
+	myInstance->myStoredPointLightInformation.push_back(aPointLight);
+}
+
+DirectionalLight& AssetDatabase::GetDirectionalLight()
+{
+	return myInstance->myStoredDirectionalLightInformation;
+}
+
+std::vector<PointLight>& AssetDatabase::GetPointLight()
+{
+	return myInstance->myStoredPointLightInformation;
 }

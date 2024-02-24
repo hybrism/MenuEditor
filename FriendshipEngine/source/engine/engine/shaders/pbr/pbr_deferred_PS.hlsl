@@ -7,7 +7,11 @@ Texture2D aNormalTexture : register(t3);
 Texture2D aVertexNormalTexture : register(t4);
 Texture2D aMaterialTexture : register(t5);
 Texture2D aEffectsTexture : register(t6);
-Texture2D aShadowMapTexture : register(t7);
+
+
+Texture2D aShadowMapTexture : register(t8);
+Texture2D aDirectionlaLightTexture : register(t9);
+Texture2D aPointLightTexture : register(t10);
 
 float3 expandNormal(float3 normalTexture)
 {
@@ -21,7 +25,7 @@ float3 expandNormal(float3 normalTexture)
 //NORMAL:       X           Y           N/A                   N/A
 //EFFECTS:      Emissive    Height/DP?  AlbedoOverride        Any
 
-PixelOutput main(DeferredVertexOutput input)
+PixelOutput main(FullscreenVertexOutput input)
 {
     PixelOutput result;
     
@@ -98,7 +102,9 @@ PixelOutput main(DeferredVertexOutput input)
     float3 worldPosition = aWorldPositionTexture.Sample(aDefaultSampler, scaledUV).xyz;
     float3 pixelNormal = aNormalTexture.Sample(aDefaultSampler, scaledUV).xyz;
     float3 vertexNormal = aVertexNormalTexture.Sample(aDefaultSampler, scaledUV).xyz;
-    float3 toEye = normalize(CameraPosition.xyz - worldPosition.xyz);
+    
+    float3 cameraPosition = modelToWorld[3].xyz;
+    float3 toEye = normalize(cameraPosition - worldPosition.xyz);
     
     //MATERIAL
     float3 material = aMaterialTexture.Sample(aDefaultSampler, scaledUV).rgb;
@@ -111,7 +117,11 @@ PixelOutput main(DeferredVertexOutput input)
     float1 emissive = effects.r;
     //float1 heightDP = effects.g;
     float1 colorOverride = effects.b;
-    colorOverride = 0;
+    
+    //LIGHT
+    float4 pointLight = aPointLightTexture.Sample(aDefaultSampler, scaledUV).rgba;
+    float4 directionalLight = aDirectionlaLightTexture.Sample(aDefaultSampler, scaledUV).rgba;
+    
     
     float3 specularColor = lerp((float3) 0.04f, albedo.rgb, metalness);
     float3 diffuseColor = lerp((float3) 0.00f, albedo.rgb, 1 - metalness);
@@ -122,41 +132,17 @@ PixelOutput main(DeferredVertexOutput input)
 		ambientOcclusion, diffuseColor, specularColor
 	);
     
-    float3 dir = directionalLightDir.xyz;
-    float3 directionalLight = EvaluateDirectionalLight(
-		diffuseColor, specularColor, pixelNormal, roughness,
-		directionalLightColor.xyz, dir, toEye.xyz
-	);
-    
+
     
 
     float4 wPos = float4(worldPosition.x, worldPosition.y, worldPosition.z, 1);
-    float4 directionalLightProjectedPositionTemp = mul(directionalLightColorLightShadowSpaceToWorldSpace, wPos);
+    float4 directionalLightProjectedPositionTemp = mul(directionalLightShadowSpaceToWorldSpace, wPos);
     float3 directionalLightProjectedPosition = directionalLightProjectedPositionTemp.xyz / directionalLightProjectedPositionTemp.w;
     float shadowFactor = 1.0f;
     
-//    if (clamp(directionalLightProjectedPosition.x, -1.0, 1.0) == directionalLightProjectedPosition.x &&
-//clamp(directionalLightProjectedPosition.y, -1.0, 1.0) == directionalLightProjectedPosition.y)
-//    {
-//        float computedZ = directionalLightProjectedPosition.z;
-//        float shadowMapZ = aShadowMapTexture.Sample(aDefaultSampler, 0.5f + float2(0.5f, -0.5f) * directionalLightProjectedPosition.xy);
-//        float bias = 0.001;
-//        shadowFactor = (computedZ < shadowMapZ + bias);
-//    }
-    
-    
-//    float3 pointLightColor;
-//    for (int i = 0; i < numberOfPointLights; i++)
-//    {
-//        pointLightColor += EvaluatePointLight(
-//		    diffuseColor, specularColor, pixelNormal, roughness,
-//		    pointLights[i].color.rgb, pointLights[i].color.w, pointLights[i].range, pointLights[i].position.xyz,
-//            toEye.xyz, worldPosition.xyz
-//        );
-//    }
-    
+
     float3 emissiveAlbedo = albedo.rgb * emissive;
-    float3 radiance = ambiance  + emissiveAlbedo;
+    float3 radiance = ambiance  + emissiveAlbedo + pointLight.rgb + directionalLight.rgb;
     radiance = radiance * (colorOverride == 0) + albedo.rgb * (colorOverride != 0);
     result.color.rgb = radiance;
     result.color.a = albedo.a;

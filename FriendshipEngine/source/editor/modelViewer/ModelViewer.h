@@ -68,7 +68,7 @@ private:
 
 	std::array<Mesh, (int)eMeshType::Count> myMeshes;
 	std::array<bool, (int)eWindowType::Count> myPopups;
-	std::array<ComPtr<ID3D11ShaderResourceView>, (int)eIcon::Count> mySpriteTextures;
+	std::array<ComPtr<ID3D11ShaderResourceView>, (int)eIcon::Count> myIcons;
 	std::array<Vector3f, (int)eInitialValues::Count> myInitialValues;
 
 	std::vector<Mesh> myLoadedMeshes;

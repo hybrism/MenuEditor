@@ -74,7 +74,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib;PVDRuntime_64.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXCooking_64.lib;PhysXCharacterKinematic_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib;PVDRuntime_64.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXCooking_64.lib;PhysXCharacterKinematic_static_64.lib;fmod_vc.lib;fmodstudio_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\dependencies\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -105,13 +105,15 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib;PVDRuntime_64.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXCooking_64.lib;PhysXCharacterKinematic_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib;PVDRuntime_64.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXCooking_64.lib;PhysXCharacterKinematic_static_64.lib;fmod_vc.lib;fmodstudio_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\dependencies\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
     <ClInclude Include="application\GameApplication.h" />
+    <ClInclude Include="audio\AudioManager.h" />
+    <ClInclude Include="audio\FMODImplementation.h" />
     <ClInclude Include="collision\Bitmask.h" />
     <ClInclude Include="collision\CollisionData.h" />
     <ClInclude Include="collision\CollisionLayers.h" />
@@ -133,15 +135,24 @@
     <ClInclude Include="component\TransformComponent.h" />
     <ClInclude Include="factory\EventFactory.h" />
     <ClInclude Include="factory\ProjectileFactory.h" />
-    <ClInclude Include="gui\GuiCommon.h" />
     <ClInclude Include="gui\MenuHandler.h" />
-    <ClInclude Include="gui\MenuState.h" />
-    <ClInclude Include="gui\menuItem\MenuArrowButton.h" />
-    <ClInclude Include="gui\menuItem\MenuButton.h" />
-    <ClInclude Include="gui\menuItem\MenuItem.h" />
+    <ClInclude Include="gui\MenuObject.h" />
+    <ClInclude Include="gui\ObjectManager.h" />
+    <ClInclude Include="gui\components\Collider2DComponent.h" />
+    <ClInclude Include="gui\components\MenuComponent.h" />
+    <ClInclude Include="gui\components\SpriteComponent.h" />
+    <ClInclude Include="gui\components\TextComponent.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="physics\PhysXControllerReportCallbackWrapper.h" />
     <ClInclude Include="physics\PhysXSceneManager.h" />
+    <ClInclude Include="playerStates\PlayerAirbourneState.h" />
+    <ClInclude Include="playerStates\PlayerCrouchState.h" />
+    <ClInclude Include="playerStates\PlayerGroundState.h" />
+    <ClInclude Include="playerStates\PlayerSlideState.h" />
+    <ClInclude Include="playerStates\PlayerState.h" />
+    <ClInclude Include="playerStates\PlayerStatesInclude.h" />
+    <ClInclude Include="playerStates\PlayerVaultState.h" />
+    <ClInclude Include="playerStates\PlayerWallrunState.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="scene\MainMenuScene.h" />
     <ClInclude Include="scene\Scene.h" />
@@ -174,6 +185,7 @@
     <ClInclude Include="systems\RenderingSystem.h" />
     <ClInclude Include="systems\ScriptableEventSystem.h" />
     <ClInclude Include="utility\Events.h" />
+    <ClInclude Include="utility\GameHelperFunctions.h" />
     <ClInclude Include="utility\JsonUtility.h" />
     <ClInclude Include="utility\State.h" />
     <ClInclude Include="utility\StateMachine.h" />
@@ -181,18 +193,26 @@
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="application\GameApplication.cpp" />
+    <ClCompile Include="audio\AudioManager.cpp" />
+    <ClCompile Include="audio\FMODImplementation.cpp" />
     <ClCompile Include="collision\Bitmask.cpp" />
     <ClCompile Include="factory\EventFactory.cpp" />
-    <ClCompile Include="gui\GuiCommon.cpp" />
+    <ClCompile Include="factory\ProjectileFactory.cpp" />
     <ClCompile Include="gui\MenuHandler.cpp" />
-    <ClCompile Include="gui\MenuState.cpp" />
-    <ClCompile Include="gui\menuItem\MenuArrowButton.cpp" />
-    <ClCompile Include="gui\menuItem\MenuButton.cpp" />
-    <ClCompile Include="gui\menuItem\MenuItem.cpp" />
+    <ClCompile Include="gui\MenuObject.cpp" />
+    <ClCompile Include="gui\ObjectManager.cpp" />
+    <ClCompile Include="gui\components\SpriteComponent.cpp" />
+    <ClCompile Include="gui\components\TextComponent.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="physics\PhysXSceneManager.cpp" />
+    <ClCompile Include="playerStates\PlayerAirbourneState.cpp" />
+    <ClCompile Include="playerStates\PlayerCrouchState.cpp" />
+    <ClCompile Include="playerStates\PlayerGroundState.cpp" />
+    <ClCompile Include="playerStates\PlayerSlideState.cpp" />
+    <ClCompile Include="playerStates\PlayerVaultState.cpp" />
+    <ClCompile Include="playerStates\PlayerWallrunState.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="scene\MainMenuScene.cpp" />
     <ClCompile Include="scene\SceneManager.cpp" />

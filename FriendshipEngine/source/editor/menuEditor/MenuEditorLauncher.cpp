@@ -2,13 +2,12 @@
 
 //Engine
 #include <application/ApplicationEntryPoint.cpp>
+
 #include <engine/Engine.h>
-#include <engine/graphics/GraphicsEngine.h>
 #include <engine/utility/Error.h>
-#include <engine/utility/StringHelper.h>
-#include <engine/graphics/Camera.h>
-#include <engine/utility/InputManager.h>
 #include <engine/Paths.h>
+#include <engine/utility/StringHelper.h>
+#include <engine/utility/InputManager.h>
 
 //External
 #include <imgui/imgui.h>
@@ -92,7 +91,8 @@ LRESULT CALLBACK WndProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In
 	return 0;
 }
 
-MenuEditorLauncher::MenuEditorLauncher()
+MenuEditorLauncher::MenuEditorLauncher() 
+	: Application()
 {
 	myEngine = Engine::CreateInstance(&myTimer);
 }

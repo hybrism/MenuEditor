@@ -63,8 +63,11 @@ bool InputManager::UpdateEvents(UINT message, WPARAM wParam, LPARAM lParam)  //L
 		case WM_XBUTTONUP:
 		case WM_MOUSEHOVER:
 		case WM_MOUSEACTIVATE:
+		{
+			myPreviousMouseState = myMouse->GetState();
 			myMouse->ProcessMessage(message, wParam, lParam);
 			return true;
+		}
 	}
 
 	return false;
@@ -106,4 +109,5 @@ void InputManager::Update()
 
 	myPreviousState = myCurrentState;
 	myCurrentState = myTentativeState;
+	myPreviousMouseState = {};
 }

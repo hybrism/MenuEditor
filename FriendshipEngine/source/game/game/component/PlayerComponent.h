@@ -3,28 +3,29 @@
 #include <engine/math/Vector.h>
 #include <DirectXMath.h>
 #include "../physics/PhysXControllerReportCallbackWrapper.h"
+#include "../playerStates/PlayerStatesInclude.h"
 
 namespace physx
 {
 	class PxController;
 }
 
-enum class ePlayerState
-{
-	AOE,
-	Dash,
-	shield,
-	Ultimate,
-	Dead,
-	RMB,
-	Idle,
-	LMB,
-	Moving,
-	Active,
-	Hurt,
-	Count
-
-};
+//enum class ePlayerState
+//{
+//	AOE,
+//	Dash,
+//	shield,
+//	Ultimate,
+//	Dead,
+//	RMB,
+//	Idle,
+//	LMB,
+//	Moving,
+//	Active,
+//	Hurt,
+//	Count
+//
+//};
 
 struct PlayerComponent : public Component<PlayerComponent>
 {
@@ -77,5 +78,6 @@ struct PlayerComponent : public Component<PlayerComponent>
 
 	physx::PxController* controller = nullptr;
 	bool isPlayerActive;
-	ePlayerState playerState = ePlayerState::Idle;
+
+	PlayerState* currentPlayerState = nullptr;
 };

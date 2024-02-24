@@ -9,9 +9,13 @@
 
 //#define PX_PHYSICS_VERSION 0x304000 // TODO: Move to precompiled header
 
+#include <engine\Defines.h>
 
 #define CPU_DISPATCHER_THREADS 2
 #define USE_VISUAL_DEBUGGER 0
+
+
+
 
 physx::PxFilterFlags CustomFilterShader(physx::PxFilterObjectAttributes /*attribute0*/, physx::PxFilterData /*filterData0*/, physx::PxFilterObjectAttributes /*attribute1*/, physx::PxFilterData /*filterData1*/, physx::PxPairFlags& pairFlags, const void* /*constantBlock*/, physx::PxU32 /*constantBlockSize*/);
 
@@ -102,6 +106,7 @@ void PhysXSceneManager::Update(float dt)
 	myScene->simulate(dt);
 	myScene->fetchResults(true);
 
+
 //	//Debug
 //#ifdef _DEBUG
 //	const PxRenderBuffer& rb = myScene->getRenderBuffer();
@@ -113,7 +118,6 @@ void PhysXSceneManager::Update(float dt)
 //		Vector3f secondPointToRender = { line.pos1.x,line.pos1.y,line.pos1.z };
 //
 //		myFinalLine = DebugLine(firstPointToRender, secondPointToRender);
-//		myFinalLine.Init();
 //		myFinalLine.SetColor({1,1,0,1});
 //		myFinalLine.DrawLine();
 //	}
@@ -122,6 +126,14 @@ void PhysXSceneManager::Update(float dt)
 }
 
 #include <engine/math/Math.h>
+
+void setupFiltering(PxShape* shape, PxU32 filterGroup, PxU32 filterMask)
+{
+	PxFilterData filterData;
+	filterData.word0 = filterGroup; // word0 = own ID
+	filterData.word1 = filterMask;  // word1 = ID mask to filter pairs that trigger a contact callback
+	shape->setSimulationFilterData(filterData);
+}
 physx::PxController* PhysXSceneManager::CreateCharacterController(Transform& aTransform, physx::PxUserControllerHitReport* aHitReport)
 {
 	PxCapsuleControllerDesc desc;
@@ -140,21 +152,48 @@ physx::PxController* PhysXSceneManager::CreateCharacterController(Transform& aTr
 
 	//unused
 	//PxSetGroupCollisionFlag(CollisionGroups::PLAYER_GROUP, CollisionGroups::OBJECT_GROUP,false);
-
 	{
 		auto position = aTransform.GetPosition();
 		desc.position = physx::PxExtendedVec3(position.x, position.y + CHARACTER_HEIGHT_PRE_ADJUSTMENT / 2.0f, position.z);
 	}
 
-	desc.reportCallback = aHitReport;	
+	desc.reportCallback = aHitReport;
 	desc.scaleCoeff = 1.0f;
 	desc.slopeLimit = cos(30.0f * Deg2Rad);
-	desc.stepOffset = STEP_OFFSET;
-	desc.upDirection = physx::PxVec3(0.0f, 1.0f, 0.0f);	
+	//desc.stepOffset = STEP_OFFSET;
+	desc.stepOffset = 0;
+	desc.upDirection = physx::PxVec3(0.0f, 1.0f, 0.0f);
 	desc.userData = nullptr;
 	desc.volumeGrowth = 1.5f;
 
 	myController = myControllerManager->createController(desc);
+
+
+
+
+	//physx::PxShape** shapes = new physx::PxShape * [myController->getActor()->getNbShapes()];
+	//physx::PxU32 bufferSize = sizeof(physx::PxShape) * myController->getActor()->getNbShapes();
+	//myController->getActor()->getShapes(shapes, bufferSize, 0);
+
+	//for (physx::PxU32 shapeIndex = 0; shapeIndex < myController->getActor()->getNbShapes(); shapeIndex++)
+	//{
+
+	//	if (shapeIndex == 0)
+	//	{
+	//		physx::PxFilterData filterData;
+	//		filterData.word0 = CollisionLayer::PLAYER_GROUP;
+	//		filterData.word1 = CollisionLayer::DEFAULT;
+	//		shapes[0]->setQueryFilterData(filterData);
+	//		shapes[0]->setSimulationFilterData(filterData);
+	//	}
+	//}
+
+	//delete[] shapes;
+
+	//PxShape* playerCCTShapes[1];
+	//myController->getActor()->getShapes(playerCCTShapes, 1);
+	//setupFiltering(playerCCTShapes[0], CollisionLayer::PLAYER_GROUP , CollisionLayer::DEFAULT);
+
 	return myController;
 }
 
@@ -163,6 +202,7 @@ physx::PxRigidDynamic* PhysXSceneManager::CreateDynamicCapsule(
 	float aRadius,
 	float aHalfHeight
 )
+
 {
 	float divider = 200;
 
@@ -233,16 +273,48 @@ physx::PxRigidDynamic* PhysXSceneManager::CreateDynamicBox(Transform& aTransform
 physx::PxRigidStatic* PhysXSceneManager::CreateStatic(Transform& aTransform, Vector3f aColliderExtents)
 {
 	Vector3f position = aTransform.GetPosition();
+	Vector3f eulerRot = aTransform.GetEulerRotation();
+
+	//Transform modelS = aTransform;
+	Transform modelT{};
+	modelT.SetPosition(aColliderExtents);
+
+	Transform finalTransformPOS = modelT.GetMatrix() * aTransform.GetMatrix();
+
+	//Transform modelT = aTransform;
+
+	//r.SetEulerAngles({ 0,0,0 });
+
+	//Transform finalTransform = r.GetMatrix() * finalTransformPOS.GetMatrix();
+	//Transform superFinal = finalTransform.GetMatrix() * finalTransformPOS.GetMatrix();
 
 	auto q = DirectX::XMQuaternionRotationMatrix(aTransform.GetMatrix());
 
-	PxRigidStatic* staticBody = PxCreateStatic(*myPhysics,
-		PxTransform(PxVec3(position.x + aColliderExtents.x, position.y + aColliderExtents.y, position.z + aColliderExtents.z),
-			PxQuat(q.m128_f32[0], q.m128_f32[1], q.m128_f32[2], q.m128_f32[3])),
-		PxBoxGeometry(aColliderExtents.x, aColliderExtents.y, aColliderExtents.z),
+	Vector3f finalPos = finalTransformPOS.GetPosition();
+	PxQuat staticQuat(q.m128_f32[0], q.m128_f32[1], q.m128_f32[2], q.m128_f32[3]);
+	PxVec3 staticVector3f(finalPos.x, finalPos.y, finalPos.z);
+
+	PxTransform staticTransform(staticVector3f, staticQuat);
+
+	PxBoxGeometry staticBox(aColliderExtents.x, aColliderExtents.y, aColliderExtents.z);
+
+	//PxRigidStatic* staticBody = PxCreateStatic(*myPhysics,
+	//	PxTransform(PxVec3(position.x + aColliderExtents.x, position.y + aColliderExtents.y, position.z + aColliderExtents.z),
+	//		PxQuat(q.m128_f32[0], q.m128_f32[1], q.m128_f32[2], q.m128_f32[3])),
+	//	PxBoxGeometry(aColliderExtents.x, aColliderExtents.y, aColliderExtents.z),
+	//	*myMaterial
+	//);
+	PxRigidStatic* staticBody = PxCreateStatic(
+		*myPhysics,
+		staticTransform,
+		staticBox,
 		*myMaterial
 	);
-
+	//auto LASDstaticTransform = staticBody->getGlobalPose();
+	//PxVec3 newPos = { staticTransform.p.x + aColliderExtents.x, staticTransform.p.y + aColliderExtents.y, staticTransform.p.z + aColliderExtents.z };
+	//staticTransform.p = newPos;
+	//staticBody->setGlobalPose(staticTransform);
+	//staticQuat.
 	myScene->addActor(*staticBody);
 
 	return staticBody;
@@ -286,10 +358,3 @@ physx::PxFilterFlags CustomFilterShader(physx::PxFilterObjectAttributes attribut
 	return physx::PxFilterFlag::eDEFAULT;
 }
 
-void setupFiltering(PxShape* shape, PxU32 filterGroup, PxU32 filterMask)
-{
-	PxFilterData filterData;
-	filterData.word0 = filterGroup; // word0 = own ID
-	filterData.word1 = filterMask;  // word1 = ID mask to filter pairs that trigger a contact callback
-	shape->setSimulationFilterData(filterData);
-}

@@ -43,9 +43,14 @@ struct AnimationTransition
 class AnimationState
 {
 public:
+	AnimationState(const std::string& aAnimationName);
 	AnimationState(const int& aAnimationIndex) : animationIndex(aAnimationIndex) { }
 
-	void AddTransition(AnimationTransition aTransition) { transitions.push_back(aTransition); }
+	void AddTransition(AnimationTransition aTransition)
+	{
+		assert(aTransition.fromStateIndex != aTransition.toStateIndex && "You cannot transition to your own state");
+		transitions.push_back(aTransition);
+	}
 	void RemoveTransition(const size_t& aTransitionIndex) { transitions.erase(transitions.begin() + aTransitionIndex); }
 	
 	void SetSpeed(const float& aSpeed) { speed = aSpeed; }

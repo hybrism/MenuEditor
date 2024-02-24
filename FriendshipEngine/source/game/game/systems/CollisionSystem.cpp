@@ -3,18 +3,17 @@
 #include <ecs/World.h>
 #include <engine/utility/Error.h>
 #include <engine/math/Vector3.h>
-#include <engine/debug/DebugLine.h>
 #include <fmod/fmod.h>
 #include "..\component\TransformComponent.h"
 #include "..\component\ColliderComponent.h"
 #include "..\component\CollisionDataComponent.h"
 #include "..\component\PlayerComponent.h"
 
-
 #include <engine/graphics/Camera.h>
 #include <engine/graphics/GraphicsEngine.h>
 #include <engine/utility/InputManager.h>
 #include <engine/math/Intersection.h>
+
 CollisionSystem::CollisionSystem(World* aWorld) : System(aWorld)
 {
 	ComponentSignature signature;
@@ -32,63 +31,36 @@ CollisionSystem::~CollisionSystem()
 
 void CollisionSystem::Update(const float& /*dt*/)
 {
-	return;
+	Entity playerID = myWorld->GetPlayerEntityID();
+	if (playerID == INVALID_ENTITY)
+		return;
 
-	//We dont want to check collision right now, using PhysX instead 
-	//In future we will enable this but only for the Trigger type of collision
+	//Reset all colliders
+	for (auto& entity : myEntities)
+	{
+		auto& cd = myWorld->GetComponent<CollisionDataComponent>(entity);
+		cd.isColliding = false;
+	}
 
+	for (auto& entity : myEntities)
+	{
+		//TODO: Fix layer check
+		//if (LayerCheck(firstEntity, playerID) == false)
+		//	continue;
 
-	//for (auto& entity : myEntities)
-	//{
-	//	auto& cd = myWorld->GetComponent<CollisionDataComponent>(entity);
-	//	cd.isColliding = false;
-	//	cd.damageData.targetIDs.clear();
+		if (entity == playerID)
+			continue;
 
-	//}
-	//for (auto& firstEntity : myEntities)
-	//{
-	//	for (auto& secondEntity : myEntities)
-	//	{
-	//		if (firstEntity == secondEntity)
-	//			continue;
+		//So we dont check collision on all entities only the ones which are close enough, -> myDistanceToCheckCollision <-
+		if (IsCloseEnoughToCheckCollision(entity, playerID) == false)
+			continue;
 
-
-	//		if (LayerCheck(firstEntity, secondEntity) == false)
-	//			continue;
-
-	//		//So we dont check collision on all entities only the ones which are close enough, -> myDistanceToCheckCollision <-
-	//		if (IsCloseEnoughToCheckCollision(firstEntity, secondEntity) == false)
-	//			continue;
-
-	//		if (IsColliding(firstEntity, secondEntity))
-	//		{
-	//			myWorld->GetComponent<CollisionDataComponent>(firstEntity).isColliding = true;
-	//			myWorld->GetComponent<CollisionDataComponent>(secondEntity).isColliding = true;
-	//		}
-	//	}
-	//}
-	////for (auto& entity : myEntities)
-	////{
-	////	auto* transform = World::GetComponent<TransformComponent>(entity);
-	////	auto* collider = World::GetComponent<ColliderComponent>(entity);
-	////	auto* collisionData = World::GetComponent<CollisionDataComponent>(entity);
-	////}
-
-
-	//CheckHoveredEnemies();
-
-	//checkHoverTimer += dt;
-	//if (checkHoverTimer > 0.05f)
-	//{
-	//	CheckHoveredEnemies();
-	//	checkHoverTimer = 0;
-	//}
-
-	//Cursor;
-	//
-
-
-
+		if (IsColliding(entity, playerID))
+		{
+			myWorld->GetComponent<CollisionDataComponent>(entity).isColliding = true;
+			myWorld->GetComponent<CollisionDataComponent>(playerID).isColliding = true;
+		}
+	}
 }
 
 void CollisionSystem::Render()
@@ -114,7 +86,6 @@ bool CollisionSystem::IsColliding(Entity aFirstEntityIndex, Entity aSecondEntity
 	auto& firstTransform = myWorld->GetComponent<TransformComponent>(aFirstEntityIndex);
 	auto& firstCollider = myWorld->GetComponent<ColliderComponent>(aFirstEntityIndex);
 
-
 	auto& secondTransform = myWorld->GetComponent<TransformComponent>(aSecondEntityIndex);
 	auto& secondCollider = myWorld->GetComponent<ColliderComponent>(aSecondEntityIndex);
 
@@ -135,13 +106,9 @@ bool CollisionSystem::IsColliding(Entity aFirstEntityIndex, Entity aSecondEntity
 		firstMin.z < secondMax.z
 		)
 	{
-		auto& firstCollisionData = myWorld->GetComponent<CollisionDataComponent>(aFirstEntityIndex);
-		auto& secondCollisionData = myWorld->GetComponent<CollisionDataComponent>(aSecondEntityIndex);
-		firstCollisionData.damageData.targetIDs.push_back(secondCollisionData.ownerID);
-		secondCollisionData.damageData.targetIDs.push_back(firstCollisionData.ownerID);
-
 		return true;
 	}
+
 	return false;
 }
 
@@ -149,8 +116,10 @@ bool CollisionSystem::LayerCheck(Entity aFirstEntity, Entity aSecondEntity)
 {
 	eCollisionLayer firstEnum = myWorld->GetComponent<CollisionDataComponent>(aFirstEntity).layer;
 	eCollisionLayer secondEnum = myWorld->GetComponent<CollisionDataComponent>(aSecondEntity).layer;
+
 	auto firstLayer = myCollisionLayers.at(firstEnum);
 	auto secondLayer = myCollisionLayers.at(secondEnum);
+
 	if (firstLayer.GetBit((int)secondEnum) && secondLayer.GetBit((int)firstEnum))
 	{
 		return true;
@@ -160,96 +129,43 @@ bool CollisionSystem::LayerCheck(Entity aFirstEntity, Entity aSecondEntity)
 
 void CollisionSystem::DrawAllColliders()
 {
-	//for (auto& entity : myEntities)
-	//{
-	//	auto& collider = myWorld->GetComponent<ColliderComponent>(entity);
-	//	if (collider.debugLines.empty())
-	//	{
-	//		GenerateDebugLines(entity);
-	//	}
-	//	else
-	//	{
-	//		UpdateDebugLines(entity);
-	//	}
-	//}
+	myLines.clear();
 
-}
+	for (auto& entity : myEntities)
+	{
+		auto& collider = myWorld->GetComponent<ColliderComponent>(entity);
+		auto& collisionData = myWorld->GetComponent<CollisionDataComponent>(entity);
+		auto& transform = myWorld->GetComponent<TransformComponent>(entity);
 
-void CollisionSystem::GenerateDebugLines(Entity /*aEntity*/)
-{
-	//auto& collider = myWorld->GetComponent<ColliderComponent>(aEntity);
-	//auto& transform = myWorld->GetComponent<TransformComponent>(aEntity);
-	//auto& collisionData = myWorld->GetComponent<CollisionDataComponent>(aEntity);
+		Vector3f min = collider.aabb3D.GetMin();
+		Vector3f max = collider.aabb3D.GetMax();
 
-	////if (collisionData.isColliding) // Regular Collision
-	////	collider.color = { 1,1,0,1 };
-	////else if (collisionData.type == eCollisionType::Trigger)
-	////	collider.color = { 0,1,1,1 };
-	////else							// No Collision
-	////	collider.color = { 0,1,0,1 };
+		min += transform.transform.GetPosition();
+		max += transform.transform.GetPosition();
 
-	//Vector3f min = collider.aabb3D.GetMin();
-	//Vector3f max = collider.aabb3D.GetMax();
-	//DebugLine* line1 = new DebugLine(transform.transform.GetPosition(), transform.transform.GetPosition() + transform.transform.GetForward() * 100.0f, collider.color);
-	////DebugLine* line1 = new DebugLine(Vector3f{ min.x, min.y, min.z }, Vector3f{ min.x, min.y, max.z }, collider.color);
-	////DebugLine* line2 = new DebugLine(Vector3f{ min.x, min.y, max.z }, Vector3f{ max.x, min.y, max.z }, collider.color);
-	////DebugLine* line3 = new DebugLine(Vector3f{ max.x, min.y, max.z }, Vector3f{ max.x, min.y, min.z }, collider.color);
-	////DebugLine* line4 = new DebugLine(Vector3f{ max.x, min.y, min.z }, Vector3f{ min.x, min.y, min.z }, collider.color);
-	////DebugLine* line5 = new DebugLine(Vector3f{ min.x, min.y, min.z }, Vector3f{ min.x, max.y, min.z }, collider.color);
-	////DebugLine* line6 = new DebugLine(Vector3f{ min.x, min.y, max.z }, Vector3f{ min.x, max.y, max.z }, collider.color);
-	////DebugLine* line7 = new DebugLine(Vector3f{ max.x, min.y, max.z }, Vector3f{ max.x, max.y, max.z }, collider.color);
-	////DebugLine* line8 = new DebugLine(Vector3f{ max.x, min.y, min.z }, Vector3f{ max.x, max.y, min.z }, collider.color);
-	////DebugLine* line9 = new DebugLine(Vector3f{ min.x, max.y, min.z }, Vector3f{ min.x, max.y, max.z }, collider.color);
-	////DebugLine* line10 = new DebugLine(Vector3f{ min.x, max.y, max.z }, Vector3f{ max.x, max.y, max.z }, collider.color);
-	////DebugLine* line11 = new DebugLine(Vector3f{ max.x, max.y, max.z }, Vector3f{ max.x, max.y, min.z }, collider.color);
-	////DebugLine* line12 = new DebugLine(Vector3f{ max.x, max.y, min.z }, Vector3f{ min.x, max.y, min.z }, collider.color);
+		if (collisionData.isColliding)
+			collider.color = { 1.f, 0.f, 0.f, 1.f };
+		else
+			collider.color = { 1.f, 1.f, 1.f, 1.f };
 
-	//collider.debugLines.push_back(line1);
-	////collider.debugLines.push_back(line2);
-	////collider.debugLines.push_back(line3);
-	////collider.debugLines.push_back(line4);
-	////collider.debugLines.push_back(line5);
-	////collider.debugLines.push_back(line6);
-	////collider.debugLines.push_back(line7);
-	////collider.debugLines.push_back(line8);
-	////collider.debugLines.push_back(line9);
-	////collider.debugLines.push_back(line10);
-	////collider.debugLines.push_back(line11);
-	////collider.debugLines.push_back(line12);
-	//for (size_t i = 0; i < collider.debugLines.size(); i++)
-	//{
-	//	collider.debugLines[i]->Init();
-	//}
-}
+		myLines.push_back(DebugLine(Vector3f{ min.x, min.y, min.z }, Vector3f{ min.x, min.y, max.z }, collider.color));
+		myLines.push_back(DebugLine(Vector3f{ min.x, min.y, max.z }, Vector3f{ max.x, min.y, max.z }, collider.color));
+		myLines.push_back(DebugLine(Vector3f{ max.x, min.y, max.z }, Vector3f{ max.x, min.y, min.z }, collider.color));
+		myLines.push_back(DebugLine(Vector3f{ max.x, min.y, min.z }, Vector3f{ min.x, min.y, min.z }, collider.color));
+		myLines.push_back(DebugLine(Vector3f{ min.x, min.y, min.z }, Vector3f{ min.x, max.y, min.z }, collider.color));
+		myLines.push_back(DebugLine(Vector3f{ min.x, min.y, max.z }, Vector3f{ min.x, max.y, max.z }, collider.color));
+		myLines.push_back(DebugLine(Vector3f{ max.x, min.y, max.z }, Vector3f{ max.x, max.y, max.z }, collider.color));
+		myLines.push_back(DebugLine(Vector3f{ max.x, min.y, min.z }, Vector3f{ max.x, max.y, min.z }, collider.color));
+		myLines.push_back(DebugLine(Vector3f{ min.x, max.y, min.z }, Vector3f{ min.x, max.y, max.z }, collider.color));
+		myLines.push_back(DebugLine(Vector3f{ min.x, max.y, max.z }, Vector3f{ max.x, max.y, max.z }, collider.color));
+		myLines.push_back(DebugLine(Vector3f{ max.x, max.y, max.z }, Vector3f{ max.x, max.y, min.z }, collider.color));
+		myLines.push_back(DebugLine(Vector3f{ max.x, max.y, min.z }, Vector3f{ min.x, max.y, min.z }, collider.color));
+	}
 
-void CollisionSystem::UpdateDebugLines(Entity /*aEntity*/)
-{
-	//auto& collider = myWorld->GetComponent<ColliderComponent>(aEntity);
-	//auto& collisionData = myWorld->GetComponent<CollisionDataComponent>(aEntity);
-	//auto& transform = myWorld->GetComponent<TransformComponent>(aEntity);
-
-	//if (collisionData.isColliding) // Regular Collision
-	//	collider.color = { 1,1,0,1 };
-	//else if (collisionData.type == eCollisionType::Trigger)
-	//	collider.color = { 0,1,1,1 };
-	//else							// No Collision
-	//	collider.color = { 0,1,0,1 };
-
-
-	//for (size_t i = 0; i < collider.debugLines.size(); i++)
-	//{
-	//	auto debugLine = collider.debugLines[i];
-	//	debugLine->SetStartPosition(transform.transform.GetPosition());
-	//	debugLine->SetEndPosition(transform.transform.GetPosition() + transform.transform.GetRight() * 100.0f);
-	//	debugLine->SetColor(collider.color);
-	//	debugLine->DrawLine();
-	//}
-
-}
-
-void CollisionSystem::DrawSpecificCollider(Entity aEntityID)
-{
-	aEntityID;
+	for (size_t i = 0; i < myLines.size(); i++)
+	{
+		myLines[i].DrawLine();
+	}
 }
 
 void CollisionSystem::SetupCollisionLayers()
@@ -295,16 +211,8 @@ void CollisionSystem::SetupCollisionLayers()
 
 }
 
-void CollisionSystem::CheckHoveredEnemies()
+Ray<float> CollisionSystem::CreateRayFromMousePosition()
 {
-
-
-}
-
-
-Ray<float> CollisionSystem::CreateRayFromMousePosition(Vector2<float> aMousePosition)
-{
-	aMousePosition;
 	Ray<float> newRay;
 	auto* camera = GraphicsEngine::GetInstance()->GetCamera();
 	auto viewportDimensions = GraphicsEngine::GetInstance()->GetViewportDimensions();
@@ -312,16 +220,15 @@ Ray<float> CollisionSystem::CreateRayFromMousePosition(Vector2<float> aMousePosi
 	auto farPlaneDimensions = camera->GetFarPlaneDimensions();
 
 	Vector2f mousePosRatio = InputManager::GetInstance()->GetCurrentMousePositionVector2f();
-	//auto mousePosRatio = aMousePosition;
 	mousePosRatio.x /= (float)viewportDimensions.x;
 	mousePosRatio.y /= (float)viewportDimensions.y;
 	mousePosRatio -= { 0.5f, 0.5f };
 
-	Vector3f initialPos = camera->GetPosition();
-	initialPos += camera->GetForward().GetNormalized() * camera->GetNearPlane();
+	Vector3f initialPos = camera->GetTransform().GetPosition();
+	initialPos += camera->GetTransform().GetForward().GetNormalized() * camera->GetNearPlane();
 
-	Vector3f xDiff = camera->GetRight() * mousePosRatio.x * nearPlaneDimensions.x * 0.65f;
-	Vector3f yDiff = camera->GetUp() * mousePosRatio.y * nearPlaneDimensions.y * 0.56f;
+	Vector3f xDiff = camera->GetTransform().GetRight() * mousePosRatio.x * nearPlaneDimensions.x * 0.65f;
+	Vector3f yDiff = camera->GetTransform().GetUp() * mousePosRatio.y * nearPlaneDimensions.y * 0.56f;
 
 	Vector3f start = initialPos + xDiff + yDiff;
 
@@ -331,11 +238,10 @@ Ray<float> CollisionSystem::CreateRayFromMousePosition(Vector2<float> aMousePosi
 	Vector3f end = initialPos;
 	end += xDiff * xRatio;
 	end += yDiff * yRatio;
-	end += camera->GetForward() * camera->GetFarPlane();
+	end += camera->GetTransform().GetForward() * camera->GetFarPlane();
 
 	Vector3 direction = end - start;
 
 	newRay.InitWithOriginAndDirection(start, direction);
-	//newRay.InitWith2Points(start, end);
 	return newRay;
 }

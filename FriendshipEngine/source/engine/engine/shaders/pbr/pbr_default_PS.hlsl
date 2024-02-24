@@ -46,7 +46,8 @@ PixelOutput main(PixelInputType input)
     float3 pixelNormal = normalize(mul(TBN, normal));
     float3 vertexNormal = input.normal;
     
-    float3 toEye = normalize(CameraPosition.xyz - input.worldPosition.xyz);
+    float3 cameraPosition = modelToWorld[3].xyz;
+    float3 toEye = normalize(cameraPosition - input.worldPosition.xyz);
     
     float ambientOcclusion = material.r;
     float roughness = material.g;
@@ -62,19 +63,19 @@ PixelOutput main(PixelInputType input)
 		ambientOcclusion, diffuseColor, specularColor
 	);
     
-    float3 dir = directionalLightDir.xyz;
+    float3 dir = directionalLightsDirection.xyz;
     float3 directionalLight = EvaluateDirectionalLight(
 		diffuseColor, specularColor, pixelNormal, roughness,
-		directionalLightColor.xyz, dir, toEye.xyz
+		directionalLightsColor.xyz, dir, toEye.xyz
 	);
     
     float3 pointLightColor;
-    for (int i = 0; i < numberOfPointLights; i++)
+    for (int i = 0; i < amountOfPointLights; i++)
     {
         
         pointLightColor += EvaluatePointLight(
 		    diffuseColor, specularColor, pixelNormal, roughness,
-		    pointLights[i].color.rgb, pointLights[i].color.w, pointLights[i].range, pointLights[i].position.xyz,
+		    myPointLights[i].pointLightsColor.rgb, myPointLights[i].pointLightsIntensity, myPointLights[i].pointLightsRange, myPointLights[i].pointLightsPosition.xyz,
             toEye.xyz, input.worldPosition.xyz
         );
     }
@@ -89,7 +90,7 @@ PixelOutput main(PixelInputType input)
     //result.color.rgb = material;
     //result.color.rgb = emissive;
     //result.color.rgb = input.worldPosition.xyz;
-    
+
     result.color.a = albedo.a;
     
     return result;

@@ -38,8 +38,8 @@ void Editor::Init(Game* aGame)
 	ImGuiHandler::Init();
 
 	auto camera = GraphicsEngine::GetInstance()->GetCamera();
-	camera->SetPosition({ 0, 1000, -3000.0f });
-	camera->SetRotation({ 25, 0, 0 });
+	camera->GetTransform().SetPosition({ 0, 1000, -3000.0f });
+	camera->GetTransform().SetEulerAngles({ 25, 0, 0 });
 
 	myEditorManager->Init(myGame);
 }

@@ -1,25 +1,27 @@
 #pragma once
+#include "../graphics/Camera.h"
 
-
-class Camera;
+struct DebugCameraData
+{
+	float myMoveSpeed = 400.0f;
+	float myMoveMultiplier = 3.0f;
+	float myCameraMoveX = 8.0f;
+	float myCameraMoveY = 5.0f;
+};
 
 class DebugCamera
 {
 public:
-	static void DebugCameraControl(Camera& aCamera, float aDeltaTime);
+	DebugCamera(const DebugCameraData& aData = {});
+	~DebugCamera();
 
-	static const float MOVE_SPEED;
-	static const float MOVE_MULTIPLIER;
-	static const float CAMERA_MOVE_X;
-	static const float CAMERA_MOVE_Y;
-	static bool ACTIVE_MULTIPLIER;
+	void Update(float aDeltaTime);
+	Camera myCamera;
 private:
-	static void MoveForward(Camera& aCamera, float aDeltaTime);
-	static void MoveBackward(Camera& aCamera, float aDeltaTime);
-	static void MoveLeft(Camera& aCamera, float aDeltaTime);
-	static void MoveRight(Camera& aCamera, float aDeltaTime);
-	static void MoveUp(Camera& aCamera, float aDeltaTime);
-	static void MoveDown(Camera& aCamera, float aDeltaTime);
-	static void RotateCameraWithMouse(Camera& aCamera, float aDeltaTime);
+	float Multiplier() const;
 
+	DebugCameraData myData;
+	float myYaw;
+	float myPitch;
+	bool myActiveMultiplier;
 };

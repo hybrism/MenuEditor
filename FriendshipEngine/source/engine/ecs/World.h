@@ -31,10 +31,10 @@ public:
 	void DestroyEntity(const Entity& aEntity);
 
 	void SetPlayerEntityID(const eid_t& aPlayerEntityID) { myPlayerEntityID = aPlayerEntityID; };
-	eid_t GetPlayerEntityID() const 
-	{ 
+	eid_t GetPlayerEntityID() const
+	{
 		//Value will be INVALID_ENTITY if no player exists in scene
-		return myPlayerEntityID; 
+		return myPlayerEntityID;
 	};
 
 	// Component Adapter
@@ -71,7 +71,9 @@ public:
 	template<typename T>
 	T* TryGetComponent(const Entity& aEntity);
 
+#ifdef _DEBUG
 	std::vector<Entity>& GetEntities() { return myEntities; }
+#endif
 
 private:
 	World(const World& aWorld) = delete;

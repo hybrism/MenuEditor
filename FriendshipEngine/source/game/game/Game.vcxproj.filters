@@ -4,6 +4,9 @@
     <Filter Include="application">
       <UniqueIdentifier>{F9860F5B-653C-8850-EE30-82275AE57E54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="audio">
+      <UniqueIdentifier>{B7281C0F-233D-44C0-ECBE-E71F589240F1}</UniqueIdentifier>
+    </Filter>
     <Filter Include="collision">
       <UniqueIdentifier>{D13AF3EB-3DA5-A762-86E3-5808F28C85B7}</UniqueIdentifier>
     </Filter>
@@ -16,11 +19,14 @@
     <Filter Include="gui">
       <UniqueIdentifier>{8A78880B-F681-887C-7FFD-9E7CEB05947C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="gui\menuItem">
-      <UniqueIdentifier>{9DB9E208-891C-72AD-32A2-AA631EE43D30}</UniqueIdentifier>
+    <Filter Include="gui\components">
+      <UniqueIdentifier>{7FD7FC1B-6BA5-F021-5439-614840A6CC86}</UniqueIdentifier>
     </Filter>
     <Filter Include="physics">
       <UniqueIdentifier>{A823A1AC-1403-2048-1D1B-AB1E897986A9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="playerStates">
+      <UniqueIdentifier>{66FA78E4-525D-0889-FBE2-403FE724D40B}</UniqueIdentifier>
     </Filter>
     <Filter Include="scene">
       <UniqueIdentifier>{D3075810-3F1C-80C1-089E-232174717CF2}</UniqueIdentifier>
@@ -48,6 +54,12 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="application\GameApplication.h">
       <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="audio\AudioManager.h">
+      <Filter>audio</Filter>
+    </ClInclude>
+    <ClInclude Include="audio\FMODImplementation.h">
+      <Filter>audio</Filter>
     </ClInclude>
     <ClInclude Include="collision\Bitmask.h">
       <Filter>collision</Filter>
@@ -112,23 +124,26 @@
     <ClInclude Include="factory\ProjectileFactory.h">
       <Filter>factory</Filter>
     </ClInclude>
-    <ClInclude Include="gui\GuiCommon.h">
-      <Filter>gui</Filter>
-    </ClInclude>
     <ClInclude Include="gui\MenuHandler.h">
       <Filter>gui</Filter>
     </ClInclude>
-    <ClInclude Include="gui\MenuState.h">
+    <ClInclude Include="gui\MenuObject.h">
       <Filter>gui</Filter>
     </ClInclude>
-    <ClInclude Include="gui\menuItem\MenuArrowButton.h">
-      <Filter>gui\menuItem</Filter>
+    <ClInclude Include="gui\ObjectManager.h">
+      <Filter>gui</Filter>
     </ClInclude>
-    <ClInclude Include="gui\menuItem\MenuButton.h">
-      <Filter>gui\menuItem</Filter>
+    <ClInclude Include="gui\components\Collider2DComponent.h">
+      <Filter>gui\components</Filter>
     </ClInclude>
-    <ClInclude Include="gui\menuItem\MenuItem.h">
-      <Filter>gui\menuItem</Filter>
+    <ClInclude Include="gui\components\MenuComponent.h">
+      <Filter>gui\components</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\components\SpriteComponent.h">
+      <Filter>gui\components</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\components\TextComponent.h">
+      <Filter>gui\components</Filter>
     </ClInclude>
     <ClInclude Include="pch.h" />
     <ClInclude Include="physics\PhysXControllerReportCallbackWrapper.h">
@@ -136,6 +151,30 @@
     </ClInclude>
     <ClInclude Include="physics\PhysXSceneManager.h">
       <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="playerStates\PlayerAirbourneState.h">
+      <Filter>playerStates</Filter>
+    </ClInclude>
+    <ClInclude Include="playerStates\PlayerCrouchState.h">
+      <Filter>playerStates</Filter>
+    </ClInclude>
+    <ClInclude Include="playerStates\PlayerGroundState.h">
+      <Filter>playerStates</Filter>
+    </ClInclude>
+    <ClInclude Include="playerStates\PlayerSlideState.h">
+      <Filter>playerStates</Filter>
+    </ClInclude>
+    <ClInclude Include="playerStates\PlayerState.h">
+      <Filter>playerStates</Filter>
+    </ClInclude>
+    <ClInclude Include="playerStates\PlayerStatesInclude.h">
+      <Filter>playerStates</Filter>
+    </ClInclude>
+    <ClInclude Include="playerStates\PlayerVaultState.h">
+      <Filter>playerStates</Filter>
+    </ClInclude>
+    <ClInclude Include="playerStates\PlayerWallrunState.h">
+      <Filter>playerStates</Filter>
     </ClInclude>
     <ClInclude Include="scene\GameScene.h">
       <Filter>scene</Filter>
@@ -233,6 +272,9 @@
     <ClInclude Include="utility\Events.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="utility\GameHelperFunctions.h">
+      <Filter>utility</Filter>
+    </ClInclude>
     <ClInclude Include="utility\JsonUtility.h">
       <Filter>utility</Filter>
     </ClInclude>
@@ -248,33 +290,57 @@
     <ClCompile Include="application\GameApplication.cpp">
       <Filter>application</Filter>
     </ClCompile>
+    <ClCompile Include="audio\AudioManager.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
+    <ClCompile Include="audio\FMODImplementation.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
     <ClCompile Include="collision\Bitmask.cpp">
       <Filter>collision</Filter>
     </ClCompile>
     <ClCompile Include="factory\EventFactory.cpp">
       <Filter>factory</Filter>
     </ClCompile>
-    <ClCompile Include="gui\GuiCommon.cpp">
-      <Filter>gui</Filter>
+    <ClCompile Include="factory\ProjectileFactory.cpp">
+      <Filter>factory</Filter>
     </ClCompile>
     <ClCompile Include="gui\MenuHandler.cpp">
       <Filter>gui</Filter>
     </ClCompile>
-    <ClCompile Include="gui\MenuState.cpp">
+    <ClCompile Include="gui\MenuObject.cpp">
       <Filter>gui</Filter>
     </ClCompile>
-    <ClCompile Include="gui\menuItem\MenuArrowButton.cpp">
-      <Filter>gui\menuItem</Filter>
+    <ClCompile Include="gui\ObjectManager.cpp">
+      <Filter>gui</Filter>
     </ClCompile>
-    <ClCompile Include="gui\menuItem\MenuButton.cpp">
-      <Filter>gui\menuItem</Filter>
+    <ClCompile Include="gui\components\SpriteComponent.cpp">
+      <Filter>gui\components</Filter>
     </ClCompile>
-    <ClCompile Include="gui\menuItem\MenuItem.cpp">
-      <Filter>gui\menuItem</Filter>
+    <ClCompile Include="gui\components\TextComponent.cpp">
+      <Filter>gui\components</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="physics\PhysXSceneManager.cpp">
       <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="playerStates\PlayerAirbourneState.cpp">
+      <Filter>playerStates</Filter>
+    </ClCompile>
+    <ClCompile Include="playerStates\PlayerCrouchState.cpp">
+      <Filter>playerStates</Filter>
+    </ClCompile>
+    <ClCompile Include="playerStates\PlayerGroundState.cpp">
+      <Filter>playerStates</Filter>
+    </ClCompile>
+    <ClCompile Include="playerStates\PlayerSlideState.cpp">
+      <Filter>playerStates</Filter>
+    </ClCompile>
+    <ClCompile Include="playerStates\PlayerVaultState.cpp">
+      <Filter>playerStates</Filter>
+    </ClCompile>
+    <ClCompile Include="playerStates\PlayerWallrunState.cpp">
+      <Filter>playerStates</Filter>
     </ClCompile>
     <ClCompile Include="scene\GameScene.cpp">
       <Filter>scene</Filter>

@@ -6,6 +6,7 @@
 
 #include "utility/UnityImporter.h"
 #include "../physics/PhysXSceneManager.h"
+#include "../scripting/ScriptManager.h"
 
 #include "SceneCommon.h"
 
@@ -37,6 +38,7 @@ public:
 private:
 	UnityImporter myUnityImporter;
 	PhysXSceneManager myPhysXManager;
+	ScriptManager myScriptManager;
 
 	std::stack<Scene*> mySceneStack;
 
@@ -46,5 +48,5 @@ private:
 	SceneParameter mySceneToLoad;
 
 	void LoadSceneInternal(const SceneParameter& aScene);
-	void LoadLevel(const std::string& aSceneName);
+	void LoadLevelInternal(const std::string& aSceneName);
 };

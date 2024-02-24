@@ -13,6 +13,9 @@
     <Filter Include="friendshipEditor\windows">
       <UniqueIdentifier>{B2F53613-9E1A-8693-C765-6B23B3E984B1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="menuEditor">
+      <UniqueIdentifier>{61922E3E-4D4A-708B-B651-49E7A2280B7C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="scriptEditor">
       <UniqueIdentifier>{01890063-EDEB-8F07-9671-C8BD82B35B8A}</UniqueIdentifier>
     </Filter>
@@ -62,11 +65,17 @@
     <ClInclude Include="editor\friendshipEditor\windows\ScriptEditorWindow.h">
       <Filter>friendshipEditor\windows</Filter>
     </ClInclude>
+    <ClInclude Include="editor\friendshipEditor\windows\VertexPainterWindow.h">
+      <Filter>friendshipEditor\windows</Filter>
+    </ClInclude>
     <ClInclude Include="editor\friendshipEditor\windows\Window.h">
       <Filter>friendshipEditor\windows</Filter>
     </ClInclude>
     <ClInclude Include="editor\friendshipEditor\windows\WindowFactory.h">
       <Filter>friendshipEditor\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\menuEditor\MenuEditor.h">
+      <Filter>menuEditor</Filter>
     </ClInclude>
     <ClInclude Include="editor\scriptEditor\ScriptEditor.h">
       <Filter>scriptEditor</Filter>
@@ -135,8 +144,14 @@
     <ClCompile Include="editor\friendshipEditor\windows\ScriptEditorWindow.cpp">
       <Filter>friendshipEditor\windows</Filter>
     </ClCompile>
+    <ClCompile Include="editor\friendshipEditor\windows\VertexPainterWindow.cpp">
+      <Filter>friendshipEditor\windows</Filter>
+    </ClCompile>
     <ClCompile Include="editor\friendshipEditor\windows\WindowFactory.cpp">
       <Filter>friendshipEditor\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="editor\menuEditor\MenuEditor.cpp">
+      <Filter>menuEditor</Filter>
     </ClCompile>
     <ClCompile Include="editor\scriptEditor\ScriptEditor.cpp">
       <Filter>scriptEditor</Filter>

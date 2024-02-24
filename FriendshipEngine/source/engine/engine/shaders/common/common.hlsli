@@ -1,5 +1,6 @@
 #define MAX_ANIMATION_BONES 64 
 #define MAX_NUMBER_OF_LIGHTS 8
+#define MAX_POINTLIGHTS 32
 
 int GetNumMips(TextureCube cubeTex)
 {
@@ -63,12 +64,7 @@ struct PixelOutput
     float4 color : SV_TARGET;
 };
 
-struct DeferredVertexInput
-{
-    uint vertexIndex : SV_VertexID;
-};
-
-struct DeferredVertexOutput
+struct FullscreenVertexOutput
 {
     float4 position : SV_POSITION;
     float2 uv : TEXCOORD0;
@@ -90,7 +86,6 @@ cbuffer FrameBuffer : register(b0)
     float4 resolution; //x = screen width, y = screen height, z = viewport width, w = viewport height
     float4x4 worldToClipMatrix; //ProjectionMatrix
     float4x4 modelToWorld; //WorldToCamera, ModelMatrix, ViewModel, ViewMatrix
-    float4 CameraPosition;
     float NearPlane;
     float FarPlane;
     float2 unused0;
@@ -127,48 +122,14 @@ cbuffer LightBufferData : register(b4)
         float pointLightsRange;
         float3 pointLightsColor;
         float pointLightsIntensity;
-    } myPointLights[100];
+    } myPointLights[32];
 
     int amountOfPointLights;
     float unused[3];
 };
-cbuffer PointLightBuffer : register(b4)
-{
-    struct PointLights
-    {
-        float4 position;
-        float4 color;
-        float range;
-        float3 garbage;
-    } pointLights[MAX_NUMBER_OF_LIGHTS];
-    
-    uint numberOfPointLights;
-    float3 garbage0;
-}
 
-cbuffer PostProcessBufferData : register(b5)
-{
-    int DownScaleLevel;
-    float AlphaBlendLevel;
-    float buffSaturation;
-    float buffExposure;
-    
-    float3 buffContrast;
-    float bufftrash1;
-    
-    float3 buffTint;
-    float bufftrash2;
-    
-    float3 buffBlackPoint;
-    float bufftrash3;
-};
 
-cbuffer DirectionalLightBufferData : register(b6)
-{
-    float4 directionalLightDir;
-    float4 directionalLightColor;
-    float4x4 directionalLightColorLightShadowSpaceToWorldSpace;
-};
+
 
 SamplerState aDefaultSampler : register(s0);
 SamplerState a2dDefaultSampler : register(s1);

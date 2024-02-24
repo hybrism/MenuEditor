@@ -88,12 +88,9 @@ Vector3f Transform::GetScale() const
 	);
 }
 
-
 void Transform::Translate(const Vector3f& aTranslation)
 {
-	myMatrix.r[3].m128_f32[0] += aTranslation.x;
-	myMatrix.r[3].m128_f32[1] += aTranslation.y;
-	myMatrix.r[3].m128_f32[2] += aTranslation.z;
+	SetPosition(GetPosition() + aTranslation);
 }
 
 void Transform::Rotate(const Vector3f& aEulerRotation)
@@ -104,7 +101,7 @@ void Transform::Rotate(const Vector3f& aEulerRotation)
 		aEulerRotation.z * Deg2Rad
 	);
 
-	myMatrix = DirectX::XMMatrixMultiply(myMatrix, rotationMatrix);
+	myMatrix = DirectX::XMMatrixMultiply(rotationMatrix, myMatrix);
 }
 
 void Transform::Scale(const Vector3f& aScale)
@@ -118,25 +115,25 @@ Vector3f Transform::GetRight() const
 {
 	return Vector3f(
 		myMatrix.r[0].m128_f32[0],
-		myMatrix.r[1].m128_f32[0],
-		myMatrix.r[2].m128_f32[0]
+		myMatrix.r[0].m128_f32[1],
+		myMatrix.r[0].m128_f32[2]
 	);
 }
 
 Vector3f Transform::GetUp() const
 {
 	return Vector3f(
-		myMatrix.r[0].m128_f32[1],
+		myMatrix.r[1].m128_f32[0],
 		myMatrix.r[1].m128_f32[1],
-		myMatrix.r[2].m128_f32[1]
+		myMatrix.r[1].m128_f32[2]
 	);
 }
 
 Vector3f Transform::GetForward() const
 {
 	return Vector3f(
-		myMatrix.r[0].m128_f32[2],
-		myMatrix.r[1].m128_f32[2],
+		myMatrix.r[2].m128_f32[0],
+		myMatrix.r[2].m128_f32[1],
 		myMatrix.r[2].m128_f32[2]
 	);
 }

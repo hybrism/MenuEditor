@@ -1,5 +1,6 @@
 #include "DeferredViewWindow.h"
 #include <engine/graphics/GraphicsEngine.h>
+#include <engine/graphics/DirectionalLightManager.h>
 #include <imgui/imgui.h>
 
 FE::DeferredViewWindow::DeferredViewWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
@@ -46,6 +47,12 @@ void FE::DeferredViewWindow::Show(const EditorUpdateContext& aContext)
 			ImGui::TableSetColumnIndex(1);
 			ImGui::Text("#5 Emissive");
 			ImGui::Image(gBuffer.mySRVs[5].Get(), ImVec2(256, 144));
+
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Text("DepthBuffer");
+			ImGui::Image(ge->GetDepthBuffer().mySRV.Get(), ImVec2(256, 144));
+
 
 			ImGui::EndTable();
 		}

@@ -28,7 +28,7 @@ bool Shader::InternalInit(
 
 
 bool Shader::PrepareRender(
-	const BufferSlots& aSlot,
+	const BufferSlots&,
 	void* aBufferData,
 	const size_t& aSize
 ) const
@@ -49,7 +49,6 @@ bool Shader::PrepareRender(
 	memcpy(dataVPtr, aBufferData, aSize);
 
 	context->Unmap(myConstantBuffer.Get(), 0);
-	context->VSSetConstantBuffers((UINT)aSlot, 1, myConstantBuffer.GetAddressOf());
 
 	return true;
 }

@@ -10,6 +10,5 @@ struct ProjectileComponent : public Component<ProjectileComponent>
 	float speed = 5300.f;
 	float size = 30.f;
 
-	bool fire = false;
 	bool hit = false;
 };

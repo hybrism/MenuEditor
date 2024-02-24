@@ -16,10 +16,10 @@
 OrbSystem::OrbSystem(World* aWorld) : System(aWorld)
 {
 	DebugLine line({}, {}, {1,0,0,1});
-	myFollowLines.resize(mySize, line);
+	myFollowLines.resize(mylength, line);
 	for (size_t i = 0; i < myFollowLines.size(); i++)
 	{
-		myFollowLines[i].Init();
+		myFollowLines[i].SetColor({1,1,0,1});
 	}
 }
 
@@ -32,13 +32,14 @@ void OrbSystem::Init()
 	for (Entity entity : myEntities)
 	{
 		OrbComponent& orbComponent = myWorld->GetComponent<OrbComponent>(entity);
+		TransformComponent& transform = myWorld->GetComponent<TransformComponent>(entity);
+		transform.transform.SetScale(Vector3f{ 0.1f,0.1f,0.1f });
 		LoadInOrbData(ORB_DATA, orbComponent);
 	}
 }
 
 void OrbSystem::Update(const float& dt)
 {
-
 	for (Entity entity : myEntities)
 	{
 		auto playerID = myWorld->GetPlayerEntityID();
@@ -48,19 +49,16 @@ void OrbSystem::Update(const float& dt)
 							   (float)playerComp.controller->getPosition().z };
 
 		TransformComponent& transformComponent = myWorld->GetComponent<TransformComponent>(entity);
+		OrbComponent& orbComponent = myWorld->GetComponent<OrbComponent>(entity);
 
-		CreateFollowPath(playerComp, dt);
-		FollowPath(transformComponent, dt);
+		if (orbComponent.playerHealth > 0)
+		{
+			CreateFollowPath(playerComp, dt);
+			FollowPath(playerComp,transformComponent, orbComponent, dt);
+			PlayerRegainHealth(orbComponent, dt);
+		}
 
-#ifdef _DEBUG	
-		//DebugLine line = DebugLine(Vector3f(transformComponent.transform.GetPosition().x, transformComponent.transform.GetPosition().y, transformComponent.transform.GetPosition().z),
-		//	                       Vector3f(transformComponent.transform.GetPosition().x, transformComponent.transform.GetPosition().y + 100.f, transformComponent.transform.GetPosition().z));
-
-		////Orb
-		//line.Init();
-		//line.SetColor(Vector4(1, 0, 0, 1));
-		//line.DrawLine();
-#endif
+		orbComponent.OrbPos = transformComponent.transform.GetPosition();
 	}
 }
 
@@ -82,14 +80,6 @@ void OrbSystem::Render()
 			myFollowLines[i].DrawLine();
 		}
 	}
-
-	/*DebugLine line = DebugLine(Vector3(myPlayerPos.x, myPlayerPos.y, myPlayerPos.z),
-		Vector3f(myPlayerPos.x, myPlayerPos.y + 100.f, myPlayerPos.z));
-
-	line.Init();
-	line.SetColor(Vector4(1, 0, 0, 1));
-	line.DrawLine();*/
-
 #endif
 }
 
@@ -105,14 +95,14 @@ void OrbSystem::LoadInOrbData(std::string aFile, OrbComponent& aOrb)
 		nlohmann::json orbSpeedSettings = orbSettingsData[i]["OrbSpeedSetting"];
 
 		aOrb.ChaseSpeed = orbSpeedSettings["ChasingSpeed"];
-		aOrb.CatchingSpeed = orbSpeedSettings["CatchingSpeed"];
-		aOrb.RegainSpeed = orbSpeedSettings["RegainSpeed"];
+		//aOrb.CatchingSpeed = orbSpeedSettings["CatchingSpeed"];
+		//aOrb.RegainSpeed = orbSpeedSettings["RegainSpeed"];
 	}
 }
 
 void OrbSystem::CreateFollowPath(PlayerComponent& aPlayer, const float aDT)
 {
-	if (aPlayer.finalVelocity.Length() > 0 )
+	if (aPlayer.finalVelocity.Length() > 1.0f )
 	{
 		myCreationTimer -= aDT;
 
@@ -120,7 +110,7 @@ void OrbSystem::CreateFollowPath(PlayerComponent& aPlayer, const float aDT)
 		{
 			myCreationTimer = .1f;
 
-			if (myFollowPath.size() == mySize)
+			if (myFollowPath.size() == mylength)
 			{
 				myFollowPath.erase(myFollowPath.begin());
 			}
@@ -130,7 +120,7 @@ void OrbSystem::CreateFollowPath(PlayerComponent& aPlayer, const float aDT)
 	}
 }
 
-void OrbSystem::FollowPath(TransformComponent& atransform, const float aDT)
+void OrbSystem::FollowPath(PlayerComponent& aPlayer,TransformComponent& atransform, OrbComponent& aOrb, const float aDT)
 {
 	
 	float distanceToPlayer = 0;
@@ -149,6 +139,13 @@ void OrbSystem::FollowPath(TransformComponent& atransform, const float aDT)
 		}
 	}
 
+	//Limit orb movement if speed is maintained
+	if (aPlayer.finalVelocity.Length() > 10.0f)
+	{
+		myChaseTimer = 0;
+		myPathIndex = 0;
+	}
+
 	if (myFollowPath.size() > 1)
 	{
 		//move
@@ -156,7 +153,7 @@ void OrbSystem::FollowPath(TransformComponent& atransform, const float aDT)
 
 		myChaseTimer += aDT;
 
-		if (myChaseTimer > 0.5f)
+		if (myChaseTimer > myChaseSpeedThreshold)
 		{
 			myPathIndex++;
 			myChaseTimer = 0;
@@ -165,7 +162,40 @@ void OrbSystem::FollowPath(TransformComponent& atransform, const float aDT)
 			{
 				atransform.transform.SetPosition(myFollowPath.front());
 				myPathIndex = 0;
+
+				//Take damage
+				PlayerTakeDamage(aOrb);
 			}
 		}
+	}
+}
+
+void OrbSystem::PlayerRegainHealth(OrbComponent& aOrb, const float& dt)
+{
+	if (aOrb.playerHealth < aOrb.playerMaxHealth)
+	{
+		aOrb.HPRegainTimer -= dt;
+
+		if (aOrb.HPRegainTimer <= 0)
+		{
+			aOrb.playerHealth++;
+			std::cout << "Health +1" << std::endl;
+		}
+	}
+}
+
+void OrbSystem::PlayerTakeDamage(OrbComponent& aOrb)
+{
+	aOrb.playerHealth--;
+	std::cout << "Damage taken" << std::endl;
+
+	//player died
+	if (aOrb.playerHealth <= 0)
+	{
+		std::cout << "player killed" << std::endl;
+	}
+	else
+	{
+		aOrb.HPRegainTimer = aOrb.HPRegaintime;
 	}
 }

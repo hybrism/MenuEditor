@@ -82,7 +82,10 @@ void FE::Inspector::DisplayTransformData(World* aWorld)
 		Vector3f scale = transform.GetScale();
 
 		Header("TransformComponent");
-		ImGui::DragFloat3("Position", &pos.x);
+
+		if (ImGui::DragFloat3("Position", &pos.x))
+			transform.SetPosition(pos);
+
 		ImGui::DragFloat3("Rotation", &rot.x, 0.1f, 0.f, 360.f);
 		ImGui::DragFloat3("Scale (Can't edit atm)", &scale.x, 0.1f, 0.f);
 
@@ -225,6 +228,14 @@ void FE::Inspector::DisplayPlayerData(World* aWorld)
 
 		ImGui::Checkbox("Is Crouching:", &p.isCrouching);
 		ImGui::Checkbox("Is Sliding:", &p.isSliding);
+
+		
+		int playerStateInt = static_cast<int>(p.currentPlayerState->GetID());
+		const char* playerStateNames[static_cast<int>(ePlayerClassStates::Count)] = { "Ground", "Airbourne", "Crouch", "Slide", "Wallrun", "Vault"};
+		const char* playerStateName = (playerStateInt >= 0 && playerStateInt < static_cast<int>(ePlayerClassStates::Count)) ? playerStateNames[playerStateInt] : "Unknown";
+		ImGui::SliderInt("Player State", &playerStateInt, 0, static_cast<int>(ePlayerClassStates::Count) - 1, playerStateName, ImGuiSliderFlags_NoInput);
+
+
 	}
 }
 

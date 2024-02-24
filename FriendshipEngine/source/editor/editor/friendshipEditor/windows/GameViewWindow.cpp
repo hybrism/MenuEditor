@@ -1,5 +1,6 @@
 #include "GameViewWindow.h"
 
+#include "../EditorManager.h" // TODO: MOVE THIS TO A BETTER PLACE
 #include <engine/graphics/GraphicsEngine.h>
 #include <imgui/imgui.h>
 
@@ -35,6 +36,8 @@ void FE::GameViewWindow::Show(const EditorUpdateContext& aContext)
 
 		ImVec2 vMinWin = wPos + vMin;
 		ImVec2 vMaxWin = wPos + vMax;
+
+		aContext.editorManager->SetGameWindowRect({ vMinWin, vMaxWin });
 
 		ImDrawList* tDrawList = ImGui::GetWindowDrawList();
 		tDrawList->AddImage(GraphicsEngine::GetInstance()->GetBackBufferSRV().Get(), vMinWin, vMaxWin);

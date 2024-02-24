@@ -26,6 +26,10 @@ void ScriptLinkData::LoadFromJson(ScriptLinkDataType type, const ScriptJson& jso
 			data = ScriptStringRegistry::RegisterOrGetStringId(string);
 			break;
 		}
+		case ScriptLinkDataType::Entity:
+		{
+			data = json.json.get<Entity>();
+		}
 		}
 	}
 }
@@ -49,6 +53,11 @@ void ScriptLinkData::WriteToJson(ScriptLinkDataType type, ScriptJson& json) cons
 		{
 			ScriptStringId stringId = std::get<ScriptStringId>(data);
 			json.json = ScriptStringRegistry::GetStringFromStringId(stringId).data();
+			break;
+		}
+		case ScriptLinkDataType::Entity:
+		{
+			json.json = std::get<Entity>(data);
 			break;
 		}
 		}

@@ -3,7 +3,7 @@
 
 #include "../Defines.h"
 
-#if !USE_LAUNCHER_AS_STARTUP
+#if USE_FE_CONSOLE
 #include "../editor/shared/postMaster/PostMaster.h"
 #endif
 
@@ -63,7 +63,7 @@ namespace Error
 
 		std::cout << aString << std::endl;
 
-#if !USE_LAUNCHER_AS_STARTUP
+#if USE_FE_CONSOLE
 		FE::Message message;
 		message.myEventType = FE::eMessageType::PrintToConsole;
 		message.myMessage = std::string(aString);
@@ -75,7 +75,7 @@ namespace Error
 	{
 		std::cout << "[" << aFile << "] " << aString << std::endl;
 
-#if  !USE_LAUNCHER_AS_STARTUP
+#if USE_FE_CONSOLE
 		FE::Message message;
 		message.myEventType = FE::eMessageType::PrintToConsole;
 		message.myMessage = std::string("[" + aFile + "] " + aString);
@@ -90,7 +90,7 @@ namespace Error
 		std::cout << "[WARNING] " << aString << " :S" << std::endl;
 		SetConsoleTextAttribute(console, TEXT_DEFAULT);
 
-#if  !USE_LAUNCHER_AS_STARTUP
+#if USE_FE_CONSOLE
 		FE::Message message;
 		message.myEventType = FE::eMessageType::PrintToConsole;
 		message.myMessage = std::string("[WARNING] " + aString);
@@ -105,7 +105,7 @@ namespace Error
 		std::cout << "[ERROR] " << aString << " :(" << std::endl;
 		SetConsoleTextAttribute(console, TEXT_DEFAULT);
 
-#if  !USE_LAUNCHER_AS_STARTUP
+#if USE_FE_CONSOLE
 		FE::Message message;
 		message.myEventType = FE::eMessageType::PrintToConsole;
 		message.myMessage = std::string("[ERROR] " + aString);
@@ -120,7 +120,7 @@ namespace Error
 		std::cout << "[INFO] " << aString << std::endl;
 		SetConsoleTextAttribute(console, TEXT_DEFAULT);
 
-#if  !USE_LAUNCHER_AS_STARTUP
+#if USE_FE_CONSOLE
 		FE::Message message;
 		message.myEventType = FE::eMessageType::PrintToConsole;
 		message.myMessage = std::string("[INFO] " + aString);

@@ -22,7 +22,7 @@
 #include "..\component\MeshComponent.h"
 #include <engine/graphics\animation\AnimationController.h>
 #include <physics/PhysXSceneManager.h>
-
+#include "audio/AudioManager.h"
 
 
 #include <engine/graphics/vfx/VFXManager.h>
@@ -43,13 +43,15 @@ PlayerSystem::PlayerSystem(World* aWorld, PhysXSceneManager* aPhysXSceneManager)
 
 PlayerSystem::~PlayerSystem()
 {
+	DeletePlayerStates();
 }
-
 
 #include <iostream>
 #include <assets/AssetDatabase.h>
 void PlayerSystem::Init()
 {
+	CreatePlayerStates();
+
 	VisualEffect testEffect{};
 	float tempDuration = 0.65f;
 	{
@@ -103,31 +105,49 @@ void PlayerSystem::Init()
 		PlayerComponent& playerComponent = myWorld->GetComponent<PlayerComponent>(entity);
 		//PhysXComponent& physXComponent = myWorld->GetComponent<PhysXComponent>(entity);
 
-		playerComponent.callbackWrapper.OnShapeHit = [&](const PxControllerShapeHit& hit) {
-			playerComponent.capsuleCollisionPosition = { (float)hit.worldPos.x, (float)hit.worldPos.y, (float)hit.worldPos.z };
+		playerComponent.currentPlayerState = myPlayerStateArray[static_cast<int>(ePlayerClassStates::GroundState)];
+		//SetPlayerState(playerComponent, ePlayerClassStates::GroundState);
+		playerComponent.callbackWrapper.OnShapeHit = [&](const PxControllerShapeHit& hit)
+			{
+				playerComponent.capsuleCollisionPosition = { (float)hit.worldPos.x, (float)hit.worldPos.y, (float)hit.worldPos.z };
 
-			//playerComponent.isGrounded = worldPos.y - playerComponent.controller->getFootPosition().y < 1.0f && hit.worldNormal.y > 0.5f;
+				playerComponent.capsuleCollisionNormal = { hit.worldNormal.x, hit.worldNormal.y, hit.worldNormal.z };
 
-			playerComponent.capsuleCollisionNormal = { hit.worldNormal.x, hit.worldNormal.y, hit.worldNormal.z };
+				playerComponent.isGrounded = hit.worldPos.y - playerComponent.controller->getFootPosition().y < CHARACTER_RADIUS && Vector3f::Up().Dot(playerComponent.capsuleCollisionNormal) > 0.7f;
+
 			};
 
-		playerComponent.callbackWrapper.OnControllerHit = [&](const PxControllersHit&) {
+		playerComponent.callbackWrapper.OnControllerHit = [&](const PxControllersHit&)
+			{
 			};
 
-		playerComponent.callbackWrapper.OnObstacleHit = [&](const PxControllerObstacleHit&) {
+		playerComponent.callbackWrapper.OnObstacleHit = [&](const PxControllerObstacleHit&)
+			{
 			};
+
 	}
+
+	filter = PxControllerFilters();
 }
 
 #include <engine/math/helper.h>
 float prevY = 0;
 void PlayerSystem::Update(const float& dt)
 {
+#ifdef _DEBUG
+	if (GraphicsEngine::GetInstance()->GetCamera() != GraphicsEngine::GetInstance()->GetViewCamera())
+	{
+		return;
+	}
+#endif
+
 	//MATI! Om myEntities ?r tom kommer denna kod inte att k?ras, det ?r b?ttre att ha allt inom denna for-loop!
 	for (auto entity : myEntities)
 	{
 		PlayerComponent& p = myWorld->GetComponent<PlayerComponent>(entity);
 		TransformComponent& t = myWorld->GetComponent<TransformComponent>(entity);
+
+		//AudioManager::GetInstance()->SetPlayerListenPosition(t.transform);
 
 		Input(entity, dt);
 		Collision(entity, dt);
@@ -140,19 +160,40 @@ void PlayerSystem::Update(const float& dt)
 		TestVfxBlob(dt);
 
 		{
-			PxControllerFilters filter = PxControllerFilters();
+		
+			PxFilterData filterData;
+
+		
+
 			filter.mCCTFilterCallback = nullptr;
 			filter.mFilterCallback = nullptr;
 			filter.mFilterFlags = PxQueryFlag::eSTATIC | PxQueryFlag::eDYNAMIC;
 
+			p.finalVelocity = { p.xVelocity.x, p.yVelocity, p.xVelocity.y };
+
+			if (p.isGrounded && p.xVelocity.LengthSqr() > 0)
+			{
+				//float length = p.xVelocity.Length();
+				Vector3f playerVelocity = Vector3f(p.xVelocity.x, p.yVelocity, p.xVelocity.y);
+				playerVelocity.y = 0;
+				Vector3f moveDirection = playerVelocity.GetNormalized();
+
+				//Vector3f projectedMovement = Vector3f::Cross(Vector3f::Cross(p.groundCollisionNormal, Vector3f::Up()), p.groundCollisionNormal).GetNormalized() * Vector3f::Dot(moveDirection, p.groundCollisionNormal);
+
+				float dist = Vector3f::Dot(playerVelocity, p.groundCollisionNormal);
+				Vector3f projectedPoint = (playerVelocity) - (p.groundCollisionNormal * dist);
+
+				p.finalVelocity = projectedPoint;
+			}
+			/*filterData.word0 =  CollisionLayer::PLAYER_GROUP;
+			filterData.word1 = CollisionLayer::DEFAULT;*/
+			filter.mFilterData = &filterData;
+
+			p.isGrounded = false;
 			p.groundCollisionNormal = { 0, 0, 0 };
 			p.capsuleCollisionPosition = { 0, 0, 0 };
-			p.finalVelocity = { p.xVelocity.x, p.yVelocity, p.xVelocity.y };
-			p.finalVelocity *= 60.0f;
-			p.finalVelocity *= dt;
-			p.isGrounded = false;
 
-			p.controller->move(PxVec3(p.finalVelocity.x, p.finalVelocity.y, p.finalVelocity.z), 1.0f, dt, filter);
+			p.controller->move(PxVec3(p.finalVelocity.x, p.finalVelocity.y, p.finalVelocity.z), 0.01f, dt, filter);
 		}
 
 		auto footPos = p.controller->getFootPosition();
@@ -217,19 +258,23 @@ void PlayerSystem::Move(Entity entity, float dt)
 			float gravity = p.gravity * dt;
 			if (p.isGrounded)
 			{
-				p.yVelocity = 0;
+				SetPlayerState(p, ePlayerClassStates::GroundState);
+				p.yVelocity = -0.02f;
 			}
-			else if (p.wallNormal.LengthSqr() > 0 && p.yVelocity + gravity <= 0)
+			else
 			{
-				gravity *= p.wallRunGravityMultiplier;
-				p.isWallRunning = true;
-			}
-			else if (p.groundCollisionNormal.y < -0.5f && p.yVelocity > 0)
-			{
-				p.yVelocity = 0;
+				if (p.wallNormal.LengthSqr() > 0 && p.yVelocity + gravity <= 0)
+				{
+					gravity *= p.wallRunGravityMultiplier;
+					p.isWallRunning = true;
+				}
+				else if (p.groundCollisionNormal.y < -0.5f && p.yVelocity > 0)
+				{
+					p.yVelocity = 0;
+				}
+				p.yVelocity += gravity;
 			}
 
-			p.yVelocity += gravity;
 
 
 			if (p.hasPressedJump)
@@ -241,10 +286,15 @@ void PlayerSystem::Move(Entity entity, float dt)
 				}
 				else if (p.isGrounded || p.isWallRunning)
 				{
+					SetPlayerState(p, ePlayerClassStates::AirbourneState);
 					p.yVelocity = p.jumpSpeed;
+					//std::string jumpFilePath = RELATIVE_AUDIO_ASSET_PATH;
+					//jumpFilePath += "Jump.wav";
+					//AudioManager::GetInstance()->PlaySound(jumpFilePath, { 0,0,0 }, 0.2f);
 					if (p.isWallRunning)
 					{
 						//float length = p.xVelocity.Length();
+						//SetPlayerState(p, ePlayerClassStates::WallrunState);
 						p.xVelocity += Vector2f(p.wallNormal.x, p.wallNormal.z) * p.wallJumpSpeed;
 						p.isWallRunning = false;
 					}
@@ -264,7 +314,7 @@ void PlayerSystem::Move(Entity entity, float dt)
 			if (!p.isWallRunning)
 			{
 				float crouchingMultiplier = p.isCrouching ? p.crouchSpeedMultiplier : 1.0f;
-				p.xVelocity += p.inputDirection * (p.speed) * strafeMultiplier * airMultiplier * crouchingMultiplier;
+				p.xVelocity += p.inputDirection * (p.speed) * strafeMultiplier * airMultiplier * crouchingMultiplier; // Add delta?
 			}
 
 			float friction = shouldUseGroundFriction ? p.friction : p.airFriction;
@@ -297,6 +347,7 @@ void PlayerSystem::Move(Entity entity, float dt)
 
 			if (p.isWallRunning)
 			{
+				SetPlayerState(p, ePlayerClassStates::WallrunState);
 				float length = p.xVelocity.Length();
 				Vector3f wallDirection = p.wallNormal.Cross(Vector3f::Up()).GetNormalized();
 				Vector3f projectedVector = Vector3f::Project(Vector3f(p.xVelocity.x, 0, p.xVelocity.y), wallDirection);
@@ -326,7 +377,7 @@ void PlayerSystem::CameraMove(Entity entity, float dt)
 	float& camera_yaw = p.cameraRotation.y;
 
 	InputManager* im = InputManager::GetInstance();
-	Vector2<float> mouseMovement = im->GetCurrentMousePositionVector2f();
+	Vector2f mouseMovement = im->GetCurrentMousePositionVector2f();
 
 	float rotation_rate_x = p.cameraSensitivity.x * dt;
 	float rotation_rate_y = p.cameraSensitivity.y * dt;
@@ -350,23 +401,21 @@ void PlayerSystem::Collision(Entity entity, float)
 	// Ground Collision
 	if (p.yVelocity <= 0)
 	{
-		physx::PxOverlapBuffer hit = {};
-		auto footPos = p.controller->getFootPosition();
-		physx::PxTransform shapePose(physx::PxVec3((float)footPos.x, (float)footPos.y + 25.0f, (float)footPos.z));
-
-		PxSweepBuffer hitBuffer;
-		if (myPhysXSceneManager->GetScene()->sweep(
-			physx::PxSphereGeometry(40.0f),
-			shapePose,
+		physx::PxVec3 footPos = physx::toVec3(p.controller->getFootPosition());
+		footPos = physx::PxVec3((float)footPos.x, (float)footPos.y + CHARACTER_HEIGHT / 2, (float)footPos.z);
+		physx::PxRaycastBuffer hit = {};
+		if (myPhysXSceneManager->GetScene()->raycast(
+			footPos,
 			physx::PxVec3(0, -1, 0),
-			100.0f,
-			hitBuffer,
+			CHARACTER_HEIGHT / 2 + 10.0f,
+			hit,
 			physx::PxHitFlag::eDEFAULT,
 			physx::PxQueryFilterData(PxQueryFlag::eANY_HIT | physx::PxQueryFlag::eSTATIC)
-		))
+		)
+			)
 		{
-			p.groundCollisionNormal = { hitBuffer.block.normal.x, hitBuffer.block.normal.y, hitBuffer.block.normal.z };
-			p.isGrounded = p.groundCollisionNormal.y > 0.5f && (p.controller->getFootPosition().y - p.capsuleCollisionPosition.y < 15.0f);
+			p.groundCollisionNormal = { hit.block.normal.x, hit.block.normal.y, hit.block.normal.z };
+			p.isGrounded = p.groundCollisionNormal.y > 0.5f;
 		}
 	}
 
@@ -498,7 +547,7 @@ void PlayerSystem::Slide(Entity entity, float dt)
 
 	if (p.isSliding || p.isCrouching)
 	{
-		p.controller->resize(0.0f);
+		//p.controller->resize(0.0f);
 	}
 	else if (canUncrouch)
 	{
@@ -545,6 +594,36 @@ void PlayerSystem::Slide(Entity entity, float dt)
 	if (p.slideTimer >= p.slideTimeUnitlFriction)
 	{
 		p.xVelocity *= p.slideFriction;
+	}
+}
+
+void PlayerSystem::SetPlayerState(PlayerComponent& aPlayerComponent, const ePlayerClassStates& aPlayerState)
+{
+	if (myPlayerStateArray[static_cast<int>(aPlayerState)] == aPlayerComponent.currentPlayerState)
+		return;
+
+	aPlayerComponent.currentPlayerState->OnExit();
+	aPlayerComponent.currentPlayerState = myPlayerStateArray[static_cast<int>(aPlayerState)];
+	aPlayerComponent.currentPlayerState->OnEnter();
+}
+
+void PlayerSystem::CreatePlayerStates()
+{
+	myPlayerStateArray[static_cast<int>(ePlayerClassStates::GroundState)] = new PlayerGroundState();
+	myPlayerStateArray[static_cast<int>(ePlayerClassStates::AirbourneState)] = new PlayerAirbourneState();
+	myPlayerStateArray[static_cast<int>(ePlayerClassStates::CrouchState)] = new PlayerCrouchState();
+	myPlayerStateArray[static_cast<int>(ePlayerClassStates::SlideState)] = new PlayerSlideState();
+	myPlayerStateArray[static_cast<int>(ePlayerClassStates::WallrunState)] = new PlayerWallrunState();
+	myPlayerStateArray[static_cast<int>(ePlayerClassStates::VaultState)] = new PlayerVaultState();
+
+}
+
+void PlayerSystem::DeletePlayerStates()
+{
+	for (int i = 0; i < static_cast<int>(ePlayerClassStates::Count); i++)
+	{
+		delete myPlayerStateArray[i];
+		myPlayerStateArray[i] = nullptr;
 	}
 }
 

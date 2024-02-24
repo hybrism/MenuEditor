@@ -71,6 +71,7 @@ public:
 		myClearColor.x = r;
 		myClearColor.y = g;
 		myClearColor.z = b;
+		myClearColor.w = 1.0f;
 	}
 
 	Vector4f GetClearColor() const { return myClearColor; }
@@ -80,17 +81,18 @@ public:
 
 	const Vector2<int>& GetWindowDimensions() const { return myWindowDimensions; }
 	const Vector2<int>& GetViewportDimensions() const { return myViewportDimensions; }
-	const Vector2<float>& GetBackTexturesize() const { return myBackBufferTextureSize; }
-	const D3D11_VIEWPORT& GetViewPort() const {return *myViewport;}
+	const D3D11_VIEWPORT& GetViewPort() const { return *myViewport; }
 	ComPtr<ID3D11RenderTargetView>& GetBackBuffer();
 	ComPtr<ID3D11ShaderResourceView>& GetBackBufferSRV();
+	RenderTarget& GetBackBufferRenderTarget();
 	DepthBuffer& GetDepthBuffer() { return myDepthBuffer; }
 	bool SetResolution(const Vector2<int>& aResolution);
 
 	Camera* GetCamera() { return myCurrentCamera; }
+	Camera* GetViewCamera() { return myViewCamera; }
 	Camera const* GetCamera() const { return myCurrentCamera; }
 	void ChangeCurrentCamera(Camera* aCamera);
-	void ResetToPrimaryCamera();
+	void ResetToViewCamera();
 
 	SpriteDrawer& GetSpriteDrawer() { return *mySpriteDrawer; }
 	MeshDrawer& GetMeshDrawer() { return myMeshDrawer; }

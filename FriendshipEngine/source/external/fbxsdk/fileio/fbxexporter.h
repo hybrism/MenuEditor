@@ -194,7 +194,7 @@ public:
 
 		/** Return \c true if the file format is a recognized FBX format.
 		  */
-		bool IsFbx();
+		bool IsFBX();
 
 		/** Get the list of writable versions for the current file format.
 		  * \return \c NULL or a null terminated array of strings.

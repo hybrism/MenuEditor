@@ -52,26 +52,25 @@ void AnimatorSystem::Update(const float& dt)
 
 		// Prevents crash if no animation states are added to skinned mesh, though this should never happen
 #ifdef _DEBUG
-		if (!controller->HasAnimationStates()) { continue; }
+		if (!controller->HasAnimationStates())
+		{
+			continue;
+		}
 #endif
 		int currentAnimIndex = controller->GetCurrentAnimationIndex(animData);
-
+		
 		if (currentAnimIndex < 0) { continue; }
 
-		auto* animation = AssetDatabase::GetAnimation(meshId, currentAnimIndex);
+		Animation* animation = AssetDatabase::GetAnimation(meshId, currentAnimIndex);
 
-		// Skeletal meshes only contain one mesh
-		SkeletalMesh* mesh = static_cast<SkeletalMesh*>(AssetDatabase::GetMesh(meshId).meshData[0]);
-		
-		controller->Update(dt, animData);
-		myAnimationPlayer->Init(animation, mesh, &animData);
+		controller->Update(dt, *animation, animData);
 
-		if (animData.currentStateIndex == animData.nextStateIndex && animData.previousStateIndex != animData.currentStateIndex)
+		AnimationState* toState = nullptr;
+		if (animData.IsTransitioning())
 		{
-			myAnimationPlayer->Play();
+			toState = &controller->GetState(animData.nextStateIndex);
 		}
 
-		// TODO: Blend between animations
-		myAnimationPlayer->Update(dt, controller->GetCurrentState(animData));
+		myAnimationPlayer->UpdatePose(dt, meshId, animData, controller->GetCurrentState(animData), toState);
 	}
 }

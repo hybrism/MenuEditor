@@ -8,14 +8,12 @@ FE::ScriptEditorWindow::ScriptEditorWindow(const std::string& aHandle, bool aOpe
 
 void FE::ScriptEditorWindow::Show(const EditorUpdateContext& aContext)
 {
-	aContext;
-
 	if (!myData.isOpen)
 		return;
 
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
-		myScriptEditor.Update();
+		myScriptEditor.Update(aContext);
 	}
 	ImGui::End();
 }

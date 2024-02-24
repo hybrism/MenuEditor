@@ -3,8 +3,14 @@
 
 #include <ecs/World.h>
 #include <engine/utility/InputManager.h>
+#include <nlohmann/json.hpp>
 
-#pragma region Systems and Components Include
+#include "../utility/JsonUtility.h"
+#include "../scripting/ScriptManager.h"
+#include "../scripting/ScriptRuntimeInstance.h"
+#include "../scripting/ScriptUpdateContext.h"
+
+#pragma region Systems and Components Includes
 //Systems
 #include "../systems/PlayerSystem.h"
 #include "../systems/RenderingSystem.h"
@@ -60,7 +66,13 @@ bool GameScene::Update(float dt)
 {
 	myWorld->Update(dt);
 
-	if (InputManager::GetInstance()->IsKeyPressed(VK_ESCAPE))
+	for (size_t i = 0; i < myScripts.size(); i++)
+	{
+		myScripts[i]->Update({ dt });
+	}
+
+	auto* im = InputManager::GetInstance();
+	if (im->IsKeyHeld(VK_SHIFT) && im->IsKeyPressed(VK_ESCAPE))
 	{
 		return false;
 	}
@@ -89,8 +101,8 @@ void GameScene::InitComponents()
 	myWorld->RegisterComponent<OrbComponent, 1>();
 	myWorld->RegisterComponent<ProjectileComponent, 32>();
 	myWorld->RegisterComponent<NpcComponent, 32>();
-	//myWorld->RegisterComponent<EventComponent>();
-	//myWorld->RegisterComponent<ScriptableEventComponent>();
+	myWorld->RegisterComponent<EventComponent>();
+	myWorld->RegisterComponent<ScriptableEventComponent, 64>();
 
 #ifdef _DEBUG
 	myWorld->RegisterComponent<MetaDataComponent>();
@@ -99,6 +111,8 @@ void GameScene::InitComponents()
 
 void GameScene::InitSystems(PhysXSceneManager& aPhysXManager)
 {
+	//TODO: Move all of these to respective constructor
+
 	// RenderingSystem
 	{
 		ComponentSignature renderingSystemSignature;
@@ -107,29 +121,10 @@ void GameScene::InitSystems(PhysXSceneManager& aPhysXManager)
 		myWorld->RegisterSystem<RenderingSystem>(renderingSystemSignature);
 	}
 
-	// PlayerSystem
-	{
-		myWorld->RegisterSystem<PlayerSystem, PhysXSceneManager*>(&aPhysXManager);
-	}
-
-	//CameraSystem
-	{
-		myWorld->RegisterSystem<CameraSystem>();
-	}
-	
-	// CollisionSystem
-	{
-		myWorld->RegisterSystem<CollisionSystem>();
-	}
-	
-	// EnemySystem
-	{
-		ComponentSignature enemySystemSignature;
-		enemySystemSignature.set(myWorld->GetComponentSignatureID<TransformComponent>());
-		enemySystemSignature.set(myWorld->GetComponentSignatureID<EnemyComponent>());
-
-		myWorld->RegisterSystem<EnemySystem>(enemySystemSignature);
-	}
+	myWorld->RegisterSystem<PlayerSystem, PhysXSceneManager*>(&aPhysXManager);
+	myWorld->RegisterSystem<CameraSystem>();
+	myWorld->RegisterSystem<CollisionSystem>();
+	myWorld->RegisterSystem<EnemySystem>();
 
 	// HitboxSystem
 	{
@@ -139,14 +134,12 @@ void GameScene::InitSystems(PhysXSceneManager& aPhysXManager)
 		myWorld->RegisterSystem<HitboxSystem>(hitboxSystemSignature);
 	}
 
-	//// EventSystem
-	//{
-	//	ComponentSignature eventSystemSignature;
-	//	eventSystemSignature.set(myWorld->GetComponentSignatureID<EventComponent>());
-	//	//TODO, check if this is OK to do :)
-	//	auto eventSys = myWorld->RegisterSystem<EventSystem>(eventSystemSignature);
-	//	eventSys->Connect(myStateStackPtr);
-	//}
+	// EventSystem
+	{
+		ComponentSignature eventSystemSignature;
+		eventSystemSignature.set(myWorld->GetComponentSignatureID<EventComponent>());
+		myWorld->RegisterSystem<EventSystem>(eventSystemSignature);
+	}
 
 	// AnimatorSystem
 	{
@@ -158,10 +151,7 @@ void GameScene::InitSystems(PhysXSceneManager& aPhysXManager)
 
 	//ScriptableEventSystem
 	{
-		ComponentSignature scriptableEventSystemSignature;
-		scriptableEventSystemSignature.set(myWorld->GetComponentSignatureID<ScriptableEventComponent>());
-		scriptableEventSystemSignature.set(myWorld->GetComponentSignatureID<CollisionDataComponent>());
-		myWorld->RegisterSystem<ScriptableEventSystem>(scriptableEventSystemSignature);
+		myWorld->RegisterSystem<ScriptableEventSystem>();
 	}
 
 	//PhysXSystem
@@ -193,4 +183,14 @@ void GameScene::InitSystems(PhysXSceneManager& aPhysXManager)
 		myWorld->RegisterSystem<NpcSystem>(npcSystemSignature);
 	}
 
+}
+
+void GameScene::InitScripts(const std::string& aLevelName)
+{
+	myScripts = ScriptManager::GetLevelScripts(aLevelName);
+
+	for (size_t i = 0; i < myScripts.size(); i++)
+	{
+		myScripts[i]->Init();
+	}
 }

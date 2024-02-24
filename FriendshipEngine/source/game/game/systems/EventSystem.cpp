@@ -103,8 +103,3 @@ void EventSystem::Update(const float&)
 		}
 	}
 }
-
-void EventSystem::Connect(StateStack* aStateStack)
-{
-	myStateStackPtr = aStateStack;
-}

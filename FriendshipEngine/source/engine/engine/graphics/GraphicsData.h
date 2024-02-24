@@ -13,9 +13,8 @@ struct ID3D11ShaderResourceView;
 struct FrameBufferData
 {
 	Vector4<float> resolution; //myResolution.x = screen width, myResolution.y = screen height, myResolution.z = unset, myResolution.w = unset
-	Matrix4x4<float> worldToClipMatrix;
-	Matrix4x4<float> modelToWorld;
-	Vector4<float> cameraPosition;
+	DirectX::XMMATRIX worldToClipMatrix;
+	DirectX::XMMATRIX modelToWorld;
 	float nearPlane;
 	float farPlane;
 	float unused[2];
@@ -35,35 +34,13 @@ struct InputBufferData
 	float unused[1];
 };
 
-//struct PointLightBufferData
-//{
-//	struct PointLights
-//	{
-//		Vector4<float> pos;
-//		Vector4<float> color;
-//
-//		float range; // TODO: We can bake range into alpha chanel of color since it is not used and save performance
-//		float unused[3];
-//	}myPointLights[8];  //TO DO Ändra till ett max senare
-//
-//	int amountOfPointLights;
-//	alignas(4) bool isAdditiveStateOn; // TODO: This is really inefficient, do we really need this?
-//	float unused[2];
-//};	
-//
-//struct DirectionalLightBufferData
-//{
-//	Vector4<float> dLightDir;
-//	Vector4<float> dLightColor;
-//	Matrix4x4<float> dLightShadowSpaceToWorldSpace;
-//};
 
 struct LightBufferData
 {
 	Vector4<float> directionalLightsDirection;
 	Vector3<float> directionalLightsColor;
 	float directionalLightsIntensity;
-	Matrix4x4<float> dLightShadowSpaceToWorldSpace;
+	DirectX::XMMATRIX dLightShadowSpaceToWorldSpace;
 
 	struct PointLights
 	{
@@ -71,40 +48,28 @@ struct LightBufferData
 		float pointLightsRange; 
 		Vector3<float> pointLightsColor;
 		float pointLightsIntensity; 
-	}myPointLights[MAX_POINTLIGHTS];
+	}myPointLights[32];
 
 	int amountOfPointLights;
 	float unused[3];
-
-	//alignas(4) bool isAdditiveStateOn; // TODO: This is really inefficient, do we really need this?
 };
 
-//struct ShadowMapCameraSpaceBufferData
-//{
-//	Matrix4x4<float> directionalLightsShadowSpaceToWorldSpace;
-//};
 
 
 // TODO: optimize memory useage
 struct PostProcessBufferData
 {
-	int DownScaleLevel;
-	float AlphaBlendLevel;
-	float buffSaturation;
-	float buffExposure;
+	int downScaleLevel = 0;
+	float alphaBlendLevel = 0.25f;
+	float saturation = 1.1f;
+	float exposure = 0.0f;
 
-	float buffContrast[3];
-	float bufftrash1;
+	Vector3f contrast = { 1.f, 1.f, 1.f };
+	float trash1 = 0.0f;
 
-	float buffTint[3];
-	float bufftrash2;
+	Vector3f tint = { 1.f, 1.f,1.f };
+	float trash2 = 0.0f;
 
-	float buffBlackPoint[3];
-	float bufftrash3;
+	Vector3f blackPoint = { 0.f , 0.f, 0.f };
+	float trash3 = 0.0f;
 };
-
-//struct RenderTarget
-//{
-//	ComPtr<ID3D11RenderTargetView> renderTargetView;
-//	ComPtr<ID3D11ShaderResourceView> shaderResourceView;
-//};

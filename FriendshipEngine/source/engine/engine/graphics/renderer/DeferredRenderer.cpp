@@ -25,8 +25,13 @@ void DeferredRenderer::Render(Mesh* aMesh, const MeshInstanceRenderData& aInstan
 	myStaticMeshes[aMesh].push_back(aInstanceData);
 }
 
-void DeferredRenderer::Render(SkeletalMesh* aMesh, const MeshInstanceRenderData& aInstanceData)
+void DeferredRenderer::Render(SkeletalMesh* aMesh, const MeshInstanceRenderData& aInstanceData, bool aShouldDisregardDepth)
 {
+	if (aShouldDisregardDepth)
+	{
+		myDisregardDepthMeshes[aMesh].push_back(aInstanceData);
+		return;
+	}
 	mySkeletalMeshes[aMesh].push_back(aInstanceData);
 }
 
@@ -34,6 +39,7 @@ void DeferredRenderer::DoShadowRenderPass()
 {
 	//auto* lightManager = GraphicsEngine::GetInstance()->GetDirectionalLightManager();
 	//lightManager->BeginShadowRendering();
+	GraphicsEngine::GetInstance()->SetDepthStencilState(DepthStencilState::ReadWrite);
 	RenderMeshes(false);
 }
 
@@ -57,17 +63,17 @@ void DeferredRenderer::Clear()
 	}
 	myStaticMeshes.clear();
 	mySkeletalMeshes.clear();
+	myDisregardDepthMeshes.clear();
 }
 
 void DeferredRenderer::PrepareGBuffer()
 {
 	GraphicsEngine* ge = GraphicsEngine::GetInstance();
-	auto* context = ge->GetContext();
 	auto& gBuffer = ge->GetGBuffer();
 
 	gBuffer.ClearTextures();
 	gBuffer.SetAsActiveTarget();
-	context->ClearDepthStencilView(ge->GetDepthBuffer().GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	ge->GetDepthBuffer().Clear();
 
 	ge->SetBlendState(BlendState::Disabled);
 	ge->SetDepthStencilState(DepthStencilState::ReadWrite);
@@ -100,7 +106,7 @@ void DeferredRenderer::RenderMeshes(bool aUsePixelShader)
 
 		for (size_t i = 0; i < instances.size(); i++)
 		{
-			auto data = std::get<SkeletalMeshInstanceData>(instances[i].data);
+			auto& data = std::get<SkeletalMeshInstanceData>(instances[i].data);
 			skeletalMesh->SetPose(data.pose);
 
 			const VertexShader* vs = ShaderDatabase::GetVertexShader(instances[i].vsType);
@@ -119,6 +125,37 @@ void DeferredRenderer::RenderMeshes(bool aUsePixelShader)
 			);
 		}
 	}
+
+	auto* ge = GraphicsEngine::GetInstance();
+	DepthStencilState previousState = ge->GetRenderState().depthStencilState;
+	for (auto& mesh : myDisregardDepthMeshes)
+	{
+		SkeletalMesh* skeletalMesh = mesh.first;
+		std::vector<MeshInstanceRenderData>& instances = mesh.second;
+
+		for (size_t i = 0; i < instances.size(); i++)
+		{
+			auto& data = std::get<SkeletalMeshInstanceData>(instances[i].data);
+			skeletalMesh->SetPose(data.pose);
+
+			const VertexShader* vs = ShaderDatabase::GetVertexShader(instances[i].vsType);
+			const PixelShader* ps = nullptr;
+
+			if (aUsePixelShader)
+			{
+				ps = ShaderDatabase::GetPixelShader(instances[i].psType);
+			}
+
+			ge->SetDepthStencilState(DepthStencilState::Disabled);
+			skeletalMesh->Render(
+				data.transform.GetMatrix(),
+				vs,
+				ps,
+				instances[i].renderMode
+			);
+		}
+	}
+	ge->SetDepthStencilState(previousState);
 }
 
 void DeferredRenderer::RenderDeferred()

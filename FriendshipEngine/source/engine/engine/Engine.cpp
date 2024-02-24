@@ -132,7 +132,11 @@ bool Engine::Init(
 
 	// https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow
 #ifdef _DEBUG
+#if EDITOR_VIEWPORT_SIZE
 	ShowWindow(hWnd, SW_SHOWMAXIMIZED);
+#else
+	ShowWindow(hWnd, SW_SHOWDEFAULT);
+#endif
 #else
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
 #endif

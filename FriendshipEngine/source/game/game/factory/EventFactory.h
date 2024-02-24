@@ -5,6 +5,10 @@
 
 class World;
 
+#ifdef CreateEvent
+#undef CreateEvent
+#endif
+
 class EventFactory
 {
 public:

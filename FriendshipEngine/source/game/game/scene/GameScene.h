@@ -14,4 +14,6 @@ private:
 	void InitComponents() override;
 	void InitSystems(PhysXSceneManager& aPhysXManager) override;
 
+protected:
+	void InitScripts(const std::string& aLevelName) override;
 };

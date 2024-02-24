@@ -4,8 +4,9 @@
 #include <shared/postMaster/PostMaster.h>
 #include <imgui/imgui.h>
 
-#include "../gui/MenuHandler.h"
-#include "../gui/menuObject/MenuObject.h"
+#include <game/gui/ObjectManager.h>
+#include <game/gui/MenuHandler.h>
+#include <game/gui/MenuObject.h>
 
 ME::MenuObjectHierarchy::MenuObjectHierarchy(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
 	: WindowBase(aHandle, aOpen, aFlags)
@@ -15,6 +16,8 @@ ME::MenuObjectHierarchy::MenuObjectHierarchy(const std::string& aHandle, bool aO
 
 void ME::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 {
+	aContext;
+
 	if (!myData.isOpen)
 		return;
 
@@ -22,22 +25,22 @@ void ME::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 	{
 		if (ImGui::Button("Add Empty Object"))
 		{
-			aContext.menuHandler->myObjectManager.CreateNew();
+			//aContext.menuHandler->myObjectManager.CreateNew();
 		}
 
 		if (ImGui::BeginChild("MenuObjects", ImGui::GetContentRegionAvail(), true))
 		{
-			for (size_t i = 0; i < aContext.menuHandler->myObjectManager.myObjects.size(); i++)
-			{
-				MenuObject& object = aContext.menuHandler->myObjectManager.myObjects[i];
-				
-				std::string displayName = std::to_string(i) + " " + object.GetName();
-				if (ImGui::Selectable(displayName.c_str(), i == mySelectedIndex))
-				{
-					mySelectedIndex = i;
-					PushMenuObjectToInspector();
-				}
-			}
+			//for (size_t i = 0; i < aContext.menuHandler->myObjectManager.myObjects.size(); i++)
+			//{
+				//MenuObject& object = *aContext.menuHandler->myObjectManager.myObjects[i];
+				//
+				//std::string displayName = std::to_string(i) + " " + object.GetName();
+				//if (ImGui::Selectable(displayName.c_str(), i == mySelectedIndex))
+				//{
+				//	mySelectedIndex = i;
+				//	PushMenuObjectToInspector();
+				//}
+			//}
 			ImGui::EndChild();
 		}
 	}

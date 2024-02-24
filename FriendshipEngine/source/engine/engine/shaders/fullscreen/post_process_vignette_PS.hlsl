@@ -2,7 +2,7 @@
 
 Texture2D postProcessTexture : register(t11);
 
-float4 main(PixelInputType input) : SV_Target
+float4 main(FullscreenVertexOutput input) : SV_Target
 {
     float4 finalColor = float4(postProcessTexture.Sample(aDefaultSampler, input.uv.xy).rgb, 1);
     

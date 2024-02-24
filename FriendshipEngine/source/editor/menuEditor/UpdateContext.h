@@ -1,9 +1,10 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <memory>
 
 class Texture;
-class MenuHandler;
+//class MenuHandler;
 
 namespace ME
 {
@@ -11,6 +12,6 @@ namespace ME
 	{
 		std::vector<Texture*> textures;
 		std::vector<std::string> textureIDtoPath;
-		MenuHandler* menuHandler = nullptr;
+		//std::shared_ptr<MenuHandler> menuHandler;
 	};
 }

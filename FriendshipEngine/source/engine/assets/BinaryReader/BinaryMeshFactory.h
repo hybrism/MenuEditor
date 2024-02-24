@@ -24,8 +24,8 @@ struct Skeleton;
 class BinaryMeshFactory
 {
 public:
-	static SharedMeshPackage LoadMeshFromFile(const std::string& aFilePath, AssetDatabase* aAssetDatabase);
-	static void WriteMeshToFile(MeshDataPackage& aData);
+	static SharedMeshPackage LoadMeshFromFile(const std::string& aFilePath, const std::string& aFolderPath, AssetDatabase* aAssetDatabase);
+	static void WriteMeshToFile(MeshDataPackage& aData, std::string aFolderPath);
 
 private:
 	static MeshDataPackage GetMeshDataFromFile(const std::string& filePath);

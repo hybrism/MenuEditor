@@ -5,8 +5,8 @@ struct Skeleton;
 class BinaryFileUtility
 {
 public:
-	static std::string GetModelFilePathFromName(const std::string& aName);
-	static std::string GetAnimationFilePathFromName(const std::string& aName);
+	static std::string GetModelFileName(const std::string& aName);
+	static std::string GetAnimationFileName(const std::string& aName);
 
 	static void WriteStringToFile(std::ofstream& aFile, const std::string& aString);
 	static void WriteBoneToFile(std::ofstream& aFile, Bone& aBone);

@@ -8,6 +8,4 @@ public:
 
 	void Update(const float&) override;
 	void Render() override;
-private:
-
 };

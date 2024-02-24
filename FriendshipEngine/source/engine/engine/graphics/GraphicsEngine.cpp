@@ -26,19 +26,23 @@
 
 GraphicsEngine* GraphicsEngine::myInstance = nullptr;
 
-ComPtr<ID3D11RenderTargetView>& GraphicsEngine::GetBackBuffer() { return myBackBufferRenderTarget->renderTargetView; }
-ComPtr<ID3D11ShaderResourceView>& GraphicsEngine::GetBackBufferSRV() { return myBackBufferRenderTarget->shaderResourceView; }
+ComPtr<ID3D11RenderTargetView>& GraphicsEngine::GetBackBuffer() { return myBackBufferRenderTarget->RTV; }
+ComPtr<ID3D11ShaderResourceView>& GraphicsEngine::GetBackBufferSRV() { return myBackBufferRenderTarget->SRV; }
+
+RenderTarget& GraphicsEngine::GetBackBufferRenderTarget()
+{
+	return *myBackBufferRenderTarget;
+}
 
 GraphicsEngine::GraphicsEngine() : myMeshDrawer(), myDeferredRenderer(myMeshDrawer), myForwardRenderer(myMeshDrawer)
 {
 #ifdef _DEBUG
-	SetClearColor(0, 0, 0);
+	SetClearColor(64.0f / 256.0f, 166.0f / 256.0f, 245.0f / 256.0f);
 	//SetClearColor(0.14f, 0.38f, 0.8f);
 #else
 	SetClearColor(0.93f, 1.f, 0.83f);
 #endif // _DEBUG
 
-	myClearColor.z = 1.f;
 	myTextService = nullptr;
 	mySpriteDrawer = nullptr;
 }
@@ -154,8 +158,7 @@ bool GraphicsEngine::Initialize(int width, int height, HWND windowHandle)
 	myViewportDimensions = { (int)textureDesc.Width, (int)textureDesc.Height };
 
 	myViewCamera = new Camera();
-	myViewCamera->SetProjectionMatrix(100.0f, (float)myWindowDimensions.x, (float)myWindowDimensions.y, 1.0f, 100000.f);
-	myViewCamera->SetPosition({ 0, 1, -2 });
+	myViewCamera->SetProjectionMatrix(100.0f, (float)myWindowDimensions.x, (float)myWindowDimensions.y, 0.1f, 100000.f);
 	{
 		D3D11_BUFFER_DESC bufferDescription = { 0 };
 		bufferDescription.Usage = D3D11_USAGE_DYNAMIC;
@@ -344,7 +347,7 @@ void GraphicsEngine::ChangeCurrentCamera(Camera* aCamera)
 	UpdateFrameBuffer();
 }
 
-void GraphicsEngine::ResetToPrimaryCamera()
+void GraphicsEngine::ResetToViewCamera()
 {
 	ChangeCurrentCamera(myViewCamera);
 }
@@ -500,7 +503,6 @@ void GraphicsEngine::UpdateFrameBuffer()
 	frameBufferData.resolution = { (float)myWindowDimensions.x, (float)myWindowDimensions.y, (float)myViewportDimensions.x, (float)myViewportDimensions.y };
 	frameBufferData.worldToClipMatrix = myCurrentCamera->GetProjectionMatrix();
 	frameBufferData.modelToWorld = myCurrentCamera->GetModelMatrix();
-	frameBufferData.cameraPosition = { myCurrentCamera->GetPosition().x, myCurrentCamera->GetPosition().y, myCurrentCamera->GetPosition().z, 0.0f };
 	frameBufferData.nearPlane = myCurrentCamera->GetNearPlane();
 	frameBufferData.farPlane = myCurrentCamera->GetFarPlane();
 
@@ -690,24 +692,15 @@ void GraphicsEngine::BeginFrame()
 	}
 
 	{
-		myContext->OMSetRenderTargets(1, myBackBufferRenderTarget->renderTargetView.GetAddressOf(), myDepthBuffer.GetDepthStencilView());
+		myContext->OMSetRenderTargets(1, myBackBufferRenderTarget->RTV.GetAddressOf(), myDepthBuffer.GetDepthStencilView());
 		{
+			myContext->ClearRenderTargetView(myBackBufferRenderTarget->RTV.Get(), &myClearColor.x);
+
 			Vector4f color = { 0.02f, 0.02f, 0.02f, 1 }; //DARK GREY
-			//color.x = myClearColor.x;
-			//color.y = myClearColor.y;
-			//color.z = myClearColor.z;
-
-			myContext->ClearRenderTargetView(myBackBufferRenderTarget->renderTargetView.Get(), &color.x);
-
-			color.x = 0.02f;
-			color.y = 0.02f;
-			color.z = 0.02f;
 			myContext->ClearRenderTargetView(myBackBuffer.Get(), &color.x);
 		}
-		myContext->ClearDepthStencilView(myDepthBuffer.GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		myDepthBuffer.Clear();
 	}
-
-	
 }
 
 void GraphicsEngine::SetRawBackBufferAsRenderTarget()
@@ -723,6 +716,11 @@ void GraphicsEngine::SetRawBackBufferAsRenderTarget(DepthBuffer* aDepth)
 void GraphicsEngine::EndFrame()
 {
 	mySwapChain->Present(1, 0);
+
+#ifdef _DEBUG
+	myGBuffer.CopyToStaging();
+	myDepthBuffer.CopyToStaging();
+#endif
 }
 
 void GraphicsEngine::PrepareForSpriteRender()

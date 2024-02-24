@@ -9,6 +9,7 @@
 #include "AnimationState.h"
 
 class AssetDatabase;
+struct Animation;
 
 
 // TODO: Make this pure so that we can store one controller per mesh and make it interact with the ECS
@@ -20,7 +21,7 @@ public:
 	AnimationController(AssetDatabase* aAssetDatabase, const size_t& aMeshId);
 	~AnimationController();
 
-	void Update(const float& aDeltaTime, AnimationData& aData);
+	void Update(const float& aDeltaTime, Animation& aAnimation, AnimationData& aData);
 	void AddParameter(const std::string& aName, const size_t& aIndex);
 
 	void SetParameter(

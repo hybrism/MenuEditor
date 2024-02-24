@@ -49,7 +49,15 @@ bool PixelShader::PrepareRender(
 		return false;
 	}
 
-	myGraphicsEngine->GetContext()->PSSetShader(myShader.Get(), NULL, 0);
+	auto* context = myGraphicsEngine->GetContext();
+	context->PSSetShader(myShader.Get(), NULL, 0);
 
-	return Shader::PrepareRender(aSlot, aBufferData, aSize);
+	if (!Shader::PrepareRender(aSlot, aBufferData, aSize)) { return false; }
+
+	if (myConstantBuffer != nullptr)
+	{
+		context->PSSetConstantBuffers((UINT)aSlot, 1, myConstantBuffer.GetAddressOf());
+	}
+
+	return true;
 }

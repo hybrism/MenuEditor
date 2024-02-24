@@ -12,23 +12,23 @@
 #include <engine/Paths.h>
 #include "BinaryFileUtility.h"
 
-Animation* BinaryAnimationFactory::LoadAnimationFromFile(const std::string& aFilePath, AssetDatabase* aAssetDatabase)
+Animation* BinaryAnimationFactory::LoadAnimationFromFile(const std::string& aFilePath, const std::string& aFolderName, AssetDatabase* aAssetDatabase)
 {
-	std::string path = BinaryFileUtility::GetAnimationFilePathFromName(aAssetDatabase->GetNameFromPath(aFilePath));
+	std::string path = aFolderName + BinaryFileUtility::GetAnimationFileName(aAssetDatabase->GetNameFromPath(aFilePath));
 
 	return GetAnimationFromFile(path);
 }
 
-void BinaryAnimationFactory::WriteAnimationToFile(Animation* aAnimation)
+void BinaryAnimationFactory::WriteAnimationToFile(Animation* aAnimation, const std::string& aFolderName)
 {
-	std::string path = BinaryFileUtility::GetAnimationFilePathFromName(aAnimation->name);
+	std::string path = aFolderName + BinaryFileUtility::GetAnimationFileName(aAnimation->name);
 	std::ofstream file(path, std::ios::binary | std::ios::out);
 
 	if (!file.is_open()) {
 		PrintE("Animation \"" + aAnimation->name + "\" doesn't have a binary animation file. Generating file...");
 
-		if (!std::filesystem::exists(RELATIVE_CUSTOM_ANIMATION_DATA_PATH)) {
-			std::filesystem::create_directory(RELATIVE_CUSTOM_ANIMATION_DATA_PATH);
+		if (!std::filesystem::exists(aFolderName)) {
+			std::filesystem::create_directory(aFolderName);
 		}
 
 		file.open(path, std::ios::binary | std::ios::out | std::ios::trunc);
@@ -45,16 +45,13 @@ void BinaryAnimationFactory::WriteAnimationToFile(Animation* aAnimation)
 
 		for (size_t i = 0; i < containerSize; i++)
 		{
-			size_t size = aAnimation->frames[i].localTransforms.size();
+			size_t size = MAX_ANIMATION_BONES;
 			file.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
 
-			for (auto& pair : aAnimation->frames[i].localTransforms)
+			for (size_t j = 0; j < size; ++j)
 			{
-				int key = pair.first;
-				file.write(reinterpret_cast<const char*>(&key), sizeof(int));
-
 				// Write transform
-				DirectX::XMMATRIX m = pair.second.GetMatrix();
+				DirectX::XMMATRIX m = aAnimation->frames[i].jointTransforms[j].GetMatrix();
 				file.write(reinterpret_cast<const char*>(&m), sizeof(DirectX::XMMATRIX));
 			}
 		}
@@ -114,14 +111,11 @@ Animation* BinaryAnimationFactory::GetAnimationFromFile(const std::string& aFile
 
 			for (size_t j = 0; j < size; j++)
 			{
-				int key = 0;
-				file.read(reinterpret_cast<char*>(&key), sizeof(int));
-
 				// Read transform
 				DirectX::XMMATRIX m{};
 				file.read(reinterpret_cast<char*>(&m), sizeof(DirectX::XMMATRIX));
 				
-				frame.localTransforms.insert({ key, m }); // kanske behöver ha en transform istället för en matrix utifall att den inte tar constructor data
+				frame.jointTransforms[j] = Transform(m);
 			}
 			anim->frames[i] = frame;
 		}

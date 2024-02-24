@@ -1,6 +1,11 @@
 #include "../common/common.hlsli"
 
-DeferredVertexOutput main(DeferredVertexInput input)
+struct FullscreenVertexInput
+{
+    uint vertexIndex : SV_VertexID;
+};
+
+FullscreenVertexOutput main(FullscreenVertexInput input)
 {
     const float4 pos[3] =
     {
@@ -16,7 +21,7 @@ DeferredVertexOutput main(DeferredVertexInput input)
 		float2(2.0f, 1.0f)
     };
     
-    DeferredVertexOutput output;
+    FullscreenVertexOutput output;
 
     output.position = pos[input.vertexIndex.x];
     output.uv = uv[input.vertexIndex.x];

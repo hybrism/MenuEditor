@@ -7,11 +7,18 @@
 #include <memory>
 #include <engine/math/Vector.h>
 #include "windows/Window.h"
+#include "../menuEditor/MenuEditor.h"
 
 #include <engine/Defines.h>
 
 class World;
 class Game;
+
+struct GameWindowRect
+{
+	ImVec2 vMinWin;
+	ImVec2 vMaxWin;
+};
 
 class EditorManager
 {
@@ -20,8 +27,10 @@ public:
 	~EditorManager();
 
 	void Init(Game* aGame);
-	void Update(const EditorUpdateContext& aContext);
+	void Update(EditorUpdateContext aContext);
 
+	void SetGameWindowRect(const GameWindowRect& aRect) { myGameWindowRect = aRect; }
+	GameWindowRect GetGameWindowRect() const { return myGameWindowRect; }
 private:
 	std::unordered_map<FE::ID, std::shared_ptr<FE::WindowBase>> myWindows; 
 	Game* myGame;
@@ -30,6 +39,7 @@ private:
 	void MenuBar();
 
 	//TODO: Move this to GameWindow
+	GameWindowRect myGameWindowRect;
 	int myFPS = 0;
 	float myFPSTimer = 0.f;
 	float myFPSUpdateFrequency = 1.f;

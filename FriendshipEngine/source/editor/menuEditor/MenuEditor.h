@@ -3,14 +3,12 @@
 #include <map>
 #include <engine/math/Vector.h>
 #include <shared/postMaster/Observer.h>
-#include <assets/TextureFactory.h>
 #include "windows/Window.h"
 
-#include "gui/menuObject/ObjectManager.h"
-#include "gui/MenuHandler.h"
-
 class Texture;
-
+class TextureFactory;
+class MenuHandler;
+class Game;
 namespace ME
 {
 	enum class ePopup
@@ -34,10 +32,9 @@ namespace ME
 		MenuEditor();
 		~MenuEditor();
 
-		void Init();
+		void Init(MenuHandler* aMenuHandler = nullptr);
 		void Update(float dt);
 		void Render();
-
 
 	private: //IMGUI
 		std::array<std::shared_ptr<ME::WindowBase>, (int)ME::ID::Count> myWindows;
@@ -49,9 +46,11 @@ namespace ME
 		void Popups();
 
 	private:
-		ObjectManager myObjectManager;
-		TextureFactory myTextureFactory;
-		MenuHandler myMenuHandler;
+		//std::shared_ptr<ObjectManager> myObjectManager;
+		//std::shared_ptr<MenuManager> myMenuHandler;
+		std::shared_ptr<TextureFactory> myTextureFactory;
+
+		MenuHandler* myMenuHandler;
 
 		Vector2f myRenderSize;
 		Vector2f myRenderCenter;

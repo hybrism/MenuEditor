@@ -17,6 +17,7 @@ namespace FE
 		DeferredView,
 		Console,
 		ScriptEditor,
+		VertexPainter,
 		Count
 	};
 

@@ -12,5 +12,5 @@ struct MeshComponent : public Component<MeshComponent>
 {
 	size_t id = 0;
 	MeshType type = MeshType::Static;
-	bool shouldRenderThroughEnviroment = false;
+	bool shouldDisregardDepth = false;
 };

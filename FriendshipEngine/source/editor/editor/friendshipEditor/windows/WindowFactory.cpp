@@ -8,6 +8,7 @@
 #include "InspectorWindow.h"
 #include "SceneHierarchyWindow.h"
 #include "ScriptEditorWindow.h"
+#include "VertexPainterWindow.h"
 
 std::shared_ptr<FE::WindowBase> FE::WindowFactory::Create(ID aID)
 {
@@ -56,6 +57,11 @@ std::shared_ptr<FE::WindowBase> FE::WindowFactory::Create(ID aID)
 	case FE::ID::ScriptEditor:
 	{
 		return std::make_shared<FE::ScriptEditorWindow>("Script Editor", false, flags);
+		break;
+	}
+	case FE::ID::VertexPainter:
+	{
+		return std::make_shared<FE::VertexPainterWindow>("Vertex Painter", false, flags);
 		break;
 	}
 	case FE::ID::Count:

@@ -28,14 +28,11 @@ float3 tonemap_s_gamut3_cine(float3 c)
     return mul(toSrgb, s_curve(mul(fromSrgb, c)));
 }
 
-float4 main(PixelInputType input) : SV_Target
+float4 main(FullscreenVertexOutput input) : SV_Target
 {
-    float4 returnValue;
-    float3 resource = postProcessTexture.Sample(aDefaultSampler, input.uv.xy).rgb;
+    float4 finalColor = float4(postProcessTexture.Sample(aDefaultSampler, input.uv.xy).rgb, 1.0f);
 
-    returnValue.rgb = tonemap_s_gamut3_cine(resource);
-
-    returnValue.a = 1.0f;
+    finalColor.rgb = tonemap_s_gamut3_cine(finalColor.rgb);
     
-    return returnValue;
+    return finalColor;
 }

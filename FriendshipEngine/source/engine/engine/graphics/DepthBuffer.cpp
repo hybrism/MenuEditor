@@ -7,6 +7,8 @@ DepthBuffer DepthBuffer::Create(const Vector2i& aSize)
 {
 	auto& device = GraphicsEngine::GetInstance()->GetDevice();//GlobalStuff::GetInstance().GetGraphicsEngine()->GetDevice();
 
+	DepthBuffer depthBufferResult;
+
 	HRESULT result;
 	D3D11_TEXTURE2D_DESC desc = { 0 };
 	desc.Width = aSize.x;
@@ -16,13 +18,12 @@ DepthBuffer DepthBuffer::Create(const Vector2i& aSize)
 	desc.Format = DXGI_FORMAT_R32_TYPELESS;
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
-	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.MiscFlags = 0;
 	desc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 	desc.CPUAccessFlags = 0;
-	desc.MiscFlags = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT;
 
-	ID3D11Texture2D* texture;
-	result = device->CreateTexture2D(&desc, nullptr, &texture);
+	result = device->CreateTexture2D(&desc, nullptr, &depthBufferResult.myTexture);
 	assert(SUCCEEDED(result));
 
 	ID3D11DepthStencilView* DSV;
@@ -31,11 +32,10 @@ DepthBuffer DepthBuffer::Create(const Vector2i& aSize)
 	dsvDesc.Flags = 0;
 	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
 	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	result = device->CreateDepthStencilView(texture, &dsvDesc, &DSV);
+	result = device->CreateDepthStencilView(depthBufferResult.myTexture, &dsvDesc, &DSV);
 	assert(SUCCEEDED(result));
 
-	DepthBuffer textureResult;
-	textureResult.myDepth = DSV;
+	depthBufferResult.myDepth = DSV;
 	DSV->Release();
 
 	ID3D11ShaderResourceView* SRV;
@@ -44,12 +44,12 @@ DepthBuffer DepthBuffer::Create(const Vector2i& aSize)
 	srDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srDesc.Texture2D.MostDetailedMip = 0;
 	srDesc.Texture2D.MipLevels = UINT_MAX;
-	result = device->CreateShaderResourceView(texture, &srDesc, &SRV);
+	result = device->CreateShaderResourceView(depthBufferResult.myTexture, &srDesc, &SRV);
 	assert(SUCCEEDED(result));
-	textureResult.mySRV = SRV;
+	depthBufferResult.mySRV = SRV;
 	SRV->Release();
 
-	textureResult.myViewport = {
+	depthBufferResult.myViewport = {
 			0,
 			0,
 			static_cast<float>(aSize.x),
@@ -57,20 +57,31 @@ DepthBuffer DepthBuffer::Create(const Vector2i& aSize)
 			0,
 			1
 	};
-	return textureResult;
+	
+	depthBufferResult.CreateStagingTexture();
+
+	return depthBufferResult;
 }
 
 void DepthBuffer::Clear(float aClearDepthValue, unsigned char aClearStencilValue)
 {
 	auto context = GraphicsEngine::GetInstance()->GetContext();
 
-    context->ClearDepthStencilView(myDepth.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, aClearDepthValue, aClearStencilValue);
+	context->ClearDepthStencilView(myDepth.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, aClearDepthValue, aClearStencilValue);
 }
 
 void DepthBuffer::SetAsActiveTarget()
 {
 	auto context = GraphicsEngine::GetInstance()->GetContext();
 
-    context->OMSetRenderTargets(0, nullptr, GetDepthStencilView());
-    context->RSSetViewports(1, &myViewport);
+	context->OMSetRenderTargets(0, nullptr, GetDepthStencilView());
+	context->RSSetViewports(1, &myViewport);
+}
+
+Vector2i DepthBuffer::GetSize() const
+{
+	Vector2i size;
+	size.x = (int)myViewport.Width;
+	size.y = (int)myViewport.Height;
+	return size;
 }

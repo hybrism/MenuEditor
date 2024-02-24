@@ -1,314 +1,160 @@
 #include "pch.h"
 #include "MenuHandler.h"
 
-#include <engine/Paths.h>
-#include <engine/utility/Error.h>
-#include <engine/graphics/sprite/SpriteDrawer.h>
-#include <assets/AssetDatabase.h>
-#include <assets/textureFactory.h>
-#include <engine/graphics/GraphicsEngine.h>
-
-#include <engine/utility/InputManager.h>
-
-#include "../utility/JsonUtility.h"
 #include <nlohmann/json.hpp>
+#include <assets/TextureFactory.h>
 
-#include "menuItem/MenuButton.h"
+//#include <shared/postMaster/PostMaster.h>
 
-MenuHandler::MenuHandler(StateStack* aStateStack) :
-	myButtonScale({ 0.f, 0.f }),
-	myStateStackPtr(aStateStack),
-	myShowMenuEditor(true),
-	myType(eMenuType::Count)
+#include "../editor/menuEditor/MenuCommon.h"
+
+#include "MenuObject.h"
+#include "components/SpriteComponent.h"
+
+//#include "../editor/menuEditor/gui/components/TextComponent.h"
+//#include "../editor/menuEditor/gui/components/Collider2DComponent.h"
+
+MenuHandler::MenuHandler()
 {}
 
 MenuHandler::~MenuHandler()
+{}
+
+void MenuHandler::Init(const std::string& aMenuFile, TextureFactory* aTextureFactory)
 {
-	myStateStackPtr = nullptr;
-
-	//for (int i = 0; i < static_cast<int>(eButtonType::Count); i++)
-	//{
-	//	delete myButtons[static_cast<eButtonType>(i)];
-	//}
-}
-
-void MenuHandler::Init(eMenuType aType)
-{
-	myRenderSize.x = static_cast<float>(GraphicsEngine::GetInstance()->GetWindowDimensions().x);
-	myRenderSize.y = static_cast<float>(GraphicsEngine::GetInstance()->GetWindowDimensions().y);
-	myScreenCenter = myRenderSize / 2.f;
-	myType = aType;
-
-	ReadMenuData(SAVE_FILE);
-
-	InitButtons();
-	InitMenuStates();
-
-	//TODO TOVE: This is not pretty! Will develop further
-	switch (aType)
-	{
-	case eMenuType::PauseMenu:
-		PushMenuState(eMenuState::PauseMenu);
-		myBackground.myInstance.color = BACKGROUND_OPACITY;
-		break;
-	case eMenuType::MainMenu:
-		PushMenuState(eMenuState::MainMenu);
-		break;
-	default:
-		PrintW("[MenuHandler.cpp] Type is invalid");
-		break;
-	}
-
-	auto texFac = AssetDatabase::GetTextureFactory();
-	myBackground.mySharedData.texture = texFac->CreateTexture(RELATIVE_SPRITE_ASSET_PATH + (std::string)"MenuUI/" + myBackground.myTexturePath);
-	myBackground.myInstance.scale = myBackground.GetTextureSize() * 10.f;
+	LoadFromJson(aMenuFile, aTextureFactory);
+//	//FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::NewMenuLoaded, aMenuFile });
 }
 
 void MenuHandler::Update()
 {
-	auto input = InputManager::GetInstance();
-	Vector2f mousePos = input->GetCurrentMousePositionVector2f();
-
-	for (auto button : GetCurrentButtons())
-	{
-		button->Update();
-
-		if (button->IsHovered(mousePos))
-		{
-			if (input->IsKeyPressed(VK_LBUTTON))
-			{
-				button->OnClick();
-			}
-		}
-	}
+	myObjectManager.Update();
 }
 
 void MenuHandler::Render()
 {
-	SpriteDrawer& spriteDrawer = GraphicsEngine::GetInstance()->GetSpriteDrawer();
-	GraphicsEngine::GetInstance()->PrepareForSpriteRender();
+	myObjectManager.Render();
+}
 
-	myBackground.Render(spriteDrawer);
+void MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory)
+{
+	myObjectManager.ClearAll();
 
-	for (auto sprite : GetCurrentMenuState()->mySpriteTextures)
+	myFileName = aMenuFile;
+	myName = aMenuFile.substr(0, aMenuFile.find_last_of('.'));
+
+	std::string path = ME::RELATIVE_MENUEDITOR_ASSETS + ME::MENU_PATH + myFileName;
+	std::ifstream dataFile(path);
+	if (dataFile.fail())
 	{
-		sprite->Render(spriteDrawer);
+		PrintE("Could not open \"" + path + "\" to read data");
+		return;
 	}
 
-	for (auto button : GetCurrentButtons())
+	nlohmann::json menuFile = nlohmann::json::parse(dataFile);
+	dataFile.close();
+
+	for (size_t i = 0; i < menuFile["objectID"].size(); i++)
 	{
-		button->Render(spriteDrawer);
+		MenuObject& obj = myObjectManager.CreateNew();
+		obj.SetName(menuFile["objectID"][i]["name"]);
 	}
 
-	GraphicsEngine::GetInstance()->ResetToDefault();
-}
-
-void MenuHandler::PushMenuState(eMenuState aType)
-{
-	myMenuStack.push(&myMenuStates[aType]);
-	ArrangeButtonPositions();
-}
-
-void MenuHandler::PopMenu()
-{
-	myMenuStack.pop();
-}
-
-void MenuHandler::InitButtons()
-{
-	MenuItemFactory menuItemFactory(myStateStackPtr, this);
-
-	for (int i = 0; i < static_cast<int>(eButtonType::Count); i++)
+	nlohmann::json spriteComponents = menuFile["spriteComponent"];
+	for (size_t i = 0; i < spriteComponents.size(); i++)
 	{
-		eButtonType type = static_cast<eButtonType>(i);
-		myButtons[type] = menuItemFactory.CreateMenuItem(type);
+		size_t ownerID = spriteComponents[i]["ownerID"];
+		SpriteComponent& sprite = myObjectManager.myObjects[ownerID]->AddComponent<SpriteComponent>();
 
-		//vvv TODO TOVE: if we set textures beforehand buttons already know which texture it should have
-		//Maybe Set type in constructor aswell and remove init completely? hmm.
-		myButtons[type]->Init(myButtonTextures[type]);
-	}
-}
+		//TODO: AssetDatabase for sprites?
+		std::string spriteAssetPath = ME::RELATIVE_MENUEDITOR_ASSETS + ME::SPRITES;
+		std::string texturePath = spriteComponents[i]["texture"];
+		sprite.SetTexture(aTextureFactory->CreateTexture(spriteAssetPath + texturePath, false), texturePath);
 
-void MenuHandler::InitMenuStates()
-{
-	myMenuStates[eMenuState::MainMenu].Init(eMenuState::MainMenu, myButtons);
-	myMenuStates[eMenuState::PauseMenu].Init(eMenuState::PauseMenu, myButtons);
-	myMenuStates[eMenuState::Settings].Init(eMenuState::Settings, myButtons);
-	myMenuStates[eMenuState::LevelSelect].Init(eMenuState::LevelSelect, myButtons);
-	myMenuStates[eMenuState::Credits].Init(eMenuState::Credits, myButtons);
-}
-
-void MenuHandler::ArrangeButtonPositions()
-{
-	for (int i = 0; i < GetCurrentButtons().size(); i++)
-	{
-		GetCurrentButtons()[i]->SetPosition({ GetCurrentMenuState()->myTopButtonPosition.x, (GetCurrentMenuState()->myTopButtonPosition.y - (i * GetCurrentMenuState()->myButtonSpacing)) });
-		GetCurrentButtons()[i]->SetScale(myButtonScale);
+		SpriteInstanceData& instanceData = sprite.GetInstanceData();
+		instanceData.position.x = spriteComponents[i]["position"]["x"];
+		instanceData.position.y = spriteComponents[i]["position"]["y"];
+		instanceData.scale.x = spriteComponents[i]["size"]["x"];
+		instanceData.scale.y = spriteComponents[i]["size"]["y"];
+		instanceData.pivot.x = spriteComponents[i]["pivot"]["x"];
+		instanceData.pivot.y = spriteComponents[i]["pivot"]["y"];
+		instanceData.scaleMultiplier.x = spriteComponents[i]["scaleMultiplier"]["x"];
+		instanceData.scaleMultiplier.y = spriteComponents[i]["scaleMultiplier"]["y"];
+		instanceData.color.x = spriteComponents[i]["color"]["r"];
+		instanceData.color.y = spriteComponents[i]["color"]["g"];
+		instanceData.color.z = spriteComponents[i]["color"]["b"];
+		instanceData.color.w = spriteComponents[i]["color"]["a"];
+		instanceData.clip.left = spriteComponents[i]["clip"]["left"];
+		instanceData.clip.right = spriteComponents[i]["clip"]["right"];
+		instanceData.clip.down = spriteComponents[i]["clip"]["down"];
+		instanceData.clip.upper = spriteComponents[i]["clip"]["upper"];
+		instanceData.rotation = spriteComponents[i]["rotation"];
+		instanceData.myIsHidden = spriteComponents[i]["isHidden"];
 	}
 }
 
-void MenuHandler::ReadMenuData(const std::string& aFileName)
+void MenuHandler::SaveToJson()
 {
-	switch (myType)
+	nlohmann::json menuFile;
+	menuFile["name"] = myName;
+
+	nlohmann::json objects;
+	for (size_t i = 0; i < myObjectManager.myObjects.size(); i++)
 	{
-	case eMenuType::PauseMenu:
-		myMenuTypeName = "pauseMenu";
-		break;
-	case eMenuType::MainMenu:
-		myMenuTypeName = "mainMenu";
-		break;
-	default:
-		PrintE("[MenuHandler.cpp] Menu type is invalid!");
-		break;
+		MenuObject& object = *myObjectManager.myObjects[i];
+		nlohmann::json objectData;
+
+		objectData["objectID"] = object.myID;
+		objectData["name"] = object.GetName();
+
+		objects.push_back(objectData);
 	}
 
-	nlohmann::json jsonData = JsonUtility::OpenJson(aFileName);
+	menuFile["objectID"] = objects;
 
-	nlohmann::json menuData = jsonData[myMenuTypeName];
-	for (int i = 0; i < menuData["menuData"].size(); i++)
+	nlohmann::json spriteComponents;
+	for (size_t i = 0; i < myObjectManager.myObjects.size(); i++)
 	{
-		eMenuState type = static_cast<eMenuState>(i);
-		nlohmann::json m = menuData["menuData"][i];
-		myMenuStates[type].myMenuStateName = m["stateType"].get<std::string>();
-		myMenuStates[type].myButtonSpacing = m["spacing"].get<float>() * myRenderSize.y;
-		myMenuStates[type].myTopButtonPosition.x = m["xAlignment"].get<float>() * myRenderSize.x;
-		myMenuStates[type].myTopButtonPosition.y = m["topPos"].get<float>() * myRenderSize.y;
-
-		for (int spriteIndex = 0; spriteIndex < myMenuStates[type].mySpriteTextures.size(); spriteIndex++)
+		if (myObjectManager.myObjects[i]->HasComponent<SpriteComponent>())
 		{
-			delete myMenuStates[type].mySpriteTextures[spriteIndex];
-		}
-		myMenuStates[type].mySpriteTextures.clear();
-
-		for (int j = 0; j < m["sprites"].size(); j++)
-		{
-			GuiSprite* sprite = new GuiSprite();
-			ReadSpriteData(*sprite, m["sprites"][j]);
-			std::string relative = RELATIVE_SPRITE_ASSET_PATH + (std::string)"MenuUI/";
-			sprite->mySharedData.texture = AssetDatabase::GetTextureFactory()->CreateTexture(relative + sprite->myTexturePath);
-			sprite->myInstance.scale = sprite->GetTextureSize();
-			myMenuStates[type].mySpriteTextures.push_back(sprite);
-		}
-
-	}
-
-	ReadSpriteData(myBackground, menuData["background"]);
-	myBackground.myInstance.color = { 0.f, 0.f, 0.f, 1.f };
-
-	nlohmann::json buttonData = jsonData["buttons"];
-	myButtonScale.x = buttonData["scale"]["x"];
-	myButtonScale.y = buttonData["scale"]["y"];
-	for (int i = 0; i < buttonData["textures"].size(); i++)
-	{
-		myButtonTextures[static_cast<eButtonType>(i)] = buttonData["textures"][i];
-	}
-
-}
-
-void MenuHandler::ReadSpriteData(GuiSprite& aSprite, const nlohmann::json& aJson)
-{
-	aSprite.myInstance.position.x = aJson["pos"]["x"].get<float>() * myRenderSize.x;
-	aSprite.myInstance.position.y = aJson["pos"]["y"].get<float>() * myRenderSize.y;
-	aSprite.myInstance.scaleMultiplier.x = aJson["scale"]["x"].get<float>();
-	aSprite.myInstance.scaleMultiplier.y = aJson["scale"]["y"].get<float>();
-	aSprite.myTexturePath = aJson["path"].get<std::string>();
-}
-
-#pragma region EDITOR FUNCTIONS
-
-void MenuHandler::WriteMenuData(const std::string& aFileName)
-{
-	nlohmann::json jsonData = JsonUtility::OpenJson(aFileName);
-	nlohmann::json& menuData = jsonData[myMenuTypeName];
-	menuData.clear();
-
-	for (int i = 0; i < static_cast<int>(eMenuState::Count); i++)
-	{
-		eMenuState type = static_cast<eMenuState>(i);
-		menuData["menuData"][i]["stateType"] = myMenuStates[type].myMenuStateName;
-		menuData["menuData"][i]["spacing"] = myMenuStates[type].myButtonSpacing / myRenderSize.y;
-		menuData["menuData"][i]["xAlignment"] = myMenuStates[type].myTopButtonPosition.x / myRenderSize.x;
-		menuData["menuData"][i]["topPos"] = myMenuStates[type].myTopButtonPosition.y / myRenderSize.y;
-
-		for (int j = 0; j < myMenuStates[type].mySpriteTextures.size(); j++)
-		{
-			nlohmann::json sprite;
-			WriteSpriteData(*myMenuStates[type].mySpriteTextures[j], sprite);
-			menuData["menuData"][i]["sprites"].push_back(sprite);
+			SpriteComponent sprite = myObjectManager.myObjects[i]->GetComponent<SpriteComponent>();
+			nlohmann::json spriteEntry;
+			spriteEntry["ownerID"] = i;
+			spriteEntry["texture"] = sprite.GetTexturePath();
+			spriteEntry["position"]["x"] = sprite.GetPosition().x;
+			spriteEntry["position"]["y"] = sprite.GetPosition().y;
+			spriteEntry["size"]["x"] = sprite.GetSize().x;
+			spriteEntry["size"]["y"] = sprite.GetSize().y;
+			spriteEntry["pivot"]["x"] = sprite.GetPivot().x;
+			spriteEntry["pivot"]["y"] = sprite.GetPivot().y;
+			spriteEntry["scaleMultiplier"]["x"] = sprite.GetScaleMultiplier().x;
+			spriteEntry["scaleMultiplier"]["y"] = sprite.GetScaleMultiplier().y;
+			spriteEntry["color"]["r"] = sprite.GetColor().x;
+			spriteEntry["color"]["g"] = sprite.GetColor().y;
+			spriteEntry["color"]["b"] = sprite.GetColor().z;
+			spriteEntry["color"]["a"] = sprite.GetColor().w;
+			spriteEntry["clip"]["left"] = sprite.GetClipValue().left;
+			spriteEntry["clip"]["right"] = sprite.GetClipValue().right;
+			spriteEntry["clip"]["down"] = sprite.GetClipValue().down;
+			spriteEntry["clip"]["upper"] = sprite.GetClipValue().upper;
+			spriteEntry["rotation"] = sprite.GetRotation();
+			spriteEntry["isHidden"] = sprite.GetIsHidden();
+			spriteComponents.push_back(spriteEntry);
 		}
 	}
 
-	WriteSpriteData(myBackground, menuData["background"]);
+	menuFile["spriteComponent"] = spriteComponents;
 
-	//SHARED For all buttons
-	nlohmann::json& buttonData = jsonData["buttons"];
-	buttonData["scale"]["x"] = myButtonScale.x;
-	buttonData["scale"]["y"] = myButtonScale.y;
-
-	for (int i = 0; i < static_cast<int>(eButtonType::Count); i++)
+	std::string path = ME::RELATIVE_MENUEDITOR_ASSETS + ME::MENU_PATH + myFileName;
+	std::ofstream dataFile(path);
+	if (dataFile.fail())
 	{
-		buttonData["textures"][i] = myButtonTextures[static_cast<eButtonType>(i)];
+		PrintE("Could not open \"" + path + "\" to save data");
+		return;
 	}
 
-	JsonUtility::OverwriteJson(aFileName, jsonData);
+	dataFile << menuFile;
+
+	dataFile.close();
+
 }
-
-void MenuHandler::WriteSpriteData(const GuiSprite& aSprite, nlohmann::json& aJson)
-{
-	aJson["pos"]["x"] = aSprite.myInstance.position.x / myRenderSize.x;
-	aJson["pos"]["y"] = aSprite.myInstance.position.y / myRenderSize.y;
-	aJson["scale"]["x"] = aSprite.myInstance.scaleMultiplier.x;
-	aJson["scale"]["y"] = aSprite.myInstance.scaleMultiplier.y;
-	aJson["path"] = aSprite.myTexturePath;
-}
-
-void MenuHandler::SpriteTextureEdit(SpriteSharedData aSharedTexture, char aChar[CHAR_SIZE])
-{
-	aSharedTexture;
-	aChar;
-
-#ifdef _DEBUG
-	//ImGui::PushID(&aChar);
-	//ImGui::InputTextWithHint("", "Starts at Resources/Sprites/...", aChar, CHAR_SIZE);
-	//ImGui::SameLine();
-	//if (ImGui::Button("Reload"))
-	//{
-	//	auto texFac = AssetDatabase::GetTextureFactory();
-	//	Texture* newTexture = texFac->CreateTexture(aChar);
-	//	if (newTexture != nullptr)
-	//	{
-	//		delete aSharedTexture.texture;
-	//		aSharedTexture.texture = newTexture;
-	//	}
-	//}
-	//ImGui::PopID();
-#endif
-}
-
-void MenuHandler::ButtonTextureEdit(eButtonTextureType aTextureType, char aChar[CHAR_SIZE], int aButtonIndex)
-{
-	aTextureType;
-	aButtonIndex;
-	aChar;
-
-#ifdef _DEBUG
-	//ImGui::PushID(static_cast<int>(aTextureType));
-	//ImGui::InputTextWithHint("", "Starts at MenuUI/...", aChar, CHAR_SIZE);
-	//ImGui::SameLine();
-	//if (ImGui::Button("Reload"))
-	//{
-	//	eButtonType type = GetCurrentButtons()[aButtonIndex]->GetType();
-
-	//	//vvv TODO: This step is obsolete if we set textures to buttons directly
-	//	myButtonTextures[myButtons[type]->GetType()][static_cast<int>(aTextureType)] = aChar;
-	//	//^^^
-
-	//	myButtons[type]->SetTexturePath(aTextureType, aChar);
-	//	myButtons[type]->ReloadTexture(aTextureType);
-	//	myButtons[type]->SetScale(myButtonScale);
-	//}
-	//ImGui::PopID();
-#endif
-}
-
-#pragma endregion

@@ -1,6 +1,5 @@
 #pragma once
 
-class StateStack;
 
 class EventSystem : public System
 {
@@ -15,9 +14,7 @@ public:
 	// Inherited via System
 	virtual void Update(const float& dt) override;
 
-	void Connect(StateStack* aStateStack);
 
 private:
-	StateStack* myStateStackPtr;
 };
 

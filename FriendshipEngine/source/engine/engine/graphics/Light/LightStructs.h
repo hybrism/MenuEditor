@@ -4,6 +4,7 @@
 #include "../../../engine/math/Vector3.h"
 #include "../../../engine/math/Vector4.h"
 #include "../../../engine/math/VectorFwd.h"
+#include <engine\graphics\DepthBuffer.h>
 
 class DepthBuffer;
 class Camera;
@@ -11,6 +12,7 @@ class Camera;
 
 struct PointLight
 {
+	PointLight() = default;
 	PointLight(Vector3f aPosition, Vector3f aColor, float aRange, float aIntensity)
 	{
 		myPos = aPosition;
@@ -27,6 +29,7 @@ struct PointLight
 
 struct DirectionalLight
 {
+	DirectionalLight() = default;
 	DirectionalLight(Vector3f aDirection, Vector3f aColor, float aIntensity)
 	{
 		myColor = aColor;
@@ -34,12 +37,12 @@ struct DirectionalLight
 		myIntensity = aIntensity;
 
 		myDirectionalLightCamera = nullptr;
-	}	
+	}
 
 	Vector3f myColor;
 	Vector3f myDirection;
-	float myIntensity;
+	float myIntensity = -1.f;;
 
-	DepthBuffer* myShadowMapDepthBuffer;
+	DepthBuffer myShadowMapDepthBuffer;
 	Camera* myDirectionalLightCamera = nullptr;
 };

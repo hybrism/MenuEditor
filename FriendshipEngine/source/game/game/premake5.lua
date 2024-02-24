@@ -33,7 +33,9 @@ project "Game"
 		"PhysXExtensions_static_64.lib", 
 		"PhysXPvdSDK_static_64.lib", 
 		"PhysXCooking_64.lib",
-		"PhysXCharacterKinematic_static_64.lib"
+		"PhysXCharacterKinematic_static_64.lib",
+		"fmod_vc.lib",
+		"fmodstudio_vc.lib"
 	}
 	--verify_or_create_settings("Game")
 	

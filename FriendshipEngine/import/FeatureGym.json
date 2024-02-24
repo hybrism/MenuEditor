@@ -1,492 +1,637 @@
 {
     "sceneName": "FeatureGym",
     "entities": [
-        34616,
-        34932,
-        34634,
-        34522,
-        35010,
-        34874,
-        35076,
-        34760,
-        -56564,
-        -56498,
-        -56834,
-        -56642,
-        -56882,
-        -56426,
-        -56750,
-        -56858,
-        -56516,
-        -56510,
-        -56648,
-        -56744,
-        -56822,
-        -56666,
-        -56588,
-        -56384,
-        -56576,
-        -56606,
-        -56792,
-        -56888,
-        -56810,
-        -56780,
-        -56672,
-        34846,
-        -56558,
-        -56756,
-        -56408,
-        -56654,
-        -56870,
-        -56480,
-        -56696,
-        -56714,
-        -56540,
-        -56852,
-        -56552,
-        -56840,
-        -56732,
-        -56630,
-        -56522,
-        -56768,
-        -56690,
-        -56444,
-        -56492,
-        -56396,
-        -56618,
-        -56462,
-        -56582,
-        -56762,
-        -56594,
-        -56660,
-        -56786,
-        -56432,
-        -56414,
-        -56624,
-        -56798,
-        -56486,
-        -56600,
-        -56504,
-        -56726,
-        -56846,
-        -56570,
-        -56678,
-        -56534,
-        -56894,
-        -56684,
-        -56738,
-        -56702,
-        -56438,
-        -56456,
-        -56528,
-        -56720,
-        -56450,
-        -56402,
-        -56390,
-        -56864,
-        -56708,
-        -56468,
-        -56420,
-        -56612,
-        -56804,
-        -56474,
-        -56636,
-        -56774,
-        -56876,
-        -56546,
-        34624,
-        -56816,
-        -56828
+        39172,
+        39474,
+        39190,
+        39078,
+        39552,
+        39416,
+        39620,
+        39310,
+        -20360,
+        -20264,
+        -20444,
+        -20728,
+        -20486,
+        -20746,
+        -20276,
+        -20456,
+        -20528,
+        -20222,
+        -20558,
+        -20516,
+        -20420,
+        -20770,
+        -20180,
+        -20186,
+        -20432,
+        -20414,
+        -20312,
+        -20426,
+        -20396,
+        -20300,
+        -20438,
+        -20408,
+        -20282,
+        -20734,
+        -20342,
+        -20468,
+        -20240,
+        -20384,
+        -20150,
+        -20540,
+        -20450,
+        -20336,
+        -20378,
+        -20252,
+        -20510,
+        -20288,
+        -20534,
+        -20366,
+        -20764,
+        -20198,
+        -20522,
+        -20324,
+        -20722,
+        -20390,
+        -20234,
+        -20462,
+        -20758,
+        -20552,
+        -20698,
+        -20546,
+        -20216,
+        -20294,
+        -20258,
+        -20480,
+        -20270,
+        -20228,
+        -20168,
+        -20330,
+        -20710,
+        -20246,
+        -20204,
+        -20504,
+        -20210,
+        -20776,
+        -20354,
+        -20372,
+        -20306,
+        -20162,
+        -20782,
+        -20716,
+        -20492,
+        -20402,
+        -20498,
+        -20752,
+        -20740,
+        -20192,
+        -20318,
+        -20174,
+        -20704,
+        -20156,
+        -20474,
+        39180,
+        -20348,
+        -20566,
+        -20570,
+        -20580,
+        -20584,
+        -20588,
+        -20592,
+        -20596,
+        -20600,
+        -20604,
+        -20608,
+        -20612,
+        -20616,
+        -20620,
+        -20624,
+        -20628,
+        -20632,
+        -20636,
+        -20640,
+        -20644,
+        -20648,
+        -20652,
+        -20656,
+        -20660,
+        -20664,
+        -20668,
+        -20672,
+        -20676,
+        -20680,
+        -20684,
+        -20688,
+        -20692,
+        -20696
     ],
     "names": [
         {
-            "entityID": 34616,
+            "entityID": 39172,
             "name": "Blockout Walkable"
         },
         {
-            "entityID": 34932,
+            "entityID": 39474,
             "name": "Setdress"
         },
         {
-            "entityID": 34634,
+            "entityID": 39190,
             "name": "Lighting"
         },
         {
-            "entityID": 34522,
+            "entityID": 39078,
             "name": "Enemies"
         },
         {
-            "entityID": 35010,
+            "entityID": 39552,
             "name": "----Enviorment----"
         },
         {
-            "entityID": 34874,
+            "entityID": 39416,
             "name": "---Characters---"
         },
         {
-            "entityID": 35076,
+            "entityID": 39620,
             "name": "p_player(PLACEHOLDER)"
         },
         {
-            "entityID": 34760,
+            "entityID": 39310,
             "name": "---Scripted Events---"
         },
         {
-            "entityID": -56564,
+            "entityID": -20360,
             "name": "sm_walkway"
         },
         {
-            "entityID": -56498,
+            "entityID": -20264,
             "name": "sm_walkway (9)"
         },
         {
-            "entityID": -56834,
+            "entityID": -20444,
             "name": "sm_walkway (28)"
         },
         {
-            "entityID": -56642,
+            "entityID": -20728,
             "name": "sm_walkway (3)"
         },
         {
-            "entityID": -56882,
+            "entityID": -20486,
             "name": "sm_walkway (10)"
         },
         {
-            "entityID": -56426,
+            "entityID": -20746,
             "name": "sm_walkway (32)"
         },
         {
-            "entityID": -56750,
+            "entityID": -20276,
             "name": "sm_walkway (6)"
         },
         {
-            "entityID": -56858,
+            "entityID": -20456,
             "name": "sm_walkway (11)"
         },
         {
-            "entityID": -56516,
+            "entityID": -20528,
             "name": "sm_walkway (36)"
         },
         {
-            "entityID": -56510,
+            "entityID": -20222,
             "name": "sm_walkway (1)"
         },
         {
-            "entityID": -56648,
+            "entityID": -20558,
             "name": "sm_walkway (24)"
         },
         {
-            "entityID": -56744,
+            "entityID": -20516,
             "name": "sm_walkway (42)"
         },
         {
-            "entityID": -56822,
+            "entityID": -20420,
             "name": "sm_walkway (4)"
         },
         {
-            "entityID": -56666,
+            "entityID": -20770,
             "name": "sm_walkway (25)"
         },
         {
-            "entityID": -56588,
+            "entityID": -20180,
             "name": "sm_walkway (43)"
         },
         {
-            "entityID": -56384,
+            "entityID": -20186,
             "name": "sm_walkway (12)"
         },
         {
-            "entityID": -56576,
+            "entityID": -20432,
             "name": "sm_walkway (26)"
         },
         {
-            "entityID": -56606,
+            "entityID": -20414,
             "name": "sm_walkway (78)"
         },
         {
-            "entityID": -56792,
+            "entityID": -20312,
             "name": "sm_walkway (44)"
         },
         {
-            "entityID": -56888,
+            "entityID": -20426,
             "name": "sm_walkway (15)"
         },
         {
-            "entityID": -56810,
+            "entityID": -20396,
             "name": "sm_walkway (27)"
         },
         {
-            "entityID": -56780,
+            "entityID": -20300,
             "name": "sm_walkway (45)"
         },
         {
-            "entityID": -56672,
+            "entityID": -20438,
             "name": "sm_walkway (18)"
         },
         {
-            "entityID": 34846,
-            "name": "MainCam (1)"
-        },
-        {
-            "entityID": -56558,
+            "entityID": -20408,
             "name": "sm_walkway (74)"
         },
         {
-            "entityID": -56756,
+            "entityID": -20282,
             "name": "sm_walkway (57)"
         },
         {
-            "entityID": -56408,
+            "entityID": -20734,
             "name": "sm_walkway (61)"
         },
         {
-            "entityID": -56654,
+            "entityID": -20342,
             "name": "sm_walkway (60)"
         },
         {
-            "entityID": -56870,
+            "entityID": -20468,
             "name": "sm_walkway (58)"
         },
         {
-            "entityID": -56480,
+            "entityID": -20240,
             "name": "sm_walkway (75)"
         },
         {
-            "entityID": -56696,
+            "entityID": -20384,
             "name": "sm_walkway (59)"
         },
         {
-            "entityID": -56714,
+            "entityID": -20150,
             "name": "sm_arrow (2)"
         },
         {
-            "entityID": -56540,
+            "entityID": -20540,
             "name": "sm_walkway (76)"
         },
         {
-            "entityID": -56852,
+            "entityID": -20450,
             "name": "sm_walkway (77)"
         },
         {
-            "entityID": -56552,
+            "entityID": -20336,
             "name": "sm_walkway (62)"
         },
         {
-            "entityID": -56840,
+            "entityID": -20378,
             "name": "sm_walkway (66)"
         },
         {
-            "entityID": -56732,
+            "entityID": -20252,
             "name": "sm_walkway (70)"
         },
         {
-            "entityID": -56630,
+            "entityID": -20510,
             "name": "sm_walkway (71)"
         },
         {
-            "entityID": -56522,
+            "entityID": -20288,
             "name": "sm_walkway (67)"
         },
         {
-            "entityID": -56768,
+            "entityID": -20534,
             "name": "sm_walkway (63)"
         },
         {
-            "entityID": -56690,
+            "entityID": -20366,
             "name": "sm_walkway (64)"
         },
         {
-            "entityID": -56444,
+            "entityID": -20764,
             "name": "sm_walkway (68)"
         },
         {
-            "entityID": -56492,
+            "entityID": -20198,
             "name": "sm_walkway (72)"
         },
         {
-            "entityID": -56396,
+            "entityID": -20522,
             "name": "sm_walkway (73)"
         },
         {
-            "entityID": -56618,
+            "entityID": -20324,
             "name": "sm_walkway (69)"
         },
         {
-            "entityID": -56462,
+            "entityID": -20722,
             "name": "sm_walkway (65)"
         },
         {
-            "entityID": -56582,
+            "entityID": -20390,
             "name": "sm_walkway (21)"
         },
         {
-            "entityID": -56762,
+            "entityID": -20234,
             "name": "sm_walkway (29)"
         },
         {
-            "entityID": -56594,
+            "entityID": -20462,
             "name": "sm_walkway (46)"
         },
         {
-            "entityID": -56660,
+            "entityID": -20758,
             "name": "sm_walkway (13)"
         },
         {
-            "entityID": -56786,
+            "entityID": -20552,
             "name": "sm_walkway (30)"
         },
         {
-            "entityID": -56432,
+            "entityID": -20698,
             "name": "sm_walkway (79)"
         },
         {
-            "entityID": -56414,
+            "entityID": -20546,
             "name": "sm_walkway (47)"
         },
         {
-            "entityID": -56624,
+            "entityID": -20216,
             "name": "sm_walkway (16)"
         },
         {
-            "entityID": -56798,
+            "entityID": -20294,
             "name": "sm_walkway (31)"
         },
         {
-            "entityID": -56486,
+            "entityID": -20258,
             "name": "sm_walkway (48)"
         },
         {
-            "entityID": -56600,
+            "entityID": -20480,
             "name": "sm_walkway (19)"
         },
         {
-            "entityID": -56504,
+            "entityID": -20270,
             "name": "sm_walkway (22)"
         },
         {
-            "entityID": -56726,
+            "entityID": -20228,
             "name": "sm_walkway (33)"
         },
         {
-            "entityID": -56846,
+            "entityID": -20168,
             "name": "sm_walkway (49)"
         },
         {
-            "entityID": -56570,
+            "entityID": -20330,
             "name": "sm_walkway (14)"
         },
         {
-            "entityID": -56678,
+            "entityID": -20710,
             "name": "sm_walkway (34)"
         },
         {
-            "entityID": -56534,
+            "entityID": -20246,
             "name": "sm_walkway (80)"
         },
         {
-            "entityID": -56894,
+            "entityID": -20204,
             "name": "sm_walkway (81)"
         },
         {
-            "entityID": -56684,
+            "entityID": -20504,
             "name": "sm_walkway (50)"
         },
         {
-            "entityID": -56738,
+            "entityID": -20210,
             "name": "sm_walkway (17)"
         },
         {
-            "entityID": -56702,
+            "entityID": -20776,
             "name": "sm_walkway (35)"
         },
         {
-            "entityID": -56438,
+            "entityID": -20354,
             "name": "sm_walkway (51)"
         },
         {
-            "entityID": -56456,
+            "entityID": -20372,
             "name": "sm_walkway (20)"
         },
         {
-            "entityID": -56528,
+            "entityID": -20306,
             "name": "sm_walkway (23)"
         },
         {
-            "entityID": -56720,
+            "entityID": -20162,
             "name": "sm_walkway (37)"
         },
         {
-            "entityID": -56450,
+            "entityID": -20782,
             "name": "sm_walkway (52)"
         },
         {
-            "entityID": -56402,
+            "entityID": -20716,
             "name": "sm_walkway (7)"
         },
         {
-            "entityID": -56390,
+            "entityID": -20492,
             "name": "sm_walkway (38)"
         },
         {
-            "entityID": -56864,
+            "entityID": -20402,
             "name": "sm_walkway (53)"
         },
         {
-            "entityID": -56708,
+            "entityID": -20498,
             "name": "sm_walkway (2)"
         },
         {
-            "entityID": -56468,
+            "entityID": -20752,
             "name": "sm_walkway (39)"
         },
         {
-            "entityID": -56420,
+            "entityID": -20740,
             "name": "sm_walkway (54)"
         },
         {
-            "entityID": -56612,
+            "entityID": -20192,
             "name": "sm_walkway (5)"
         },
         {
-            "entityID": -56804,
+            "entityID": -20318,
             "name": "sm_walkway (40)"
         },
         {
-            "entityID": -56474,
+            "entityID": -20174,
             "name": "sm_walkway (55)"
         },
         {
-            "entityID": -56636,
+            "entityID": -20704,
             "name": "sm_walkway (8)"
         },
         {
-            "entityID": -56774,
+            "entityID": -20156,
             "name": "sm_walkway (41)"
         },
         {
-            "entityID": -56876,
+            "entityID": -20474,
             "name": "sm_walkway (56)"
         },
         {
-            "entityID": -56546,
-            "name": "sm_enemy"
-        },
-        {
-            "entityID": 34624,
+            "entityID": 39180,
             "name": "MainCam"
         },
         {
-            "entityID": -56816,
+            "entityID": -20348,
             "name": "sm_arrow"
         },
         {
-            "entityID": -56828,
-            "name": "sm_arrow (1)"
+            "entityID": -20566,
+            "name": "enemy"
+        },
+        {
+            "entityID": -20570,
+            "name": "enemy___rig:enemyBlockout"
+        },
+        {
+            "entityID": -20580,
+            "name": "enemy___rig:root_jnt"
+        },
+        {
+            "entityID": -20584,
+            "name": "enemy___rig:c_cog_jnt"
+        },
+        {
+            "entityID": -20588,
+            "name": "enemy___rig:c_main_jnt"
+        },
+        {
+            "entityID": -20592,
+            "name": "enemy___rig:c_shootThing_jnt"
+        },
+        {
+            "entityID": -20596,
+            "name": "enemy___rig:c_string_jnt"
+        },
+        {
+            "entityID": -20600,
+            "name": "enemy___rig:l_bow_jnt"
+        },
+        {
+            "entityID": -20604,
+            "name": "enemy___rig:r_bow_jnt"
+        },
+        {
+            "entityID": -20608,
+            "name": "enemy___rig:c_spine1_jnt"
+        },
+        {
+            "entityID": -20612,
+            "name": "enemy___rig:c_knees_jnt"
+        },
+        {
+            "entityID": -20616,
+            "name": "enemy___rig:c_feet_jnt"
+        },
+        {
+            "entityID": -20620,
+            "name": "enemy___rig:c_spine2_jnt"
+        },
+        {
+            "entityID": -20624,
+            "name": "enemy___rig:c_spine3_jnt"
+        },
+        {
+            "entityID": -20628,
+            "name": "enemy___rig:c_neck_jnt"
+        },
+        {
+            "entityID": -20632,
+            "name": "enemy___rig:c_head_jnt"
+        },
+        {
+            "entityID": -20636,
+            "name": "enemy___rig:l_clavicle_jnt"
+        },
+        {
+            "entityID": -20640,
+            "name": "enemy___rig:l_shoulder_jnt"
+        },
+        {
+            "entityID": -20644,
+            "name": "enemy___rig:l_elbow_jnt"
+        },
+        {
+            "entityID": -20648,
+            "name": "enemy___rig:l_hand_jnt"
+        },
+        {
+            "entityID": -20652,
+            "name": "enemy___rig:l_fingers1_jnt"
+        },
+        {
+            "entityID": -20656,
+            "name": "enemy___rig:l_fingers2_jnt"
+        },
+        {
+            "entityID": -20660,
+            "name": "enemy___rig:l_thumb1_jnt"
+        },
+        {
+            "entityID": -20664,
+            "name": "enemy___rig:l_thumb2_jnt"
+        },
+        {
+            "entityID": -20668,
+            "name": "enemy___rig:r_clavicle_jnt"
+        },
+        {
+            "entityID": -20672,
+            "name": "enemy___rig:r_shoulder_jnt"
+        },
+        {
+            "entityID": -20676,
+            "name": "enemy___rig:r_elbow_jnt"
+        },
+        {
+            "entityID": -20680,
+            "name": "enemy___rig:r_hand_jnt"
+        },
+        {
+            "entityID": -20684,
+            "name": "enemy___rig:r_fingers1_jnt"
+        },
+        {
+            "entityID": -20688,
+            "name": "enemy___rig:r_fingers2_jnt"
+        },
+        {
+            "entityID": -20692,
+            "name": "enemy___rig:r_thumb1_jnt"
+        },
+        {
+            "entityID": -20696,
+            "name": "enemy___rig:r_thumb2_jnt"
         }
     ],
     "transforms": [
         {
-            "entityID": 34616,
+            "entityID": 39172,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -506,7 +651,7 @@
             "parent": 0
         },
         {
-            "entityID": 34932,
+            "entityID": 39474,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -526,7 +671,7 @@
             "parent": 0
         },
         {
-            "entityID": 34634,
+            "entityID": 39190,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -546,7 +691,7 @@
             "parent": 0
         },
         {
-            "entityID": 34522,
+            "entityID": 39078,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -566,7 +711,7 @@
             "parent": 0
         },
         {
-            "entityID": 35010,
+            "entityID": 39552,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -586,7 +731,7 @@
             "parent": 0
         },
         {
-            "entityID": 34874,
+            "entityID": 39416,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -603,12 +748,12 @@
                 "z": 1.0
             },
             "children": [
-                35076
+                39620
             ],
             "parent": 0
         },
         {
-            "entityID": 35076,
+            "entityID": 39620,
             "position": {
                 "x": 0.6600000262260437,
                 "y": 2.759999990463257,
@@ -625,10 +770,10 @@
                 "z": 1.0
             },
             "children": [],
-            "parent": 34874
+            "parent": 39416
         },
         {
-            "entityID": 34760,
+            "entityID": 39310,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -648,7 +793,7 @@
             "parent": 0
         },
         {
-            "entityID": -56564,
+            "entityID": -20360,
             "position": {
                 "x": 0.25,
                 "y": 0.0,
@@ -668,7 +813,7 @@
             "parent": 0
         },
         {
-            "entityID": -56498,
+            "entityID": -20264,
             "position": {
                 "x": -18.75,
                 "y": 0.0,
@@ -688,7 +833,7 @@
             "parent": 0
         },
         {
-            "entityID": -56834,
+            "entityID": -20444,
             "position": {
                 "x": -55.2508544921875,
                 "y": 0.0,
@@ -708,7 +853,7 @@
             "parent": 0
         },
         {
-            "entityID": -56642,
+            "entityID": -20728,
             "position": {
                 "x": 0.25,
                 "y": 0.0,
@@ -728,7 +873,7 @@
             "parent": 0
         },
         {
-            "entityID": -56882,
+            "entityID": -20486,
             "position": {
                 "x": -18.75,
                 "y": 0.0,
@@ -748,7 +893,7 @@
             "parent": 0
         },
         {
-            "entityID": -56426,
+            "entityID": -20746,
             "position": {
                 "x": -55.250877380371097,
                 "y": 0.0,
@@ -768,7 +913,7 @@
             "parent": 0
         },
         {
-            "entityID": -56750,
+            "entityID": -20276,
             "position": {
                 "x": 0.25,
                 "y": 0.0,
@@ -788,7 +933,7 @@
             "parent": 0
         },
         {
-            "entityID": -56858,
+            "entityID": -20456,
             "position": {
                 "x": -18.75,
                 "y": 0.0,
@@ -808,7 +953,7 @@
             "parent": 0
         },
         {
-            "entityID": -56516,
+            "entityID": -20528,
             "position": {
                 "x": -55.25083923339844,
                 "y": 0.0,
@@ -828,7 +973,7 @@
             "parent": 0
         },
         {
-            "entityID": -56510,
+            "entityID": -20222,
             "position": {
                 "x": 4.25,
                 "y": 0.0,
@@ -848,7 +993,7 @@
             "parent": 0
         },
         {
-            "entityID": -56648,
+            "entityID": -20558,
             "position": {
                 "x": -14.75,
                 "y": 0.0,
@@ -868,7 +1013,7 @@
             "parent": 0
         },
         {
-            "entityID": -56744,
+            "entityID": -20516,
             "position": {
                 "x": -59.250858306884769,
                 "y": 0.0,
@@ -888,7 +1033,7 @@
             "parent": 0
         },
         {
-            "entityID": -56822,
+            "entityID": -20420,
             "position": {
                 "x": 4.25,
                 "y": 0.0,
@@ -908,7 +1053,7 @@
             "parent": 0
         },
         {
-            "entityID": -56666,
+            "entityID": -20770,
             "position": {
                 "x": -14.75,
                 "y": 0.0,
@@ -928,7 +1073,7 @@
             "parent": 0
         },
         {
-            "entityID": -56588,
+            "entityID": -20180,
             "position": {
                 "x": -59.25088119506836,
                 "y": 0.0,
@@ -948,7 +1093,7 @@
             "parent": 0
         },
         {
-            "entityID": -56384,
+            "entityID": -20186,
             "position": {
                 "x": 4.25,
                 "y": 2.0,
@@ -962,13 +1107,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56576,
+            "entityID": -20432,
             "position": {
                 "x": -14.75,
                 "y": 2.0,
@@ -982,13 +1127,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56606,
+            "entityID": -20414,
             "position": {
                 "x": -30.479999542236329,
                 "y": 2.0,
@@ -1002,13 +1147,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56792,
+            "entityID": -20312,
             "position": {
                 "x": -59.250885009765628,
                 "y": 2.0,
@@ -1028,7 +1173,7 @@
             "parent": 0
         },
         {
-            "entityID": -56888,
+            "entityID": -20426,
             "position": {
                 "x": 4.25,
                 "y": 2.0,
@@ -1042,13 +1187,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56810,
+            "entityID": -20396,
             "position": {
                 "x": -14.75,
                 "y": 2.0,
@@ -1062,13 +1207,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56780,
+            "entityID": -20300,
             "position": {
                 "x": -59.250831604003909,
                 "y": 2.0,
@@ -1088,7 +1233,7 @@
             "parent": 0
         },
         {
-            "entityID": -56672,
+            "entityID": -20438,
             "position": {
                 "x": -5.64124059677124,
                 "y": 2.0,
@@ -1108,27 +1253,7 @@
             "parent": 0
         },
         {
-            "entityID": 34846,
-            "position": {
-                "x": 21.839746475219728,
-                "y": 1.27286696434021,
-                "z": -0.7582065463066101
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "children": [],
-            "parent": 0
-        },
-        {
-            "entityID": -56558,
+            "entityID": -20408,
             "position": {
                 "x": 23.5,
                 "y": 0.0,
@@ -1148,7 +1273,7 @@
             "parent": 0
         },
         {
-            "entityID": -56756,
+            "entityID": -20282,
             "position": {
                 "x": 19.5,
                 "y": 0.0,
@@ -1168,7 +1293,7 @@
             "parent": 0
         },
         {
-            "entityID": -56408,
+            "entityID": -20734,
             "position": {
                 "x": 23.5,
                 "y": 0.0,
@@ -1188,7 +1313,7 @@
             "parent": 0
         },
         {
-            "entityID": -56654,
+            "entityID": -20342,
             "position": {
                 "x": 23.5,
                 "y": 0.0,
@@ -1208,7 +1333,7 @@
             "parent": 0
         },
         {
-            "entityID": -56870,
+            "entityID": -20468,
             "position": {
                 "x": 19.5,
                 "y": 0.0,
@@ -1228,7 +1353,7 @@
             "parent": 0
         },
         {
-            "entityID": -56480,
+            "entityID": -20240,
             "position": {
                 "x": 15.5,
                 "y": 0.0,
@@ -1248,7 +1373,7 @@
             "parent": 0
         },
         {
-            "entityID": -56696,
+            "entityID": -20384,
             "position": {
                 "x": 19.5,
                 "y": 0.0,
@@ -1268,7 +1393,7 @@
             "parent": 0
         },
         {
-            "entityID": -56714,
+            "entityID": -20150,
             "position": {
                 "x": 10.329999923706055,
                 "y": 1.5,
@@ -1288,7 +1413,7 @@
             "parent": 0
         },
         {
-            "entityID": -56540,
+            "entityID": -20540,
             "position": {
                 "x": 15.5,
                 "y": 0.0,
@@ -1308,7 +1433,7 @@
             "parent": 0
         },
         {
-            "entityID": -56852,
+            "entityID": -20450,
             "position": {
                 "x": 15.5,
                 "y": 0.0,
@@ -1328,7 +1453,7 @@
             "parent": 0
         },
         {
-            "entityID": -56552,
+            "entityID": -20336,
             "position": {
                 "x": 23.5,
                 "y": 2.0,
@@ -1342,13 +1467,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56840,
+            "entityID": -20378,
             "position": {
                 "x": 19.5,
                 "y": 2.0,
@@ -1362,13 +1487,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56732,
+            "entityID": -20252,
             "position": {
                 "x": 15.5,
                 "y": 2.0,
@@ -1382,13 +1507,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56630,
+            "entityID": -20510,
             "position": {
                 "x": 15.5,
                 "y": 2.0,
@@ -1402,13 +1527,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56522,
+            "entityID": -20288,
             "position": {
                 "x": 19.5,
                 "y": 2.0,
@@ -1422,13 +1547,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56768,
+            "entityID": -20534,
             "position": {
                 "x": 23.5,
                 "y": 2.0,
@@ -1442,13 +1567,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56690,
+            "entityID": -20366,
             "position": {
                 "x": 13.608758926391602,
                 "y": 2.0,
@@ -1468,7 +1593,7 @@
             "parent": 0
         },
         {
-            "entityID": -56444,
+            "entityID": -20764,
             "position": {
                 "x": 13.608749389648438,
                 "y": 2.0,
@@ -1488,7 +1613,7 @@
             "parent": 0
         },
         {
-            "entityID": -56492,
+            "entityID": -20198,
             "position": {
                 "x": 13.60874080657959,
                 "y": 2.0,
@@ -1508,7 +1633,7 @@
             "parent": 0
         },
         {
-            "entityID": -56396,
+            "entityID": -20522,
             "position": {
                 "x": 25.108741760253908,
                 "y": 2.0,
@@ -1528,7 +1653,7 @@
             "parent": 0
         },
         {
-            "entityID": -56618,
+            "entityID": -20324,
             "position": {
                 "x": 25.108749389648439,
                 "y": 2.0,
@@ -1548,7 +1673,7 @@
             "parent": 0
         },
         {
-            "entityID": -56462,
+            "entityID": -20722,
             "position": {
                 "x": 25.1087589263916,
                 "y": 2.0,
@@ -1568,7 +1693,7 @@
             "parent": 0
         },
         {
-            "entityID": -56582,
+            "entityID": -20390,
             "position": {
                 "x": 5.85875940322876,
                 "y": 2.0,
@@ -1588,7 +1713,7 @@
             "parent": 0
         },
         {
-            "entityID": -56762,
+            "entityID": -20234,
             "position": {
                 "x": -13.141241073608399,
                 "y": 2.0,
@@ -1608,7 +1733,7 @@
             "parent": 0
         },
         {
-            "entityID": -56594,
+            "entityID": -20462,
             "position": {
                 "x": -60.859596252441409,
                 "y": 2.0,
@@ -1620,15 +1745,15 @@
                 "z": 89.99980926513672
             },
             "scale": {
-                "x": 1.000000238418579,
-                "y": 1.000000238418579,
-                "z": 1.0000004768371583
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56660,
+            "entityID": -20758,
             "position": {
                 "x": 0.25,
                 "y": 2.0,
@@ -1642,13 +1767,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56786,
+            "entityID": -20552,
             "position": {
                 "x": -18.75,
                 "y": 2.0,
@@ -1662,13 +1787,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56432,
+            "entityID": -20698,
             "position": {
                 "x": -34.47999954223633,
                 "y": 2.0,
@@ -1682,13 +1807,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56414,
+            "entityID": -20546,
             "position": {
                 "x": -55.250885009765628,
                 "y": 2.0,
@@ -1708,7 +1833,7 @@
             "parent": 0
         },
         {
-            "entityID": -56624,
+            "entityID": -20216,
             "position": {
                 "x": 0.25,
                 "y": 2.0,
@@ -1722,13 +1847,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56798,
+            "entityID": -20294,
             "position": {
                 "x": -18.75,
                 "y": 2.0,
@@ -1742,13 +1867,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56486,
+            "entityID": -20258,
             "position": {
                 "x": -55.250823974609378,
                 "y": 2.0,
@@ -1768,7 +1893,7 @@
             "parent": 0
         },
         {
-            "entityID": -56600,
+            "entityID": -20480,
             "position": {
                 "x": -5.641250133514404,
                 "y": 2.0,
@@ -1788,7 +1913,7 @@
             "parent": 0
         },
         {
-            "entityID": -56504,
+            "entityID": -20270,
             "position": {
                 "x": 5.858749866485596,
                 "y": 2.0,
@@ -1808,7 +1933,7 @@
             "parent": 0
         },
         {
-            "entityID": -56726,
+            "entityID": -20228,
             "position": {
                 "x": -13.141250610351563,
                 "y": 2.0,
@@ -1828,7 +1953,7 @@
             "parent": 0
         },
         {
-            "entityID": -56846,
+            "entityID": -20168,
             "position": {
                 "x": -60.85960388183594,
                 "y": 2.0,
@@ -1840,15 +1965,15 @@
                 "z": 89.99980926513672
             },
             "scale": {
-                "x": 1.000000238418579,
-                "y": 1.000000238418579,
-                "z": 1.0000004768371583
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56570,
+            "entityID": -20330,
             "position": {
                 "x": -3.75,
                 "y": 2.0,
@@ -1862,13 +1987,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56678,
+            "entityID": -20710,
             "position": {
                 "x": -22.75,
                 "y": 2.0,
@@ -1882,13 +2007,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56534,
+            "entityID": -20246,
             "position": {
                 "x": -38.47999954223633,
                 "y": 2.0,
@@ -1902,13 +2027,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56894,
+            "entityID": -20204,
             "position": {
                 "x": -42.45000076293945,
                 "y": 2.0,
@@ -1922,13 +2047,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56684,
+            "entityID": -20504,
             "position": {
                 "x": -51.25088119506836,
                 "y": 2.0,
@@ -1948,7 +2073,7 @@
             "parent": 0
         },
         {
-            "entityID": -56738,
+            "entityID": -20210,
             "position": {
                 "x": -3.75,
                 "y": 2.0,
@@ -1962,13 +2087,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56702,
+            "entityID": -20776,
             "position": {
                 "x": -22.75,
                 "y": 2.0,
@@ -1982,13 +2107,13 @@
             "scale": {
                 "x": 1.0,
                 "y": 1.0,
-                "z": 1.000000238418579
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56438,
+            "entityID": -20354,
             "position": {
                 "x": -51.250823974609378,
                 "y": 2.0,
@@ -2008,7 +2133,7 @@
             "parent": 0
         },
         {
-            "entityID": -56456,
+            "entityID": -20372,
             "position": {
                 "x": -5.64125919342041,
                 "y": 2.0,
@@ -2028,7 +2153,7 @@
             "parent": 0
         },
         {
-            "entityID": -56528,
+            "entityID": -20306,
             "position": {
                 "x": 5.85874080657959,
                 "y": 2.0,
@@ -2048,7 +2173,7 @@
             "parent": 0
         },
         {
-            "entityID": -56720,
+            "entityID": -20162,
             "position": {
                 "x": -13.14125919342041,
                 "y": 2.0,
@@ -2068,7 +2193,7 @@
             "parent": 0
         },
         {
-            "entityID": -56450,
+            "entityID": -20782,
             "position": {
                 "x": -60.859619140625,
                 "y": 2.0,
@@ -2080,15 +2205,15 @@
                 "z": 89.99980926513672
             },
             "scale": {
-                "x": 1.000000238418579,
-                "y": 1.000000238418579,
-                "z": 1.0000004768371583
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
             },
             "children": [],
             "parent": 0
         },
         {
-            "entityID": -56402,
+            "entityID": -20716,
             "position": {
                 "x": 4.25,
                 "y": 0.0,
@@ -2108,7 +2233,7 @@
             "parent": 0
         },
         {
-            "entityID": -56390,
+            "entityID": -20492,
             "position": {
                 "x": -14.75,
                 "y": 0.0,
@@ -2128,7 +2253,7 @@
             "parent": 0
         },
         {
-            "entityID": -56864,
+            "entityID": -20402,
             "position": {
                 "x": -59.25083541870117,
                 "y": 0.0,
@@ -2148,7 +2273,7 @@
             "parent": 0
         },
         {
-            "entityID": -56708,
+            "entityID": -20498,
             "position": {
                 "x": -3.75,
                 "y": 0.0,
@@ -2168,7 +2293,7 @@
             "parent": 0
         },
         {
-            "entityID": -56468,
+            "entityID": -20752,
             "position": {
                 "x": -22.75,
                 "y": 0.0,
@@ -2188,7 +2313,7 @@
             "parent": 0
         },
         {
-            "entityID": -56420,
+            "entityID": -20740,
             "position": {
                 "x": -51.250858306884769,
                 "y": 0.0,
@@ -2208,7 +2333,7 @@
             "parent": 0
         },
         {
-            "entityID": -56612,
+            "entityID": -20192,
             "position": {
                 "x": -3.75,
                 "y": 0.0,
@@ -2228,7 +2353,7 @@
             "parent": 0
         },
         {
-            "entityID": -56804,
+            "entityID": -20318,
             "position": {
                 "x": -22.75,
                 "y": 0.0,
@@ -2248,7 +2373,7 @@
             "parent": 0
         },
         {
-            "entityID": -56474,
+            "entityID": -20174,
             "position": {
                 "x": -51.250877380371097,
                 "y": 0.0,
@@ -2268,7 +2393,7 @@
             "parent": 0
         },
         {
-            "entityID": -56636,
+            "entityID": -20704,
             "position": {
                 "x": -3.75,
                 "y": 0.0,
@@ -2288,7 +2413,7 @@
             "parent": 0
         },
         {
-            "entityID": -56774,
+            "entityID": -20156,
             "position": {
                 "x": -22.75,
                 "y": 0.0,
@@ -2308,7 +2433,7 @@
             "parent": 0
         },
         {
-            "entityID": -56876,
+            "entityID": -20474,
             "position": {
                 "x": -51.25083923339844,
                 "y": 0.0,
@@ -2328,27 +2453,7 @@
             "parent": 0
         },
         {
-            "entityID": -56546,
-            "position": {
-                "x": 0.0,
-                "y": 10.220000267028809,
-                "z": 0.05000000074505806
-            },
-            "rotation": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "scale": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "children": [],
-            "parent": 0
-        },
-        {
-            "entityID": 34624,
+            "entityID": 39180,
             "position": {
                 "x": 2.5897462368011476,
                 "y": 1.27286696434021,
@@ -2368,7 +2473,7 @@
             "parent": 0
         },
         {
-            "entityID": -56816,
+            "entityID": -20348,
             "position": {
                 "x": -8.920000076293946,
                 "y": 1.5,
@@ -2388,11 +2493,34 @@
             "parent": 0
         },
         {
-            "entityID": -56828,
+            "entityID": -20566,
             "position": {
-                "x": -27.920000076293947,
-                "y": 1.5,
-                "z": 0.1899999976158142
+                "x": 0.0,
+                "y": 6.0,
+                "z": 0.02846527099609375
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20570,
+                -20580
+            ],
+            "parent": 0
+        },
+        {
+            "entityID": -20570,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
             },
             "rotation": {
                 "x": 0.0,
@@ -2405,12 +2533,660 @@
                 "z": 1.0
             },
             "children": [],
-            "parent": 0
+            "parent": -20566
+        },
+        {
+            "entityID": -20580,
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20584,
+                -20588,
+                -20608
+            ],
+            "parent": -20566
+        },
+        {
+            "entityID": -20584,
+            "position": {
+                "x": 0.0,
+                "y": 1.2714396715164185,
+                "z": 0.8607423305511475
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [],
+            "parent": -20580
+        },
+        {
+            "entityID": -20588,
+            "position": {
+                "x": 0.0,
+                "y": 1.4425640106201172,
+                "z": 0.8607423305511475
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20592,
+                -20596,
+                -20600,
+                -20604
+            ],
+            "parent": -20580
+        },
+        {
+            "entityID": -20592,
+            "position": {
+                "x": 0.0,
+                "y": 0.06294815242290497,
+                "z": -0.9117372632026672
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [],
+            "parent": -20588
+        },
+        {
+            "entityID": -20596,
+            "position": {
+                "x": 0.0,
+                "y": 0.19827337563037873,
+                "z": -0.9102361798286438
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [],
+            "parent": -20588
+        },
+        {
+            "entityID": -20600,
+            "position": {
+                "x": -1.237361192703247,
+                "y": 0.06438460201025009,
+                "z": 0.07527999579906464
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [],
+            "parent": -20588
+        },
+        {
+            "entityID": -20604,
+            "position": {
+                "x": 1.2373600006103516,
+                "y": 0.06438591331243515,
+                "z": 0.07528065890073776
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [],
+            "parent": -20588
+        },
+        {
+            "entityID": -20608,
+            "position": {
+                "x": 0.0,
+                "y": 1.1083600521087647,
+                "z": -1.209503173828125
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20612,
+                -20620
+            ],
+            "parent": -20580
+        },
+        {
+            "entityID": -20612,
+            "position": {
+                "x": -6.863419166336371e-9,
+                "y": -0.38133367896080019,
+                "z": 0.00009990465332521126
+            },
+            "rotation": {
+                "x": 0.012184727005660534,
+                "y": -0.00009540179598843679,
+                "z": 8.167974669959222e-7
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20616
+            ],
+            "parent": -20608
+        },
+        {
+            "entityID": -20616,
+            "position": {
+                "x": 6.697161936131124e-9,
+                "y": -0.4697849154472351,
+                "z": -1.1226574682908497e-14
+            },
+            "rotation": {
+                "x": 1.363462836558027e-12,
+                "y": 1.737141958058075e-10,
+                "z": 8.167974101525033e-7
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [],
+            "parent": -20612
+        },
+        {
+            "entityID": -20620,
+            "position": {
+                "x": 0.0,
+                "y": 0.19497649371623994,
+                "z": 4.2632563192693947e-16
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20624
+            ],
+            "parent": -20608
+        },
+        {
+            "entityID": -20624,
+            "position": {
+                "x": 0.0,
+                "y": 0.19497649371623994,
+                "z": 4.2632563192693947e-16
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20628,
+                -20636,
+                -20668
+            ],
+            "parent": -20620
+        },
+        {
+            "entityID": -20628,
+            "position": {
+                "x": 0.0,
+                "y": 0.19497649371623994,
+                "z": 4.2632563192693947e-16
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20632
+            ],
+            "parent": -20624
+        },
+        {
+            "entityID": -20632,
+            "position": {
+                "x": 0.0,
+                "y": 0.15557965636253358,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [],
+            "parent": -20628
+        },
+        {
+            "entityID": -20636,
+            "position": {
+                "x": -0.17197303473949433,
+                "y": 0.17097507417201997,
+                "z": -0.0077229212038218979
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 345.3859558105469,
+                "z": 350.8385314941406
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20640
+            ],
+            "parent": -20624
+        },
+        {
+            "entityID": -20640,
+            "position": {
+                "x": -0.17692165076732636,
+                "y": 2.8421708795129299e-16,
+                "z": -1.4210854397564649e-16
+            },
+            "rotation": {
+                "x": 357.47637939453127,
+                "y": 15.85995864868164,
+                "z": 73.86701202392578
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20644
+            ],
+            "parent": -20636
+        },
+        {
+            "entityID": -20644,
+            "position": {
+                "x": -0.28662359714508059,
+                "y": 4.2632563192693947e-16,
+                "z": -2.8421708795129299e-16
+            },
+            "rotation": {
+                "x": 32.19340515136719,
+                "y": 17.02629852294922,
+                "z": 337.4220275878906
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20648
+            ],
+            "parent": -20640
+        },
+        {
+            "entityID": -20648,
+            "position": {
+                "x": -0.2549600601196289,
+                "y": -1.4210854397564649e-16,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 8.124464988708496,
+                "y": 10.70931625366211,
+                "z": 0.025571085512638093
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20652,
+                -20660
+            ],
+            "parent": -20644
+        },
+        {
+            "entityID": -20652,
+            "position": {
+                "x": -0.15469634532928468,
+                "y": 7.105426934084528e-16,
+                "z": 5.684341759025859e-16
+            },
+            "rotation": {
+                "x": 0.7905414700508118,
+                "y": 1.0570491552352906,
+                "z": 18.840116500854493
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20656
+            ],
+            "parent": -20648
+        },
+        {
+            "entityID": -20656,
+            "position": {
+                "x": -0.21500703692436219,
+                "y": -8.526512638538789e-16,
+                "z": 7.105426934084528e-16
+            },
+            "rotation": {
+                "x": 350.581298828125,
+                "y": -1.0818009599233847e-7,
+                "z": 11.40544319152832
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [],
+            "parent": -20652
+        },
+        {
+            "entityID": -20660,
+            "position": {
+                "x": -0.07229551672935486,
+                "y": 0.004252597223967314,
+                "z": 0.06123148649930954
+            },
+            "rotation": {
+                "x": 31.261106491088868,
+                "y": 54.256649017333987,
+                "z": 7.703444957733154
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20664
+            ],
+            "parent": -20648
+        },
+        {
+            "entityID": -20664,
+            "position": {
+                "x": -0.1381838470697403,
+                "y": -3.552713467042264e-16,
+                "z": 3.552713599391162e-17
+            },
+            "rotation": {
+                "x": 356.3223571777344,
+                "y": 3.272033214569092,
+                "z": 16.209325790405275
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [],
+            "parent": -20660
+        },
+        {
+            "entityID": -20668,
+            "position": {
+                "x": 0.17197299003601075,
+                "y": 0.1709769070148468,
+                "z": -0.007726849522441626
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 194.61402893066407,
+                "z": 170.83853149414063
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20672
+            ],
+            "parent": -20624
+        },
+        {
+            "entityID": -20672,
+            "position": {
+                "x": 0.17692214250564576,
+                "y": -9.496823167864932e-7,
+                "z": 9.047696494235424e-7
+            },
+            "rotation": {
+                "x": 357.47637939453127,
+                "y": 15.85995864868164,
+                "z": 73.86701202392578
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20676
+            ],
+            "parent": -20668
+        },
+        {
+            "entityID": -20676,
+            "position": {
+                "x": 0.28662368655204775,
+                "y": 7.905409660224905e-8,
+                "z": -0.0000016950380086200312
+            },
+            "rotation": {
+                "x": 32.19340515136719,
+                "y": 17.02629852294922,
+                "z": 337.4220275878906
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20680
+            ],
+            "parent": -20672
+        },
+        {
+            "entityID": -20680,
+            "position": {
+                "x": 0.2549654543399811,
+                "y": 0.000003057353524127393,
+                "z": -0.000003594892177716247
+            },
+            "rotation": {
+                "x": 8.124464988708496,
+                "y": 10.70931625366211,
+                "z": 0.025571085512638093
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20684,
+                -20692
+            ],
+            "parent": -20676
+        },
+        {
+            "entityID": -20684,
+            "position": {
+                "x": 0.15469080209732057,
+                "y": -0.0000038982143450994048,
+                "z": 0.0000017168936210509856
+            },
+            "rotation": {
+                "x": 0.7905414700508118,
+                "y": 1.0570491552352906,
+                "z": 18.840116500854493
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20688
+            ],
+            "parent": -20680
+        },
+        {
+            "entityID": -20688,
+            "position": {
+                "x": 0.2150123417377472,
+                "y": 0.0000017018872995322454,
+                "z": -3.8045274664000319e-7
+            },
+            "rotation": {
+                "x": 350.581298828125,
+                "y": -1.0818009599233847e-7,
+                "z": 11.40544319152832
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [],
+            "parent": -20684
+        },
+        {
+            "entityID": -20692,
+            "position": {
+                "x": 0.07229098677635193,
+                "y": -0.004257321823388338,
+                "z": -0.061230361461639407
+            },
+            "rotation": {
+                "x": 31.261106491088868,
+                "y": 54.256649017333987,
+                "z": 7.703444957733154
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [
+                -20696
+            ],
+            "parent": -20680
+        },
+        {
+            "entityID": -20696,
+            "position": {
+                "x": 0.1381870061159134,
+                "y": 0.000004942341547575779,
+                "z": 6.158157930258312e-7
+            },
+            "rotation": {
+                "x": 356.3223571777344,
+                "y": 3.272033214569092,
+                "z": 16.209325790405275
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "children": [],
+            "parent": -20692
         }
     ],
     "boxColliders": [
         {
-            "entityID": -56564,
+            "entityID": -20360,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2424,7 +3200,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56498,
+            "entityID": -20264,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2438,7 +3214,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56834,
+            "entityID": -20444,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2452,7 +3228,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56642,
+            "entityID": -20728,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2466,7 +3242,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56882,
+            "entityID": -20486,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2480,7 +3256,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56426,
+            "entityID": -20746,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2494,7 +3270,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56750,
+            "entityID": -20276,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2508,7 +3284,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56858,
+            "entityID": -20456,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2522,7 +3298,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56516,
+            "entityID": -20528,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2536,7 +3312,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56510,
+            "entityID": -20222,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2550,7 +3326,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56648,
+            "entityID": -20558,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2564,7 +3340,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56744,
+            "entityID": -20516,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2578,7 +3354,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56822,
+            "entityID": -20420,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2592,7 +3368,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56666,
+            "entityID": -20770,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2606,7 +3382,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56588,
+            "entityID": -20180,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2620,7 +3396,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56384,
+            "entityID": -20186,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2634,7 +3410,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56576,
+            "entityID": -20432,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2648,7 +3424,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56606,
+            "entityID": -20414,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2662,7 +3438,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56792,
+            "entityID": -20312,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2676,7 +3452,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56888,
+            "entityID": -20426,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2690,7 +3466,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56810,
+            "entityID": -20396,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2704,7 +3480,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56780,
+            "entityID": -20300,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2718,7 +3494,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56672,
+            "entityID": -20438,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2732,7 +3508,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56558,
+            "entityID": -20408,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2746,7 +3522,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56756,
+            "entityID": -20282,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2760,7 +3536,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56408,
+            "entityID": -20734,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2774,7 +3550,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56654,
+            "entityID": -20342,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2788,7 +3564,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56870,
+            "entityID": -20468,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2802,7 +3578,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56480,
+            "entityID": -20240,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2816,7 +3592,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56696,
+            "entityID": -20384,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2830,7 +3606,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56714,
+            "entityID": -20150,
             "center": {
                 "x": 0.0,
                 "y": 0.0,
@@ -2844,7 +3620,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56540,
+            "entityID": -20540,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2858,7 +3634,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56852,
+            "entityID": -20450,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2872,7 +3648,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56552,
+            "entityID": -20336,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2886,7 +3662,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56840,
+            "entityID": -20378,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2900,7 +3676,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56732,
+            "entityID": -20252,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2914,7 +3690,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56630,
+            "entityID": -20510,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2928,7 +3704,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56522,
+            "entityID": -20288,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2942,7 +3718,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56768,
+            "entityID": -20534,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2956,7 +3732,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56690,
+            "entityID": -20366,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2970,7 +3746,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56444,
+            "entityID": -20764,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2984,7 +3760,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56492,
+            "entityID": -20198,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -2998,7 +3774,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56396,
+            "entityID": -20522,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3012,7 +3788,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56618,
+            "entityID": -20324,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3026,7 +3802,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56462,
+            "entityID": -20722,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3040,7 +3816,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56582,
+            "entityID": -20390,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3054,7 +3830,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56762,
+            "entityID": -20234,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3068,7 +3844,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56594,
+            "entityID": -20462,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3082,7 +3858,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56660,
+            "entityID": -20758,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3096,7 +3872,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56786,
+            "entityID": -20552,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3110,7 +3886,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56432,
+            "entityID": -20698,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3124,7 +3900,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56414,
+            "entityID": -20546,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3138,7 +3914,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56624,
+            "entityID": -20216,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3152,7 +3928,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56798,
+            "entityID": -20294,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3166,7 +3942,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56486,
+            "entityID": -20258,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3180,7 +3956,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56600,
+            "entityID": -20480,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3194,7 +3970,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56504,
+            "entityID": -20270,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3208,7 +3984,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56726,
+            "entityID": -20228,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3222,7 +3998,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56846,
+            "entityID": -20168,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3236,7 +4012,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56570,
+            "entityID": -20330,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3250,7 +4026,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56678,
+            "entityID": -20710,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3264,7 +4040,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56534,
+            "entityID": -20246,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3278,7 +4054,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56894,
+            "entityID": -20204,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3292,7 +4068,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56684,
+            "entityID": -20504,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3306,7 +4082,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56738,
+            "entityID": -20210,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3320,7 +4096,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56702,
+            "entityID": -20776,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3334,7 +4110,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56438,
+            "entityID": -20354,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3348,7 +4124,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56456,
+            "entityID": -20372,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3362,7 +4138,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56528,
+            "entityID": -20306,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3376,7 +4152,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56720,
+            "entityID": -20162,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3390,7 +4166,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56450,
+            "entityID": -20782,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3404,7 +4180,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56402,
+            "entityID": -20716,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3418,7 +4194,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56390,
+            "entityID": -20492,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3432,7 +4208,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56864,
+            "entityID": -20402,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3446,7 +4222,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56708,
+            "entityID": -20498,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3460,7 +4236,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56468,
+            "entityID": -20752,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3474,7 +4250,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56420,
+            "entityID": -20740,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3488,7 +4264,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56612,
+            "entityID": -20192,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3502,7 +4278,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56804,
+            "entityID": -20318,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3516,7 +4292,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56474,
+            "entityID": -20174,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3530,7 +4306,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56636,
+            "entityID": -20704,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3544,7 +4320,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56774,
+            "entityID": -20156,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3558,7 +4334,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56876,
+            "entityID": -20474,
             "center": {
                 "x": 0.011640071868896485,
                 "y": -0.1455097496509552,
@@ -3572,35 +4348,7 @@
             "isDynamic": false
         },
         {
-            "entityID": -56546,
-            "center": {
-                "x": 2.384185791015625e-7,
-                "y": 1.2716712951660157,
-                "z": 0.755348265171051
-            },
-            "size": {
-                "x": 3.9558188915252687,
-                "y": 2.5433425903320314,
-                "z": 5.466516494750977
-            },
-            "isDynamic": false
-        },
-        {
-            "entityID": -56816,
-            "center": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 1.3016157150268555
-            },
-            "size": {
-                "x": 0.3063616156578064,
-                "y": 0.30636167526245119,
-                "z": 3.0407280921936037
-            },
-            "isDynamic": false
-        },
-        {
-            "entityID": -56828,
+            "entityID": -20348,
             "center": {
                 "x": 0.0,
                 "y": 0.0,
@@ -3616,380 +4364,375 @@
     ],
     "meshFilters": [
         {
-            "entityID": -56564,
-            "meshID": -1107556455
+            "entityID": -20360,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56498,
-            "meshID": -1107556455
+            "entityID": -20264,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56834,
-            "meshID": -1107556455
+            "entityID": -20444,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56642,
-            "meshID": -1107556455
+            "entityID": -20728,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56882,
-            "meshID": -1107556455
+            "entityID": -20486,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56426,
-            "meshID": -1107556455
+            "entityID": -20746,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56750,
-            "meshID": -1107556455
+            "entityID": -20276,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56858,
-            "meshID": -1107556455
+            "entityID": -20456,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56516,
-            "meshID": -1107556455
+            "entityID": -20528,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56510,
-            "meshID": -1107556455
+            "entityID": -20222,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56648,
-            "meshID": -1107556455
+            "entityID": -20558,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56744,
-            "meshID": -1107556455
+            "entityID": -20516,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56822,
-            "meshID": -1107556455
+            "entityID": -20420,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56666,
-            "meshID": -1107556455
+            "entityID": -20770,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56588,
-            "meshID": -1107556455
+            "entityID": -20180,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56384,
-            "meshID": -1107556455
+            "entityID": -20186,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56576,
-            "meshID": -1107556455
+            "entityID": -20432,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56606,
-            "meshID": -1107556455
+            "entityID": -20414,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56792,
-            "meshID": -1107556455
+            "entityID": -20312,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56888,
-            "meshID": -1107556455
+            "entityID": -20426,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56810,
-            "meshID": -1107556455
+            "entityID": -20396,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56780,
-            "meshID": -1107556455
+            "entityID": -20300,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56672,
-            "meshID": -1107556455
+            "entityID": -20438,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56558,
-            "meshID": -1107556455
+            "entityID": -20408,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56756,
-            "meshID": -1107556455
+            "entityID": -20282,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56408,
-            "meshID": -1107556455
+            "entityID": -20734,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56654,
-            "meshID": -1107556455
+            "entityID": -20342,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56870,
-            "meshID": -1107556455
+            "entityID": -20468,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56480,
-            "meshID": -1107556455
+            "entityID": -20240,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56696,
-            "meshID": -1107556455
+            "entityID": -20384,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56714,
+            "entityID": -20150,
             "meshID": 2032625024
         },
         {
-            "entityID": -56540,
-            "meshID": -1107556455
+            "entityID": -20540,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56852,
-            "meshID": -1107556455
+            "entityID": -20450,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56552,
-            "meshID": -1107556455
+            "entityID": -20336,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56840,
-            "meshID": -1107556455
+            "entityID": -20378,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56732,
-            "meshID": -1107556455
+            "entityID": -20252,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56630,
-            "meshID": -1107556455
+            "entityID": -20510,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56522,
-            "meshID": -1107556455
+            "entityID": -20288,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56768,
-            "meshID": -1107556455
+            "entityID": -20534,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56690,
-            "meshID": -1107556455
+            "entityID": -20366,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56444,
-            "meshID": -1107556455
+            "entityID": -20764,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56492,
-            "meshID": -1107556455
+            "entityID": -20198,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56396,
-            "meshID": -1107556455
+            "entityID": -20522,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56618,
-            "meshID": -1107556455
+            "entityID": -20324,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56462,
-            "meshID": -1107556455
+            "entityID": -20722,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56582,
-            "meshID": -1107556455
+            "entityID": -20390,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56762,
-            "meshID": -1107556455
+            "entityID": -20234,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56594,
-            "meshID": -1107556455
+            "entityID": -20462,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56660,
-            "meshID": -1107556455
+            "entityID": -20758,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56786,
-            "meshID": -1107556455
+            "entityID": -20552,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56432,
-            "meshID": -1107556455
+            "entityID": -20698,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56414,
-            "meshID": -1107556455
+            "entityID": -20546,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56624,
-            "meshID": -1107556455
+            "entityID": -20216,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56798,
-            "meshID": -1107556455
+            "entityID": -20294,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56486,
-            "meshID": -1107556455
+            "entityID": -20258,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56600,
-            "meshID": -1107556455
+            "entityID": -20480,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56504,
-            "meshID": -1107556455
+            "entityID": -20270,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56726,
-            "meshID": -1107556455
+            "entityID": -20228,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56846,
-            "meshID": -1107556455
+            "entityID": -20168,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56570,
-            "meshID": -1107556455
+            "entityID": -20330,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56678,
-            "meshID": -1107556455
+            "entityID": -20710,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56534,
-            "meshID": -1107556455
+            "entityID": -20246,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56894,
-            "meshID": -1107556455
+            "entityID": -20204,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56684,
-            "meshID": -1107556455
+            "entityID": -20504,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56738,
-            "meshID": -1107556455
+            "entityID": -20210,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56702,
-            "meshID": -1107556455
+            "entityID": -20776,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56438,
-            "meshID": -1107556455
+            "entityID": -20354,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56456,
-            "meshID": -1107556455
+            "entityID": -20372,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56528,
-            "meshID": -1107556455
+            "entityID": -20306,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56720,
-            "meshID": -1107556455
+            "entityID": -20162,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56450,
-            "meshID": -1107556455
+            "entityID": -20782,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56402,
-            "meshID": -1107556455
+            "entityID": -20716,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56390,
-            "meshID": -1107556455
+            "entityID": -20492,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56864,
-            "meshID": -1107556455
+            "entityID": -20402,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56708,
-            "meshID": -1107556455
+            "entityID": -20498,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56468,
-            "meshID": -1107556455
+            "entityID": -20752,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56420,
-            "meshID": -1107556455
+            "entityID": -20740,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56612,
-            "meshID": -1107556455
+            "entityID": -20192,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56804,
-            "meshID": -1107556455
+            "entityID": -20318,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56474,
-            "meshID": -1107556455
+            "entityID": -20174,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56636,
-            "meshID": -1107556455
+            "entityID": -20704,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56774,
-            "meshID": -1107556455
+            "entityID": -20156,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56876,
-            "meshID": -1107556455
+            "entityID": -20474,
+            "meshID": 1722560315
         },
         {
-            "entityID": -56546,
-            "meshID": -1876450427
-        },
-        {
-            "entityID": -56816,
+            "entityID": -20348,
             "meshID": 2032625024
         },
         {
-            "entityID": -56828,
-            "meshID": 2032625024
+            "entityID": -20570,
+            "meshID": -253768702
         }
     ],
-    "playerComponent": [
-        35076
-    ],
+    "playerComponent": [],
     "lightComponents": [],
     "directionalLightComponentData": [],
     "cameraComponent": [
         {
-            "entityID": 34846
-        },
-        {
-            "entityID": 34624
+            "entityID": 39180
         }
     ],
-    "animationComponents": [],
+    "eventColliderComponents": [],
+    "animationComponents": [
+        {
+            "entityID": -20570
+        }
+    ],
     "physXComponents": [],
     "orbComponent": [],
     "enemyComponents": [
         {
-            "entityID": -56546
+            "attackSpeed": 1.2999999523162842,
+            "entityID": -20570
         }
     ],
     "projectileComponents": [
         {
-            "entityID": -56714
+            "entityID": -20150
         },
         {
-            "entityID": -56816
-        },
-        {
-            "entityID": -56828
+            "entityID": -20348
         }
-    ]
+    ],
+    "nonPlayerComponent": []
 }

@@ -165,8 +165,6 @@ void SkeletalMesh::SetSkeleton(const Skeleton& aSkeleton)
 #ifdef _DEBUG
 	myDebugLines.clear();
 	myDebugLines.resize(mySkeleton.bones.size(), DebugLine({ 0, 0, 0 }, { 1, 1, 1 }));
-	for (auto& dl : myDebugLines)
-		dl.Init();
 #endif
 }
 
@@ -177,6 +175,11 @@ const Skeleton& SkeletalMesh::GetSkeleton() const
 
 void SkeletalMesh::SetPose(const Pose& aLocalSpacePose)
 {
+	if (aLocalSpacePose.count == 0)
+	{
+		memcpy(myPose.jointTransforms, aLocalSpacePose.jointTransforms, sizeof(DirectX::XMMATRIX) * MAX_ANIMATION_BONES);
+		return;
+	}
 	Pose modelSpacePose;
 	mySkeleton.ConvertPoseToModelSpace(aLocalSpacePose, modelSpacePose);
 

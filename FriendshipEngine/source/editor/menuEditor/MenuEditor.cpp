@@ -1,20 +1,23 @@
 #include "MenuEditor.h"
-#include <string>
 #include <d3d11.h>
 #include <filesystem>
 #include <fstream>
+#include <string>
+#include <vector>
+#include <memory>
+
 
 //ImGui
 #include <imgui/imgui.h>
 #include <imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
-
 #include <nlohmann/json.hpp>
 
 //Engine
 #include <engine/utility/Error.h>
 #include <engine/utility/StringHelper.h>
 #include <engine/graphics/Texture.h>
+#include <assets/TextureFactory.h>
 #include <engine/graphics/GraphicsEngine.h>
 
 //Internal
@@ -29,22 +32,30 @@
 #include "windows/MenuObjectHierarchy.h"
 #include "windows/MenuViewWindow.h"
 
+#include <game/gui/MenuHandler.h>
+
 
 ME::MenuEditor::MenuEditor()
 	: myFirstFrameSetup(false)
+	, myMenuHandler(nullptr)
 {
 	for (size_t i = 0; i < (int)ePopup::Count; i++)
 	{
 		myPopups[i] = false;
 	}
+
+	//myObjectManager = std::make_shared<ObjectManager>();
+	//myMenuHandler = std::make_shared<MenuManager>();
+	//myTextureFactory = std::make_shared<TextureFactory>();
 }
 
 ME::MenuEditor::~MenuEditor()
-{
-}
+{}
 
-void ME::MenuEditor::Init()
+void ME::MenuEditor::Init(MenuHandler* aMenuHandler)
 {
+	myMenuHandler = aMenuHandler;
+
 	auto ge = GraphicsEngine::GetInstance();
 	Vector2i viewport = ge->GetViewportDimensions();
 	myRenderSize = { (float)viewport.x, (float)viewport.y };
@@ -68,7 +79,7 @@ void ME::MenuEditor::Init()
 		auto ext = entry.path().extension();
 		if (ext == ".dds")
 		{
-			myAssets.textures.push_back(myTextureFactory.CreateTexture(spriteAssetPath + entry.path().filename().string(), false));
+			myAssets.textures.push_back(myTextureFactory->CreateTexture(spriteAssetPath + entry.path().filename().string(), false));
 			myAssets.textureIDtoPath.push_back(entry.path().filename().string());
 		}
 	}
@@ -97,7 +108,10 @@ void ME::MenuEditor::Init()
 		}
 	}
 
-	myMenuHandler.Init("testMenu.json", &myTextureFactory);
+	//if (myMenuHandler)
+	//	myMenuHandler->Init("testMenu.json", myTextureFactory);
+
+	//myMenuHandler->LoadFromJson("testMenu.json", myTextureFactory);
 }
 
 void ME::MenuEditor::Update(float)
@@ -108,7 +122,7 @@ void ME::MenuEditor::Update(float)
 	UpdateContext updateContext;
 	updateContext.textures = myAssets.textures;
 	updateContext.textureIDtoPath = myAssets.textureIDtoPath;
-	updateContext.menuHandler = &myMenuHandler;
+	//updateContext.menuHandler = myMenuHandler;
 
 	for (size_t i = 0; i < (int)ME::ID::Count; i++)
 	{
@@ -118,7 +132,7 @@ void ME::MenuEditor::Update(float)
 		myWindows[i]->Show(updateContext);
 	}
 
-	myMenuHandler.Update();
+	//myMenuHandler->Update();
 }
 
 void ME::MenuEditor::Render()
@@ -127,7 +141,7 @@ void ME::MenuEditor::Render()
 	ge->SetBlendState(BlendState::AlphaBlend);
 	ge->GetContext()->OMSetRenderTargets(1, ge->GetBackBuffer().GetAddressOf(), nullptr);
 
-	myMenuHandler.Render();
+	//myMenuHandler->Render();
 }
 
 void ME::MenuEditor::Dockspace()
@@ -220,15 +234,15 @@ void ME::MenuEditor::MenuBar()
 			{
 				for (size_t i = 0; i < myAssets.saveFiles.size(); i++)
 				{
-					if (ImGui::MenuItem(myAssets.saveFiles[i].c_str()))
-						myMenuHandler.LoadFromJson(myAssets.saveFiles[i], &myTextureFactory);
+					//if (ImGui::MenuItem(myAssets.saveFiles[i].c_str()))
+						//myMenuHandler.LoadFromJson(myAssets.saveFiles[i], &myTextureFactory);
 				}
 				ImGui::EndMenu();
 			}
 
 			if (ImGui::MenuItem("Save"))
 			{
-				myMenuHandler.SaveToJson();
+				//myMenuHandler.SaveToJson();
 			}
 
 			if (ImGui::MenuItem("Save As..."))
@@ -297,7 +311,7 @@ void ME::MenuEditor::Popups()
 			dataFile << menu;
 			dataFile.close();
 
-			myMenuHandler.Init(newMenuName, &myTextureFactory);
+			//myMenuHandler.Init(newMenuName, &myTextureFactory);
 
 		}
 		ImGui::SameLine();

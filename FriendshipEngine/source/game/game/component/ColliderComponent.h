@@ -9,4 +9,5 @@ struct ColliderComponent : public Component<ColliderComponent>
 {
 	Vector3f extents = { 0,0,0 };
 	AABB3D<float> aabb3D;
+	Vector4f color = {};
 };

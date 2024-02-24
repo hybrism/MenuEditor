@@ -55,12 +55,12 @@ void BinaryFileUtility::ReadBoneFromFile(std::ifstream& file, Skeleton* aSkeleto
 	file.read(reinterpret_cast<char*>(b.childrenIds.data()), sizeof(unsigned int) * size);
 }
 
-std::string BinaryFileUtility::GetModelFilePathFromName(const std::string& aName)
+std::string BinaryFileUtility::GetModelFileName(const std::string& aName)
 {
-	return RELATIVE_CUSTOM_MESH_DATA_PATH + aName + ".bestie";
+	return aName + ".bestie";
 }
 
-std::string BinaryFileUtility::GetAnimationFilePathFromName(const std::string& aName)
+std::string BinaryFileUtility::GetAnimationFileName(const std::string& aName)
 {
-	return RELATIVE_CUSTOM_ANIMATION_DATA_PATH + aName + ".bff";
+	return aName + ".bff";
 }

@@ -4,91 +4,34 @@
 #include "Animation.h"
 #include "AnimationStructs.h"
 #include "AnimationState.h"
+#include <assets/AssetDatabase.h>
 
-void AnimationPlayer::Init(const Animation* aAnimation, const SkeletalMesh* aModel, AnimationData* aData)
+void AnimationPlayer::UpdatePose(
+	const float& aDeltaTime,
+	size_t aMeshId,
+	AnimationData& aData,
+	const AnimationState& aFromState,
+	const AnimationState* aToState
+)
 {
-	myAnimation = aAnimation;
-	myModel = aModel;
-	myData = aData;
-}
+	const SharedMeshPackage& meshPackage = AssetDatabase::GetMesh(aMeshId);
 
-void AnimationPlayer::Update(const float& dt, const AnimationState& aAnimationState)
-{
-	const float frameRate = 1.0f / myAnimation->frameRate;
-	const float result = myData->time / frameRate;
-#ifdef _DEBUG // this should only occur if a breakpoint is active
-	size_t currentFrame = static_cast<size_t>(std::floor(result));
-	if (currentFrame > myAnimation->length) { currentFrame = 0; }
-#else
-	const size_t currentFrame = static_cast<size_t>(std::floor(result));
-#endif
-	const float delta = result - static_cast<float>(currentFrame);
-	size_t nextFrame = currentFrame + 1;
+	Pose pose = InternalUpdateAndGetPose(aDeltaTime, aMeshId, 0, meshPackage, aData, aFromState);
 
-	if (nextFrame > myAnimation->length) { nextFrame = 0; }
-
-	myData->time += dt;
-
-	if (myData->time >= myAnimation->duration)
+	if (aToState != nullptr)
 	{
-		if (aAnimationState.IsLooping())
-		{
-			// TODO: Optimize this
-			while (myData->time >= myAnimation->duration)
-				myData->time -= myAnimation->duration;
-		}
-		else
-		{
-			myData->time = myAnimation->duration;
-			nextFrame = currentFrame;
-		}
+		Pose toPose = InternalUpdateAndGetPose(aDeltaTime, aMeshId, 1, meshPackage, aData, *aToState);
+		pose = GetInterpolatedPose(pose, toPose, *meshPackage.skeleton, aData.blendFactor);
 	}
 
-	// Update all animations
-	const Skeleton& skeleton = myModel->GetSkeleton();
-	for (size_t i = 0; i < skeleton.bones.size(); i++)
-	{
-		// nåt går jättefel om den hoppar in i detta if statement D:
-		if (myAnimation->frames[currentFrame].localTransforms.find(skeleton.bones[i].id) == myAnimation->frames[currentFrame].localTransforms.end()) { continue; }
-
-		const Transform& currentFrameJointXform = myAnimation->frames[currentFrame].localTransforms.at(skeleton.bones[i].id);
-		//const Transform& currentFrameJointXform = myAnimation->Frames[currentFrame].LocalTransforms.find(skeleton.bones[i].name)._Ptr->_Myval.second;
-		DirectX::XMMATRIX jointXform = currentFrameJointXform.GetMatrix();
-#ifdef SHOULD_INTERPOLATE_ANIMATIONS
-		{
-			const Transform& nextFrameJointXform = myAnimation->frames[nextFrame].localTransforms.at(skeleton.bones[i].id);
-			DirectX::FXMVECTOR currentFrameRotation = DirectX::XMQuaternionRotationMatrix(currentFrameJointXform.GetMatrix());
-			DirectX::FXMVECTOR nextFrameRotation = DirectX::XMQuaternionRotationMatrix(nextFrameJointXform.GetMatrix());
-
-			// Interpolate between the frames
-			const Vector3f T = Vector3f::Lerp(currentFrameJointXform.GetPosition(), nextFrameJointXform.GetPosition(), delta);
-			const  DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(currentFrameRotation, nextFrameRotation, delta);
-			const Vector3f S = Vector3f::Lerp(currentFrameJointXform.GetScale(), nextFrameJointXform.GetScale(), delta);
-			jointXform = DirectX::XMMatrixScaling(S.x, S.y, S.z) * DirectX::XMMatrixRotationQuaternion(R) * DirectX::XMMatrixTranslation(T.x, T.y, T.z);
-		}
-#endif
-		myData->localSpacePose.jointTransforms[i] = jointXform;
-	}
-	myData->localSpacePose.count = skeleton.bones.size();
+	aData.localSpacePose = pose;
 }
 
-void AnimationPlayer::UpdatePose()
-{
-	const size_t frame = GetFrame();// Which frame we're on
-	// Update all animations
-	const Skeleton& skeleton = myModel->GetSkeleton();
-	for (size_t i = 0; i < skeleton.bones.size(); i++)
-	{
-		const Transform& currentFrameJointXform = myAnimation->frames[frame].localTransforms.at(skeleton.bones[i].id);
-		myData->localSpacePose.jointTransforms[i] = currentFrameJointXform.GetMatrix();
-	}
-	myData->localSpacePose.count = skeleton.bones.size();
-}
-
-void AnimationPlayer::Play()
+void AnimationPlayer::Play(AnimationData& aData)
 {
 	myIsPlaying = true;
-	myData->time = 0;
+	aData.time[0] = 0;
+	aData.time[1] = 0;
 }
 
 void AnimationPlayer::Pause()
@@ -96,24 +39,104 @@ void AnimationPlayer::Pause()
 	myIsPlaying = false;
 }
 
-void AnimationPlayer::Stop()
+void AnimationPlayer::Stop(AnimationData& aData)
 {
 	myIsPlaying = false;
-	myData->time = 0;
+	aData.time[0] = 0;
+	aData.time[1] = 0;
 }
 
-unsigned int AnimationPlayer::GetFrame() const
+unsigned int AnimationPlayer::GetFrame(AnimationData& aData, const Animation& aAnimation) const
 {
 	//return static_cast<unsigned int>(std::floor(myTime / (1.0f / myFPS)));
-	return static_cast<unsigned int>(myData->time * myAnimation->frameRate);
+	return static_cast<unsigned int>(aData.time[0] * aAnimation.frameRate);
 }
 
-void AnimationPlayer::SetFrame(const unsigned int& aFrame)
+void AnimationPlayer::SetFrame(AnimationData& aData, const Animation& aAnimation, const unsigned int& aFrame)
 {
-	myData->time = static_cast<float>(aFrame) / myAnimation->frameRate;
+	aData.time[0] = static_cast<float>(aFrame) / aAnimation.frameRate;
+	aData.time[1] = 0.0f;
+	aData.transitionIndex = -1;
+	aData.nextStateIndex = aData.currentStateIndex;
 }
 
-bool AnimationPlayer::IsValid() const
+#include <iostream>
+Pose AnimationPlayer::InternalUpdateAndGetPose(
+	const float& aDeltaTime,
+	size_t aMeshId,
+	size_t aTimeIndex,
+	const SharedMeshPackage& aMeshPackage,
+	AnimationData& aData,
+	const AnimationState& aState
+) const
 {
-	return myAnimation != nullptr;
+	Animation* animation = AssetDatabase::GetAnimation(aMeshId, aState.GetAnimationIndex());
+	Skeleton* skeleton = aMeshPackage.skeleton;
+
+	float& time = aData.time[aTimeIndex];
+	time += aDeltaTime * aData.speed;
+
+	unsigned int count = animation->length - 1;
+	const float frameRate = 1.0f / animation->frameRate;
+	size_t currentFrame = static_cast<size_t>(std::floor(time / frameRate));
+	size_t nextFrame = currentFrame + 1;
+
+	if (time >= animation->duration)
+	{
+		if (aState.IsLooping())
+		{
+			float delta = time - animation->duration;
+			time = std::fmodf(delta, animation->duration);
+			currentFrame = static_cast<size_t>(std::floor(time / frameRate));
+			nextFrame = currentFrame + 1;
+		}
+		else
+		{
+			time = animation->duration;
+			currentFrame = count;
+			nextFrame = currentFrame;
+		}
+	}
+
+	float nextFrameTime = nextFrame * frameRate;
+	float blendFactor = 1.0f - (nextFrameTime - time) / frameRate; // delta from current time and time of next frame
+
+	if (nextFrame > count) {
+		nextFrame = 0;
+	}
+
+	return GetInterpolatedPose(animation->frames[currentFrame], animation->frames[nextFrame], *skeleton, blendFactor);
+}
+
+Pose AnimationPlayer::GetInterpolatedPose(
+	const Pose& aPoseA,
+	const Pose& aPoseB,
+	const Skeleton& aSkeleton,
+	const float& aBlendFactor
+) const
+{
+	Pose pose;
+
+	pose.count = aSkeleton.bones.size();
+	for (size_t i = 0; i < aSkeleton.bones.size(); i++)
+	{
+		const Transform& jointA = aPoseA.jointTransforms[aSkeleton.bones[i].id];
+
+		DirectX::XMMATRIX jointXform = jointA.GetMatrix();
+#ifdef SHOULD_INTERPOLATE_ANIMATIONS
+		{
+			const Transform& jointB = aPoseB.jointTransforms[aSkeleton.bones[i].id];
+			DirectX::FXMVECTOR rotationA = DirectX::XMQuaternionRotationMatrix(jointA.GetMatrix());
+			DirectX::FXMVECTOR rotationB = DirectX::XMQuaternionRotationMatrix(jointB.GetMatrix());
+
+			const Vector3f			S = Vector3f::Lerp(jointA.GetScale(), jointB.GetScale(), aBlendFactor);
+			const DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(rotationA, rotationB, aBlendFactor);
+			const Vector3f			T = Vector3f::Lerp(jointA.GetPosition(), jointB.GetPosition(), aBlendFactor);
+			jointXform = DirectX::XMMatrixScaling(S.x, S.y, S.z) * DirectX::XMMatrixRotationQuaternion(R) * DirectX::XMMatrixTranslation(T.x, T.y, T.z);
+		}
+#endif
+		pose.jointTransforms[i] = jointXform;
+	}
+
+	return pose;
 }

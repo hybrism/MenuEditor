@@ -108,8 +108,16 @@ bool VertexShader::PrepareRender(
 		return false;
 	}
 
-	myGraphicsEngine->GetContext()->VSSetShader(myShader.Get(), NULL, 0);
-	myGraphicsEngine->GetContext()->IASetInputLayout(myInputLayout.Get());
+	auto* context = myGraphicsEngine->GetContext();
+	context->VSSetShader(myShader.Get(), NULL, 0);
+	context->IASetInputLayout(myInputLayout.Get());
 
-	return Shader::PrepareRender(aSlot, aBufferData, aSize);
+	if (!Shader::PrepareRender(aSlot, aBufferData, aSize)) { return false; }
+
+	if (myConstantBuffer != nullptr)
+	{
+		context->VSSetConstantBuffers((UINT)aSlot, 1, myConstantBuffer.GetAddressOf());
+	}
+
+	return true;
 }

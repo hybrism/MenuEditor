@@ -2,13 +2,16 @@
 #include "CameraSystem.h"
 
 #include <ecs/World.h>
-#include <engine/graphics/Camera.h>
 
 #include "../component/PlayerComponent.h"
 #include "../component/TransformComponent.h"
 #include "../component/CameraComponent.h"
 
 #include <engine/utility/InputManager.h>
+
+#ifdef _DEBUG
+#include <engine/debug/DebugCamera.h>
+#endif
 
 
 CameraSystem::CameraSystem(World* aWorld) : System(aWorld)
@@ -17,6 +20,8 @@ CameraSystem::CameraSystem(World* aWorld) : System(aWorld)
 	CameraSystemSignature.set(myWorld->GetComponentSignatureID<TransformComponent>());
 	CameraSystemSignature.set(myWorld->GetComponentSignatureID<CameraComponent>());
 	aWorld->SetSystemSignature<CameraSystem>(CameraSystemSignature);
+
+	memcpy(&myDebugCamera, GraphicsEngine::GetInstance()->GetViewCamera(), sizeof(Camera));
 }
 
 CameraSystem::~CameraSystem()
@@ -41,11 +46,32 @@ void CameraSystem::Init()
 }
 
 
-void CameraSystem::Update(const float&)
+void CameraSystem::Update(const float& dt)
 {
+	dt;
 	HandleLockMouse();
 
 	if (isLocked) { return; }
+
+	auto* ge = GraphicsEngine::GetInstance();
+
+#ifdef _DEBUG
+	if (InputManager::GetInstance()->IsKeyPressed(VK_F1))
+	{
+		if (ge->GetCamera() == &myDebugCamera.myCamera)
+			ge->ResetToViewCamera();
+		else
+			ge->ChangeCurrentCamera(&myDebugCamera.myCamera);
+
+		return;
+	}
+
+	if (ge->GetCamera() == &myDebugCamera.myCamera)
+	{
+		myDebugCamera.Update(dt);
+		return;
+	}
+#endif
 
 	for (auto& entity : myEntities)
 	{
@@ -58,7 +84,7 @@ void CameraSystem::Update(const float&)
 
 			TransformComponent& transformComponent = myWorld->GetComponent<TransformComponent>(entity);
 
-			Camera& camera = *GraphicsEngine::GetInstance()->GetCamera();
+			Camera& camera = *ge->GetCamera();
 
 			transformComponent.transform = playerTransform.transform;
 
@@ -68,8 +94,8 @@ void CameraSystem::Update(const float&)
 			//cameraHeight = 0;
 			transformComponent.transform.SetPosition(Vector3f((float)footPosition.x, (float)footPosition.y + cameraHeight, (float)footPosition.z));
 
-			camera.SetPosition(transformComponent.transform.GetPosition());
-			camera.SetRotation({ playerComponent.cameraRotation.x, playerComponent.cameraRotation.y, 0 });
+			camera.GetTransform().SetPosition(transformComponent.transform.GetPosition());
+			camera.GetTransform().SetEulerAngles({ playerComponent.cameraRotation.x, playerComponent.cameraRotation.y, 0 });
 		}
 	}
 }
@@ -77,7 +103,7 @@ void CameraSystem::Update(const float&)
 void CameraSystem::HandleLockMouse()
 {
 	InputManager* im = InputManager::GetInstance();
-	if (im->IsKeyPressed(VK_TAB))
+	if (im->IsKeyPressed(VK_ESCAPE))
 	{
 		if (!isLocked)
 			im->UnlockMouseScreen();

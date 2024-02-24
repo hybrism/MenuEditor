@@ -8,11 +8,6 @@ struct ScriptUpdateContext;
 
 class ScriptRuntimeInstance
 {
-	std::shared_ptr<const Script> myScript;
-
-	std::vector<std::unique_ptr<ScriptNodeRuntimeInstanceBase>> myNodeInstances;
-	std::vector<ScriptNodeId> myActiveNodes;
-
 public:
 	ScriptRuntimeInstance(std::shared_ptr<const Script>& script);
 
@@ -24,4 +19,10 @@ public:
 	ScriptNodeRuntimeInstanceBase* GetRuntimeInstance(ScriptNodeId nodeId);
 	void ActivateNode(ScriptNodeId nodeId);
 	void DeactivateNode(ScriptNodeId nodeId);
+
+private:
+	std::shared_ptr<const Script> myScript;
+
+	std::vector<std::unique_ptr<ScriptNodeRuntimeInstanceBase>> myNodeInstances;
+	std::vector<ScriptNodeId> myActiveNodes;
 };

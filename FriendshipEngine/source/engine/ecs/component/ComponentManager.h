@@ -76,7 +76,6 @@ public:
 		return T::componentId;
 	}
 private:
-
 	std::vector<IComponentContainer*> myComponentContainers;
 	cid_t myNextComponentId = 0;
 
