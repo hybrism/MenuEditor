@@ -1,5 +1,7 @@
 #pragma once
 #include "MenuComponent.h"
+#include <string>
+
 #include <engine/graphics/sprite/Sprite.h>
 
 class Texture;

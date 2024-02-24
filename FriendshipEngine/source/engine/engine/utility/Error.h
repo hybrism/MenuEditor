@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include "../math/Vector.h"
 #include "../math/Transform.h"
 

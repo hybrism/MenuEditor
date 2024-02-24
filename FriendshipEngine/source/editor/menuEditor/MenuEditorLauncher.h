@@ -20,7 +20,7 @@ private:
 
 	Engine* myEngine = nullptr;
 
-	ME::MenuEditor myMenuEditor;
+	MENU::MenuEditor myMenuEditor;
 };
 
 namespace Utility

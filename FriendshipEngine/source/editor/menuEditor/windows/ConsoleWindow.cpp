@@ -3,7 +3,7 @@
 #include <shared/postMaster/PostMaster.h>
 #include <imgui/imgui.h>
 
-ME::ConsoleWindow::ConsoleWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
+MENU::ConsoleWindow::ConsoleWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
 	: WindowBase(aHandle, aOpen, aFlags)
 {
 	ClearLog();
@@ -17,14 +17,14 @@ ME::ConsoleWindow::ConsoleWindow(const std::string& aHandle, bool aOpen, ImGuiWi
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::PrintToConsole);
 }
 
-ME::ConsoleWindow::~ConsoleWindow()
+MENU::ConsoleWindow::~ConsoleWindow()
 {
 	ClearLog();
 	for (int i = 0; i < History.Size; i++)
 		free(History[i]);
 }
 
-void ME::ConsoleWindow::Show(const UpdateContext&)
+void MENU::ConsoleWindow::Show(const UpdateContext&)
 {
 	if (!myData.isOpen)
 		return;
@@ -96,14 +96,14 @@ void ME::ConsoleWindow::Show(const UpdateContext&)
 	ImGui::End();
 }
 
-void ME::ConsoleWindow::ClearLog()
+void MENU::ConsoleWindow::ClearLog()
 {
 	for (int i = 0; i < Items.Size; i++)
 		free(Items[i]);
 	Items.clear();
 }
 
-void ME::ConsoleWindow::AddLog(const char* fmt, ...) IM_FMTARGS(2)
+void MENU::ConsoleWindow::AddLog(const char* fmt, ...) IM_FMTARGS(2)
 {
 	// FIXME-OPT
 	char buf[1024];
@@ -115,7 +115,7 @@ void ME::ConsoleWindow::AddLog(const char* fmt, ...) IM_FMTARGS(2)
 	Items.push_back(Strdup(buf));
 }
 
-void ME::ConsoleWindow::RecieveMessage(const FE::Message& aMessage)
+void MENU::ConsoleWindow::RecieveMessage(const FE::Message& aMessage)
 {
 	switch (aMessage.myEventType)
 	{

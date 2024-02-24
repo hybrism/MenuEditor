@@ -4,7 +4,7 @@
 #include <imgui/imgui.h>
 #include "../UpdateContext.h"
 
-namespace ME
+namespace MENU
 {
 	enum class ID
 	{

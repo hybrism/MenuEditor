@@ -1,0 +1,215 @@
+#include "MenuHandler.h"
+#include <fstream>
+#include <ostream>
+#include <engine/utility/Error.h>
+
+#include <nlohmann/json.hpp>
+#include <assets/TextureFactory.h>
+
+#include <shared/postMaster/PostMaster.h>
+
+#include "MenuObject.h"
+#include "../MenuCommon.h"
+#include "components/SpriteComponent.h"
+#include "components/TextComponent.h"
+#include "components/Collider2DComponent.h"
+
+MenuHandler::MenuHandler()
+{}
+
+MenuHandler::~MenuHandler()
+{}
+
+void MenuHandler::Init(const std::string& aMenuFile, TextureFactory* aTextureFactory)
+{
+	LoadFromJson(aMenuFile, aTextureFactory);
+	FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::NewMenuLoaded, aMenuFile });
+}
+
+void MenuHandler::Update()
+{
+	myObjectManager.Update();
+}
+
+void MenuHandler::Render()
+{
+	myObjectManager.Render();
+}
+
+void MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory)
+{
+	myObjectManager.ClearAll();
+
+	myFileName = aMenuFile;
+	myName = aMenuFile.substr(0, aMenuFile.find_last_of('.'));
+
+	std::string path = MENU::RELATIVE_MENUEDITOR_ASSETS + MENU::MENU_PATH + myFileName;
+	std::ifstream dataFile(path);
+	if (dataFile.fail())
+	{
+		PrintE("Could not open \"" + path + "\" to read data");
+		return;
+	}
+
+	nlohmann::json menuFile = nlohmann::json::parse(dataFile);
+	dataFile.close();
+
+	for (size_t i = 0; i < menuFile["objectID"].size(); i++)
+	{
+		MenuObject& obj = myObjectManager.CreateNew();
+		obj.SetName(menuFile["objectID"][i]["name"]);
+		obj.SetPosition(JsonToVec2(menuFile["objectID"][i]["position"]));
+	}
+
+	nlohmann::json spriteComponents = menuFile["spriteComponents"];
+	for (size_t i = 0; i < spriteComponents.size(); i++)
+	{
+		size_t ownerID = spriteComponents[i]["ownerID"];
+		SpriteComponent& sprite = myObjectManager.myObjects[ownerID]->AddComponent<SpriteComponent>();
+
+		//TODO: AssetDatabase for sprites?
+		std::string spriteAssetPath = MENU::RELATIVE_MENUEDITOR_ASSETS + MENU::SPRITES;
+		std::string texturePath = spriteComponents[i]["texture"];
+		sprite.SetTexture(aTextureFactory->CreateTexture(spriteAssetPath + texturePath, false), texturePath);
+
+		sprite.SetPosition(JsonToVec2(spriteComponents[i]["position"]));
+		sprite.SetSize(JsonToVec2(spriteComponents[i]["size"]));
+		sprite.SetPivot(JsonToVec2(spriteComponents[i]["pivot"]));
+		sprite.SetScaleMultiplier(JsonToVec2(spriteComponents[i]["scaleMultiplier"]));
+		sprite.SetColor(JsonToColorVec(spriteComponents[i]["color"]));
+
+		ClipValue clip;
+		clip.left = spriteComponents[i]["clip"]["left"];
+		clip.right = spriteComponents[i]["clip"]["right"];
+		clip.down = spriteComponents[i]["clip"]["down"];
+		clip.upper = spriteComponents[i]["clip"]["upper"];
+		sprite.SetClipValue(clip);
+
+		sprite.SetRotation(spriteComponents[i]["rotation"]);
+		sprite.SetIsHidden(spriteComponents[i]["isHidden"]);
+	}
+
+	nlohmann::json textComponents = menuFile["textComponents"];
+	for (size_t i = 0; i < textComponents.size(); i++)
+	{
+		size_t ownerID = textComponents[i]["ownerID"];
+		TextComponent& text = myObjectManager.myObjects[ownerID]->AddComponent<TextComponent>();
+
+		text.SetText(textComponents[i]["textString"]);
+		text.SetPosition(JsonToVec2(textComponents[i]["position"]));
+
+	}
+}
+
+Vector4f MenuHandler::JsonToColorVec(nlohmann::json aJson)
+{
+	Vector4f vec;
+	vec.x = aJson["r"];
+	vec.y = aJson["g"];
+	vec.z = aJson["b"];
+	vec.w = aJson["a"];
+
+	return vec;
+}
+
+Vector2f MenuHandler::JsonToVec2(nlohmann::json aJson)
+{
+	Vector2f vec;
+	vec.x = aJson["x"];
+	vec.y = aJson["y"];
+
+	return vec;
+}
+
+void MenuHandler::SaveToJson()
+{
+	nlohmann::json menuFile;
+	menuFile["name"] = myName;
+
+	nlohmann::json objects;
+	for (size_t i = 0; i < myObjectManager.myObjects.size(); i++)
+	{
+		MenuObject& object = *myObjectManager.myObjects[i];
+		nlohmann::json objectData;
+
+		objectData["objectID"] = object.GetID();
+		objectData["name"] = object.GetName();
+		objectData["position"] = Vec2ToJson(object.GetPosition());
+		objects.push_back(objectData);
+	}
+
+	menuFile["objectID"] = objects;
+
+	nlohmann::json spriteComponents;
+	nlohmann::json textComponents;
+
+	for (size_t i = 0; i < myObjectManager.myObjects.size(); i++)
+	{
+		if (myObjectManager.myObjects[i]->HasComponent<SpriteComponent>())
+		{
+			SpriteComponent sprite = myObjectManager.myObjects[i]->GetComponent<SpriteComponent>();
+			nlohmann::json spriteEntry;
+			spriteEntry["ownerID"] = i;
+			spriteEntry["texture"] = sprite.GetTexturePath();
+			spriteEntry["position"] = Vec2ToJson(sprite.GetPosition());
+			spriteEntry["size"] = Vec2ToJson(sprite.GetSize());
+			spriteEntry["pivot"] = Vec2ToJson(sprite.GetPivot());
+			spriteEntry["scaleMultiplier"] = Vec2ToJson(sprite.GetScaleMultiplier());
+			spriteEntry["color"] = ColorVecToJson(sprite.GetColor());
+			spriteEntry["clip"]["left"] = sprite.GetClipValue().left;
+			spriteEntry["clip"]["right"] = sprite.GetClipValue().right;
+			spriteEntry["clip"]["down"] = sprite.GetClipValue().down;
+			spriteEntry["clip"]["upper"] = sprite.GetClipValue().upper;
+			spriteEntry["rotation"] = sprite.GetRotation();
+			spriteEntry["isHidden"] = sprite.GetIsHidden();
+			spriteComponents.push_back(spriteEntry);
+		}
+
+		if (myObjectManager.myObjects[i]->HasComponent<TextComponent>())
+		{
+			TextComponent text = myObjectManager.myObjects[i]->GetComponent<TextComponent>();
+			nlohmann::json textEntry;
+			textEntry["ownerID"] = i;
+			textEntry["textString"] = text.GetText();
+			textEntry["position"] = Vec2ToJson(text.GetPosition());
+			textComponents.push_back(textEntry);
+		}
+	}
+
+	menuFile["spriteComponents"] = spriteComponents;
+	menuFile["textComponents"] = textComponents;
+
+
+	std::string path = MENU::RELATIVE_MENUEDITOR_ASSETS + MENU::MENU_PATH + myFileName;
+	std::ofstream dataFile(path);
+	if (dataFile.fail())
+	{
+		PrintE("Could not open \"" + path + "\" to save data");
+		return;
+	}
+
+	dataFile << menuFile;
+
+	dataFile.close();
+
+}
+
+nlohmann::json MenuHandler::ColorVecToJson(const Vector4f& aVec)
+{
+	nlohmann::json vec;
+	vec["r"] = aVec.x;
+	vec["g"] = aVec.y;
+	vec["b"] = aVec.z;
+	vec["a"] = aVec.w;
+
+	return vec;
+}
+
+nlohmann::json MenuHandler::Vec2ToJson(const Vector2f& aVec)
+{
+	nlohmann::json vec;
+	vec["x"] = aVec.x;
+	vec["y"] = aVec.y;
+
+	return vec;
+}

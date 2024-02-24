@@ -43,7 +43,7 @@ void MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactory* aTe
 	myFileName = aMenuFile;
 	myName = aMenuFile.substr(0, aMenuFile.find_last_of('.'));
 
-	std::string path = ME::RELATIVE_MENUEDITOR_ASSETS + ME::MENU_PATH + myFileName;
+	std::string path = MENU::RELATIVE_MENUEDITOR_ASSETS + MENU::MENU_PATH + myFileName;
 	std::ifstream dataFile(path);
 	if (dataFile.fail())
 	{
@@ -67,15 +67,15 @@ void MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactory* aTe
 		SpriteComponent& sprite = myObjectManager.myObjects[ownerID]->AddComponent<SpriteComponent>();
 
 		//TODO: AssetDatabase for sprites?
-		std::string spriteAssetPath = ME::RELATIVE_MENUEDITOR_ASSETS + ME::SPRITES;
+		std::string spriteAssetPath = MENU::RELATIVE_MENUEDITOR_ASSETS + MENU::SPRITES;
 		std::string texturePath = spriteComponents[i]["texture"];
 		sprite.SetTexture(aTextureFactory->CreateTexture(spriteAssetPath + texturePath, false), texturePath);
 
 		SpriteInstanceData& instanceData = sprite.GetInstanceData();
 		instanceData.position.x = spriteComponents[i]["position"]["x"];
 		instanceData.position.y = spriteComponents[i]["position"]["y"];
-		instanceData.scale.x = spriteComponents[i]["size"]["x"];
-		instanceData.scale.y = spriteComponents[i]["size"]["y"];
+		instanceData.size.x = spriteComponents[i]["size"]["x"];
+		instanceData.size.y = spriteComponents[i]["size"]["y"];
 		instanceData.pivot.x = spriteComponents[i]["pivot"]["x"];
 		instanceData.pivot.y = spriteComponents[i]["pivot"]["y"];
 		instanceData.scaleMultiplier.x = spriteComponents[i]["scaleMultiplier"]["x"];
@@ -89,7 +89,7 @@ void MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactory* aTe
 		instanceData.clip.down = spriteComponents[i]["clip"]["down"];
 		instanceData.clip.upper = spriteComponents[i]["clip"]["upper"];
 		instanceData.rotation = spriteComponents[i]["rotation"];
-		instanceData.myIsHidden = spriteComponents[i]["isHidden"];
+		instanceData.isHidden = spriteComponents[i]["isHidden"];
 	}
 }
 
@@ -145,7 +145,7 @@ void MenuHandler::SaveToJson()
 
 	menuFile["spriteComponent"] = spriteComponents;
 
-	std::string path = ME::RELATIVE_MENUEDITOR_ASSETS + ME::MENU_PATH + myFileName;
+	std::string path = MENU::RELATIVE_MENUEDITOR_ASSETS + MENU::MENU_PATH + myFileName;
 	std::ofstream dataFile(path);
 	if (dataFile.fail())
 	{

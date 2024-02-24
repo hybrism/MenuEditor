@@ -8,7 +8,7 @@
 class World;
 class Texture;
 
-namespace ME
+namespace MENU
 {
 	class ConsoleWindow : public WindowBase, public FE::Observer
 	{

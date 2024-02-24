@@ -2,16 +2,16 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "MenuCommon.h"
 
 class Texture;
-//class MenuHandler;
+class MenuHandler;
 
-namespace ME
+namespace MENU
 {
 	struct UpdateContext
 	{
-		std::vector<Texture*> textures;
-		std::vector<std::string> textureIDtoPath;
-		//std::shared_ptr<MenuHandler> menuHandler;
+		Assets assets;
+		MenuHandler* menuHandler = nullptr;
 	};
 }

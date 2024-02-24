@@ -3,32 +3,48 @@
 #include <shared/postMaster/PostMaster.h>
 #include <imgui/imgui.h>
 
-ME::AssetsWindow::AssetsWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
+MENU::AssetsWindow::AssetsWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
 	: WindowBase(aHandle, aOpen, aFlags)
 {}
 
-void ME::AssetsWindow::Show(const UpdateContext& aContext)
+void MENU::AssetsWindow::Show(const UpdateContext& aContext)
 {
 	if (!myData.isOpen)
 		return;
 
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
-		if (ImGui::BeginChild("Textures", ImGui::GetContentRegionAvail(), true))
+		if (ImGui::BeginChild("Assets", ImGui::GetContentRegionAvail(), true))
 		{
-			for (size_t i = 0; i < aContext.textures.size(); i++)
+			if (ImGui::TreeNode("Sprites"))
 			{
-				std::string textureName = aContext.textureIDtoPath[i];
-
-				ImGui::MenuItem(textureName.c_str());
-				if (ImGui::BeginItemTooltip())
+				for (size_t i = 0; i < aContext.assets.textures.size(); i++)
 				{
-					Vector2f texSize = aContext.textures[i]->GetTextureSize();
-					ImGui::Image(aContext.textures[i]->GetShaderResourceView(), ImVec2(texSize.x, texSize.y));
+					std::string textureName = aContext.assets.textureIdToName[i];
 
-					ImGui::EndTooltip();
+					ImGui::MenuItem(textureName.c_str());
+					if (ImGui::BeginItemTooltip())
+					{
+						Vector2f texSize = aContext.assets.textures[i]->GetTextureSize();
+						ImGui::Image(aContext.assets.textures[i]->GetShaderResourceView(), ImVec2(texSize.x, texSize.y));
+
+						ImGui::EndTooltip();
+					}
 				}
+				ImGui::TreePop();
 			}
+
+			if (ImGui::TreeNode("Fonts"))
+			{
+				for (size_t i = 0; i < aContext.assets.fontFiles.size(); i++)
+				{
+					std::string fontFile = aContext.assets.fontFiles[i];
+
+					ImGui::MenuItem(fontFile.c_str());
+				}
+				ImGui::TreePop();
+			}
+
 			ImGui::EndChild();
 		}
 	}

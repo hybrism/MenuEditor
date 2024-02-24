@@ -33,7 +33,7 @@ Vector2f& SpriteComponent::GetPosition()
 
 Vector2f& SpriteComponent::GetSize()
 {
-	return myInstance.scale;
+	return myInstance.size;
 }
 
 Vector2f& SpriteComponent::GetPivot()
@@ -63,7 +63,7 @@ float& SpriteComponent::GetRotation()
 
 bool& SpriteComponent::GetIsHidden()
 {
-	return myInstance.myIsHidden;
+	return myInstance.isHidden;
 }
 
 Texture* SpriteComponent::GetTexture() const
@@ -91,7 +91,7 @@ void SpriteComponent::SetTexture(Texture* aTexture, const std::string& aTextureN
 {
 	myTextureFile = aTextureName;
 	mySharedData.texture = aTexture;
-	myInstance.scale = mySharedData.texture->GetTextureSize();
+	myInstance.size = mySharedData.texture->GetTextureSize();
 }
 
 void SpriteComponent::SetPosition(Vector2f aPosition)

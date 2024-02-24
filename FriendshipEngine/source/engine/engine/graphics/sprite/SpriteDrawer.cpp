@@ -39,14 +39,14 @@ void SpriteBatchScope::Draw(const SpriteInstanceData* aInstances, size_t aInstan
 	{
 		const SpriteInstanceData& instance = aInstances[i];
 
-		if (instance.myIsHidden)
+		if (instance.isHidden)
 			continue;
 
 		SpriteShaderInstanceData& shaderInstance = myInstanceData[myInstanceCount];
 
 		Vector2f pivot = Vector2f(-instance.pivot.x, instance.pivot.y);
 
-		Matrix2x2f scalingMatrix = Matrix2x2f::CreateScaleMatrix(Vector2f((instance.scale.x) * instance.scaleMultiplier.x, (instance.scale.y) * instance.scaleMultiplier.y));
+		Matrix2x2f scalingMatrix = Matrix2x2f::CreateScaleMatrix(Vector2f((instance.size.x) * instance.scaleMultiplier.x, (instance.size.y) * instance.scaleMultiplier.y));
 		Matrix2x2f rotationMatrix = Matrix2x2f::CreateRotation(instance.rotation);
 
 		Matrix2x2f m = scalingMatrix * rotationMatrix;
@@ -97,7 +97,7 @@ void SpriteBatchScope::Draw(const Sprite3DInstanceData* aInstances, size_t aInst
 	{
 		const Sprite3DInstanceData& instance = aInstances[i];
 
-		if (instance.myIsHidden)
+		if (instance.isHidden)
 			continue;
 
 		SpriteShaderInstanceData& shaderInstance = myInstanceData[myInstanceCount];

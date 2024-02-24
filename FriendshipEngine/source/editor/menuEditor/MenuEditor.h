@@ -1,15 +1,16 @@
 #pragma once
+#include "gui/MenuHandler.h"
+#include "MenuCommon.h"
+#include "windows/Window.h"
 #include <array>
-#include <map>
+#include <assets/TextureFactory.h>
 #include <engine/math/Vector.h>
 #include <shared/postMaster/Observer.h>
-#include "windows/Window.h"
 
-class Texture;
-class TextureFactory;
-class MenuHandler;
 class Game;
-namespace ME
+class Texture;
+
+namespace MENU
 {
 	enum class ePopup
 	{
@@ -20,24 +21,16 @@ namespace ME
 
 	class MenuEditor : public FE::Observer
 	{
-		struct Assets
-		{
-			std::vector<Texture*> textures;
-			std::vector<std::string> textureIDtoPath;
-			std::vector<std::string> fontFiles;
-			std::vector<std::string> saveFiles;
-		} myAssets;
-
 	public:
 		MenuEditor();
 		~MenuEditor();
 
-		void Init(MenuHandler* aMenuHandler = nullptr);
+		void Init();
 		void Update(float dt);
 		void Render();
 
 	private: //IMGUI
-		std::array<std::shared_ptr<ME::WindowBase>, (int)ME::ID::Count> myWindows;
+		std::array<std::shared_ptr<MENU::WindowBase>, (int)MENU::ID::Count> myWindows;
 		std::array<bool, (int)ePopup::Count> myPopups;
 
 		bool myFirstFrameSetup;
@@ -46,11 +39,13 @@ namespace ME
 		void Popups();
 
 	private:
-		//std::shared_ptr<ObjectManager> myObjectManager;
-		//std::shared_ptr<MenuManager> myMenuHandler;
-		std::shared_ptr<TextureFactory> myTextureFactory;
+		ObjectManager myEditorObjectManager;
+		MenuHandler myMenuHandler;
+		TextureFactory myTextureFactory;
+		Assets myAssets;
 
-		MenuHandler* myMenuHandler;
+		size_t mySelectedEntityIndex;
+		size_t myGizmoIndex;
 
 		Vector2f myRenderSize;
 		Vector2f myRenderCenter;

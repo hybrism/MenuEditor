@@ -1,5 +1,6 @@
 #pragma once
 #include <wrl/client.h>
+#include <string>
 
 using Microsoft::WRL::ComPtr;
 struct ID3D11ShaderResourceView;

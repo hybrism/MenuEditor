@@ -29,7 +29,7 @@ struct SpriteInstanceData
 {
 	Vector2<float> position = { 0.f, 0.f };
 	Vector2<float> pivot = { 0.5f, 0.5f };
-	Vector2<float> scale = { 0.f, 0.f };
+	Vector2<float> size = { 0.f, 0.f };
 	Vector2<float> scaleMultiplier = { 1.f, 1.f };
 	Vector2<float> UV = { 0.f, 0.f };
 	Vector2<float> UVscale = { 1.f, 1.f };
@@ -37,7 +37,7 @@ struct SpriteInstanceData
 	TextureRect textureRect = { 0.f, 0.f, 1.f, 1.f };
 	ClipValue clip = { 0.f, 0.f, 0.f, 0.f }; // values from 0.f - 1.f
 	float rotation = 0.f;
-	bool myIsHidden = false;
+	bool isHidden = false;
 };
 
 struct Sprite3DInstanceData
@@ -49,7 +49,7 @@ struct Sprite3DInstanceData
 	TextureRect textureRect = { 0.f, 0.f, 1.f, 1.f };
 	ClipValue clip = { 0.f, 0.f, 0.f, 0.f }; // values from 0.f - 1.f
 	float rotation = 0.f;
-	bool myIsHidden = false;
+	bool isHidden = false;
 };
 
 struct SpriteSharedData

@@ -3,11 +3,11 @@
 #include <engine/graphics/GraphicsEngine.h>
 #include <imgui/imgui.h>
 
-ME::MenuViewWindow::MenuViewWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
+MENU::MenuViewWindow::MenuViewWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
 	: WindowBase(aHandle, aOpen, aFlags)
 {}
 
-void ME::MenuViewWindow::Show(const UpdateContext&)
+void MENU::MenuViewWindow::Show(const UpdateContext&)
 {
 	if (!myData.isOpen)
 		return;

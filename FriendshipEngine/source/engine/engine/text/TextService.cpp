@@ -750,7 +750,7 @@ bool TextService::Draw(Text& aText, SpriteShader* aCustomShader)
 
 			spriteInstance.pivot = { 0.f, 0.f };
 			spriteInstance.position = charInfo.myPosition + aText.myPosition;
-			spriteInstance.scale = charInfo.mySize * scale;
+			spriteInstance.size = charInfo.mySize * scale;
 			spriteInstance.color = aText.myColor;
 			spriteInstance.textureRect = { charInfo.myUvStart.x, charInfo.myUvStart.y, charInfo.myUvEnd.x, charInfo.myUvEnd.y };
 

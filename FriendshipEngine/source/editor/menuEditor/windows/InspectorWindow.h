@@ -4,9 +4,9 @@
 
 class MenuObject;
 
-namespace ME
+namespace MENU
 {
-	class InspectorWindow : public ME::WindowBase, public FE::Observer
+	class InspectorWindow : public MENU::WindowBase, public FE::Observer
 	{
 	public:
 		InspectorWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags);

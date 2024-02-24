@@ -6,7 +6,6 @@
 #include <vector>
 #include <memory>
 
-
 //ImGui
 #include <imgui/imgui.h>
 #include <imgui_internal.h>
@@ -32,30 +31,25 @@
 #include "windows/MenuObjectHierarchy.h"
 #include "windows/MenuViewWindow.h"
 
-#include <game/gui/MenuHandler.h>
+#include "gui/MenuObject.h"
+#include "gui/components/SpriteComponent.h"
+#include "gui/components/Collider2DComponent.h"
 
-
-ME::MenuEditor::MenuEditor()
-	: myFirstFrameSetup(false)
-	, myMenuHandler(nullptr)
+MENU::MenuEditor::MenuEditor()
+	: myFirstFrameSetup(true)
+	, mySelectedEntityIndex(UINT_MAX)
 {
 	for (size_t i = 0; i < (int)ePopup::Count; i++)
 	{
 		myPopups[i] = false;
 	}
-
-	//myObjectManager = std::make_shared<ObjectManager>();
-	//myMenuHandler = std::make_shared<MenuManager>();
-	//myTextureFactory = std::make_shared<TextureFactory>();
 }
 
-ME::MenuEditor::~MenuEditor()
+MENU::MenuEditor::~MenuEditor()
 {}
 
-void ME::MenuEditor::Init(MenuHandler* aMenuHandler)
+void MENU::MenuEditor::Init()
 {
-	myMenuHandler = aMenuHandler;
-
 	auto ge = GraphicsEngine::GetInstance();
 	Vector2i viewport = ge->GetViewportDimensions();
 	myRenderSize = { (float)viewport.x, (float)viewport.y };
@@ -63,13 +57,14 @@ void ME::MenuEditor::Init(MenuHandler* aMenuHandler)
 
 	//SUBSCRIBE TO EVENTS
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::DdsDropped);
+	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::PushEntityToInspector);
 
 	//CREATE EDITOR WINDOWS
-	myWindows[(int)ME::ID::Assets] = std::make_shared<AssetsWindow>("Assets", true, ImGuiWindowFlags_None);
-	myWindows[(int)ME::ID::MenuView] = std::make_shared<MenuViewWindow>("MenuView", true, ImGuiWindowFlags_None);
-	myWindows[(int)ME::ID::Console] = std::make_shared<ConsoleWindow>("Console", true, ImGuiWindowFlags_None);
-	myWindows[(int)ME::ID::Inspector] = std::make_shared<InspectorWindow>("Inspector", true, ImGuiWindowFlags_None);
-	myWindows[(int)ME::ID::MenuObjectHierarchy] = std::make_shared<MenuObjectHierarchy>("MenuObjects", true, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::ID::Assets] = std::make_shared<AssetsWindow>("Assets", true, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::ID::MenuView] = std::make_shared<MenuViewWindow>("MenuView", false, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::ID::Console] = std::make_shared<ConsoleWindow>("Console", true, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::ID::Inspector] = std::make_shared<InspectorWindow>("Inspector", true, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::ID::MenuObjectHierarchy] = std::make_shared<MenuObjectHierarchy>("MenuObjects", true, ImGuiWindowFlags_None);
 
 	//GET SPRITES
 	std::string spriteAssetPath = RELATIVE_MENUEDITOR_ASSETS + SPRITES;
@@ -79,8 +74,9 @@ void ME::MenuEditor::Init(MenuHandler* aMenuHandler)
 		auto ext = entry.path().extension();
 		if (ext == ".dds")
 		{
-			myAssets.textures.push_back(myTextureFactory->CreateTexture(spriteAssetPath + entry.path().filename().string(), false));
-			myAssets.textureIDtoPath.push_back(entry.path().filename().string());
+			myAssets.textures.push_back(myTextureFactory.CreateTexture(spriteAssetPath + entry.path().filename().string(), false));
+			myAssets.textureIdToName.push_back(entry.path().filename().string());
+			myAssets.textureNameToId[entry.path().filename().string()] = (UINT)myAssets.textures.size() - 1;
 		}
 	}
 
@@ -108,43 +104,65 @@ void ME::MenuEditor::Init(MenuHandler* aMenuHandler)
 		}
 	}
 
-	//if (myMenuHandler)
-	//	myMenuHandler->Init("testMenu.json", myTextureFactory);
+	//CREATE GIZMO
+	{
+		MenuObject& mo = myEditorObjectManager.CreateNew();
+		mo.SetPosition(myRenderCenter);
+		myGizmoIndex = mo.GetID();
 
-	//myMenuHandler->LoadFromJson("testMenu.json", myTextureFactory);
+		SpriteComponent& sprite = mo.AddComponent<SpriteComponent>();
+		int textureID = myAssets.textureNameToId["s_gizmo.dds"];
+		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID]);
+
+		Collider2DComponent& collider = mo.AddComponent<Collider2DComponent>();
+
+
+	}
+
+	myMenuHandler.Init("testMenu.json", &myTextureFactory);
+
 }
 
-void ME::MenuEditor::Update(float)
+void MENU::MenuEditor::Update(float)
 {
-	Dockspace();
+	//Dockspace();
+	MenuBar();
 	Popups();
 
 	UpdateContext updateContext;
-	updateContext.textures = myAssets.textures;
-	updateContext.textureIDtoPath = myAssets.textureIDtoPath;
-	//updateContext.menuHandler = myMenuHandler;
+	updateContext.assets = myAssets;
+	updateContext.menuHandler = &myMenuHandler;
 
-	for (size_t i = 0; i < (int)ME::ID::Count; i++)
+	for (size_t i = 0; i < (int)MENU::ID::Count; i++)
 	{
 		if (!myWindows[i]->myData.isOpen)
 			continue;
 
+		ImGui::SetNextWindowBgAlpha(0.1f);
 		myWindows[i]->Show(updateContext);
 	}
 
-	//myMenuHandler->Update();
+	myMenuHandler.Update();
+	myEditorObjectManager.Update();
+
+	if (mySelectedEntityIndex != UINT_MAX)
+		myEditorObjectManager.myObjects[myGizmoIndex]->SetPosition(myMenuHandler.myObjectManager.myObjects[mySelectedEntityIndex]->GetPosition());
 }
 
-void ME::MenuEditor::Render()
+void MENU::MenuEditor::Render()
 {
 	auto ge = GraphicsEngine::GetInstance();
 	ge->SetBlendState(BlendState::AlphaBlend);
-	ge->GetContext()->OMSetRenderTargets(1, ge->GetBackBuffer().GetAddressOf(), nullptr);
 
-	//myMenuHandler->Render();
+	//ge->GetContext()->OMSetRenderTargets(1, ge->GetBackBuffer().GetAddressOf(), nullptr);
+
+	myMenuHandler.Render();
+
+	if (mySelectedEntityIndex != UINT_MAX)
+		myEditorObjectManager.myObjects[myGizmoIndex]->Render();
 }
 
-void ME::MenuEditor::Dockspace()
+void MENU::MenuEditor::Dockspace()
 {
 	const auto& viewport = ImGui::GetMainViewport();
 
@@ -159,6 +177,7 @@ void ME::MenuEditor::Dockspace()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
 	ImGui::Begin("MenuEditorDockspace", NULL, hostWindowFlags);
 	ImGui::PopStyleVar(3);
 	ImGuiID dockspaceID = ImGui::GetID("MenuEditorDockspace");
@@ -210,11 +229,11 @@ void ME::MenuEditor::Dockspace()
 		ImGui::DockBuilderSplitNode(topRightAreaID, ImGuiDir_Down, ratioTopRightWindowSplit, &topRightBottomAreaID, &topRightTopAreaID);
 
 
-		ImGui::DockBuilderDockWindow(myWindows[(int)ME::ID::MenuView]->myData.handle.c_str(), topLeftAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)ME::ID::MenuObjectHierarchy]->myData.handle.c_str(), topRightTopAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)ME::ID::Inspector]->myData.handle.c_str(), topRightBottomAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)ME::ID::Assets]->myData.handle.c_str(), bottomLeftAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)ME::ID::Console]->myData.handle.c_str(), bottomRightAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::ID::MenuView]->myData.handle.c_str(), topLeftAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::ID::MenuObjectHierarchy]->myData.handle.c_str(), topRightTopAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::ID::Inspector]->myData.handle.c_str(), topRightBottomAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::ID::Assets]->myData.handle.c_str(), bottomLeftAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::ID::Console]->myData.handle.c_str(), bottomRightAreaID);
 
 		ImGui::DockBuilderFinish(dockspaceID);
 
@@ -223,7 +242,7 @@ void ME::MenuEditor::Dockspace()
 
 }
 
-void ME::MenuEditor::MenuBar()
+void MENU::MenuEditor::MenuBar()
 {
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -234,15 +253,15 @@ void ME::MenuEditor::MenuBar()
 			{
 				for (size_t i = 0; i < myAssets.saveFiles.size(); i++)
 				{
-					//if (ImGui::MenuItem(myAssets.saveFiles[i].c_str()))
-						//myMenuHandler.LoadFromJson(myAssets.saveFiles[i], &myTextureFactory);
+					if (ImGui::MenuItem(myAssets.saveFiles[i].c_str()))
+						myMenuHandler.LoadFromJson(myAssets.saveFiles[i], &myTextureFactory);
 				}
 				ImGui::EndMenu();
 			}
 
 			if (ImGui::MenuItem("Save"))
 			{
-				//myMenuHandler.SaveToJson();
+				myMenuHandler.SaveToJson();
 			}
 
 			if (ImGui::MenuItem("Save As..."))
@@ -266,7 +285,7 @@ void ME::MenuEditor::MenuBar()
 
 		if (ImGui::BeginMenu("Windows"))
 		{
-			for (int windowIndex = 0; windowIndex < (int)ME::ID::Count; windowIndex++)
+			for (int windowIndex = 0; windowIndex < (int)MENU::ID::Count; windowIndex++)
 			{
 				ImGui::MenuItem(myWindows[windowIndex]->myData.handle.c_str(), NULL, &myWindows[windowIndex]->myData.isOpen);
 			}
@@ -277,7 +296,7 @@ void ME::MenuEditor::MenuBar()
 	}
 }
 
-void ME::MenuEditor::Popups()
+void MENU::MenuEditor::Popups()
 {
 	static std::string newMenuName;
 
@@ -305,13 +324,13 @@ void ME::MenuEditor::Popups()
 			if (n == std::string::npos)
 				newMenuName += ".json";
 
-			std::string path = ME::RELATIVE_MENUEDITOR_ASSETS + ME::MENU_PATH + newMenuName;
+			std::string path = MENU::RELATIVE_MENUEDITOR_ASSETS + MENU::MENU_PATH + newMenuName;
 			nlohmann::json menu;
 			std::ofstream dataFile(path);
 			dataFile << menu;
 			dataFile.close();
 
-			//myMenuHandler.Init(newMenuName, &myTextureFactory);
+			myMenuHandler.Init(newMenuName, &myTextureFactory);
 
 		}
 		ImGui::SameLine();
@@ -325,7 +344,7 @@ void ME::MenuEditor::Popups()
 	}
 }
 
-void ME::MenuEditor::RecieveMessage(const FE::Message& aMessage)
+void MENU::MenuEditor::RecieveMessage(const FE::Message& aMessage)
 {
 	switch (aMessage.myEventType)
 	{
@@ -333,6 +352,11 @@ void ME::MenuEditor::RecieveMessage(const FE::Message& aMessage)
 	{
 		std::string filename = std::any_cast<std::string>(aMessage.myMessage);
 		PrintI(filename);
+		break;
+	}
+	case FE::eMessageType::PushEntityToInspector:
+	{
+		mySelectedEntityIndex = std::any_cast<size_t>(aMessage.myMessage);
 		break;
 	}
 	default:

@@ -1,9 +1,10 @@
 #pragma once
 #include "Window.h"
+#include <engine/math/Vector.h>
 
-namespace ME
+namespace MENU
 {
-	class MenuObjectHierarchy : public ME::WindowBase
+	class MenuObjectHierarchy : public MENU::WindowBase
 	{
 	public:
 		MenuObjectHierarchy(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags);
@@ -12,6 +13,8 @@ namespace ME
 
 	private:
 		size_t mySelectedIndex;
+		Vector2f myViewportCenter;
+
 		void PushMenuObjectToInspector();
 	};
 }

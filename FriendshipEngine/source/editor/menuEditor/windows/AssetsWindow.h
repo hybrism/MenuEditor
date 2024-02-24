@@ -1,9 +1,9 @@
 #pragma once
 #include "Window.h"
 
-namespace ME
+namespace MENU
 {
-	class AssetsWindow : public ME::WindowBase
+	class AssetsWindow : public MENU::WindowBase
 	{
 	public:
 		AssetsWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags);

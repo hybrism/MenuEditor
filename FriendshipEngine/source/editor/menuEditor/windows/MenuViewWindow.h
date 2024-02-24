@@ -7,7 +7,7 @@
 class World;
 class Texture;
 
-namespace ME
+namespace MENU
 {
 	class MenuViewWindow : public WindowBase
 	{
