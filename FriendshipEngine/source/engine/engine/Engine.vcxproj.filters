@@ -271,6 +271,9 @@
     <ClInclude Include="utility\StringHelper.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\renderer\DebugRenderer.h">
+      <Filter>graphics\renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp" />
@@ -392,6 +395,7 @@
     <ClCompile Include="utility\StringHelper.cpp">
       <Filter>utility</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\renderer\DebugRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\common\debug_line_PS.hlsl">

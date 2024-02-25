@@ -2,7 +2,6 @@
 #include "MenuComponent.h"
 
 class MenuObject;
-
 class Collider2DComponent : public MenuComponent
 {
 public:
@@ -13,6 +12,5 @@ public:
 	virtual void Render() override;
 
 private:
-
 
 };

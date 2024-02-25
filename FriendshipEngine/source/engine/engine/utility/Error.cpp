@@ -132,6 +132,14 @@ namespace Error
 	void DebugPrintPosition(const std::string& aObjectName, const Vector3f& aPos)
 	{
 		std::cout << "[" << aObjectName << "]\t Position x: " << aPos.x << " y: " << aPos.y << " z: " << aPos.z << std::endl;
+
+#if USE_FE_CONSOLE
+		std::string text = "[" + aObjectName + "]\t Position x: " + std::to_string(aPos.x) + " y: " + std::to_string(aPos.y) + " z: " + std::to_string(aPos.z);
+		FE::Message message;
+		message.myEventType = FE::eMessageType::PrintToConsole;
+		message.myMessage = std::string(text);
+		FE::PostMaster::GetInstance()->SendMessage(message);
+#endif
 	}
 
 	void DebugPrintRotation(const std::string& aObjectName, const Vector3f& aRot)

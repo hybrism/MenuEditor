@@ -1,1 +1,222 @@
-{"name":"testMenu","objectID":[{"name":"testObject","objectID":0,"position":{"x":450.0,"y":450.0}},{"name":"untitled","objectID":1,"position":{"x":943.0,"y":576.0}},{"name":"empty object","objectID":2,"position":{"x":748.0,"y":346.0}}],"spriteComponents":[{"clip":{"down":0.0,"left":0.0,"right":0.0,"upper":0.0},"color":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"isHidden":false,"ownerID":0,"pivot":{"x":0.5,"y":0.5},"position":{"x":0.0,"y":0.0},"rotation":0.0,"scaleMultiplier":{"x":1.0,"y":1.0},"size":{"x":256.0,"y":32.0},"texture":"s_slider_fill.dds"},{"clip":{"down":0.0,"left":0.0,"right":0.0,"upper":0.0},"color":{"a":1.0,"b":1.0,"g":1.0,"r":1.0},"isHidden":false,"ownerID":2,"pivot":{"x":0.5,"y":0.5},"position":{"x":0.0,"y":0.0},"rotation":0.0,"scaleMultiplier":{"x":1.0,"y":1.0},"size":{"x":256.0,"y":64.0},"texture":"s_button_default.dds"}],"textComponents":[{"ownerID":0,"position":{"x":0.0,"y":0.0},"textString":"VinterNoll2"}]}
+{
+  "colliderComponents": [
+    {
+      "ownerID": 0,
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "size": {
+        "x": 251.0,
+        "y": 34.0
+      }
+    }
+  ],
+  "name": "testMenu",
+  "objectID": [
+    {
+      "name": "testObject",
+      "objectID": 0,
+      "position": {
+        "x": 501.0,
+        "y": 450.0
+      }
+    },
+    {
+      "name": "text",
+      "objectID": 1,
+      "position": {
+        "x": 1196.0,
+        "y": 765.0
+      }
+    },
+    {
+      "name": "empty object",
+      "objectID": 2,
+      "position": {
+        "x": 938.0,
+        "y": 452.0
+      }
+    },
+    {
+      "name": "StartGame",
+      "objectID": 3,
+      "position": {
+        "x": 923.0,
+        "y": 620.0
+      }
+    },
+    {
+      "name": "Slider",
+      "objectID": 4,
+      "position": {
+        "x": 274.0,
+        "y": 704.0
+      }
+    }
+  ],
+  "spriteComponents": [
+    {
+      "clip": {
+        "down": 0.0,
+        "left": 0.0,
+        "right": 0.0,
+        "upper": 0.0
+      },
+      "color": {
+        "a": 1.0,
+        "b": 1.0,
+        "g": 1.0,
+        "r": 1.0
+      },
+      "isHidden": false,
+      "ownerID": 0,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "rotation": 0.0,
+      "scaleMultiplier": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "size": {
+        "x": 256.0,
+        "y": 32.0
+      },
+      "texture": "s_slider_fill.dds"
+    },
+    {
+      "clip": {
+        "down": 0.0,
+        "left": 0.0,
+        "right": 0.0,
+        "upper": 0.0
+      },
+      "color": {
+        "a": 1.0,
+        "b": 1.0,
+        "g": 1.0,
+        "r": 1.0
+      },
+      "isHidden": false,
+      "ownerID": 2,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "rotation": 0.0,
+      "scaleMultiplier": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "size": {
+        "x": 256.0,
+        "y": 64.0
+      },
+      "texture": "s_button_default.dds"
+    },
+    {
+      "clip": {
+        "down": 0.0,
+        "left": 0.0,
+        "right": 0.0,
+        "upper": 0.0
+      },
+      "color": {
+        "a": 1.0,
+        "b": 1.0,
+        "g": 1.0,
+        "r": 1.0
+      },
+      "isHidden": false,
+      "ownerID": 3,
+      "pivot": {
+        "x": 0.5040000081062317,
+        "y": 0.5
+      },
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "rotation": 0.0,
+      "scaleMultiplier": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "size": {
+        "x": 256.0,
+        "y": 64.0
+      },
+      "texture": "s_button_default.dds"
+    },
+    {
+      "clip": {
+        "down": 0.0,
+        "left": 0.0,
+        "right": 0.0,
+        "upper": 0.0
+      },
+      "color": {
+        "a": 1.0,
+        "b": 1.0,
+        "g": 1.0,
+        "r": 1.0
+      },
+      "isHidden": false,
+      "ownerID": 4,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "rotation": 0.0,
+      "scaleMultiplier": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "size": {
+        "x": 256.0,
+        "y": 32.0
+      },
+      "texture": "s_slider_bg.dds"
+    }
+  ],
+  "textComponents": [
+    {
+      "ownerID": 0,
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "textString": "VinterNoll2"
+    },
+    {
+      "ownerID": 1,
+      "position": {
+        "x": -43.0,
+        "y": -8.0
+      },
+      "textString": "Hello!"
+    },
+    {
+      "ownerID": 3,
+      "position": {
+        "x": -90.0,
+        "y": 0.0
+      },
+      "textString": "Start Game"
+    }
+  ]
+}

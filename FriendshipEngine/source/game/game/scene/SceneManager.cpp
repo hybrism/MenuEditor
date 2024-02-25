@@ -85,6 +85,7 @@ void SceneManager::Render()
 		return;
 
 	GetCurrentScene()->Render();
+
 }
 
 void SceneManager::LoadScene(const SceneParameter& aSceneData)

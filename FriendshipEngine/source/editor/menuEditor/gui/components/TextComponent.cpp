@@ -1,56 +1,52 @@
 #include "TextComponent.h"
 #include <engine/text/text.h>
 
-TextComponent::TextComponent(MenuObject& aParent)
+MENU::TextComponent::TextComponent(MenuObject& aParent)
 	: MenuComponent(aParent, eComponentType::Text)
 {
 	myText = new Text(L"ProggyClean.ttf", FontSize_30);
 	myText->SetPosition({0, 0});
 }
 
-void TextComponent::Init()
-{
-}
-
-void TextComponent::Update()
+void MENU::TextComponent::Update()
 {
 
 	myText->SetPosition(myParent.GetPosition() + myPosition);
 }
 
-void TextComponent::Render()
+void MENU::TextComponent::Render()
 {
 	if (myText)
 		myText->Render();
 }
 
-std::string TextComponent::GetText()
+std::string MENU::TextComponent::GetText()
 {
 	return myString;
 }
 
-const Vector2f TextComponent::GetPosition()
+const Vector2f MENU::TextComponent::GetPosition()
 {
 	return myPosition;
 }
 
-const Vector4f TextComponent::GetColor()
+const Vector4f MENU::TextComponent::GetColor()
 {
 	return myText->GetColor();
 }
 
-void TextComponent::SetText(const std::string& aText)
+void MENU::TextComponent::SetText(const std::string& aText)
 {
 	myString = aText;
 	myText->SetText(aText);
 }
 
-void TextComponent::SetPosition(const Vector2f& aPosition)
+void MENU::TextComponent::SetPosition(const Vector2f& aPosition)
 {
 	myPosition = aPosition;
 }
 
-void TextComponent::SetColor(const Vector4f& aColor)
+void MENU::TextComponent::SetColor(const Vector4f& aColor)
 {
 	myText->SetColor(aColor);
 }

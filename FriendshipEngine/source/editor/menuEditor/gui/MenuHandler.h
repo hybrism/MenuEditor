@@ -5,42 +5,47 @@
 #include <nlohmann/json_fwd.hpp>
 #include "ObjectManager.h"
 
-struct MenuState
-{
-	unsigned int id;
-	std::string name;
-	std::vector<unsigned int> objects;
-};
-
 class TextureFactory;
 
-class MenuHandler
+namespace MENU
 {
-public:
-	MenuHandler();
-	~MenuHandler();
+	struct MenuState
+	{
+		std::string name;
+		std::vector<unsigned int> objects;
+		unsigned int id;
+	};
 
-	void Init(const std::string& aMenuFile, TextureFactory* aTextureFactory);
-	void Update();
-	void Render();
+	class MenuHandler
+	{
+	public:
+		MenuHandler();
+		~MenuHandler();
 
-	ObjectManager myObjectManager;
+		void Init(const std::string& aMenuFile, TextureFactory* aTextureFactory);
+		void Update();
+		void Render();
 
-	//TODO: Move these to a "MenuLoader"
-	void LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory);
-	Vector4f JsonToColorVec(nlohmann::json aJson);
-	Vector2f JsonToVec2(nlohmann::json aJson);
+		//TODO: Add getters for object ID etc...
+		ObjectManager myObjectManager;
 
-	//TODO: These are not needed in game
-	void SaveToJson();
-	nlohmann::json ColorVecToJson(const Vector4f& aVec);
-	nlohmann::json Vec2ToJson(const Vector2f& aVec);
+		//TODO: Move these to a "MenuLoader"
+		void LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory);
+		Vector4f JsonToColorVec(nlohmann::json aJson);
+		Vector2f JsonToVec2(nlohmann::json aJson);
 
-private:
-	std::string myName;
-	std::string myFileName;
+		//TODO: These are not needed in game
+		void SaveToJson();
+		nlohmann::json ColorVecToJson(const Vector4f& aVec);
+		nlohmann::json Vec2ToJson(const Vector2f& aVec);
 
-	std::stack<MenuState*> myStateStack;
-	std::vector<MenuState> myStates;
+	private:
+		//TODO: Change types of these (Takes alot of memory)
+		std::string myName;
+		std::string myFileName;
 
-};
+		std::stack<MenuState*> myStateStack;
+		std::vector<MenuState> myStates;
+
+	};
+}

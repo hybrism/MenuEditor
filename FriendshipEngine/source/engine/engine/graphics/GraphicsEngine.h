@@ -8,6 +8,8 @@
 #include "model/MeshDrawer.h"
 #include "renderer/DeferredRenderer.h"
 #include "renderer/ForwardRenderer.h"
+#include "renderer/DebugRenderer.h"
+
 #include "RenderDefines.h"
 #include <array>
 
@@ -76,9 +78,6 @@ public:
 
 	Vector4f GetClearColor() const { return myClearColor; }
 
-	void PrepareForSpriteRender();
-	void ResetToDefault();
-
 	const Vector2<int>& GetWindowDimensions() const { return myWindowDimensions; }
 	const Vector2<int>& GetViewportDimensions() const { return myViewportDimensions; }
 	const D3D11_VIEWPORT& GetViewPort() const { return *myViewport; }
@@ -131,6 +130,8 @@ public:
 
 	DeferredRenderer& GetDeferredRenderer() { return myDeferredRenderer; }
 	ForwardRenderer& GetForwardRenderer() { return myForwardRenderer; }
+	DebugRenderer& GetDebugRenderer() { return myDebugRenderer; }
+
 private:
 	GraphicsEngine();
 
@@ -169,6 +170,7 @@ private:
 	DepthBuffer myDepthBuffer;
 	ForwardRenderer myForwardRenderer;
 	DeferredRenderer myDeferredRenderer;
+	DebugRenderer myDebugRenderer;
 
 	RenderTarget* myBackBufferRenderTarget;
 

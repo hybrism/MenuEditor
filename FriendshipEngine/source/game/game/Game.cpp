@@ -93,6 +93,5 @@ void Game::Render()
 			myLightManager.ClearAllResources();
 		}
 		myPostProcess.Render();
-
 	}
 }

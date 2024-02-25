@@ -14,29 +14,28 @@
 #include "components/TextComponent.h"
 #include "components/Collider2DComponent.h"
 
-MenuHandler::MenuHandler()
+MENU::MenuHandler::MenuHandler()
 {}
 
-MenuHandler::~MenuHandler()
+MENU::MenuHandler::~MenuHandler()
 {}
 
-void MenuHandler::Init(const std::string& aMenuFile, TextureFactory* aTextureFactory)
+void MENU::MenuHandler::Init(const std::string& aMenuFile, TextureFactory* aTextureFactory)
 {
 	LoadFromJson(aMenuFile, aTextureFactory);
-	FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::NewMenuLoaded, aMenuFile });
 }
 
-void MenuHandler::Update()
+void MENU::MenuHandler::Update()
 {
 	myObjectManager.Update();
 }
 
-void MenuHandler::Render()
+void MENU::MenuHandler::Render()
 {
 	myObjectManager.Render();
 }
 
-void MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory)
+void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory)
 {
 	myObjectManager.ClearAll();
 
@@ -99,9 +98,20 @@ void MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactory* aTe
 		text.SetPosition(JsonToVec2(textComponents[i]["position"]));
 
 	}
+
+	nlohmann::json colliderComponents = menuFile["colliderComponents"];
+	for (size_t i = 0; i < colliderComponents.size(); i++)
+	{
+		size_t ownerID = colliderComponents[i]["ownerID"];
+		Collider2DComponent& collider = myObjectManager.myObjects[ownerID]->AddComponent<Collider2DComponent>();
+
+		collider.SetPosition(JsonToVec2(colliderComponents[i]["position"]));
+		collider.SetSize(JsonToVec2(colliderComponents[i]["size"]));
+
+	}
 }
 
-Vector4f MenuHandler::JsonToColorVec(nlohmann::json aJson)
+Vector4f MENU::MenuHandler::JsonToColorVec(nlohmann::json aJson)
 {
 	Vector4f vec;
 	vec.x = aJson["r"];
@@ -112,7 +122,7 @@ Vector4f MenuHandler::JsonToColorVec(nlohmann::json aJson)
 	return vec;
 }
 
-Vector2f MenuHandler::JsonToVec2(nlohmann::json aJson)
+Vector2f MENU::MenuHandler::JsonToVec2(nlohmann::json aJson)
 {
 	Vector2f vec;
 	vec.x = aJson["x"];
@@ -121,7 +131,7 @@ Vector2f MenuHandler::JsonToVec2(nlohmann::json aJson)
 	return vec;
 }
 
-void MenuHandler::SaveToJson()
+void MENU::MenuHandler::SaveToJson()
 {
 	nlohmann::json menuFile;
 	menuFile["name"] = myName;
@@ -142,6 +152,7 @@ void MenuHandler::SaveToJson()
 
 	nlohmann::json spriteComponents;
 	nlohmann::json textComponents;
+	nlohmann::json colliderComponents;
 
 	for (size_t i = 0; i < myObjectManager.myObjects.size(); i++)
 	{
@@ -174,10 +185,21 @@ void MenuHandler::SaveToJson()
 			textEntry["position"] = Vec2ToJson(text.GetPosition());
 			textComponents.push_back(textEntry);
 		}
+
+		if (myObjectManager.myObjects[i]->HasComponent<Collider2DComponent>())
+		{
+			Collider2DComponent collider = myObjectManager.myObjects[i]->GetComponent<Collider2DComponent>();
+			nlohmann::json colliderEntry;
+			colliderEntry["ownerID"] = i;
+			colliderEntry["position"] = Vec2ToJson(collider.GetPosition());
+			colliderEntry["size"] = Vec2ToJson(collider.GetSize());
+			colliderComponents.push_back(colliderEntry);
+		}
 	}
 
 	menuFile["spriteComponents"] = spriteComponents;
 	menuFile["textComponents"] = textComponents;
+	menuFile["colliderComponents"] = colliderComponents;
 
 
 	std::string path = MENU::RELATIVE_MENUEDITOR_ASSETS + MENU::MENU_PATH + myFileName;
@@ -194,7 +216,7 @@ void MenuHandler::SaveToJson()
 
 }
 
-nlohmann::json MenuHandler::ColorVecToJson(const Vector4f& aVec)
+nlohmann::json MENU::MenuHandler::ColorVecToJson(const Vector4f& aVec)
 {
 	nlohmann::json vec;
 	vec["r"] = aVec.x;
@@ -205,7 +227,7 @@ nlohmann::json MenuHandler::ColorVecToJson(const Vector4f& aVec)
 	return vec;
 }
 
-nlohmann::json MenuHandler::Vec2ToJson(const Vector2f& aVec)
+nlohmann::json MENU::MenuHandler::Vec2ToJson(const Vector2f& aVec)
 {
 	nlohmann::json vec;
 	vec["x"] = aVec.x;

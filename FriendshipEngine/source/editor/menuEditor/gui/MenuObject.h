@@ -2,49 +2,67 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <cassert>
 #include <engine/math/Vector.h>
+#include "../MenuCommon.h"
 
-class MenuComponent;
-class MenuObject
+namespace MENU
 {
-	friend class ObjectManager;
+	class MenuComponent;
 
-public:
+	enum class eComponentType
+	{
+		Sprite,
+		Collider2D,
+		Text,
+		Count
+	};
 
-	MenuObject(const unsigned int aID, const Vector2f& aPosition = { 0.f, 0.f });
+	class MenuObject
+	{
+		friend class ObjectManager;
 
-	template<class T>
-	T& AddComponent();
+	public:
 
-	template<class T>
-	T& GetComponent();
+		MenuObject(const unsigned int aID, const Vector2f& aPosition = { 0.f, 0.f });
 
-	template<class T>
-	bool HasComponent();
+		template<class T>
+		T& AddComponent();
 
-	virtual void Init();
-	virtual void Update();
-	virtual void Render();
+		template<class T>
+		T& GetComponent();
 
-	void SetName(const std::string& aName) { myName = aName; }
-	void SetPosition(const Vector2f& aPosition) { myPosition = aPosition; }
+		void AddComponentOfType(eComponentType aType);
 
-	const unsigned int GetID() const { return myID; }
-	std::string GetName() const { return myName; }
-	Vector2f GetPosition() const { return myPosition; }
+		template<class T>
+		bool HasComponent();
 
-private:
-	MenuObject() = delete;
+		virtual void Init();
+		virtual void Update();
+		virtual void Render();
 
-	std::vector<std::shared_ptr<MenuComponent>> myComponents;
+		//TODO: When setposition on ParentObject->UpdateChildComponents
+		void SetName(const std::string& aName) { myName = aName; }
+		void SetPosition(const Vector2f& aPosition) { myPosition = aPosition; }
 
-	const unsigned int myID;
-	std::string myName;
-	Vector2f myPosition;
-};
+		const unsigned int GetID() const { return myID; }
+		std::string GetName() const { return myName; }
+		Vector2f GetPosition() const { return myPosition; }
+
+	private:
+		MenuObject() = delete;
+
+		//TODO: Store components as a map with vectors, so we can have more of the same
+		std::vector<std::shared_ptr<MenuComponent>> myComponents;
+
+		const unsigned int myID;
+		std::string myName;
+		Vector2f myPosition;
+	};
+}
 
 template<class T>
-inline T& MenuObject::AddComponent()
+inline T& MENU::MenuObject::AddComponent()
 {
 	std::shared_ptr<T> component = std::make_shared<T>(*this);
 	myComponents.emplace_back(component);
@@ -52,7 +70,7 @@ inline T& MenuObject::AddComponent()
 }
 
 template<class T>
-inline T& MenuObject::GetComponent()
+inline T& MENU::MenuObject::GetComponent()
 {
 	for (size_t i = 0; i < myComponents.size(); i++)
 	{
@@ -68,7 +86,7 @@ inline T& MenuObject::GetComponent()
 }
 
 template<class T>
-inline bool MenuObject::HasComponent()
+inline bool MENU::MenuObject::HasComponent()
 {
 	for (size_t i = 0; i < myComponents.size(); i++)
 	{

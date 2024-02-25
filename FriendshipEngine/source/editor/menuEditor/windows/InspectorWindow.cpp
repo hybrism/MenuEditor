@@ -8,13 +8,15 @@
 
 #include "../gui/components/SpriteComponent.h"
 #include "../gui/components/TextComponent.h"
+#include "../gui/components/Collider2DComponent.h"
 
 #include <shared/postMaster/PostMaster.h>
 
 MENU::InspectorWindow::InspectorWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
 	: WindowBase(aHandle, aOpen, aFlags)
 {
-	mySelectedIndex = INT_MAX;
+	mySelectedObjectIndex = UINT_MAX;
+	mySelectedComponentIndex = (size_t)eComponentType::Count;
 	myIsNewObjectSelected = false;
 
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::PushEntityToInspector);
@@ -23,27 +25,26 @@ MENU::InspectorWindow::InspectorWindow(const std::string& aHandle, bool aOpen, I
 
 void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 {
-	aContext;
 	if (!myData.isOpen)
 		return;
 
 	if (myIsNewObjectSelected)
 	{
 		//Get values from object
-		myObjectName = aContext.menuHandler->myObjectManager.myObjects[mySelectedIndex]->GetName();
+		myObjectName = aContext.menuHandler->myObjectManager.myObjects[mySelectedObjectIndex]->GetName();
 
 		myIsNewObjectSelected = false;
 	}
 
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
-		if (mySelectedIndex == INT_MAX) //Early out
+		if (mySelectedObjectIndex == UINT_MAX) //Early out
 		{
 			ImGui::End();
 			return;
 		}
 
-		MenuObject& selectedObject = *aContext.menuHandler->myObjectManager.myObjects[mySelectedIndex];
+		MenuObject& selectedObject = *aContext.menuHandler->myObjectManager.myObjects[mySelectedObjectIndex];
 		ImGui::PushID(selectedObject.GetID());
 
 		{
@@ -63,12 +64,15 @@ void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 		if (selectedObject.HasComponent<TextComponent>())
 			EditTextComponent(selectedObject);
 
+		if (selectedObject.HasComponent<Collider2DComponent>())
+			EditCollider2DComponent(selectedObject);
+
 		if (ImGui::Button("Add Component", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
 		{
-			//Display popup where you can select which component to add
-			TextComponent& text = selectedObject.AddComponent<TextComponent>();
-			text.SetText("Hello World!");
+			ImGui::OpenPopup("Add Component");
 		}
+
+		AddComponent(selectedObject);
 
 		ImGui::PopID();
 	}
@@ -81,18 +85,69 @@ void MENU::InspectorWindow::RecieveMessage(const FE::Message& aMessage)
 	{
 	case FE::eMessageType::PushEntityToInspector:
 	{
-		mySelectedIndex = std::any_cast<size_t>(aMessage.myMessage);
+		mySelectedObjectIndex = std::any_cast<size_t>(aMessage.myMessage);
 		myIsNewObjectSelected = true;
 		break;
 	}
 	case FE::eMessageType::NewMenuLoaded:
 	{
-		mySelectedIndex = INT_MAX;
+		mySelectedObjectIndex = UINT_MAX;
 		break;
 	}
 	default:
 		break;
 	}
+}
+
+void MENU::InspectorWindow::AddComponent(MenuObject& aObject)
+{
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	if (ImGui::BeginPopupModal("Add Component", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Chose component: ");
+
+		//TODO: Make this more dynamic
+		const char* componentNames[] = { "SpriteComponent", "ColliderComponent", "TextComponent", "None" };
+		const char* comboPreviewValue = componentNames[mySelectedComponentIndex];  // Pass in the preview value visible before opening the combo (it could be anything)
+
+		if (ImGui::BeginCombo("Select Component", comboPreviewValue))
+		{
+			for (int i = 0; i < IM_ARRAYSIZE(componentNames); i++)
+			{
+				const bool isSelected = (mySelectedComponentIndex == i);
+				if (ImGui::Selectable(componentNames[i], isSelected))
+				{
+					mySelectedComponentIndex = i;
+				}
+
+				if (isSelected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		if (ImGui::Button("Add", ImVec2(120, 0)))
+		{
+			if ((eComponentType)mySelectedComponentIndex == eComponentType::Count)
+				ImGui::CloseCurrentPopup();
+
+			aObject.AddComponentOfType((eComponentType)mySelectedComponentIndex);
+			mySelectedComponentIndex = (size_t)eComponentType::Count;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			mySelectedComponentIndex = 0;
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+
 }
 
 void MENU::InspectorWindow::EditSpriteComponent(const UpdateContext& aContext, MenuObject& aObject)
@@ -130,7 +185,7 @@ void MENU::InspectorWindow::EditSpriteComponent(const UpdateContext& aContext, M
 
 	ImGui::DragFloat2("Size", &sprite.GetSize().x, 0.01f);
 	ImGui::DragFloat2("Pivot", &sprite.GetPivot().x, 0.001f, 0.f, 1.f);
-	ImGui::DragFloat2("ScaleMultiplier", &sprite.GetScaleMultiplier().x);
+	ImGui::DragFloat2("ScaleMultiplier", &sprite.GetScaleMultiplier().x, 0.01f);
 	ImGui::ColorEdit4("Color", &sprite.GetColor().x);
 
 	//ImGui::DragFloat("Rotation", &sprite.GetRotation(), 0.01f);
@@ -170,5 +225,24 @@ void MENU::InspectorWindow::EditTextComponent(MenuObject& aObject)
 	if (ImGui::ColorEdit4("Color", &color.x))
 		text.SetColor(color);
 
+	ImGui::PopID();
+}
+
+void MENU::InspectorWindow::EditCollider2DComponent(MenuObject& aObject)
+{
+	Collider2DComponent& collider = aObject.GetComponent<Collider2DComponent>();
+	ImGui::PushID("2DCollider");
+	ImGui::SeparatorText("Collider");
+
+	Vector2f position = collider.GetPosition();
+	Vector2f size = collider.GetSize();
+
+	if (ImGui::DragFloat2("Position", &position.x))
+		collider.SetPosition(position);
+
+	if (ImGui::DragFloat2("Size", &size.x))
+		collider.SetSize(size);
+
+	ImGui::Spacing();
 	ImGui::PopID();
 }

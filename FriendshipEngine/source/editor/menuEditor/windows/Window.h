@@ -36,4 +36,4 @@ namespace MENU
 		WindowData myData = {};
 		virtual void Show(const UpdateContext& aContext) = 0;
 	};
-};
+}

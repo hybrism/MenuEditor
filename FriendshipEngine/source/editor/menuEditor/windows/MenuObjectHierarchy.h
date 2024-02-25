@@ -4,7 +4,7 @@
 
 namespace MENU
 {
-	class MenuObjectHierarchy : public MENU::WindowBase
+	class MenuObjectHierarchy : public WindowBase
 	{
 	public:
 		MenuObjectHierarchy(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags);

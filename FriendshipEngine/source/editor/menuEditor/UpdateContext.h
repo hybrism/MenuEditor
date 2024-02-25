@@ -5,10 +5,10 @@
 #include "MenuCommon.h"
 
 class Texture;
-class MenuHandler;
 
 namespace MENU
 {
+	class MenuHandler;
 	struct UpdateContext
 	{
 		Assets assets;

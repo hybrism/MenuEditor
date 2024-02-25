@@ -20,8 +20,6 @@ MENU::MenuObjectHierarchy::MenuObjectHierarchy(const std::string& aHandle, bool 
 
 void MENU::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 {
-	aContext;
-
 	if (!myData.isOpen)
 		return;
 

@@ -3,9 +3,9 @@
 #include "MenuCommon.h"
 #include "windows/Window.h"
 #include <array>
-#include <assets/TextureFactory.h>
 #include <engine/math/Vector.h>
 #include <shared/postMaster/Observer.h>
+#include <assets/TextureFactory.h>
 
 class Game;
 class Texture;
@@ -39,9 +39,9 @@ namespace MENU
 		void Popups();
 
 	private:
+		::TextureFactory myTextureFactory;
 		ObjectManager myEditorObjectManager;
 		MenuHandler myMenuHandler;
-		TextureFactory myTextureFactory;
 		Assets myAssets;
 
 		size_t mySelectedEntityIndex;

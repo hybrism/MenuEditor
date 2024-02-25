@@ -15,13 +15,12 @@
 //Engine
 #include <engine/utility/Error.h>
 #include <engine/utility/StringHelper.h>
+#include <engine/utility/InputManager.h>
 #include <engine/graphics/Texture.h>
-#include <assets/TextureFactory.h>
 #include <engine/graphics/GraphicsEngine.h>
 
 //Internal
 #include <shared/postMaster/PostMaster.h>
-
 #include "UpdateContext.h"
 #include "MenuCommon.h"
 
@@ -38,7 +37,9 @@
 MENU::MenuEditor::MenuEditor()
 	: myFirstFrameSetup(true)
 	, mySelectedEntityIndex(UINT_MAX)
+	, myGizmoIndex(UINT_MAX)
 {
+
 	for (size_t i = 0; i < (int)ePopup::Count; i++)
 	{
 		myPopups[i] = false;
@@ -51,8 +52,10 @@ MENU::MenuEditor::~MenuEditor()
 void MENU::MenuEditor::Init()
 {
 	auto ge = GraphicsEngine::GetInstance();
+
+	//TODO:  ViewPort != RenderSize, add get RenderSize to graphicsengine 23.f is the height of menubar?
 	Vector2i viewport = ge->GetViewportDimensions();
-	myRenderSize = { (float)viewport.x, (float)viewport.y };
+	myRenderSize = { (float)viewport.x, (float)viewport.y + 23.f };
 	myRenderCenter = myRenderSize * 0.5f;
 
 	//SUBSCRIBE TO EVENTS
@@ -115,8 +118,7 @@ void MENU::MenuEditor::Init()
 		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID]);
 
 		Collider2DComponent& collider = mo.AddComponent<Collider2DComponent>();
-
-
+		collider.SetShouldRenderColliders(false);
 	}
 
 	myMenuHandler.Init("testMenu.json", &myTextureFactory);
@@ -142,24 +144,39 @@ void MENU::MenuEditor::Update(float)
 		myWindows[i]->Show(updateContext);
 	}
 
+	ImVec2 mousePos = ImGui::GetMousePos();
+	myMenuHandler.myObjectManager.CheckCollision({ mousePos.x, myRenderSize.y - mousePos.y });
+	myEditorObjectManager.CheckCollision({ mousePos.x, myRenderSize.y - mousePos.y });
+
 	myMenuHandler.Update();
 	myEditorObjectManager.Update();
 
 	if (mySelectedEntityIndex != UINT_MAX)
+	{
 		myEditorObjectManager.myObjects[myGizmoIndex]->SetPosition(myMenuHandler.myObjectManager.myObjects[mySelectedEntityIndex]->GetPosition());
+
+		Collider2DComponent& collider = myEditorObjectManager.myObjects[myGizmoIndex]->GetComponent<Collider2DComponent>();
+		SpriteComponent& sprite = myEditorObjectManager.myObjects[myGizmoIndex]->GetComponent<SpriteComponent>();
+
+		if (collider.IsHovered())
+			sprite.SetColor({ 1.f, 1.f, 1.f, 1.f });
+		else
+			sprite.SetColor({ 1.f, 1.f, 1.f, 0.5f });
+	}
 }
 
 void MENU::MenuEditor::Render()
 {
-	auto ge = GraphicsEngine::GetInstance();
+	GraphicsEngine* ge = GraphicsEngine::GetInstance();
+	DebugRenderer& debug = ge->GetDebugRenderer();
 	ge->SetBlendState(BlendState::AlphaBlend);
-
-	//ge->GetContext()->OMSetRenderTargets(1, ge->GetBackBuffer().GetAddressOf(), nullptr);
 
 	myMenuHandler.Render();
 
 	if (mySelectedEntityIndex != UINT_MAX)
 		myEditorObjectManager.myObjects[myGizmoIndex]->Render();
+
+	debug.Render();
 }
 
 void MENU::MenuEditor::Dockspace()
@@ -180,7 +197,8 @@ void MENU::MenuEditor::Dockspace()
 
 	ImGui::Begin("MenuEditorDockspace", NULL, hostWindowFlags);
 	ImGui::PopStyleVar(3);
-	ImGuiID dockspaceID = ImGui::GetID("MenuEditorDockspace");
+
+	ImGuiID dockspaceID = ImGui::GetID(myWindows[(int)MENU::ID::Assets]->myData.handle.c_str());
 	ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
 	MenuBar();
@@ -254,7 +272,11 @@ void MENU::MenuEditor::MenuBar()
 				for (size_t i = 0; i < myAssets.saveFiles.size(); i++)
 				{
 					if (ImGui::MenuItem(myAssets.saveFiles[i].c_str()))
+					{
 						myMenuHandler.LoadFromJson(myAssets.saveFiles[i], &myTextureFactory);
+						mySelectedEntityIndex = UINT_MAX;
+						FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::NewMenuLoaded, myAssets.saveFiles[i] });
+					}
 				}
 				ImGui::EndMenu();
 			}
@@ -319,7 +341,6 @@ void MENU::MenuEditor::Popups()
 			ImGui::CloseCurrentPopup();
 			myPopups[(int)ePopup::CreateNew] = false;
 
-			//TODO: Add functionality to create new JSON
 			size_t n = newMenuName.find(".json");
 			if (n == std::string::npos)
 				newMenuName += ".json";

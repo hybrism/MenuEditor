@@ -2,15 +2,17 @@
 #include <engine/utility/Error.h>
 #include <memory>
 
+#include "components/Collider2DComponent.h"
+
 #include "MenuObject.h"
 
-ObjectManager::ObjectManager()
+MENU::ObjectManager::ObjectManager()
 {
     myIdCounter = 0;
     myLastObjectIndex = 0;
 }
 
-void ObjectManager::Update()
+void MENU::ObjectManager::Update()
 {
     for (size_t i = 0; i < myObjects.size(); i++)
     {
@@ -18,7 +20,7 @@ void ObjectManager::Update()
     }
 }
 
-void ObjectManager::Render()
+void MENU::ObjectManager::Render()
 {
     for (size_t i = 0; i < myObjects.size(); i++)
     {
@@ -26,7 +28,19 @@ void ObjectManager::Render()
     }
 }
 
-MenuObject& ObjectManager::CreateNew(const Vector2f& aPosition)
+void MENU::ObjectManager::CheckCollision(const Vector2f& aPosition)
+{
+    for (size_t i = 0; i < myObjects.size(); i++)
+    {
+        if (myObjects[i]->HasComponent<Collider2DComponent>())
+        {
+            Collider2DComponent& collider = myObjects[i]->GetComponent<Collider2DComponent>();
+            collider.CheckCollision(aPosition);
+        }
+    }
+}
+
+MENU::MenuObject& MENU::ObjectManager::CreateNew(const Vector2f& aPosition)
 {
     myObjects.push_back(std::make_shared<MenuObject>(myIdCounter, aPosition));
     
@@ -36,7 +50,7 @@ MenuObject& ObjectManager::CreateNew(const Vector2f& aPosition)
     return *myObjects[myLastObjectIndex];
 }
 
-void ObjectManager::ClearAll()
+void MENU::ObjectManager::ClearAll()
 {
     myObjects.clear();
     myIdCounter = 0;

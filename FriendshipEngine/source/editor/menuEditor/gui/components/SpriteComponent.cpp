@@ -2,20 +2,16 @@
 #include <engine/graphics/GraphicsEngine.h>
 #include <engine/graphics/sprite/SpriteDrawer.h>
 
-SpriteComponent::SpriteComponent(MenuObject& aParent) 
+MENU::SpriteComponent::SpriteComponent(MenuObject& aParent)
 	: MenuComponent(aParent, eComponentType::Sprite)
 {}
 
-void SpriteComponent::Init()
-{
-}
-
-void SpriteComponent::Update()
+void MENU::SpriteComponent::Update()
 {
 	myInstance.position = myParent.GetPosition() + myPosition;
 }
 
-void SpriteComponent::Render()
+void MENU::SpriteComponent::Render()
 {
 	if (!mySharedData.texture)
 		return;
@@ -24,12 +20,12 @@ void SpriteComponent::Render()
 	GraphicsEngine::GetInstance()->GetSpriteDrawer().Draw(mySharedData, myInstance);
 }
 
-Texture* SpriteComponent::GetTexture() const
+Texture* MENU::SpriteComponent::GetTexture() const
 {
 	return mySharedData.texture;
 }
 
-Vector2f SpriteComponent::GetTextureSize() const
+Vector2f MENU::SpriteComponent::GetTextureSize() const
 {
 	if (mySharedData.texture == nullptr)
 		return Vector2f(0, 0);
@@ -37,7 +33,7 @@ Vector2f SpriteComponent::GetTextureSize() const
 	return mySharedData.texture->GetTextureSize();
 }
 
-std::string SpriteComponent::GetTexturePath()
+std::string MENU::SpriteComponent::GetTexturePath()
 {
 	if (mySharedData.texture == nullptr)
 		return "";
@@ -45,47 +41,47 @@ std::string SpriteComponent::GetTexturePath()
 	return myTextureFile;
 }
 
-void SpriteComponent::SetPosition(const Vector2f& aPosition)
+void MENU::SpriteComponent::SetPosition(const Vector2f& aPosition)
 {
 	myPosition = aPosition;
 }
 
-void SpriteComponent::SetPivot(const Vector2f& aPivot)
+void MENU::SpriteComponent::SetPivot(const Vector2f& aPivot)
 {
 	myInstance.pivot = aPivot;
 }
 
-void SpriteComponent::SetSize(const Vector2f& aPosition)
+void MENU::SpriteComponent::SetSize(const Vector2f& aPosition)
 {
 	myInstance.size = aPosition;
 }
 
-void SpriteComponent::SetScaleMultiplier(const Vector2f& aPosition)
+void MENU::SpriteComponent::SetScaleMultiplier(const Vector2f& aPosition)
 {
 	myInstance.scaleMultiplier = aPosition;
 }
 
-void SpriteComponent::SetColor(const Vector4f& aPosition)
+void MENU::SpriteComponent::SetColor(const Vector4f& aPosition)
 {
 	myInstance.color = aPosition;
 }
 
-void SpriteComponent::SetClipValue(const ClipValue& aClipValue)
+void MENU::SpriteComponent::SetClipValue(const ClipValue& aClipValue)
 {
 	myInstance.clip = aClipValue;
 }
 
-void SpriteComponent::SetRotation(float aRotation)
+void MENU::SpriteComponent::SetRotation(float aRotation)
 {
 	myInstance.rotation = aRotation;
 }
 
-void SpriteComponent::SetIsHidden(bool aIsHidden)
+void MENU::SpriteComponent::SetIsHidden(bool aIsHidden)
 {
 	myInstance.isHidden = aIsHidden;
 }
 
-void SpriteComponent::SetTexture(Texture* aTexture, const std::string& aTextureName)
+void MENU::SpriteComponent::SetTexture(Texture* aTexture, const std::string& aTextureName)
 {
 	myTextureFile = aTextureName;
 	mySharedData.texture = aTexture;

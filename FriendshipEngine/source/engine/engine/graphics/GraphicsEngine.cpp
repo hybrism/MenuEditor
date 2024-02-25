@@ -34,7 +34,7 @@ RenderTarget& GraphicsEngine::GetBackBufferRenderTarget()
 	return *myBackBufferRenderTarget;
 }
 
-GraphicsEngine::GraphicsEngine() : myMeshDrawer(), myDeferredRenderer(myMeshDrawer), myForwardRenderer(myMeshDrawer)
+GraphicsEngine::GraphicsEngine() : myMeshDrawer(), myDebugRenderer(), myDeferredRenderer(myMeshDrawer), myForwardRenderer(myMeshDrawer)
 {
 #ifdef _DEBUG
 	SetClearColor(64.0f / 256.0f, 166.0f / 256.0f, 245.0f / 256.0f);
@@ -321,6 +321,8 @@ bool GraphicsEngine::Initialize(int width, int height, HWND windowHandle)
 	mySpriteDrawer->Init();
 
 	myMeshDrawer.Init();
+
+	myDebugRenderer.Init();
 
 	//myDirectionalLightManager = new DirectionalLightManager();
 	//myDirectionalLightManager->Init();
@@ -723,16 +725,6 @@ void GraphicsEngine::EndFrame()
 #endif
 }
 
-void GraphicsEngine::PrepareForSpriteRender()
-{
-	//TO::DO  Set p? alpha igen 
-
-	//TOVE: ALPHABLEND
-	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	myContext->OMSetRenderTargets(1, GetBackBuffer().GetAddressOf(), nullptr);
-	myContext->OMSetBlendState(myAlphaBlendState.Get(), blendFactor, 0xFFFFFFFFu);
-}
-
 bool GraphicsEngine::CreateBlendStates()
 {
 	{
@@ -814,11 +806,6 @@ bool GraphicsEngine::CreateBlendStates()
 
 		return true;
 	}
-}
-
-void GraphicsEngine::ResetToDefault()
-{
-	myContext->OMSetRenderTargets(1, myBackBuffer.GetAddressOf(), myDepthBuffer.GetDepthStencilView());
 }
 
 bool GraphicsEngine::SetResolution(const Vector2<int>& aResolution)
