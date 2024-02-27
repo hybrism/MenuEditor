@@ -20,14 +20,14 @@ public:
 	ComponentContainer(size_t MAX_SIZE) : myMaxSize(MAX_SIZE), myComponentToEntityMap()
 	{
 		// since we want segmented memory we use an array instead of a vector:(, additionally it is of the size of max entities since it is possible for every entity to have every component
-		myComponents = new T[MAX_SIZE];
+		myComponents1DVector = new T[MAX_SIZE];
 		myComponentToEntityMap = new eid_t[MAX_SIZE];
 		mySize = 0;
 	}
 
 	~ComponentContainer() override
 	{
-		delete[] myComponents;
+		delete[] myComponents1DVector;
 		delete[] myComponentToEntityMap;
 		mySize = 0;
 	}
@@ -50,7 +50,7 @@ public:
 		myComponentToEntityMap[mySize] = aEntity;
 		++mySize;
 
-		return myComponents[mySize - 1];
+		return myComponents1DVector[mySize - 1];
 	}
 
 	void RemoveComponent(const Entity& aEntity, EntityManager* aManager)
@@ -62,9 +62,9 @@ public:
 		size_t indexOfRemovedEntity = aManager->GetSignature(aEntity).indices[T::componentId];
 		eid_t lastEntity = myComponentToEntityMap[lastElementIndex];
 
-		memcpy(&myComponents[indexOfRemovedEntity], &myComponents[lastElementIndex], sizeof(myComponents[indexOfRemovedEntity]));
+		memcpy(&myComponents1DVector[indexOfRemovedEntity], &myComponents1DVector[lastElementIndex], sizeof(myComponents1DVector[indexOfRemovedEntity]));
 		T copy{};
-		memcpy(&myComponents[lastElementIndex], &copy, sizeof(T));  // resets the component
+		memcpy(&myComponents1DVector[lastElementIndex], &copy, sizeof(T));  // resets the component
 		aManager->GetSignature(lastEntity).indices[T::componentId] = static_cast<int>(indexOfRemovedEntity);
 
 		aManager->GetSignature(aEntity).signature.set(T::componentId, false);
@@ -76,7 +76,7 @@ public:
 	{
 		assert(aSignature.signature.test(T::componentId) && "Entity does not exist in ComponentContainer");
 		
-		return myComponents[aSignature.indices[T::componentId]];
+		return myComponents1DVector[aSignature.indices[T::componentId]];
 	}
 
 #ifdef _DEBUG
@@ -84,7 +84,7 @@ public:
 	{
 		if (!aSignature.signature.test(T::componentId)) { return nullptr; }
 
-		return &myComponents[aSignature.indices[T::componentId]];
+		return &myComponents1DVector[aSignature.indices[T::componentId]];
 	}
 #endif
 
@@ -113,7 +113,7 @@ public:
 private:
 	const size_t myMaxSize;
 	size_t mySize;
-	T* myComponents;
+	T* myComponents1DVector;
 	eid_t* myComponentToEntityMap;
 	// TODO: optimize initialization of components if they contain too lot of data?
 	

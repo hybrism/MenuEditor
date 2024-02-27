@@ -11,24 +11,25 @@ MenuObject::MenuObject(const unsigned int aID)
 
 void MenuObject::Init()
 {
-	for (int i = 0; i < myComponents.size(); i++)
+	for (int i = 0; i < myComponents1DVector.size(); i++)
 	{
-		myComponents[i]->Init();
+		myComponents1DVector[i]->Init();
 	}
 }
 
 void MenuObject::Update()
 {
-	for (int i = 0; i < myComponents.size(); i++)
+	for (int i = 0; i < myComponents1DVector.size(); i++)
 	{
-		myComponents[i]->Update();
+		myComponents1DVector[i]->Update();
 	}
 }
 
 void MenuObject::Render()
 {
-	for (int i = 0; i < myComponents.size(); i++)
+	for (int i = 0; i < myComponents1DVector.size(); i++)
 	{
-		myComponents[i]->Render();
+		myComponents1DVector[i]->Render();
 	}
 }
+

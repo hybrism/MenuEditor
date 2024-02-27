@@ -8,6 +8,8 @@ namespace MENU
 	class MenuObject;
 	class ObjectManager
 	{
+		friend class MenuEditor;
+
 	public:
 		ObjectManager();
 
@@ -18,13 +20,15 @@ namespace MENU
 
 		MenuObject& CreateNew(const Vector2f& aPosition = { 0.f, 0.f });
 		
+		MenuObject& GetObjectFromID(size_t aID);
+
 		void ClearAll();
 
 		//TODO: Not make it public (?)
 		std::vector<std::shared_ptr<MenuObject>> myObjects;
 
 	private:
-		unsigned int myIdCounter;
+		unsigned int myObjectIdCounter;
 		size_t myLastObjectIndex;
 
 	};

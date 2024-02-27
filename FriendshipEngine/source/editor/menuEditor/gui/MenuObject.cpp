@@ -1,39 +1,31 @@
 #include "MenuObject.h"
+
 #include "components/MenuComponent.h"
+
 #include "components/Collider2DComponent.h"
 #include "components/SpriteComponent.h"
 #include "components/TextComponent.h"
 
 MENU::MenuObject::MenuObject(const unsigned int aID, const Vector2f& aPosition)
 	: myID(aID)
-	, myName("untitled")
+	, myName("(Untitled)")
 	, myPosition(aPosition)
 {
 }
 
-void MENU::MenuObject::AddComponentOfType(eComponentType aType)
+void MENU::MenuObject::AddComponentOfType(ComponentType aType)
 {
 	switch (aType)
 	{
-	case MENU::eComponentType::Sprite:
-	{
-		std::shared_ptr<SpriteComponent> sprite = std::make_shared<SpriteComponent>(*this);
-		myComponents.emplace_back(sprite);
+	case MENU::ComponentType::Sprite:
+		AddComponent<SpriteComponent>();
 		break;
-	}
-	case MENU::eComponentType::Collider2D:
-	{
-		std::shared_ptr<Collider2DComponent> collider = std::make_shared<Collider2DComponent>(*this);
-		myComponents.emplace_back(collider);
+	case MENU::ComponentType::Collider2D:
+		AddComponent<Collider2DComponent>();
 		break;
-	}
-	case MENU::eComponentType::Text:
-	{
-		std::shared_ptr<TextComponent> text = std::make_shared<TextComponent>(*this);
-		myComponents.emplace_back(text);
+	case MENU::ComponentType::Text:
+		AddComponent<TextComponent>();
 		break;
-	}
-	case MENU::eComponentType::Count:
 	default:
 		break;
 	}
@@ -45,16 +37,44 @@ void MENU::MenuObject::Init()
 
 void MENU::MenuObject::Update()
 {
-	for (int i = 0; i < myComponents.size(); i++)
+	for (size_t typeIndex = 0; typeIndex < myComponents.size(); typeIndex++)
 	{
-		myComponents[i]->Update();
+		assert(!myComponents[typeIndex].empty() && "This should never happen");
+
+		for (size_t componentIndex = 0; componentIndex < myComponents[typeIndex].size(); componentIndex++)
+			myComponents[typeIndex][componentIndex]->Update();
 	}
 }
 
 void MENU::MenuObject::Render()
 {
-	for (int i = 0; i < myComponents.size(); i++)
+	for (size_t typeIndex = 0; typeIndex < myComponents.size(); typeIndex++)
 	{
-		myComponents[i]->Render();
+		assert(!myComponents[typeIndex].empty() && "This should never happen");
+
+		for (size_t componentIndex = 0; componentIndex < myComponents[typeIndex].size(); componentIndex++)
+			myComponents[typeIndex][componentIndex]->Render();
+	}
+}
+
+bool MENU::MenuObject::IsHovered()
+{
+	if (!HasComponent<Collider2DComponent>())
+		return false;
+
+	Collider2DComponent& collider = GetComponent<Collider2DComponent>();
+	return collider.IsHovered();
+}
+
+void MENU::MenuObject::SetPosition(const Vector2f& aPosition)
+{
+	myPosition = aPosition;
+
+	for (size_t typeIndex = 0; typeIndex < myComponents.size(); typeIndex++)
+	{
+		assert(!myComponents[typeIndex].empty() && "This should never happen");
+
+		for (size_t componentIndex = 0; componentIndex < myComponents[typeIndex].size(); componentIndex++)
+			myComponents[typeIndex][componentIndex]->UpdatePosition();
 	}
 }

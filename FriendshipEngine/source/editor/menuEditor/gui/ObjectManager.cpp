@@ -8,51 +8,56 @@
 
 MENU::ObjectManager::ObjectManager()
 {
-    myIdCounter = 0;
-    myLastObjectIndex = 0;
+	myObjectIdCounter = 0;
+	myLastObjectIndex = 0;
 }
 
 void MENU::ObjectManager::Update()
 {
-    for (size_t i = 0; i < myObjects.size(); i++)
-    {
-        myObjects[i]->Update();
-    }
+	for (size_t i = 0; i < myObjects.size(); i++)
+	{
+		myObjects[i]->Update();
+	}
 }
 
 void MENU::ObjectManager::Render()
 {
-    for (size_t i = 0; i < myObjects.size(); i++)
-    {
-        myObjects[i]->Render();
-    }
+	for (size_t i = 0; i < myObjects.size(); i++)
+	{
+		myObjects[i]->Render();
+	}
 }
 
 void MENU::ObjectManager::CheckCollision(const Vector2f& aPosition)
 {
-    for (size_t i = 0; i < myObjects.size(); i++)
-    {
-        if (myObjects[i]->HasComponent<Collider2DComponent>())
-        {
-            Collider2DComponent& collider = myObjects[i]->GetComponent<Collider2DComponent>();
-            collider.CheckCollision(aPosition);
-        }
-    }
+	for (size_t i = 0; i < myObjects.size(); i++)
+	{
+		if (myObjects[i]->HasComponent<Collider2DComponent>())
+		{
+			Collider2DComponent& collider = myObjects[i]->GetComponent<Collider2DComponent>();
+			collider.CheckCollision(aPosition);
+		}
+	}
 }
 
 MENU::MenuObject& MENU::ObjectManager::CreateNew(const Vector2f& aPosition)
 {
-    myObjects.push_back(std::make_shared<MenuObject>(myIdCounter, aPosition));
-    
-    myIdCounter++;
-    myLastObjectIndex = myObjects.size() - 1;
+	myObjects.push_back(std::make_shared<MenuObject>(myObjectIdCounter, aPosition));
 
-    return *myObjects[myLastObjectIndex];
+	myObjectIdCounter++;
+	myLastObjectIndex = myObjects.size() - 1;
+
+	return *myObjects[myLastObjectIndex];
+}
+
+MENU::MenuObject& MENU::ObjectManager::GetObjectFromID(size_t aID)
+{
+	return *myObjects[aID];
 }
 
 void MENU::ObjectManager::ClearAll()
 {
-    myObjects.clear();
-    myIdCounter = 0;
-    myLastObjectIndex = 0;
+	myObjects.clear();
+	myObjectIdCounter = 0;
+	myLastObjectIndex = 0;
 }

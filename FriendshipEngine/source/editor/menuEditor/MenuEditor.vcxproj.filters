@@ -28,6 +28,9 @@
     <ClInclude Include="gui\components\Collider2DComponent.h">
       <Filter>gui\components</Filter>
     </ClInclude>
+    <ClInclude Include="gui\components\ComponentTypeEnum.h">
+      <Filter>gui\components</Filter>
+    </ClInclude>
     <ClInclude Include="gui\components\MenuComponent.h">
       <Filter>gui\components</Filter>
     </ClInclude>

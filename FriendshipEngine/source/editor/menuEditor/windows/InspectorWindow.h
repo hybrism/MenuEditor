@@ -14,7 +14,7 @@ namespace MENU
 
 	private:
 		std::string myObjectName;
-		size_t mySelectedObjectIndex;
+		size_t mySelectedObjectID;
 		size_t mySelectedComponentIndex;
 		bool myIsNewObjectSelected;
 
@@ -24,7 +24,7 @@ namespace MENU
 	private:
 		void AddComponent(MenuObject& aObject);
 		void EditSpriteComponent(const UpdateContext& aContext, MenuObject& aObject);
-		void EditTextComponent(MenuObject& aObject);
+		void EditTextComponent(const UpdateContext& aContext, MenuObject& aObject);
 		void EditCollider2DComponent(MenuObject& aObject);
 	};
 }

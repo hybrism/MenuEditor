@@ -16,7 +16,7 @@ public:
 	std::vector<std::shared_ptr<MenuObject>> myObjects;
 
 private:
-	unsigned int myIdCounter;
+	unsigned int myObjectIdCounter;
 	size_t myLastObjectIndex;
 
 };

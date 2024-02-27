@@ -53,7 +53,10 @@ float Text::GetHeight()
 void Text::CenterTextOverPosition(const Vector2f& aPosition)
 {
 	float width = myTextService->GetSentenceWidth(*this);
+	float height = myTextService->GetSentenceHeight(*this);
+
 	myPosition.x = aPosition.x - (width * 0.5f);
+	myPosition.y = aPosition.y - (height * 0.25f);
 }
 
 void Text::SetColor(const Vector4f& aColor)

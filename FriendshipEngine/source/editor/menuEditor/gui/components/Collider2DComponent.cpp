@@ -3,7 +3,7 @@
 #include <engine/utility/Error.h>
 
 MENU::Collider2DComponent::Collider2DComponent(MenuObject& aParent)
-	: MenuComponent(aParent, eComponentType::Collider2D)
+	: MenuComponent(aParent, ComponentType::Collider2D)
 	, myMin({ 0.f,0.f })
 	, myMax({ 100.f,100.f })
 	, mySize({ 50.f,50.f })
@@ -15,13 +15,18 @@ MENU::Collider2DComponent::Collider2DComponent(MenuObject& aParent)
 
 void MENU::Collider2DComponent::Update()
 {
-	UpdateMinMax();
+	//UpdateMinMax();
 }
 
 void MENU::Collider2DComponent::Render()
 {
 	if (myShouldRenderColliders)
 		RenderColliders();
+}
+
+void MENU::Collider2DComponent::UpdatePosition()
+{
+	UpdateMinMax();
 }
 
 void MENU::Collider2DComponent::RenderColliders()
@@ -58,7 +63,7 @@ void MENU::Collider2DComponent::SetShouldRenderColliders(bool aShouldRender)
 void MENU::Collider2DComponent::SetPosition(const Vector2f& aPosition)
 {
 	myPosition = aPosition;
-	UpdateMinMax();
+
 }
 
 void MENU::Collider2DComponent::SetSize(const Vector2f& aSize)

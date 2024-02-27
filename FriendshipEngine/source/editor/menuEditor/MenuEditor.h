@@ -44,8 +44,8 @@ namespace MENU
 		MenuHandler myMenuHandler;
 		Assets myAssets;
 
-		size_t mySelectedEntityIndex;
-		size_t myGizmoIndex;
+		size_t mySelectedEntityID;
+		size_t myGizmoID;
 
 		Vector2f myRenderSize;
 		Vector2f myRenderCenter;

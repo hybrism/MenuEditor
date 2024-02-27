@@ -2,10 +2,12 @@
 #include <imgui/imgui.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
 
+#include <engine/text/text.h>
+#include <engine/utility/StringHelper.h>
+
 #include "../gui/MenuObject.h"
 #include "../gui/MenuHandler.h"
 #include "../gui/ObjectManager.h"
-
 #include "../gui/components/SpriteComponent.h"
 #include "../gui/components/TextComponent.h"
 #include "../gui/components/Collider2DComponent.h"
@@ -15,8 +17,8 @@
 MENU::InspectorWindow::InspectorWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
 	: WindowBase(aHandle, aOpen, aFlags)
 {
-	mySelectedObjectIndex = UINT_MAX;
-	mySelectedComponentIndex = (size_t)eComponentType::Count;
+	mySelectedObjectID = UINT_MAX;
+	mySelectedComponentIndex = (size_t)ComponentType::Count;
 	myIsNewObjectSelected = false;
 
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::PushEntityToInspector);
@@ -31,20 +33,20 @@ void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 	if (myIsNewObjectSelected)
 	{
 		//Get values from object
-		myObjectName = aContext.menuHandler->myObjectManager.myObjects[mySelectedObjectIndex]->GetName();
+		myObjectName = aContext.menuHandler->GetObjectFromID(mySelectedObjectID).GetName();
 
 		myIsNewObjectSelected = false;
 	}
 
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
-		if (mySelectedObjectIndex == UINT_MAX) //Early out
+		if (mySelectedObjectID == UINT_MAX) //Early out
 		{
 			ImGui::End();
 			return;
 		}
 
-		MenuObject& selectedObject = *aContext.menuHandler->myObjectManager.myObjects[mySelectedObjectIndex];
+		MenuObject& selectedObject = aContext.menuHandler->GetObjectFromID(mySelectedObjectID);
 		ImGui::PushID(selectedObject.GetID());
 
 		{
@@ -62,7 +64,7 @@ void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 			EditSpriteComponent(aContext, selectedObject);
 
 		if (selectedObject.HasComponent<TextComponent>())
-			EditTextComponent(selectedObject);
+			EditTextComponent(aContext, selectedObject);
 
 		if (selectedObject.HasComponent<Collider2DComponent>())
 			EditCollider2DComponent(selectedObject);
@@ -85,13 +87,13 @@ void MENU::InspectorWindow::RecieveMessage(const FE::Message& aMessage)
 	{
 	case FE::eMessageType::PushEntityToInspector:
 	{
-		mySelectedObjectIndex = std::any_cast<size_t>(aMessage.myMessage);
+		mySelectedObjectID = std::any_cast<size_t>(aMessage.myMessage);
 		myIsNewObjectSelected = true;
 		break;
 	}
 	case FE::eMessageType::NewMenuLoaded:
 	{
-		mySelectedObjectIndex = UINT_MAX;
+		mySelectedObjectID = UINT_MAX;
 		break;
 	}
 	default:
@@ -131,11 +133,11 @@ void MENU::InspectorWindow::AddComponent(MenuObject& aObject)
 
 		if (ImGui::Button("Add", ImVec2(120, 0)))
 		{
-			if ((eComponentType)mySelectedComponentIndex == eComponentType::Count)
+			if ((ComponentType)mySelectedComponentIndex == ComponentType::Count)
 				ImGui::CloseCurrentPopup();
 
-			aObject.AddComponentOfType((eComponentType)mySelectedComponentIndex);
-			mySelectedComponentIndex = (size_t)eComponentType::Count;
+			aObject.AddComponentOfType((ComponentType)mySelectedComponentIndex);
+			mySelectedComponentIndex = (size_t)ComponentType::Count;
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::SameLine();
@@ -152,78 +154,136 @@ void MENU::InspectorWindow::AddComponent(MenuObject& aObject)
 
 void MENU::InspectorWindow::EditSpriteComponent(const UpdateContext& aContext, MenuObject& aObject)
 {
-	SpriteComponent& sprite = aObject.GetComponent<SpriteComponent>();
-	Vector2f position = sprite.GetPosition();
+	auto sprites = aObject.GetComponents<SpriteComponent>();
 
 	ImGui::PushID("Sprite");
-	ImGui::SeparatorText("Sprite");
-
-	Vector2f texSize = sprite.GetTextureSize();
-	ImGui::Text("Texture size x: %i y: %i", (int)texSize.x, (int)texSize.y);
-	Texture* currentItem = sprite.GetTexture();
-
-	if (ImGui::BeginCombo("Select Texture", sprite.GetTexturePath().c_str()))
+	for (int componentIndex = 0; componentIndex < sprites.size(); componentIndex++)
 	{
-		for (size_t i = 0; i < aContext.assets.textures.size(); i++)
+		SpriteComponent& sprite = static_cast<SpriteComponent&>(*sprites[componentIndex]);
+
+		Vector2f position = sprite.GetPosition();
+		ImGui::PushID(componentIndex);
+		ImGui::SeparatorText("Sprite");
+
+		Vector2f texSize = sprite.GetTextureSize();
+		ImGui::Text("Texture size x: %i y: %i", (int)texSize.x, (int)texSize.y);
+		Texture* currentItem = sprite.GetTexture();
+		if (ImGui::BeginCombo("Select Texture", sprite.GetTexturePath().c_str()))
 		{
-			bool isSelected = (currentItem == aContext.assets.textures[i]);
+			for (size_t i = 0; i < aContext.assets.textures.size(); i++)
+			{
+				bool isSelected = (currentItem == aContext.assets.textures[i]);
 
-			if (ImGui::Selectable(aContext.assets.textureIdToName[i].c_str(), isSelected))
-				sprite.SetTexture(aContext.assets.textures[i], aContext.assets.textureIdToName[i]);
+				if (ImGui::Selectable(aContext.assets.textureIdToName[i].c_str(), isSelected))
+					sprite.SetTexture(aContext.assets.textures[i], aContext.assets.textureIdToName[i]);
 
-			if (isSelected)
-				ImGui::SetItemDefaultFocus();
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
 		}
 
-		ImGui::EndCombo();
+		ImGui::Spacing();
+
+		if (ImGui::DragFloat2("Position", &position.x))
+			sprite.SetPosition(position);
+
+		ImGui::DragFloat2("Size", &sprite.GetSize().x, 0.01f);
+		ImGui::DragFloat2("Pivot", &sprite.GetPivot().x, 0.001f, 0.f, 1.f);
+		ImGui::DragFloat2("ScaleMultiplier", &sprite.GetScaleMultiplier().x, 0.01f);
+		ImGui::ColorEdit4("Color", &sprite.GetColor().x);
+
+		//ImGui::DragFloat("Rotation", &sprite.GetRotation(), 0.01f);
+		ClipValue& clip = sprite.GetClipValue();
+		ImGui::SetNextItemWidth(50.f);
+		ImGui::DragFloat("Left", &clip.left, 0.01f, 0.f, 1.f);
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(50.f);
+		ImGui::DragFloat("Right", &clip.right, 0.01f, 0.f, 1.f);
+		ImGui::SetNextItemWidth(50.f);
+		ImGui::DragFloat("Upper", &clip.upper, 0.01f, 0.f, 1.f);
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(50.f);
+		ImGui::DragFloat("Down", &clip.down, 0.01f, 0.f, 1.f);
+		ImGui::Checkbox("Is Hidden", &sprite.GetIsHidden());
+
+		ImGui::PopID();
 	}
-
-	ImGui::Spacing();
-
-	if (ImGui::DragFloat2("Position", &position.x))
-		sprite.SetPosition(position);
-
-	ImGui::DragFloat2("Size", &sprite.GetSize().x, 0.01f);
-	ImGui::DragFloat2("Pivot", &sprite.GetPivot().x, 0.001f, 0.f, 1.f);
-	ImGui::DragFloat2("ScaleMultiplier", &sprite.GetScaleMultiplier().x, 0.01f);
-	ImGui::ColorEdit4("Color", &sprite.GetColor().x);
-
-	//ImGui::DragFloat("Rotation", &sprite.GetRotation(), 0.01f);
-	ClipValue& clip = sprite.GetClipValue();
-	ImGui::SetNextItemWidth(50.f);
-	ImGui::DragFloat("Left", &clip.left, 0.01f, 0.f, 1.f);
-	ImGui::SameLine();
-	ImGui::SetNextItemWidth(50.f);
-	ImGui::DragFloat("Right", &clip.right, 0.01f, 0.f, 1.f);
-	ImGui::SetNextItemWidth(50.f);
-	ImGui::DragFloat("Upper", &clip.upper, 0.01f, 0.f, 1.f);
-	ImGui::SameLine();
-	ImGui::SetNextItemWidth(50.f);
-	ImGui::DragFloat("Down", &clip.down, 0.01f, 0.f, 1.f);
-	ImGui::Checkbox("Is Hidden", &sprite.GetIsHidden());
 
 	ImGui::PopID();
 }
 
-void MENU::InspectorWindow::EditTextComponent(MenuObject& aObject)
+void MENU::InspectorWindow::EditTextComponent(const UpdateContext& aContext, MenuObject& aObject)
 {
-	TextComponent& text = aObject.GetComponent<TextComponent>();
+	auto texts = aObject.GetComponents<TextComponent>();
 
 	ImGui::PushID("Text");
-	ImGui::SeparatorText("Text");
+	for (int componentIndex = 0; componentIndex < texts.size(); componentIndex++)
+	{
+		TextComponent& text = static_cast<TextComponent&>(*texts[componentIndex]);
 
-	std::string string = text.GetText();
-	Vector2f position = text.GetPosition();
-	Vector4f color = text.GetColor();
+		ImGui::PushID(componentIndex);
+		ImGui::SeparatorText("Text");
 
-	if (ImGui::InputText("Text", &string))
-		text.SetText(string);
+		std::string string = text.GetText();
+		Vector2f position = text.GetPosition();
+		Vector4f color = text.GetColor();
 
-	if (ImGui::DragFloat2("Position", &position.x))
-		text.SetPosition(position);
+		if (ImGui::InputText("Text", &string))
+			text.SetText(string);
 
-	if (ImGui::ColorEdit4("Color", &color.x))
-		text.SetColor(color);
+		std::string currentFont = text.GetFontName();
+		if (ImGui::BeginCombo("Select Font", text.GetFontName().c_str()))
+		{
+			for (size_t i = 0; i < aContext.assets.fontFiles.size(); i++)
+			{
+				bool isSelected = (currentFont == aContext.assets.fontFiles[i]);
+
+				if (ImGui::Selectable(aContext.assets.fontFiles[i].c_str(), isSelected))
+				{
+					text.SetFont(aContext.assets.fontFiles[i]);
+				}
+
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+
+		const char* sizeDisplayNames[] = { "Small", "Medium", "Large" };
+		const char* comboPreviewValue = sizeDisplayNames[(int)text.GetFontSize()];  // Pass in the preview value visible before opening the combo (it could be anything)
+
+		if (ImGui::BeginCombo("Select Font Size", comboPreviewValue))
+		{
+			for (int i = 0; i < IM_ARRAYSIZE(sizeDisplayNames); i++)
+			{
+				const bool isSelected = ((int)text.GetFontSize() == i);
+				if (ImGui::Selectable(sizeDisplayNames[i], isSelected))
+				{
+					text.SetFontSize((eSize)i);
+				}
+
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+
+		if (ImGui::DragFloat2("Position", &position.x))
+			text.SetPosition(position);
+
+		bool isCentered = text.GetIsCentered();
+		if (ImGui::Checkbox("Center text over Position", &isCentered))
+			text.SetIsCentered(isCentered);
+
+		if (ImGui::ColorEdit4("Color", &color.x))
+			text.SetColor(color);
+
+		ImGui::PopID();
+	}
 
 	ImGui::PopID();
 }

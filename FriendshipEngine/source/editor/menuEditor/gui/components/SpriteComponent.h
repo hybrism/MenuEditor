@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <array>
 
 #include "MenuComponent.h"
 #include <engine/graphics/sprite/Sprite.h>
@@ -11,6 +12,20 @@ namespace MENU
 	class MenuObject;
 	class SpriteComponent : public MenuComponent
 	{
+		enum class TextureState
+		{
+			Default,
+			Hovered,
+			Pressed,
+			Count
+		};
+
+		struct TextureData
+		{
+			SpriteSharedData shared;
+			std::string fileName;
+		};
+
 	public:
 		SpriteComponent(MenuObject& aParent);
 
@@ -27,9 +42,9 @@ namespace MENU
 		float& GetRotation() { return myInstance.rotation; }
 		bool& GetIsHidden() { return myInstance.isHidden; }
 
-		Texture* GetTexture() const;
-		Vector2f GetTextureSize() const;
-		std::string GetTexturePath();
+		Texture* GetTexture(TextureState aType = TextureState::Default) const;
+		Vector2f GetTextureSize(TextureState aType = TextureState::Default) const;
+		std::string GetTexturePath(TextureState aType = TextureState::Default);
 
 		void SetPosition(const Vector2f& aPosition);
 		void SetPivot(const Vector2f& aPivot);
@@ -39,12 +54,17 @@ namespace MENU
 		void SetClipValue(const ClipValue& aClipValue);
 		void SetRotation(float aRotation);
 		void SetIsHidden(bool aIsHidden);
-		void SetTexture(Texture* aTexture, const std::string& aTextureName);
+		void SetTexture(Texture* aTexture, const std::string& aTextureName, TextureState aType = TextureState::Default);
 
 	private:
 		SpriteInstanceData myInstance;
 		SpriteSharedData mySharedData;
+
+		std::array<TextureData, (int)TextureState::Count> myTextures;
+
 		std::string myTextureFile;
+
+		TextureState myState;
 	};
 
 }

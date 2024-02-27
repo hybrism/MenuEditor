@@ -112,6 +112,7 @@
     <ClInclude Include="gui\MenuObject.h" />
     <ClInclude Include="gui\ObjectManager.h" />
     <ClInclude Include="gui\components\Collider2DComponent.h" />
+    <ClInclude Include="gui\components\ComponentTypeEnum.h" />
     <ClInclude Include="gui\components\MenuComponent.h" />
     <ClInclude Include="gui\components\SpriteComponent.h" />
     <ClInclude Include="gui\components\TextComponent.h" />

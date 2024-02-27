@@ -14,7 +14,7 @@ MENU::MenuObjectHierarchy::MenuObjectHierarchy(const std::string& aHandle, bool 
 	: WindowBase(aHandle, aOpen, aFlags)
 {
 	mySelectedIndex = INT_MAX;
-	Vector2i center = GraphicsEngine::GetInstance()->GetViewportDimensions();
+	Vector2i center = GraphicsEngine::GetInstance()->GetViewportDimensions() / 2;
 	myViewportCenter = { (float)center.x, (float)center.y };
 }
 
@@ -27,14 +27,14 @@ void MENU::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 	{
 		if (ImGui::Button("Add Empty Object"))
 		{
-			aContext.menuHandler->myObjectManager.CreateNew(myViewportCenter);
+			aContext.menuHandler->CreateNewObject(myViewportCenter);
 		}
 
 		if (ImGui::BeginChild("MenuObjects", ImGui::GetContentRegionAvail(), true))
 		{
-			for (size_t i = 0; i < aContext.menuHandler->myObjectManager.myObjects.size(); i++)
+			for (size_t i = 0; i < aContext.menuHandler->GetObjectsSize(); i++)
 			{
-				MenuObject& object = *aContext.menuHandler->myObjectManager.myObjects[i];
+				MenuObject& object = aContext.menuHandler->GetObjectFromID(i);
 
 				std::string displayName = std::to_string(i) + " " + object.GetName();
 				if (ImGui::Selectable(displayName.c_str(), i == mySelectedIndex))

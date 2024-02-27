@@ -19,6 +19,7 @@
 #include <engine/graphics/Texture.h>
 #include <engine/graphics/GraphicsEngine.h>
 
+
 //Internal
 #include <shared/postMaster/PostMaster.h>
 #include "UpdateContext.h"
@@ -33,13 +34,13 @@
 #include "gui/MenuObject.h"
 #include "gui/components/SpriteComponent.h"
 #include "gui/components/Collider2DComponent.h"
+#include "gui/components/TextComponent.h"
 
 MENU::MenuEditor::MenuEditor()
 	: myFirstFrameSetup(true)
-	, mySelectedEntityIndex(UINT_MAX)
-	, myGizmoIndex(UINT_MAX)
+	, mySelectedEntityID(UINT_MAX)
+	, myGizmoID(UINT_MAX)
 {
-
 	for (size_t i = 0; i < (int)ePopup::Count; i++)
 	{
 		myPopups[i] = false;
@@ -111,7 +112,7 @@ void MENU::MenuEditor::Init()
 	{
 		MenuObject& mo = myEditorObjectManager.CreateNew();
 		mo.SetPosition(myRenderCenter);
-		myGizmoIndex = mo.GetID();
+		myGizmoID = mo.GetID();
 
 		SpriteComponent& sprite = mo.AddComponent<SpriteComponent>();
 		int textureID = myAssets.textureNameToId["s_gizmo.dds"];
@@ -151,12 +152,14 @@ void MENU::MenuEditor::Update(float)
 	myMenuHandler.Update();
 	myEditorObjectManager.Update();
 
-	if (mySelectedEntityIndex != UINT_MAX)
+	if (mySelectedEntityID != UINT_MAX)
 	{
-		myEditorObjectManager.myObjects[myGizmoIndex]->SetPosition(myMenuHandler.myObjectManager.myObjects[mySelectedEntityIndex]->GetPosition());
+		MenuObject& gizmo = myEditorObjectManager.GetObjectFromID(myGizmoID);
 
-		Collider2DComponent& collider = myEditorObjectManager.myObjects[myGizmoIndex]->GetComponent<Collider2DComponent>();
-		SpriteComponent& sprite = myEditorObjectManager.myObjects[myGizmoIndex]->GetComponent<SpriteComponent>();
+		gizmo.SetPosition(myMenuHandler.myObjectManager.myObjects[mySelectedEntityID]->GetPosition());
+
+		Collider2DComponent& collider = gizmo.GetComponent<Collider2DComponent>();
+		SpriteComponent& sprite = gizmo.GetComponent<SpriteComponent>();
 
 		if (collider.IsHovered())
 			sprite.SetColor({ 1.f, 1.f, 1.f, 1.f });
@@ -173,8 +176,8 @@ void MENU::MenuEditor::Render()
 
 	myMenuHandler.Render();
 
-	if (mySelectedEntityIndex != UINT_MAX)
-		myEditorObjectManager.myObjects[myGizmoIndex]->Render();
+	if (mySelectedEntityID != UINT_MAX)
+		myEditorObjectManager.myObjects[myGizmoID]->Render();
 
 	debug.Render();
 }
@@ -274,7 +277,7 @@ void MENU::MenuEditor::MenuBar()
 					if (ImGui::MenuItem(myAssets.saveFiles[i].c_str()))
 					{
 						myMenuHandler.LoadFromJson(myAssets.saveFiles[i], &myTextureFactory);
-						mySelectedEntityIndex = UINT_MAX;
+						mySelectedEntityID = UINT_MAX;
 						FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::NewMenuLoaded, myAssets.saveFiles[i] });
 					}
 				}
@@ -352,8 +355,8 @@ void MENU::MenuEditor::Popups()
 			dataFile.close();
 
 			myMenuHandler.Init(newMenuName, &myTextureFactory);
-
 		}
+
 		ImGui::SameLine();
 		if (ImGui::Button("Cancel", ImVec2(120, 0)))
 		{
@@ -377,7 +380,7 @@ void MENU::MenuEditor::RecieveMessage(const FE::Message& aMessage)
 	}
 	case FE::eMessageType::PushEntityToInspector:
 	{
-		mySelectedEntityIndex = std::any_cast<size_t>(aMessage.myMessage);
+		mySelectedEntityID = std::any_cast<size_t>(aMessage.myMessage);
 		break;
 	}
 	default:

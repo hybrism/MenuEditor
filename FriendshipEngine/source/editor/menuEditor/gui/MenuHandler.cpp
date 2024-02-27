@@ -35,6 +35,21 @@ void MENU::MenuHandler::Render()
 	myObjectManager.Render();
 }
 
+MENU::MenuObject& MENU::MenuHandler::GetObjectFromID(size_t aID)
+{
+	return myObjectManager.GetObjectFromID(aID);
+}
+
+void MENU::MenuHandler::CreateNewObject(const Vector2f& aPosition)
+{
+	myObjectManager.CreateNew(aPosition);
+}
+
+size_t MENU::MenuHandler::GetObjectsSize()
+{
+	return myObjectManager.myObjects.size();
+}
+
 void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory)
 {
 	myObjectManager.ClearAll();
@@ -93,9 +108,11 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactor
 	{
 		size_t ownerID = textComponents[i]["ownerID"];
 		TextComponent& text = myObjectManager.myObjects[ownerID]->AddComponent<TextComponent>();
-
+		text.SetFont(textComponents[i]["font"]);
+		text.SetFontSize((eSize)textComponents[i]["fontSize"]);
 		text.SetText(textComponents[i]["textString"]);
 		text.SetPosition(JsonToVec2(textComponents[i]["position"]));
+		text.SetIsCentered(textComponents[i]["isCentered"]);
 
 	}
 
@@ -158,22 +175,26 @@ void MENU::MenuHandler::SaveToJson()
 	{
 		if (myObjectManager.myObjects[i]->HasComponent<SpriteComponent>())
 		{
-			SpriteComponent sprite = myObjectManager.myObjects[i]->GetComponent<SpriteComponent>();
-			nlohmann::json spriteEntry;
-			spriteEntry["ownerID"] = i;
-			spriteEntry["texture"] = sprite.GetTexturePath();
-			spriteEntry["position"] = Vec2ToJson(sprite.GetPosition());
-			spriteEntry["size"] = Vec2ToJson(sprite.GetSize());
-			spriteEntry["pivot"] = Vec2ToJson(sprite.GetPivot());
-			spriteEntry["scaleMultiplier"] = Vec2ToJson(sprite.GetScaleMultiplier());
-			spriteEntry["color"] = ColorVecToJson(sprite.GetColor());
-			spriteEntry["clip"]["left"] = sprite.GetClipValue().left;
-			spriteEntry["clip"]["right"] = sprite.GetClipValue().right;
-			spriteEntry["clip"]["down"] = sprite.GetClipValue().down;
-			spriteEntry["clip"]["upper"] = sprite.GetClipValue().upper;
-			spriteEntry["rotation"] = sprite.GetRotation();
-			spriteEntry["isHidden"] = sprite.GetIsHidden();
-			spriteComponents.push_back(spriteEntry);
+			auto sprites = myObjectManager.myObjects[i]->GetComponents<SpriteComponent>();
+			for (int componentIndex = 0; componentIndex < sprites.size(); componentIndex++)
+			{
+				SpriteComponent& sprite = static_cast<SpriteComponent&>(*sprites[componentIndex]);
+				nlohmann::json spriteEntry;
+				spriteEntry["ownerID"] = i;
+				spriteEntry["texture"] = sprite.GetTexturePath();
+				spriteEntry["position"] = Vec2ToJson(sprite.GetPosition());
+				spriteEntry["size"] = Vec2ToJson(sprite.GetSize());
+				spriteEntry["pivot"] = Vec2ToJson(sprite.GetPivot());
+				spriteEntry["scaleMultiplier"] = Vec2ToJson(sprite.GetScaleMultiplier());
+				spriteEntry["color"] = ColorVecToJson(sprite.GetColor());
+				spriteEntry["clip"]["left"] = sprite.GetClipValue().left;
+				spriteEntry["clip"]["right"] = sprite.GetClipValue().right;
+				spriteEntry["clip"]["down"] = sprite.GetClipValue().down;
+				spriteEntry["clip"]["upper"] = sprite.GetClipValue().upper;
+				spriteEntry["rotation"] = sprite.GetRotation();
+				spriteEntry["isHidden"] = sprite.GetIsHidden();
+				spriteComponents.push_back(spriteEntry);
+			}
 		}
 
 		if (myObjectManager.myObjects[i]->HasComponent<TextComponent>())
@@ -183,6 +204,9 @@ void MENU::MenuHandler::SaveToJson()
 			textEntry["ownerID"] = i;
 			textEntry["textString"] = text.GetText();
 			textEntry["position"] = Vec2ToJson(text.GetPosition());
+			textEntry["font"] = text.GetFontName();
+			textEntry["fontSize"] = (int)text.GetFontSize();
+			textEntry["isCentered"] = text.GetIsCentered();
 			textComponents.push_back(textEntry);
 		}
 

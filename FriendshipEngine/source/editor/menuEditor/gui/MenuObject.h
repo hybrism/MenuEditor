@@ -4,19 +4,14 @@
 #include <memory>
 #include <cassert>
 #include <engine/math/Vector.h>
-#include "../MenuCommon.h"
+#include "components/ComponentTypeEnum.h"
 
 namespace MENU
 {
 	class MenuComponent;
-
-	enum class eComponentType
-	{
-		Sprite,
-		Collider2D,
-		Text,
-		Count
-	};
+	class SpriteComponent;
+	class TextComponent;
+	class Collider2DComponent;
 
 	class MenuObject
 	{
@@ -32,7 +27,10 @@ namespace MENU
 		template<class T>
 		T& GetComponent();
 
-		void AddComponentOfType(eComponentType aType);
+		template<class T>
+		std::vector<std::shared_ptr<MenuComponent>> GetComponents();
+
+		void AddComponentOfType(ComponentType aType);
 
 		template<class T>
 		bool HasComponent();
@@ -41,9 +39,10 @@ namespace MENU
 		virtual void Update();
 		virtual void Render();
 
-		//TODO: When setposition on ParentObject->UpdateChildComponents
+		bool IsHovered();
+
 		void SetName(const std::string& aName) { myName = aName; }
-		void SetPosition(const Vector2f& aPosition) { myPosition = aPosition; }
+		void SetPosition(const Vector2f& aPosition);
 
 		const unsigned int GetID() const { return myID; }
 		std::string GetName() const { return myName; }
@@ -52,8 +51,7 @@ namespace MENU
 	private:
 		MenuObject() = delete;
 
-		//TODO: Store components as a map with vectors, so we can have more of the same
-		std::vector<std::shared_ptr<MenuComponent>> myComponents;
+		std::vector<std::vector<std::shared_ptr<MenuComponent>>> myComponents;
 
 		const unsigned int myID;
 		std::string myName;
@@ -65,32 +63,77 @@ template<class T>
 inline T& MENU::MenuObject::AddComponent()
 {
 	std::shared_ptr<T> component = std::make_shared<T>(*this);
-	myComponents.emplace_back(component);
-	return *component;
-}
 
-template<class T>
-inline T& MENU::MenuObject::GetComponent()
-{
-	for (size_t i = 0; i < myComponents.size(); i++)
+	for (size_t type = 0; type < myComponents.size(); type++)
 	{
-		if (typeid(*myComponents[i]) == typeid(T))
+		assert(!myComponents[type].empty() && "This should never happen");
+
+		if (typeid(T) == typeid(*myComponents[type].front()))
 		{
-			return static_cast<T&>(*myComponents[i]);
+			myComponents[type].emplace_back(component);
+			return *component;
 		}
 	}
 
-	//TODO: Fix this
-	T& fail = static_cast<T&>(*myComponents[0]);
-	return fail;
+	std::vector<std::shared_ptr<MenuComponent>> newVec;
+	newVec.emplace_back(component);
+	myComponents.push_back(newVec);
+
+	return *component;
+}
+
+/// <summary>
+/// Gets reference to first component of type
+/// </summary>
+template<class T>
+inline T& MENU::MenuObject::GetComponent()
+{
+	std::shared_ptr<MenuComponent> result = nullptr;
+
+	for (size_t type = 0; type < myComponents.size(); type++)
+	{
+		assert(!myComponents[type].empty() && "This should never happen");
+
+		if (typeid(*myComponents[type].front()) == typeid(T))
+		{
+			result = myComponents[type].front();
+		}
+	}
+
+	assert(result != nullptr && "Trying to get component that does not exist!");
+
+	return static_cast<T&>(*result);
+}
+
+/// <summary>
+/// Gets vector of pointers to all components of type
+/// </summary>
+template<class T>
+inline std::vector<std::shared_ptr<MENU::MenuComponent>> MENU::MenuObject::GetComponents()
+{
+	for (size_t type = 0; type < myComponents.size(); type++)
+	{
+		assert(!myComponents[type].empty() && "This should never happen");
+
+		if (typeid(*myComponents[type].front()) == typeid(T))
+		{
+			return myComponents[type];
+		}
+	}
+
+	assert("Trying to get components that does not exist!");
+
+	return std::vector<std::shared_ptr<MenuComponent>>();
 }
 
 template<class T>
 inline bool MENU::MenuObject::HasComponent()
 {
-	for (size_t i = 0; i < myComponents.size(); i++)
+	for (size_t type = 0; type < myComponents.size(); type++)
 	{
-		if (typeid(*myComponents[i]) == typeid(T))
+		assert(!myComponents[type].empty() && "This should never happen");
+
+		if (typeid(*myComponents[type].front()) == typeid(T))
 			return true;
 	}
 

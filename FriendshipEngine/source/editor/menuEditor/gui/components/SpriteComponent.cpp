@@ -3,42 +3,49 @@
 #include <engine/graphics/sprite/SpriteDrawer.h>
 
 MENU::SpriteComponent::SpriteComponent(MenuObject& aParent)
-	: MenuComponent(aParent, eComponentType::Sprite)
-{}
+	: MenuComponent(aParent, ComponentType::Sprite)
+{
+	myState = TextureState::Default;
+}
 
 void MENU::SpriteComponent::Update()
 {
 	myInstance.position = myParent.GetPosition() + myPosition;
+
+	myState = TextureState::Default;
+
+	if (myParent.IsHovered())
+		myState = TextureState::Hovered;
 }
 
 void MENU::SpriteComponent::Render()
 {
-	if (!mySharedData.texture)
+	if (!myTextures[(int)myState].shared.texture)
 		return;
 
 	//TODO: Don't do this for all components
-	GraphicsEngine::GetInstance()->GetSpriteDrawer().Draw(mySharedData, myInstance);
+	GraphicsEngine::GetInstance()->GetSpriteDrawer().Draw(myTextures[(int)myState].shared, myInstance);
 }
 
-Texture* MENU::SpriteComponent::GetTexture() const
+Texture* MENU::SpriteComponent::GetTexture(TextureState aType) const
 {
-	return mySharedData.texture;
+	return myTextures[(int)aType].shared.texture;
 }
 
-Vector2f MENU::SpriteComponent::GetTextureSize() const
+Vector2f MENU::SpriteComponent::GetTextureSize(TextureState aType) const
 {
-	if (mySharedData.texture == nullptr)
+	if (myTextures[(int)aType].shared.texture == nullptr)
 		return Vector2f(0, 0);
 
-	return mySharedData.texture->GetTextureSize();
+	return myTextures[(int)aType].shared.texture->GetTextureSize();
 }
 
-std::string MENU::SpriteComponent::GetTexturePath()
+std::string MENU::SpriteComponent::GetTexturePath(TextureState aType)
 {
-	if (mySharedData.texture == nullptr)
-		return "";
+	if (myTextures[(int)aType].shared.texture == nullptr)
+		return "(None)";
 
-	return myTextureFile;
+	return myTextures[(int)aType].fileName;
 }
 
 void MENU::SpriteComponent::SetPosition(const Vector2f& aPosition)
@@ -81,9 +88,9 @@ void MENU::SpriteComponent::SetIsHidden(bool aIsHidden)
 	myInstance.isHidden = aIsHidden;
 }
 
-void MENU::SpriteComponent::SetTexture(Texture* aTexture, const std::string& aTextureName)
+void MENU::SpriteComponent::SetTexture(Texture* aTexture, const std::string& aTextureName, TextureState aType)
 {
-	myTextureFile = aTextureName;
-	mySharedData.texture = aTexture;
-	myInstance.size = mySharedData.texture->GetTextureSize();
+	myTextures[(int)aType].fileName = aTextureName;
+	myTextures[(int)aType].shared.texture = aTexture;
+	myInstance.size = myTextures[(int)aType].shared.texture->GetTextureSize();
 }

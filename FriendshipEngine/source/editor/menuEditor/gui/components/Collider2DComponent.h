@@ -10,8 +10,10 @@ namespace MENU
 	public:
 		Collider2DComponent(MenuObject& aParent);
 
-		virtual void Update() override;
-		virtual void Render() override;
+		void Update() override;
+		void Render() override;
+
+		void UpdatePosition();
 
 		bool CheckCollision(const Vector2f& aPosition);
 		bool IsHovered() { return myIsHovered; }

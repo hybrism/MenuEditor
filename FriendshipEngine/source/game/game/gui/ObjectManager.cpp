@@ -5,7 +5,7 @@
 
 ObjectManager::ObjectManager()
 {
-    myIdCounter = 0;
+    myObjectIdCounter = 0;
     myLastObjectIndex = 0;
 }
 
@@ -28,9 +28,9 @@ void ObjectManager::Render()
 
 MenuObject& ObjectManager::CreateNew()
 {
-    myObjects.push_back(std::make_shared<MenuObject>(myIdCounter));
+    myObjects.push_back(std::make_shared<MenuObject>(myObjectIdCounter));
     
-    myIdCounter++;
+    myObjectIdCounter++;
     myLastObjectIndex = myObjects.size() - 1;
 
     return *myObjects[myLastObjectIndex];
@@ -39,6 +39,6 @@ MenuObject& ObjectManager::CreateNew()
 void ObjectManager::ClearAll()
 {
     myObjects.clear();
-    myIdCounter = 0;
+    myObjectIdCounter = 0;
     myLastObjectIndex = 0;
 }

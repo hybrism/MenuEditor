@@ -18,6 +18,8 @@ namespace MENU
 
 	class MenuHandler
 	{
+		friend class MenuEditor;
+
 	public:
 		MenuHandler();
 		~MenuHandler();
@@ -25,9 +27,11 @@ namespace MENU
 		void Init(const std::string& aMenuFile, TextureFactory* aTextureFactory);
 		void Update();
 		void Render();
+		
+		size_t GetObjectsSize();
+		MenuObject& GetObjectFromID(size_t aID);
 
-		//TODO: Add getters for object ID etc...
-		ObjectManager myObjectManager;
+		void CreateNewObject(const Vector2f& aPosition = {0.f, 0.f});
 
 		//TODO: Move these to a "MenuLoader"
 		void LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory);
@@ -40,6 +44,8 @@ namespace MENU
 		nlohmann::json Vec2ToJson(const Vector2f& aVec);
 
 	private:
+		ObjectManager myObjectManager;
+
 		//TODO: Change types of these (Takes alot of memory)
 		std::string myName;
 		std::string myFileName;
