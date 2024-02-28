@@ -22,8 +22,8 @@ public:
 	Vector2f& GetPosition();
 	Vector2f& GetSize();
 	Vector2f& GetPivot();
-	Vector2f& GetScaleMultiplier();
 	Vector4f& GetColor();
+	Vector2f& GetScaleMultiplier();
 	ClipValue& GetClipValue();
 	float& GetRotation();
 	bool& GetIsHidden();

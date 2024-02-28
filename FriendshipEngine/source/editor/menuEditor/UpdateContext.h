@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "MenuCommon.h"
+#include "MenuEditorCommon.h"
 
 class Texture;
 

@@ -6,10 +6,10 @@
 #include <nlohmann/json.hpp>
 #include <assets/TextureFactory.h>
 
+#include <engine/Paths.h>
 #include <shared/postMaster/PostMaster.h>
-
 #include "MenuObject.h"
-#include "../MenuCommon.h"
+#include "../MenuEditorCommon.h"
 #include "components/SpriteComponent.h"
 #include "components/TextComponent.h"
 #include "components/Collider2DComponent.h"
@@ -35,19 +35,39 @@ void MENU::MenuHandler::Render()
 	myObjectManager.Render();
 }
 
-MENU::MenuObject& MENU::MenuHandler::GetObjectFromID(size_t aID)
+MENU::MenuObject& MENU::MenuHandler::GetObjectFromID(unsigned int aID)
 {
 	return myObjectManager.GetObjectFromID(aID);
 }
 
-void MENU::MenuHandler::CreateNewObject(const Vector2f& aPosition)
+MENU::MenuObject& MENU::MenuHandler::GetObjectFromIndex(unsigned int aIndex)
 {
-	myObjectManager.CreateNew(aPosition);
+	return *myObjectManager.myObjects[aIndex];
+}
+
+MENU::MenuObject& MENU::MenuHandler::CreateNewObject(const Vector2f& aPosition)
+{
+	return myObjectManager.CreateNew(aPosition);
 }
 
 size_t MENU::MenuHandler::GetObjectsSize()
 {
 	return myObjectManager.myObjects.size();
+}
+
+void MENU::MenuHandler::RemoveObjectAtID(unsigned int aID)
+{
+	myObjectManager.RemoveObjectAtID(aID);
+}
+
+void MENU::MenuHandler::MoveUpObjectAtID(unsigned int aID)
+{
+	myObjectManager.MoveUpObjectAtID(aID);
+}
+
+void MENU::MenuHandler::MoveDownObjectAtID(unsigned int aID)
+{
+	myObjectManager.MoveDownObjectAtID(aID);
 }
 
 void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory)
@@ -57,7 +77,8 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactor
 	myFileName = aMenuFile;
 	myName = aMenuFile.substr(0, aMenuFile.find_last_of('.'));
 
-	std::string path = MENU::RELATIVE_MENUEDITOR_ASSETS + MENU::MENU_PATH + myFileName;
+	std::string MENU_PATH = "menus/";
+	std::string path = RELATIVE_IMPORT_DATA_PATH + MENU_PATH + myFileName;
 	std::ifstream dataFile(path);
 	if (dataFile.fail())
 	{
@@ -82,15 +103,22 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactor
 		SpriteComponent& sprite = myObjectManager.myObjects[ownerID]->AddComponent<SpriteComponent>();
 
 		//TODO: AssetDatabase for sprites?
-		std::string spriteAssetPath = MENU::RELATIVE_MENUEDITOR_ASSETS + MENU::SPRITES;
-		std::string texturePath = spriteComponents[i]["texture"];
-		sprite.SetTexture(aTextureFactory->CreateTexture(spriteAssetPath + texturePath, false), texturePath);
+		nlohmann::json textures = spriteComponents[i]["textures"];
+		for (size_t textureStateIndex = 0; textureStateIndex < textures.size(); textureStateIndex++)
+		{
+			std::string texturePath = textures[textureStateIndex]["path"];
+
+			if (texturePath == "(None)")
+				continue;
+
+			sprite.SetTexture(aTextureFactory->CreateTexture(RELATIVE_SPRITE_ASSET_PATH + texturePath, false), texturePath, (TextureState)textureStateIndex);
+			sprite.SetColor(JsonToColorVec(textures[textureStateIndex]["color"]), (TextureState)textureStateIndex);
+		}
 
 		sprite.SetPosition(JsonToVec2(spriteComponents[i]["position"]));
 		sprite.SetSize(JsonToVec2(spriteComponents[i]["size"]));
 		sprite.SetPivot(JsonToVec2(spriteComponents[i]["pivot"]));
 		sprite.SetScaleMultiplier(JsonToVec2(spriteComponents[i]["scaleMultiplier"]));
-		sprite.SetColor(JsonToColorVec(spriteComponents[i]["color"]));
 
 		ClipValue clip;
 		clip.left = spriteComponents[i]["clip"]["left"];
@@ -181,12 +209,23 @@ void MENU::MenuHandler::SaveToJson()
 				SpriteComponent& sprite = static_cast<SpriteComponent&>(*sprites[componentIndex]);
 				nlohmann::json spriteEntry;
 				spriteEntry["ownerID"] = i;
-				spriteEntry["texture"] = sprite.GetTexturePath();
+
+				for (size_t textureStateIndex = 0; textureStateIndex < (int)TextureState::Count; textureStateIndex++)
+				{
+					nlohmann::json textureEntry;
+					textureEntry["path"] = sprite.GetTexturePath((TextureState)textureStateIndex);
+					textureEntry["color"] = ColorVecToJson(sprite.GetColor((TextureState)textureStateIndex));
+
+					spriteEntry["textures"].push_back(textureEntry);
+
+					//spriteEntry["textures"][textureStateIndex]["path"] = sprite.GetTexturePath((TextureState)textureStateIndex);
+					//spriteEntry["textures"][textureStateIndex]["color"] = ColorVecToJson(sprite.GetColor((TextureState)textureStateIndex));
+				}
+
 				spriteEntry["position"] = Vec2ToJson(sprite.GetPosition());
 				spriteEntry["size"] = Vec2ToJson(sprite.GetSize());
 				spriteEntry["pivot"] = Vec2ToJson(sprite.GetPivot());
 				spriteEntry["scaleMultiplier"] = Vec2ToJson(sprite.GetScaleMultiplier());
-				spriteEntry["color"] = ColorVecToJson(sprite.GetColor());
 				spriteEntry["clip"]["left"] = sprite.GetClipValue().left;
 				spriteEntry["clip"]["right"] = sprite.GetClipValue().right;
 				spriteEntry["clip"]["down"] = sprite.GetClipValue().down;
@@ -225,8 +264,8 @@ void MENU::MenuHandler::SaveToJson()
 	menuFile["textComponents"] = textComponents;
 	menuFile["colliderComponents"] = colliderComponents;
 
-
-	std::string path = MENU::RELATIVE_MENUEDITOR_ASSETS + MENU::MENU_PATH + myFileName;
+	std::string MENU_PATH = "menus/";
+	std::string path = RELATIVE_IMPORT_DATA_PATH + MENU_PATH + myFileName;
 	std::ofstream dataFile(path);
 	if (dataFile.fail())
 	{

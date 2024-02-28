@@ -9,6 +9,7 @@ namespace MENU
 	class ObjectManager
 	{
 		friend class MenuEditor;
+		friend class MenuHandler;
 
 	public:
 		ObjectManager();
@@ -19,15 +20,16 @@ namespace MENU
 		void CheckCollision(const Vector2f& aPosition);
 
 		MenuObject& CreateNew(const Vector2f& aPosition = { 0.f, 0.f });
+		MenuObject& GetObjectFromID(unsigned int aID);
 		
-		MenuObject& GetObjectFromID(size_t aID);
+		void RemoveObjectAtID(unsigned int aID);
+		void MoveUpObjectAtID(unsigned int aID);
+		void MoveDownObjectAtID(unsigned int aID);
 
 		void ClearAll();
 
-		//TODO: Not make it public (?)
-		std::vector<std::shared_ptr<MenuObject>> myObjects;
-
 	private:
+		std::vector<std::shared_ptr<MenuObject>> myObjects;
 		unsigned int myObjectIdCounter;
 		size_t myLastObjectIndex;
 

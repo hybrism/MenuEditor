@@ -1,9 +1,9 @@
 #include "TextComponent.h"
-
+#include "../MenuObject.h"
 #include <engine/utility/StringHelper.h>
 
-MENU::TextComponent::TextComponent(MenuObject& aParent)
-	: MenuComponent(aParent, ComponentType::Text)
+MENU::TextComponent::TextComponent(MenuObject& aParent, unsigned int aID)
+	: MenuComponent(aParent, aID, ComponentType::Text)
 {
 	myString = "(None)";
 	myFontName = "ProggyClean.ttf";

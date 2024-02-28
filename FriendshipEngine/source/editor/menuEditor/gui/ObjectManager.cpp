@@ -50,9 +50,62 @@ MENU::MenuObject& MENU::ObjectManager::CreateNew(const Vector2f& aPosition)
 	return *myObjects[myLastObjectIndex];
 }
 
-MENU::MenuObject& MENU::ObjectManager::GetObjectFromID(size_t aID)
+MENU::MenuObject& MENU::ObjectManager::GetObjectFromID(unsigned int aID)
 {
-	return *myObjects[aID];
+	for (size_t i = 0; i < myObjects.size(); i++)
+	{
+		if (myObjects[i]->GetID() == aID)
+			return *myObjects[i];
+	}
+
+	assert("No object with this ID exists!");
+	return *myObjects.front();
+}
+
+void MENU::ObjectManager::RemoveObjectAtID(unsigned int aID)
+{
+	for (size_t i = 0; i < myObjects.size(); i++)
+	{
+		if (myObjects[i]->GetID() == aID)
+		{
+			myObjects.erase(myObjects.begin() + i);
+			myObjectIdCounter--;
+			myLastObjectIndex = myObjects.size() - 1;
+			return;
+		}
+	}
+}
+
+void MENU::ObjectManager::MoveUpObjectAtID(unsigned int aID)
+{
+	for (size_t objectIndexToMove = 0; objectIndexToMove < myObjects.size(); objectIndexToMove++)
+	{
+		if (myObjects[objectIndexToMove]->GetID() != aID)
+			continue;
+
+		if (objectIndexToMove == 0)
+			return;
+
+		std::shared_ptr<MenuObject> temp = myObjects[objectIndexToMove - 1];
+		myObjects[objectIndexToMove - 1] = myObjects[objectIndexToMove];
+		myObjects[objectIndexToMove] = temp;
+	}
+}
+
+void MENU::ObjectManager::MoveDownObjectAtID(unsigned int aID)
+{
+	for (size_t objectIndexToMove = 0; objectIndexToMove < myObjects.size(); objectIndexToMove++)
+	{
+		if (myObjects[objectIndexToMove]->GetID() != aID)
+			continue;
+
+		if (objectIndexToMove == myObjects.size() - 1)
+			return;
+
+		std::shared_ptr<MenuObject> temp = myObjects[objectIndexToMove + 1];
+		myObjects[objectIndexToMove + 1] = myObjects[objectIndexToMove];
+		myObjects[objectIndexToMove] = temp;
+	}
 }
 
 void MENU::ObjectManager::ClearAll()

@@ -12,9 +12,10 @@ namespace MENU
 		void Show(const UpdateContext& aContext) override;
 
 	private:
-		size_t mySelectedIndex;
+		unsigned int mySelectedID;
+		unsigned int myRightClickedID;
 		Vector2f myViewportCenter;
 
-		void PushMenuObjectToInspector();
+		void PushMenuObjectToInspector(unsigned int aID);
 	};
 }

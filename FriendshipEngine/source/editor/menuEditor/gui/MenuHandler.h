@@ -29,9 +29,14 @@ namespace MENU
 		void Render();
 		
 		size_t GetObjectsSize();
-		MenuObject& GetObjectFromID(size_t aID);
+		MenuObject& GetObjectFromID(unsigned int aID);
+		MenuObject& GetObjectFromIndex(unsigned int aIndex);
 
-		void CreateNewObject(const Vector2f& aPosition = {0.f, 0.f});
+		void RemoveObjectAtID(unsigned int aID);
+		void MoveUpObjectAtID(unsigned int aID);
+		void MoveDownObjectAtID(unsigned int aID);
+
+		MenuObject& CreateNewObject(const Vector2f& aPosition = { 0.f, 0.f });
 
 		//TODO: Move these to a "MenuLoader"
 		void LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory);

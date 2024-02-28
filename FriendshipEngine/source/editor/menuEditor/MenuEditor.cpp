@@ -13,17 +13,17 @@
 #include <nlohmann/json.hpp>
 
 //Engine
+#include <engine/Paths.h>
 #include <engine/utility/Error.h>
 #include <engine/utility/StringHelper.h>
 #include <engine/utility/InputManager.h>
 #include <engine/graphics/Texture.h>
 #include <engine/graphics/GraphicsEngine.h>
 
-
 //Internal
 #include <shared/postMaster/PostMaster.h>
 #include "UpdateContext.h"
-#include "MenuCommon.h"
+#include "MenuEditorCommon.h"
 
 #include "windows/AssetsWindow.h"
 #include "windows/ConsoleWindow.h"
@@ -71,23 +71,21 @@ void MENU::MenuEditor::Init()
 	myWindows[(int)MENU::ID::MenuObjectHierarchy] = std::make_shared<MenuObjectHierarchy>("MenuObjects", true, ImGuiWindowFlags_None);
 
 	//GET SPRITES
-	std::string spriteAssetPath = RELATIVE_MENUEDITOR_ASSETS + SPRITES;
-	std::filesystem::create_directory(spriteAssetPath);
-	for (const auto& entry : std::filesystem::directory_iterator(spriteAssetPath))
+	std::filesystem::create_directory(RELATIVE_SPRITE_ASSET_PATH);
+	for (const auto& entry : std::filesystem::directory_iterator(RELATIVE_SPRITE_ASSET_PATH))
 	{
 		auto ext = entry.path().extension();
 		if (ext == ".dds")
 		{
-			myAssets.textures.push_back(myTextureFactory.CreateTexture(spriteAssetPath + entry.path().filename().string(), false));
+			myAssets.textures.push_back(myTextureFactory.CreateTexture(RELATIVE_SPRITE_ASSET_PATH + entry.path().filename().string(), false));
 			myAssets.textureIdToName.push_back(entry.path().filename().string());
 			myAssets.textureNameToId[entry.path().filename().string()] = (UINT)myAssets.textures.size() - 1;
 		}
 	}
 
 	//GET FONTS
-	std::string fontAssetPath = RELATIVE_MENUEDITOR_ASSETS + FONT_PATH;
-	std::filesystem::create_directory(fontAssetPath);
-	for (const auto& entry : std::filesystem::directory_iterator(fontAssetPath))
+	std::filesystem::create_directory(RELATIVE_FONT_ASSET_PATH);
+	for (const auto& entry : std::filesystem::directory_iterator(RELATIVE_FONT_ASSET_PATH))
 	{
 		auto ext = entry.path().extension();
 		if (ext == ".ttf")
@@ -97,7 +95,7 @@ void MENU::MenuEditor::Init()
 	}
 
 	//GET MENUFILES
-	std::string menuPath = RELATIVE_MENUEDITOR_ASSETS + MENU_PATH;
+	std::string menuPath = RELATIVE_IMPORT_DATA_PATH + MENU::MENU_PATH;
 	std::filesystem::create_directory(menuPath);
 	for (const auto& entry : std::filesystem::directory_iterator(menuPath))
 	{
@@ -117,6 +115,9 @@ void MENU::MenuEditor::Init()
 		SpriteComponent& sprite = mo.AddComponent<SpriteComponent>();
 		int textureID = myAssets.textureNameToId["s_gizmo.dds"];
 		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID]);
+		sprite.SetColor({ 1.f, 1.f, 1.f, 0.5f });
+		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], TextureState::Hovered);
+		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, TextureState::Hovered);
 
 		Collider2DComponent& collider = mo.AddComponent<Collider2DComponent>();
 		collider.SetShouldRenderColliders(false);
@@ -141,7 +142,7 @@ void MENU::MenuEditor::Update(float)
 		if (!myWindows[i]->myData.isOpen)
 			continue;
 
-		ImGui::SetNextWindowBgAlpha(0.1f);
+		ImGui::SetNextWindowBgAlpha(0.5f);
 		myWindows[i]->Show(updateContext);
 	}
 
@@ -156,7 +157,7 @@ void MENU::MenuEditor::Update(float)
 	{
 		MenuObject& gizmo = myEditorObjectManager.GetObjectFromID(myGizmoID);
 
-		gizmo.SetPosition(myMenuHandler.myObjectManager.myObjects[mySelectedEntityID]->GetPosition());
+		gizmo.SetPosition(myMenuHandler.myObjectManager.GetObjectFromID(mySelectedEntityID).GetPosition());
 
 		Collider2DComponent& collider = gizmo.GetComponent<Collider2DComponent>();
 		SpriteComponent& sprite = gizmo.GetComponent<SpriteComponent>();
@@ -171,15 +172,19 @@ void MENU::MenuEditor::Update(float)
 void MENU::MenuEditor::Render()
 {
 	GraphicsEngine* ge = GraphicsEngine::GetInstance();
-	DebugRenderer& debug = ge->GetDebugRenderer();
-	ge->SetBlendState(BlendState::AlphaBlend);
+	DebugRenderer& debugRenderer = ge->GetDebugRenderer();
+
+	RenderState renderState;
+	renderState.blendState = BlendState::AlphaBlend;
+	renderState.depthStencilState = DepthStencilState::ReadOnly;
+	ge->SetRenderState(renderState);
 
 	myMenuHandler.Render();
 
 	if (mySelectedEntityID != UINT_MAX)
 		myEditorObjectManager.myObjects[myGizmoID]->Render();
 
-	debug.Render();
+	debugRenderer.Render();
 }
 
 void MENU::MenuEditor::Dockspace()
@@ -348,7 +353,7 @@ void MENU::MenuEditor::Popups()
 			if (n == std::string::npos)
 				newMenuName += ".json";
 
-			std::string path = MENU::RELATIVE_MENUEDITOR_ASSETS + MENU::MENU_PATH + newMenuName;
+			std::string path = RELATIVE_IMPORT_DATA_PATH + MENU::MENU_PATH + newMenuName;
 			nlohmann::json menu;
 			std::ofstream dataFile(path);
 			dataFile << menu;
@@ -380,7 +385,7 @@ void MENU::MenuEditor::RecieveMessage(const FE::Message& aMessage)
 	}
 	case FE::eMessageType::PushEntityToInspector:
 	{
-		mySelectedEntityID = std::any_cast<size_t>(aMessage.myMessage);
+		mySelectedEntityID = std::any_cast<unsigned int>(aMessage.myMessage);
 		break;
 	}
 	default:

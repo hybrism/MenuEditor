@@ -8,7 +8,7 @@ namespace MENU
 	class Collider2DComponent : public MenuComponent
 	{
 	public:
-		Collider2DComponent(MenuObject& aParent);
+		Collider2DComponent(MenuObject& aParent, unsigned int aID);
 
 		void Update() override;
 		void Render() override;
@@ -17,6 +17,7 @@ namespace MENU
 
 		bool CheckCollision(const Vector2f& aPosition);
 		bool IsHovered() { return myIsHovered; }
+		bool IsPressed() { return myIsPressed; }
 
 		Vector2f GetPosition() const { return myPosition; }
 		Vector2f GetSize() const { return mySize; }
@@ -32,6 +33,7 @@ namespace MENU
 		Vector2f mySize;
 
 		bool myIsHovered;
+		bool myIsPressed;
 		bool myShouldRenderColliders;
 
 		void UpdateMinMax();

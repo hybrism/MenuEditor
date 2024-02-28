@@ -5,24 +5,21 @@
 #include <cassert>
 #include <engine/math/Vector.h>
 #include "components/ComponentTypeEnum.h"
+#include "components/MenuComponent.h"
 
 namespace MENU
 {
-	class MenuComponent;
-	class SpriteComponent;
-	class TextComponent;
-	class Collider2DComponent;
-
 	class MenuObject
 	{
 		friend class ObjectManager;
 
 	public:
-
 		MenuObject(const unsigned int aID, const Vector2f& aPosition = { 0.f, 0.f });
 
 		template<class T>
 		T& AddComponent();
+
+		void RemoveComponent(const unsigned int aID);
 
 		template<class T>
 		T& GetComponent();
@@ -30,10 +27,10 @@ namespace MENU
 		template<class T>
 		std::vector<std::shared_ptr<MenuComponent>> GetComponents();
 
-		void AddComponentOfType(ComponentType aType);
-
 		template<class T>
 		bool HasComponent();
+
+		void AddComponentOfType(ComponentType aType);
 
 		virtual void Init();
 		virtual void Update();
@@ -45,7 +42,7 @@ namespace MENU
 		void SetPosition(const Vector2f& aPosition);
 
 		const unsigned int GetID() const { return myID; }
-		std::string GetName() const { return myName; }
+		std::string& GetName() { return myName; }
 		Vector2f GetPosition() const { return myPosition; }
 
 	private:
@@ -54,6 +51,7 @@ namespace MENU
 		std::vector<std::vector<std::shared_ptr<MenuComponent>>> myComponents;
 
 		const unsigned int myID;
+		unsigned int myComponentIDCounter;
 		std::string myName;
 		Vector2f myPosition;
 	};
@@ -62,7 +60,7 @@ namespace MENU
 template<class T>
 inline T& MENU::MenuObject::AddComponent()
 {
-	std::shared_ptr<T> component = std::make_shared<T>(*this);
+	std::shared_ptr<T> component = std::make_shared<T>(*this, ++myComponentIDCounter);
 
 	for (size_t type = 0; type < myComponents.size(); type++)
 	{
@@ -90,13 +88,13 @@ inline T& MENU::MenuObject::GetComponent()
 {
 	std::shared_ptr<MenuComponent> result = nullptr;
 
-	for (size_t type = 0; type < myComponents.size(); type++)
+	for (size_t typeIndex = 0; typeIndex < myComponents.size(); typeIndex++)
 	{
-		assert(!myComponents[type].empty() && "This should never happen");
+		assert(!myComponents[typeIndex].empty() && "This should never happen");
 
-		if (typeid(*myComponents[type].front()) == typeid(T))
+		if (typeid(*myComponents[typeIndex].front()) == typeid(T))
 		{
-			result = myComponents[type].front();
+			result = myComponents[typeIndex].front();
 		}
 	}
 
@@ -111,13 +109,13 @@ inline T& MENU::MenuObject::GetComponent()
 template<class T>
 inline std::vector<std::shared_ptr<MENU::MenuComponent>> MENU::MenuObject::GetComponents()
 {
-	for (size_t type = 0; type < myComponents.size(); type++)
+	for (size_t typeIndex = 0; typeIndex < myComponents.size(); typeIndex++)
 	{
-		assert(!myComponents[type].empty() && "This should never happen");
+		assert(!myComponents[typeIndex].empty() && "This should never happen");
 
-		if (typeid(*myComponents[type].front()) == typeid(T))
+		if (typeid(*myComponents[typeIndex].front()) == typeid(T))
 		{
-			return myComponents[type];
+			return myComponents[typeIndex];
 		}
 	}
 
@@ -129,11 +127,11 @@ inline std::vector<std::shared_ptr<MENU::MenuComponent>> MENU::MenuObject::GetCo
 template<class T>
 inline bool MENU::MenuObject::HasComponent()
 {
-	for (size_t type = 0; type < myComponents.size(); type++)
+	for (size_t typeIndex = 0; typeIndex < myComponents.size(); typeIndex++)
 	{
-		assert(!myComponents[type].empty() && "This should never happen");
+		assert(!myComponents[typeIndex].empty() && "This should never happen");
 
-		if (typeid(*myComponents[type].front()) == typeid(T))
+		if (typeid(*myComponents[typeIndex].front()) == typeid(T))
 			return true;
 	}
 

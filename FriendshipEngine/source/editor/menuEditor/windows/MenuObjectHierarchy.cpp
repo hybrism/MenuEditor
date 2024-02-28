@@ -13,7 +13,8 @@
 MENU::MenuObjectHierarchy::MenuObjectHierarchy(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
 	: WindowBase(aHandle, aOpen, aFlags)
 {
-	mySelectedIndex = INT_MAX;
+	mySelectedID = UINT_MAX;
+	myRightClickedID = UINT_MAX;
 	Vector2i center = GraphicsEngine::GetInstance()->GetViewportDimensions() / 2;
 	myViewportCenter = { (float)center.x, (float)center.y };
 }
@@ -32,24 +33,60 @@ void MENU::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 
 		if (ImGui::BeginChild("MenuObjects", ImGui::GetContentRegionAvail(), true))
 		{
-			for (size_t i = 0; i < aContext.menuHandler->GetObjectsSize(); i++)
+			for (unsigned int i = 0; i < aContext.menuHandler->GetObjectsSize(); i++)
 			{
-				MenuObject& object = aContext.menuHandler->GetObjectFromID(i);
+				MenuObject& object = aContext.menuHandler->GetObjectFromIndex(i);
 
 				std::string displayName = std::to_string(i) + " " + object.GetName();
-				if (ImGui::Selectable(displayName.c_str(), i == mySelectedIndex))
+				if (ImGui::Selectable(displayName.c_str(), aContext.menuHandler->GetObjectFromIndex(i).GetID() == mySelectedID))
 				{
-					mySelectedIndex = i;
-					PushMenuObjectToInspector();
+					mySelectedID = object.GetID();
+					PushMenuObjectToInspector(mySelectedID);
+				}
+
+				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+				{
+					ImGui::OpenPopup("Menu Object Edit");
+					myRightClickedID = aContext.menuHandler->GetObjectFromIndex(i).GetID();
 				}
 			}
+
+			if (ImGui::BeginPopup("Menu Object Edit"))
+			{
+				ImGui::Text("Item pressed: %i", myRightClickedID);
+
+				if (ImGui::Selectable("Move Up"))
+				{
+					aContext.menuHandler->MoveUpObjectAtID(myRightClickedID);
+				}
+
+				if (ImGui::Selectable("Move Down"))
+				{
+					aContext.menuHandler->MoveDownObjectAtID(myRightClickedID);
+				}
+
+				if (ImGui::Selectable("Remove"))
+				{
+					aContext.menuHandler->RemoveObjectAtID(aContext.menuHandler->GetObjectFromID(myRightClickedID).GetID());
+
+					if (myRightClickedID == mySelectedID)
+						PushMenuObjectToInspector(UINT_MAX);
+
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
+
 			ImGui::EndChild();
 		}
+
 	}
 	ImGui::End();
+
 }
 
-void MENU::MenuObjectHierarchy::PushMenuObjectToInspector()
+void MENU::MenuObjectHierarchy::PushMenuObjectToInspector(unsigned int aID)
 {
-	FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::PushEntityToInspector, mySelectedIndex });
+	FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::PushEntityToInspector, aID });
 }

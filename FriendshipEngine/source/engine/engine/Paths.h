@@ -4,7 +4,7 @@
 #ifdef _DEBUG
 
 static constexpr char* RELATIVE_ASSET_PATH = "../../../P7_Grupp4_Unity/Assets/Resources/";
-static constexpr char* RELATIVE_SPRITE_ASSET_PATH = "Sprites/";
+static constexpr char* RELATIVE_SPRITE_ASSET_PATH = "../../content/sprites/";
 static constexpr char* RELATIVE_AUDIO_ASSET_PATH = "../../content/audio/";
 static constexpr char* RELATIVE_FMOD_ASSET_PATH = "../../content/audio/Desktop/";
 static constexpr char* RELATIVE_FONT_ASSET_PATH = "../../content/fonts/";

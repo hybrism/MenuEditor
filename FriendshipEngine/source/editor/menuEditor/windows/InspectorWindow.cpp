@@ -19,7 +19,6 @@ MENU::InspectorWindow::InspectorWindow(const std::string& aHandle, bool aOpen, I
 {
 	mySelectedObjectID = UINT_MAX;
 	mySelectedComponentIndex = (size_t)ComponentType::Count;
-	myIsNewObjectSelected = false;
 
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::PushEntityToInspector);
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::NewMenuLoaded);
@@ -29,14 +28,6 @@ void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 {
 	if (!myData.isOpen)
 		return;
-
-	if (myIsNewObjectSelected)
-	{
-		//Get values from object
-		myObjectName = aContext.menuHandler->GetObjectFromID(mySelectedObjectID).GetName();
-
-		myIsNewObjectSelected = false;
-	}
 
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
@@ -50,14 +41,15 @@ void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 		ImGui::PushID(selectedObject.GetID());
 
 		{
-			ImGui::InputText("##", &myObjectName);
-			ImGui::SameLine();
-			if (ImGui::Button("Save Name"))
-				selectedObject.SetName(myObjectName);
-
+			ImGui::InputText("##", &selectedObject.GetName());
 			Vector2f position = selectedObject.GetPosition();
 			if (ImGui::DragFloat2("Position", &position.x))
 				selectedObject.SetPosition(position);
+		}
+
+		if (ImGui::Button("Add Component", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
+		{
+			ImGui::OpenPopup("Add Component");
 		}
 
 		if (selectedObject.HasComponent<SpriteComponent>())
@@ -69,12 +61,8 @@ void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 		if (selectedObject.HasComponent<Collider2DComponent>())
 			EditCollider2DComponent(selectedObject);
 
-		if (ImGui::Button("Add Component", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
-		{
-			ImGui::OpenPopup("Add Component");
-		}
 
-		AddComponent(selectedObject);
+		AddComponentPopup(selectedObject);
 
 		ImGui::PopID();
 	}
@@ -87,8 +75,7 @@ void MENU::InspectorWindow::RecieveMessage(const FE::Message& aMessage)
 	{
 	case FE::eMessageType::PushEntityToInspector:
 	{
-		mySelectedObjectID = std::any_cast<size_t>(aMessage.myMessage);
-		myIsNewObjectSelected = true;
+		mySelectedObjectID = std::any_cast<unsigned int>(aMessage.myMessage);
 		break;
 	}
 	case FE::eMessageType::NewMenuLoaded:
@@ -101,7 +88,7 @@ void MENU::InspectorWindow::RecieveMessage(const FE::Message& aMessage)
 	}
 }
 
-void MENU::InspectorWindow::AddComponent(MenuObject& aObject)
+void MENU::InspectorWindow::AddComponentPopup(MenuObject& aObject)
 {
 	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -115,7 +102,7 @@ void MENU::InspectorWindow::AddComponent(MenuObject& aObject)
 
 		if (ImGui::BeginCombo("Select Component", comboPreviewValue))
 		{
-			for (int i = 0; i < IM_ARRAYSIZE(componentNames); i++)
+			for (unsigned int i = 0; i < IM_ARRAYSIZE(componentNames); i++)
 			{
 				const bool isSelected = (mySelectedComponentIndex == i);
 				if (ImGui::Selectable(componentNames[i], isSelected))
@@ -167,15 +154,59 @@ void MENU::InspectorWindow::EditSpriteComponent(const UpdateContext& aContext, M
 
 		Vector2f texSize = sprite.GetTextureSize();
 		ImGui::Text("Texture size x: %i y: %i", (int)texSize.x, (int)texSize.y);
-		Texture* currentItem = sprite.GetTexture();
-		if (ImGui::BeginCombo("Select Texture", sprite.GetTexturePath().c_str()))
+
+		EditSpriteTextures(aContext, sprite);
+
+		if (ImGui::TreeNode("More"))
+		{
+			if (ImGui::DragFloat2("Position", &position.x))
+				sprite.SetPosition(position);
+
+			ImGui::DragFloat2("Size", &sprite.GetSize().x, 0.01f);
+			ImGui::DragFloat2("Pivot", &sprite.GetPivot().x, 0.001f, 0.f, 1.f);
+			ImGui::DragFloat2("ScaleMultiplier", &sprite.GetScaleMultiplier().x, 0.01f);
+
+			//ImGui::DragFloat("Rotation", &sprite.GetRotation(), 0.01f);
+			ClipValue& clip = sprite.GetClipValue();
+			ImGui::SetNextItemWidth(50.f);
+			ImGui::DragFloat("Left", &clip.left, 0.01f, 0.f, 1.f);
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(50.f);
+			ImGui::DragFloat("Right", &clip.right, 0.01f, 0.f, 1.f);
+			ImGui::SetNextItemWidth(50.f);
+			ImGui::DragFloat("Upper", &clip.upper, 0.01f, 0.f, 1.f);
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(50.f);
+			ImGui::DragFloat("Down", &clip.down, 0.01f, 0.f, 1.f);
+			ImGui::Checkbox("Is Hidden", &sprite.GetIsHidden());
+
+			if (ImGui::Button("RemoveComponent", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
+				aObject.RemoveComponent(sprite.GetID());
+
+			ImGui::TreePop();
+		}
+
+
+		ImGui::PopID();
+	}
+
+	ImGui::PopID();
+}
+
+void MENU::InspectorWindow::EditSpriteTextures(const UpdateContext& aContext, SpriteComponent& aSprite)
+{
+	const char* textureState[] = { "Default", "Hovered", "Pressed" };
+	Texture* currentItem = aSprite.GetTexture();
+	for (size_t textureStateIndex = 0; textureStateIndex < (int)TextureState::Count; textureStateIndex++)
+	{
+		if (ImGui::BeginCombo(textureState[textureStateIndex], aSprite.GetTexturePath((TextureState)textureStateIndex).c_str()))
 		{
 			for (size_t i = 0; i < aContext.assets.textures.size(); i++)
 			{
 				bool isSelected = (currentItem == aContext.assets.textures[i]);
 
 				if (ImGui::Selectable(aContext.assets.textureIdToName[i].c_str(), isSelected))
-					sprite.SetTexture(aContext.assets.textures[i], aContext.assets.textureIdToName[i]);
+					aSprite.SetTexture(aContext.assets.textures[i], aContext.assets.textureIdToName[i], (TextureState)textureStateIndex);
 
 				if (isSelected)
 					ImGui::SetItemDefaultFocus();
@@ -184,34 +215,8 @@ void MENU::InspectorWindow::EditSpriteComponent(const UpdateContext& aContext, M
 			ImGui::EndCombo();
 		}
 
-		ImGui::Spacing();
-
-		if (ImGui::DragFloat2("Position", &position.x))
-			sprite.SetPosition(position);
-
-		ImGui::DragFloat2("Size", &sprite.GetSize().x, 0.01f);
-		ImGui::DragFloat2("Pivot", &sprite.GetPivot().x, 0.001f, 0.f, 1.f);
-		ImGui::DragFloat2("ScaleMultiplier", &sprite.GetScaleMultiplier().x, 0.01f);
-		ImGui::ColorEdit4("Color", &sprite.GetColor().x);
-
-		//ImGui::DragFloat("Rotation", &sprite.GetRotation(), 0.01f);
-		ClipValue& clip = sprite.GetClipValue();
-		ImGui::SetNextItemWidth(50.f);
-		ImGui::DragFloat("Left", &clip.left, 0.01f, 0.f, 1.f);
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(50.f);
-		ImGui::DragFloat("Right", &clip.right, 0.01f, 0.f, 1.f);
-		ImGui::SetNextItemWidth(50.f);
-		ImGui::DragFloat("Upper", &clip.upper, 0.01f, 0.f, 1.f);
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(50.f);
-		ImGui::DragFloat("Down", &clip.down, 0.01f, 0.f, 1.f);
-		ImGui::Checkbox("Is Hidden", &sprite.GetIsHidden());
-
-		ImGui::PopID();
+		ImGui::ColorEdit4(textureState[textureStateIndex], &aSprite.GetColor((TextureState)textureStateIndex).x);
 	}
-
-	ImGui::PopID();
 }
 
 void MENU::InspectorWindow::EditTextComponent(const UpdateContext& aContext, MenuObject& aObject)
@@ -272,15 +277,24 @@ void MENU::InspectorWindow::EditTextComponent(const UpdateContext& aContext, Men
 			ImGui::EndCombo();
 		}
 
-		if (ImGui::DragFloat2("Position", &position.x))
-			text.SetPosition(position);
-
 		bool isCentered = text.GetIsCentered();
 		if (ImGui::Checkbox("Center text over Position", &isCentered))
 			text.SetIsCentered(isCentered);
 
-		if (ImGui::ColorEdit4("Color", &color.x))
-			text.SetColor(color);
+		if (ImGui::TreeNode("More"))
+		{
+
+			if (ImGui::DragFloat2("Position", &position.x))
+				text.SetPosition(position);
+
+			if (ImGui::ColorEdit4("Color", &color.x))
+				text.SetColor(color);
+
+			if (ImGui::Button("RemoveComponent", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
+				aObject.RemoveComponent(text.GetID());
+
+			ImGui::TreePop();
+		}
 
 		ImGui::PopID();
 	}
@@ -297,11 +311,18 @@ void MENU::InspectorWindow::EditCollider2DComponent(MenuObject& aObject)
 	Vector2f position = collider.GetPosition();
 	Vector2f size = collider.GetSize();
 
-	if (ImGui::DragFloat2("Position", &position.x))
-		collider.SetPosition(position);
-
 	if (ImGui::DragFloat2("Size", &size.x))
 		collider.SetSize(size);
+	if (ImGui::TreeNode("More"))
+	{
+		if (ImGui::DragFloat2("Position", &position.x))
+			collider.SetPosition(position);
+
+		if (ImGui::Button("RemoveComponent", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
+			aObject.RemoveComponent(collider.GetID());
+	
+		ImGui::TreePop();
+	}
 
 	ImGui::Spacing();
 	ImGui::PopID();

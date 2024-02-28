@@ -1,9 +1,11 @@
 #include "SpriteComponent.h"
+#include "../MenuObject.h"
+
 #include <engine/graphics/GraphicsEngine.h>
 #include <engine/graphics/sprite/SpriteDrawer.h>
 
-MENU::SpriteComponent::SpriteComponent(MenuObject& aParent)
-	: MenuComponent(aParent, ComponentType::Sprite)
+MENU::SpriteComponent::SpriteComponent(MenuObject& aParent, unsigned int aID)
+	: MenuComponent(aParent, aID, ComponentType::Sprite)
 {
 	myState = TextureState::Default;
 }
@@ -23,6 +25,8 @@ void MENU::SpriteComponent::Render()
 	if (!myTextures[(int)myState].shared.texture)
 		return;
 
+	myInstance.color = myTextures[(int)myState].color;
+
 	//TODO: Don't do this for all components
 	GraphicsEngine::GetInstance()->GetSpriteDrawer().Draw(myTextures[(int)myState].shared, myInstance);
 }
@@ -30,6 +34,11 @@ void MENU::SpriteComponent::Render()
 Texture* MENU::SpriteComponent::GetTexture(TextureState aType) const
 {
 	return myTextures[(int)aType].shared.texture;
+}
+
+Vector4f& MENU::SpriteComponent::GetColor(TextureState aType)
+{
+	return myTextures[(int)aType].color;
 }
 
 Vector2f MENU::SpriteComponent::GetTextureSize(TextureState aType) const
@@ -58,19 +67,19 @@ void MENU::SpriteComponent::SetPivot(const Vector2f& aPivot)
 	myInstance.pivot = aPivot;
 }
 
-void MENU::SpriteComponent::SetSize(const Vector2f& aPosition)
+void MENU::SpriteComponent::SetSize(const Vector2f& aSize)
 {
-	myInstance.size = aPosition;
+	myInstance.size = aSize;
 }
 
-void MENU::SpriteComponent::SetScaleMultiplier(const Vector2f& aPosition)
+void MENU::SpriteComponent::SetScaleMultiplier(const Vector2f& aScaleMultiplier)
 {
-	myInstance.scaleMultiplier = aPosition;
+	myInstance.scaleMultiplier = aScaleMultiplier;
 }
 
-void MENU::SpriteComponent::SetColor(const Vector4f& aPosition)
+void MENU::SpriteComponent::SetColor(const Vector4f& aColor, TextureState aState)
 {
-	myInstance.color = aPosition;
+	myTextures[(int)aState].color = aColor;
 }
 
 void MENU::SpriteComponent::SetClipValue(const ClipValue& aClipValue)
@@ -92,5 +101,7 @@ void MENU::SpriteComponent::SetTexture(Texture* aTexture, const std::string& aTe
 {
 	myTextures[(int)aType].fileName = aTextureName;
 	myTextures[(int)aType].shared.texture = aTexture;
-	myInstance.size = myTextures[(int)aType].shared.texture->GetTextureSize();
+
+	if (aType == TextureState::Default)
+		myInstance.size = myTextures[(int)aType].shared.texture->GetTextureSize();
 }

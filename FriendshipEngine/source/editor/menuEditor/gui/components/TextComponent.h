@@ -20,7 +20,7 @@ namespace MENU
 	{
 
 	public:
-		TextComponent(MenuObject& aParent);
+		TextComponent(MenuObject& aParent, unsigned int aID);
 
 		virtual void Update() override;
 		virtual void Render() override;

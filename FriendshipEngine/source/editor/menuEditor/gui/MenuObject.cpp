@@ -10,7 +10,27 @@ MENU::MenuObject::MenuObject(const unsigned int aID, const Vector2f& aPosition)
 	: myID(aID)
 	, myName("(Untitled)")
 	, myPosition(aPosition)
+	, myComponentIDCounter(0)
 {
+}
+
+void MENU::MenuObject::RemoveComponent(const unsigned int aID)
+{
+	for (size_t typeIndex = 0; typeIndex < myComponents.size(); typeIndex++)
+	{
+		for (size_t componentIndex = 0; componentIndex < myComponents[typeIndex].size(); componentIndex++)
+		{
+			if (myComponents[typeIndex][componentIndex]->GetID() == aID)
+			{
+				myComponents[typeIndex].erase(myComponents[typeIndex].begin() + componentIndex);
+
+				if (myComponents[typeIndex].empty())
+					myComponents.erase(myComponents.begin() + typeIndex);
+
+				return;
+			}
+		}
+	}
 }
 
 void MENU::MenuObject::AddComponentOfType(ComponentType aType)

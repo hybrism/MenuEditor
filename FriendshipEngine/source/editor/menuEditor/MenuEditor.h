@@ -1,6 +1,6 @@
 #pragma once
 #include "gui/MenuHandler.h"
-#include "MenuCommon.h"
+#include "MenuEditorCommon.h"
 #include "windows/Window.h"
 #include <array>
 #include <engine/math/Vector.h>
@@ -12,6 +12,8 @@ class Texture;
 
 namespace MENU
 {
+	const std::string MENU_PATH = "menus/";
+
 	enum class ePopup
 	{
 		CreateNew,
@@ -44,8 +46,8 @@ namespace MENU
 		MenuHandler myMenuHandler;
 		Assets myAssets;
 
-		size_t mySelectedEntityID;
-		size_t myGizmoID;
+		unsigned int mySelectedEntityID;
+		unsigned int myGizmoID;
 
 		Vector2f myRenderSize;
 		Vector2f myRenderCenter;
