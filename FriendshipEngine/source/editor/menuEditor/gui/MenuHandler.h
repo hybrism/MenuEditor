@@ -5,8 +5,6 @@
 #include <nlohmann/json_fwd.hpp>
 #include "ObjectManager.h"
 
-class TextureFactory;
-
 namespace MENU
 {
 	struct MenuState
@@ -24,10 +22,12 @@ namespace MENU
 		MenuHandler();
 		~MenuHandler();
 
-		void Init(const std::string& aMenuFile, TextureFactory* aTextureFactory);
+		void Init(const std::string& aMenuFile);
 		void Update();
 		void Render();
 		
+		void CheckCollision(const Vector2f& aMousePosition);
+
 		size_t GetObjectsSize();
 		MenuObject& GetObjectFromID(unsigned int aID);
 		MenuObject& GetObjectFromIndex(unsigned int aIndex);
@@ -39,7 +39,7 @@ namespace MENU
 		MenuObject& CreateNewObject(const Vector2f& aPosition = { 0.f, 0.f });
 
 		//TODO: Move these to a "MenuLoader"
-		void LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory);
+		void LoadFromJson(const std::string& aMenuFile);
 		Vector4f JsonToColorVec(nlohmann::json aJson);
 		Vector2f JsonToVec2(nlohmann::json aJson);
 

@@ -1,6 +1,5 @@
 #pragma once
 #include <wrl/client.h>
-#include <string>
 
 using Microsoft::WRL::ComPtr;
 struct ID3D11ShaderResourceView;
@@ -13,15 +12,46 @@ enum class TextureInitializationType
 	PNG
 };
 
+// https://stackoverflow.com/questions/3318410/pragma-pack-effect
+#pragma pack(push, 1)
+struct DDS_PIXELFORMAT {
+    uint32_t size;
+    uint32_t flags;
+    uint32_t fourCC;
+    uint32_t RGBBitCount;
+    uint32_t RBitMask;
+    uint32_t GBitMask;
+    uint32_t BBitMask;
+    uint32_t ABitMask;
+};
+
+struct DDS_HEADER {
+    uint32_t           dwSize;
+    uint32_t           dwFlags;
+    uint32_t           dwHeight;
+    uint32_t           dwWidth;
+    uint32_t           dwPitchOrLinearSize;
+    uint32_t           dwDepth;
+    uint32_t           dwMipMapCount;
+    uint32_t           dwReserved1[11];
+    DDS_PIXELFORMAT    ddspf;
+    uint32_t           dwCaps;
+    uint32_t           dwCaps2;
+    uint32_t           dwCaps3;
+    uint32_t           dwCaps4;
+    uint32_t           dwReserved2;
+};
+#pragma pack(pop)
+
 class TextureFactory
 {
 public:
-	TextureFactory();
-	~TextureFactory();
-	Texture* CreateTexture(const std::string& aTexturePath, const bool& aUseRelative = true);
-	
-	bool CreateDDSTexture(const std::wstring& aPath, ComPtr<ID3D11ShaderResourceView>& outShaderResourceView);
+	TextureFactory() = delete;
+	~TextureFactory() = delete;
 
+	static Texture* CreateTexture(const std::string& aTexturePath, const bool& aUseRelative = true);
+	static bool CreateDDSTexture(const std::wstring& aPath, ComPtr<ID3D11ShaderResourceView>& outShaderResourceView);
+	static void WriteDDSToFile(const std::wstring& aPath, const char* aData, const int& aWidth, const int& aHeight);
 private:
-	bool CreatePNGTexture(const std::string& aPath, Texture*& outTexture);
+	static bool CreatePNGTexture(const std::string& aPath, Texture*& outTexture);
 };

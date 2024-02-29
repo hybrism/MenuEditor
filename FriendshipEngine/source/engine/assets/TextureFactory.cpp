@@ -3,11 +3,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "TextureFactory.h"
 #include <stb/stb_image.h>
-#include "DDSTextureLoader11.h"
+#include <directxtk/DDSTextureLoader.h>
 #include <engine/graphics/Texture.h>
-
-TextureFactory::TextureFactory() = default;
-TextureFactory::~TextureFactory() = default;
+#include <engine/utility/Error.h>
 
 Texture* TextureFactory::CreateTexture(const std::string& aTexturePath, const bool& aUseRelative)
 {
@@ -109,12 +107,47 @@ bool TextureFactory::CreatePNGTexture(const std::string& aPath, Texture*& outTex
 
 bool TextureFactory::CreateDDSTexture(const std::wstring& aPath, ComPtr<ID3D11ShaderResourceView>& outShaderResourceView)
 {
-	auto device = GraphicsEngine::GetInstance()->GetDevice();
+	auto& device = GraphicsEngine::GetInstance()->GetDevice();
 	HRESULT result = DirectX::CreateDDSTextureFromFile(
-		GraphicsEngine::GetInstance()->GetDevice().Get(),
+		device.Get(),
 		aPath.c_str(),
 		nullptr,
 		&outShaderResourceView
 	);
 	return !FAILED(result);
+}
+
+void TextureFactory::WriteDDSToFile(
+	const std::wstring& aPath,
+	const char* aData,
+	const int& aWidth,
+	const int& aHeight
+)
+{
+	std::ofstream file(aPath, std::ios::binary);
+	if (!file) {
+		PrintE("Failed to open file for writing: " + StringHelper::ws2s(aPath));
+		return;
+	}
+
+	DDS_HEADER header;
+	memset(&header, 0, sizeof(header));
+	header.dwSize = sizeof(header);
+	header.dwFlags = 0x1 | 0x2 | 0x4 | 0x1000 | 0x80000;
+	header.dwHeight = aHeight;
+	header.dwWidth = aWidth;
+	header.dwPitchOrLinearSize = aWidth * 4;
+	header.dwDepth = 0;
+	header.dwMipMapCount = 0;
+	header.dwReserved2 = 0;
+	header.ddspf.size = sizeof(DDS_PIXELFORMAT);
+	header.ddspf.flags = 0x4;
+	header.ddspf.RGBBitCount = 32;
+	header.ddspf.fourCC = 0;
+	header.dwCaps = 0x1000 | 0x8;
+
+	file.write(reinterpret_cast<const char*>(&header), sizeof(header));
+	file.write(aData, aWidth * aHeight * 4);
+
+	file.close();
 }

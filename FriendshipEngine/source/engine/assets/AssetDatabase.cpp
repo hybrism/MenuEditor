@@ -18,10 +18,6 @@ AssetDatabase* AssetDatabase::myInstance = nullptr;
 
 AssetDatabase::AssetDatabase()
 {
-	myTextureFactory = new TextureFactory();
-
-
-
 	SpherePrimitive sphere;
 	sphere.ConstructSphere();
 
@@ -69,8 +65,6 @@ AssetDatabase::~AssetDatabase()
 		delete pair.second;
 	}
 	myAnimationControllers.clear();
-
-	delete myTextureFactory;
 }
 
 void AssetDatabase::CreateAnimationController(const size_t& aMeshId)
@@ -209,10 +203,10 @@ void AssetDatabase::ReadTextures(const nlohmann::json& jsonObject)
 		myTextures.insert({
 			id,
 			{
-				{ myTextureFactory->CreateTexture(json["albedoPath"].get<std::string>()), json["albedoPath"].get<std::string>() },
-				{ myTextureFactory->CreateTexture(json["normalPath"].get<std::string>()), json["normalPath"].get<std::string>() },
-				{ myTextureFactory->CreateTexture(json["materialPath"].get<std::string>()), json["materialPath"].get<std::string>() },
-				{ myTextureFactory->CreateTexture(json["fxPath"].get<std::string>()), json["fxPath"].get<std::string>() }
+				{ TextureFactory::CreateTexture(json["albedoPath"].get<std::string>()), json["albedoPath"].get<std::string>() },
+				{ TextureFactory::CreateTexture(json["normalPath"].get<std::string>()), json["normalPath"].get<std::string>() },
+				{ TextureFactory::CreateTexture(json["materialPath"].get<std::string>()), json["materialPath"].get<std::string>() },
+				{ TextureFactory::CreateTexture(json["fxPath"].get<std::string>()), json["fxPath"].get<std::string>() }
 			}
 			});
 	}
@@ -246,7 +240,7 @@ void AssetDatabase::ReadAnimations(const nlohmann::json& jsonObject)
 		myAnimationNameToIndex.insert({ animation->name, animationIndex });
 	}
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 	for (auto& pair : myAnimations)
 	{
 		if (pair.second.size() == 0)

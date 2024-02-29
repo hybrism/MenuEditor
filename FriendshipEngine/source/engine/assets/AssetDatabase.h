@@ -80,8 +80,6 @@ public:
 		return myInstance->myTextures.at(aId);
 	}
 
-	static TextureFactory* const GetTextureFactory() { return myInstance->myTextureFactory; }
-
 	static std::vector<Animation*> GetAnimations(const size_t& aMeshId) 
 	{
 		return myInstance->myAnimations.at(aMeshId);
@@ -156,7 +154,7 @@ public:
 
 	static volatile bool HasLoadedAssets() { return myInstance->myHasLoadedAssets; }
 
-
+	static size_t GetMeshCount() { return myInstance->myMeshes.size(); }
 
 	//LIGHTS
 	static void StoreDirectionalLight(DirectionalLight aDirectionalLight);
@@ -185,8 +183,6 @@ private:
 
 	const std::string myMissingPathText = "";
 
-	// TODO: Dependency inject this
-	TextureFactory* myTextureFactory;
 	volatile bool myHasLoadedAssets = false;
 	static AssetDatabase* myInstance;
 

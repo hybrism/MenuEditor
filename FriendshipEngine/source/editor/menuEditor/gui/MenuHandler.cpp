@@ -7,6 +7,7 @@
 #include <assets/TextureFactory.h>
 
 #include <engine/Paths.h>
+#include <assets/TextureFactory.h>
 #include <shared/postMaster/PostMaster.h>
 #include "MenuObject.h"
 #include "../MenuEditorCommon.h"
@@ -20,9 +21,9 @@ MENU::MenuHandler::MenuHandler()
 MENU::MenuHandler::~MenuHandler()
 {}
 
-void MENU::MenuHandler::Init(const std::string& aMenuFile, TextureFactory* aTextureFactory)
+void MENU::MenuHandler::Init(const std::string& aMenuFile)
 {
-	LoadFromJson(aMenuFile, aTextureFactory);
+	LoadFromJson(aMenuFile);
 }
 
 void MENU::MenuHandler::Update()
@@ -33,6 +34,11 @@ void MENU::MenuHandler::Update()
 void MENU::MenuHandler::Render()
 {
 	myObjectManager.Render();
+}
+
+void MENU::MenuHandler::CheckCollision(const Vector2f& aMousePosition)
+{
+	myObjectManager.CheckCollision(aMousePosition);
 }
 
 MENU::MenuObject& MENU::MenuHandler::GetObjectFromID(unsigned int aID)
@@ -70,7 +76,7 @@ void MENU::MenuHandler::MoveDownObjectAtID(unsigned int aID)
 	myObjectManager.MoveDownObjectAtID(aID);
 }
 
-void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory)
+void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 {
 	myObjectManager.ClearAll();
 
@@ -111,7 +117,7 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile, TextureFactor
 			if (texturePath == "(None)")
 				continue;
 
-			sprite.SetTexture(aTextureFactory->CreateTexture(RELATIVE_SPRITE_ASSET_PATH + texturePath, false), texturePath, (TextureState)textureStateIndex);
+			sprite.SetTexture(TextureFactory::CreateTexture(RELATIVE_SPRITE_ASSET_PATH + texturePath, false), texturePath, (TextureState)textureStateIndex);
 			sprite.SetColor(JsonToColorVec(textures[textureStateIndex]["color"]), (TextureState)textureStateIndex);
 		}
 

@@ -13,6 +13,7 @@
 #include <nlohmann/json.hpp>
 
 //Engine
+#include <assets/TextureFactory.h>
 #include <engine/Paths.h>
 #include <engine/utility/Error.h>
 #include <engine/utility/StringHelper.h>
@@ -77,7 +78,7 @@ void MENU::MenuEditor::Init()
 		auto ext = entry.path().extension();
 		if (ext == ".dds")
 		{
-			myAssets.textures.push_back(myTextureFactory.CreateTexture(RELATIVE_SPRITE_ASSET_PATH + entry.path().filename().string(), false));
+			myAssets.textures.push_back(TextureFactory::CreateTexture(RELATIVE_SPRITE_ASSET_PATH + entry.path().filename().string(), false));
 			myAssets.textureIdToName.push_back(entry.path().filename().string());
 			myAssets.textureNameToId[entry.path().filename().string()] = (UINT)myAssets.textures.size() - 1;
 		}
@@ -123,7 +124,7 @@ void MENU::MenuEditor::Init()
 		collider.SetShouldRenderColliders(false);
 	}
 
-	myMenuHandler.Init("testMenu.json", &myTextureFactory);
+	myMenuHandler.Init("testMenu.json");
 
 }
 
@@ -147,7 +148,7 @@ void MENU::MenuEditor::Update(float)
 	}
 
 	ImVec2 mousePos = ImGui::GetMousePos();
-	myMenuHandler.myObjectManager.CheckCollision({ mousePos.x, myRenderSize.y - mousePos.y });
+	myMenuHandler.CheckCollision({ mousePos.x, myRenderSize.y - mousePos.y });
 	myEditorObjectManager.CheckCollision({ mousePos.x, myRenderSize.y - mousePos.y });
 
 	myMenuHandler.Update();
@@ -281,7 +282,7 @@ void MENU::MenuEditor::MenuBar()
 				{
 					if (ImGui::MenuItem(myAssets.saveFiles[i].c_str()))
 					{
-						myMenuHandler.LoadFromJson(myAssets.saveFiles[i], &myTextureFactory);
+						myMenuHandler.LoadFromJson(myAssets.saveFiles[i]);
 						mySelectedEntityID = UINT_MAX;
 						FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::NewMenuLoaded, myAssets.saveFiles[i] });
 					}
@@ -359,7 +360,7 @@ void MENU::MenuEditor::Popups()
 			dataFile << menu;
 			dataFile.close();
 
-			myMenuHandler.Init(newMenuName, &myTextureFactory);
+			myMenuHandler.Init(newMenuName);
 		}
 
 		ImGui::SameLine();

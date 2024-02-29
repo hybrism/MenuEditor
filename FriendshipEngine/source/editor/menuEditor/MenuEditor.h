@@ -5,7 +5,6 @@
 #include <array>
 #include <engine/math/Vector.h>
 #include <shared/postMaster/Observer.h>
-#include <assets/TextureFactory.h>
 
 class Game;
 class Texture;
@@ -41,7 +40,6 @@ namespace MENU
 		void Popups();
 
 	private:
-		::TextureFactory myTextureFactory;
 		ObjectManager myEditorObjectManager;
 		MenuHandler myMenuHandler;
 		Assets myAssets;

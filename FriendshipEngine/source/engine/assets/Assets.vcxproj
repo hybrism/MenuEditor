@@ -114,7 +114,6 @@
     <ClInclude Include="BinaryReader\BinaryAnimationFactory.h" />
     <ClInclude Include="BinaryReader\BinaryFileUtility.h" />
     <ClInclude Include="BinaryReader\BinaryMeshFactory.h" />
-    <ClInclude Include="DDSTextureLoader11.h" />
     <ClInclude Include="FBXLoadStructs.h" />
     <ClInclude Include="FactoryStructs.h" />
     <ClInclude Include="ModelFactory.h" />
@@ -130,7 +129,6 @@
     <ClCompile Include="BinaryReader\BinaryAnimationFactory.cpp" />
     <ClCompile Include="BinaryReader\BinaryFileUtility.cpp" />
     <ClCompile Include="BinaryReader\BinaryMeshFactory.cpp" />
-    <ClCompile Include="DDSTextureLoader11.cpp" />
     <ClCompile Include="ModelFactory.cpp" />
     <ClCompile Include="ShaderDatabase.cpp" />
     <ClCompile Include="SharedFactoryFunctions.cpp" />

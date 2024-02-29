@@ -104,8 +104,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="MenuEditorCommon.h" />
     <ClInclude Include="MenuEditor.h" />
+    <ClInclude Include="MenuEditorCommon.h" />
     <ClInclude Include="MenuEditorLauncher.h" />
     <ClInclude Include="UpdateContext.h" />
     <ClInclude Include="gui\MenuHandler.h" />

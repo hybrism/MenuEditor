@@ -31,6 +31,8 @@ void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
+
+
 		if (mySelectedObjectID == UINT_MAX) //Early out
 		{
 			ImGui::End();
