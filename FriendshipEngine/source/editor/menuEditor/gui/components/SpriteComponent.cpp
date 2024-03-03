@@ -10,14 +10,19 @@ MENU::SpriteComponent::SpriteComponent(MenuObject& aParent, unsigned int aID)
 	myState = TextureState::Default;
 }
 
-void MENU::SpriteComponent::Update()
+void MENU::SpriteComponent::Update(const MenuUpdateContext& aContext)
 {
+	aContext;
+
 	myInstance.position = myParent.GetPosition() + myPosition;
 
 	myState = TextureState::Default;
 
 	if (myParent.IsHovered())
 		myState = TextureState::Hovered;
+
+	if (myParent.IsPressed())
+		myState = TextureState::Pressed;
 }
 
 void MENU::SpriteComponent::Render()

@@ -7,7 +7,7 @@
 #include <application/Timer.h>
 #include "../math/helper.h"
 #include <iostream>
-#include <assets/DDSTextureLoader11.h>
+#include <directxtk/DDSTextureLoader.h>
 #include "../Paths.h"
 #include <assets/ModelFactory.h>
 #include "../Engine.h"

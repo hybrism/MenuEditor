@@ -3,6 +3,7 @@
 #include "MenuEditorCommon.h"
 #include "windows/Window.h"
 #include <array>
+#include <map>
 #include <engine/math/Vector.h>
 #include <shared/postMaster/Observer.h>
 
@@ -30,7 +31,24 @@ namespace MENU
 		void Update(float dt);
 		void Render();
 
-	private: //IMGUI
+	private:
+		void GizmoUpdate();
+
+		void GenerateEditorColliders();
+
+		std::map<unsigned int, unsigned int> myEditorIDToMenuIDMap;
+		std::map<unsigned int, unsigned int> myMenuIDToEditorIDMap;
+		ObjectManager myEditorObjectManager;
+		MenuHandler myMenuHandler;
+		Assets myAssets;
+
+		unsigned int mySelectedObjectID;
+		unsigned int myGizmoID;
+
+		Vector2f myRenderSize;
+		Vector2f myRenderCenter;
+
+		//IMGUI
 		std::array<std::shared_ptr<MENU::WindowBase>, (int)MENU::ID::Count> myWindows;
 		std::array<bool, (int)ePopup::Count> myPopups;
 
@@ -38,19 +56,11 @@ namespace MENU
 		void Dockspace();
 		void MenuBar();
 		void Popups();
-
-	private:
-		ObjectManager myEditorObjectManager;
-		MenuHandler myMenuHandler;
-		Assets myAssets;
-
-		unsigned int mySelectedEntityID;
-		unsigned int myGizmoID;
-
-		Vector2f myRenderSize;
-		Vector2f myRenderCenter;
-
+		//!IMGUI
+	
+		//POSTMASTER
 		void RecieveMessage(const FE::Message& aMessage) override;
+		//!POSTMASTER
 	};
 
 }

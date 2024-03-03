@@ -22,7 +22,7 @@ namespace MENU
 	public:
 		TextComponent(MenuObject& aParent, unsigned int aID);
 
-		virtual void Update() override;
+		virtual void Update(const MenuUpdateContext& aContext) override;
 		virtual void Render() override;
 
 		void UpdatePosition() override;

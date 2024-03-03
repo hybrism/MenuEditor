@@ -26,19 +26,15 @@ void MENU::MenuHandler::Init(const std::string& aMenuFile)
 	LoadFromJson(aMenuFile);
 }
 
-void MENU::MenuHandler::Update()
+void MENU::MenuHandler::Update(const MenuUpdateContext& aContext)
 {
-	myObjectManager.Update();
+
+	myObjectManager.Update(aContext);
 }
 
 void MENU::MenuHandler::Render()
 {
 	myObjectManager.Render();
-}
-
-void MENU::MenuHandler::CheckCollision(const Vector2f& aMousePosition)
-{
-	myObjectManager.CheckCollision(aMousePosition);
 }
 
 MENU::MenuObject& MENU::MenuHandler::GetObjectFromID(unsigned int aID)

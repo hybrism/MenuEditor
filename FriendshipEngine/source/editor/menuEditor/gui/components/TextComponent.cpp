@@ -15,8 +15,10 @@ MENU::TextComponent::TextComponent(MenuObject& aParent, unsigned int aID)
 	myText.SetPosition(myParent.GetPosition());
 }
 
-void MENU::TextComponent::Update()
-{}
+void MENU::TextComponent::Update(const MenuUpdateContext& aContext)
+{
+	aContext;
+}
 
 void MENU::TextComponent::Render()
 {

@@ -1,5 +1,5 @@
 #pragma once
-#include <engine/math/Vector.h>
+#include "../MenuUpdateContext.h"
 #include "ComponentTypeEnum.h"
 
 namespace MENU
@@ -8,7 +8,7 @@ namespace MENU
 	class MenuComponent
 	{
 	public:
-		virtual void Update() {};
+		virtual void Update(const MenuUpdateContext& aContext) { aContext; };
 		virtual void Render() {};
 
 		MenuObject& GetParent() const { return myParent; }

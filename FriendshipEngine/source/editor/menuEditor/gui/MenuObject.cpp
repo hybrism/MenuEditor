@@ -16,19 +16,12 @@ MENU::MenuObject::MenuObject(const unsigned int aID, const Vector2f& aPosition)
 
 void MENU::MenuObject::RemoveComponent(const unsigned int aID)
 {
-	for (size_t typeIndex = 0; typeIndex < myComponents.size(); typeIndex++)
+	for (size_t i = 0; i < myComponents.size(); i++)
 	{
-		for (size_t componentIndex = 0; componentIndex < myComponents[typeIndex].size(); componentIndex++)
+		if (myComponents[i]->GetID() == aID)
 		{
-			if (myComponents[typeIndex][componentIndex]->GetID() == aID)
-			{
-				myComponents[typeIndex].erase(myComponents[typeIndex].begin() + componentIndex);
-
-				if (myComponents[typeIndex].empty())
-					myComponents.erase(myComponents.begin() + typeIndex);
-
-				return;
-			}
+			myComponents.erase(myComponents.begin() + i);
+			return;
 		}
 	}
 }
@@ -55,25 +48,19 @@ void MENU::MenuObject::Init()
 {
 }
 
-void MENU::MenuObject::Update()
+void MENU::MenuObject::Update(const MenuUpdateContext& aContext)
 {
-	for (size_t typeIndex = 0; typeIndex < myComponents.size(); typeIndex++)
+	for (size_t i = 0; i < myComponents.size(); i++)
 	{
-		assert(!myComponents[typeIndex].empty() && "This should never happen");
-
-		for (size_t componentIndex = 0; componentIndex < myComponents[typeIndex].size(); componentIndex++)
-			myComponents[typeIndex][componentIndex]->Update();
+		myComponents[i]->Update(aContext);
 	}
 }
 
 void MENU::MenuObject::Render()
 {
-	for (size_t typeIndex = 0; typeIndex < myComponents.size(); typeIndex++)
+	for (size_t i = 0; i < myComponents.size(); i++)
 	{
-		assert(!myComponents[typeIndex].empty() && "This should never happen");
-
-		for (size_t componentIndex = 0; componentIndex < myComponents[typeIndex].size(); componentIndex++)
-			myComponents[typeIndex][componentIndex]->Render();
+		myComponents[i]->Render();
 	}
 }
 
@@ -82,19 +69,23 @@ bool MENU::MenuObject::IsHovered()
 	if (!HasComponent<Collider2DComponent>())
 		return false;
 
-	Collider2DComponent& collider = GetComponent<Collider2DComponent>();
-	return collider.IsHovered();
+	return GetComponent<Collider2DComponent>().IsHovered();
+}
+
+bool MENU::MenuObject::IsPressed()
+{
+	if (!HasComponent<Collider2DComponent>())
+		return false;
+
+	return GetComponent<Collider2DComponent>().IsPressed();
 }
 
 void MENU::MenuObject::SetPosition(const Vector2f& aPosition)
 {
 	myPosition = aPosition;
 
-	for (size_t typeIndex = 0; typeIndex < myComponents.size(); typeIndex++)
+	for (size_t i = 0; i < myComponents.size(); i++)
 	{
-		assert(!myComponents[typeIndex].empty() && "This should never happen");
-
-		for (size_t componentIndex = 0; componentIndex < myComponents[typeIndex].size(); componentIndex++)
-			myComponents[typeIndex][componentIndex]->UpdatePosition();
+		myComponents[i]->UpdatePosition();
 	}
 }

@@ -12,11 +12,12 @@ MENU::ObjectManager::ObjectManager()
 	myLastObjectIndex = 0;
 }
 
-void MENU::ObjectManager::Update()
+void MENU::ObjectManager::Update(const MenuUpdateContext& aContext)
 {
 	for (size_t i = 0; i < myObjects.size(); i++)
 	{
-		myObjects[i]->Update();
+
+		myObjects[i]->Update(aContext);
 	}
 }
 
@@ -28,14 +29,15 @@ void MENU::ObjectManager::Render()
 	}
 }
 
-void MENU::ObjectManager::CheckCollision(const Vector2f& aPosition)
+void MENU::ObjectManager::CheckCollision(const Vector2f& aPosition, bool aIsPressed)
 {
 	for (size_t i = 0; i < myObjects.size(); i++)
 	{
 		if (myObjects[i]->HasComponent<Collider2DComponent>())
 		{
 			Collider2DComponent& collider = myObjects[i]->GetComponent<Collider2DComponent>();
-			collider.CheckCollision(aPosition);
+
+			collider.CheckCollision(aPosition, aIsPressed);
 		}
 	}
 }
@@ -62,18 +64,33 @@ MENU::MenuObject& MENU::ObjectManager::GetObjectFromID(unsigned int aID)
 	return *myObjects.front();
 }
 
+MENU::MenuObject& MENU::ObjectManager::GetObjectFromIndex(unsigned int aIndex)
+{
+	assert(aIndex <= myLastObjectIndex && "Index is out of range!");
+
+	return *myObjects[aIndex];
+}
+
 void MENU::ObjectManager::RemoveObjectAtID(unsigned int aID)
 {
-	for (size_t i = 0; i < myObjects.size(); i++)
+	for (unsigned int i = 0; i < myObjects.size(); i++)
 	{
-		if (myObjects[i]->GetID() == aID)
+		unsigned int ID = myObjects[i]->GetID();
+		if (ID == aID)
 		{
-			myObjects.erase(myObjects.begin() + i);
-			myObjectIdCounter--;
-			myLastObjectIndex = myObjects.size() - 1;
+			RemoveObjectAtIndex(i);
 			return;
 		}
 	}
+}
+
+void MENU::ObjectManager::RemoveObjectAtIndex(unsigned int aIndex)
+{
+	assert(aIndex <= myLastObjectIndex && "Index is out of range!");
+
+	myObjects.erase(myObjects.begin() + aIndex);
+	myObjectIdCounter--;
+	myLastObjectIndex = myObjects.size() - 1;
 }
 
 void MENU::ObjectManager::MoveUpObjectAtID(unsigned int aID)

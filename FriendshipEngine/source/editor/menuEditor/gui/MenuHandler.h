@@ -1,9 +1,10 @@
 #pragma once
 #include <stack>
 #include <string>
-#include <engine/math/Vector.h>
 #include <nlohmann/json_fwd.hpp>
+
 #include "ObjectManager.h"
+#include "MenuUpdateContext.h"
 
 namespace MENU
 {
@@ -23,11 +24,9 @@ namespace MENU
 		~MenuHandler();
 
 		void Init(const std::string& aMenuFile);
-		void Update();
+		void Update(const MenuUpdateContext& aContext);
 		void Render();
 		
-		void CheckCollision(const Vector2f& aMousePosition);
-
 		size_t GetObjectsSize();
 		MenuObject& GetObjectFromID(unsigned int aID);
 		MenuObject& GetObjectFromIndex(unsigned int aIndex);

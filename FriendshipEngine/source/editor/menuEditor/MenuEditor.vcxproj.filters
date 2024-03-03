@@ -58,6 +58,9 @@
     <ClInclude Include="windows\Window.h">
       <Filter>windows</Filter>
     </ClInclude>
+    <ClInclude Include="gui\MenuUpdateContext.h">
+      <Filter>gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MenuEditor.cpp" />
