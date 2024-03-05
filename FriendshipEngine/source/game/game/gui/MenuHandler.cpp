@@ -98,7 +98,7 @@ void MenuHandler::SaveToJson()
 	nlohmann::json menuFile;
 	menuFile["name"] = myName;
 
-	nlohmann::json objects;
+	nlohmann::json objectIds;
 	for (size_t i = 0; i < myObjectManager.myObjects.size(); i++)
 	{
 		MenuObject& object = *myObjectManager.myObjects[i];
@@ -107,10 +107,10 @@ void MenuHandler::SaveToJson()
 		objectData["objectID"] = object.myID;
 		objectData["name"] = object.GetName();
 
-		objects.push_back(objectData);
+		objectIds.push_back(objectData);
 	}
 
-	menuFile["objectID"] = objects;
+	menuFile["objectID"] = objectIds;
 
 	nlohmann::json spriteComponents;
 	for (size_t i = 0; i < myObjectManager.myObjects.size(); i++)

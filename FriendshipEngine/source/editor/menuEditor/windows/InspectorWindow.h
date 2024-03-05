@@ -20,12 +20,13 @@ namespace MENU
 		void RecieveMessage(const FE::Message& aMessage) override;
 
 	private:
-		void AddComponentPopup(MenuObject& aObject);
+		void AddComponentButton(MenuObject& aObject);
 
 		void EditSpriteComponent(const UpdateContext& aContext, MenuObject& aObject);
 		void EditSpriteTextures(const UpdateContext& aContext, SpriteComponent& aSprite);
 		void EditTextComponent(const UpdateContext& aContext, MenuObject& aObject);
 		void EditCollider2DComponent(MenuObject& aObject);
+		void EditCommandComponent(MenuObject& aObject);
 
 	};
 }

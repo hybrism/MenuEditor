@@ -18,6 +18,7 @@ namespace FE
 		PushEntityToInspector,
 		NewLevelLoaded,
 		NewMenuLoaded,
+		UpdateEditorColliders,
 		Count
 	};
 

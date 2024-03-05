@@ -11,7 +11,7 @@ namespace MENU
 	struct MenuState
 	{
 		std::string name;
-		std::vector<unsigned int> objects;
+		std::vector<unsigned int> objectIds;
 		unsigned int id;
 	};
 
@@ -27,7 +27,13 @@ namespace MENU
 		void Update(const MenuUpdateContext& aContext);
 		void Render();
 		
-		size_t GetObjectsSize();
+		void AddNewState(const std::string& aName);
+		void PushState(unsigned int aID);
+		void PopState();
+
+		MenuState& GetCurrentState();
+		std::vector<MenuState>& GetAllStates();
+
 		MenuObject& GetObjectFromID(unsigned int aID);
 		MenuObject& GetObjectFromIndex(unsigned int aIndex);
 
@@ -57,5 +63,7 @@ namespace MENU
 		std::stack<MenuState*> myStateStack;
 		std::vector<MenuState> myStates;
 
+		//TODO: Fix a general ID-generator class?
+		unsigned int myStateIDCounter;
 	};
 }

@@ -63,6 +63,7 @@ void MENU::MenuEditor::Init()
 	//SUBSCRIBE TO EVENTS
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::DdsDropped);
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::PushEntityToInspector);
+	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::UpdateEditorColliders);
 
 	//CREATE EDITOR WINDOWS
 	myWindows[(int)MENU::ID::Assets] = std::make_shared<AssetsWindow>("Assets", true, ImGuiWindowFlags_None);
@@ -109,8 +110,6 @@ void MENU::MenuEditor::Init()
 
 	myMenuHandler.Init("testMenu.json");
 
-
-
 	GenerateEditorColliders();
 }
 
@@ -137,10 +136,9 @@ void MENU::MenuEditor::Update(float)
 	ImVec2 mousePos = ImGui::GetMousePos();
 	context.mousePosition = { mousePos.x, mousePos.y };
 	context.renderSize = myRenderSize;
-	context.mousePressed = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+	context.mousePressed = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
 
 	myMenuHandler.Update(context);
-
 	myEditorObjectManager.Update(context);
 
 	GizmoUpdate();
@@ -159,7 +157,10 @@ void MENU::MenuEditor::Render()
 	myMenuHandler.Render();
 
 	if (mySelectedObjectID != UINT_MAX)
-		myEditorObjectManager.myObjects[myGizmoID]->Render();
+	{
+		myEditorObjectManager.myObjects[myUpGizmoID]->Render();
+		myEditorObjectManager.myObjects[myRightGizmoID]->Render();
+	}
 
 	myEditorObjectManager.Render();
 
@@ -170,7 +171,7 @@ void MENU::MenuEditor::GizmoUpdate()
 {
 	for (unsigned int i = 0; i < myEditorObjectManager.myObjects.size(); i++)
 	{
-		MenuObject& mo = myEditorObjectManager.GetObjectFromIndex(i);
+		MenuObject& mo = myEditorObjectManager.GetObjectFromID(myEditorObjectManager.myObjects[i]->GetID());
 		if (mo.IsPressed())
 		{
 			mySelectedObjectID = myMenuHandler.GetObjectFromID(myEditorIDToMenuIDMap[mo.GetID()]).GetID();
@@ -180,21 +181,12 @@ void MENU::MenuEditor::GizmoUpdate()
 
 	if (mySelectedObjectID != UINT_MAX)
 	{
-		MenuObject& gizmo = myEditorObjectManager.GetObjectFromID(myGizmoID);
+		MenuObject& gizmoUp = myEditorObjectManager.GetObjectFromID(myUpGizmoID);
+		MenuObject& gizmoRight = myEditorObjectManager.GetObjectFromID(myRightGizmoID);
 		MenuObject& selectedObject = myMenuHandler.myObjectManager.GetObjectFromID(mySelectedObjectID);
-		gizmo.SetPosition(selectedObject.GetPosition());
 
-		if (gizmo.IsPressed())
-		{
-			//TODO: Divide gizmos into up/right
-
-			MenuObject& editorObject = myEditorObjectManager.GetObjectFromID(myMenuIDToEditorIDMap[selectedObject.GetID()]);
-			
-			ImVec2 position = ImGui::GetMousePos();
-
-			selectedObject.SetPosition({ position.x, myRenderSize.y - position.y });
-			editorObject.SetPosition({ position.x, myRenderSize.y - position.y});
-		}
+		gizmoUp.SetPosition(selectedObject.GetPosition());
+		gizmoRight.SetPosition(selectedObject.GetPosition());
 	}
 }
 
@@ -208,10 +200,30 @@ void MENU::MenuEditor::GenerateEditorColliders()
 	{
 		MenuObject& mo = myEditorObjectManager.CreateNew();
 		mo.SetPosition(myRenderCenter);
-		myGizmoID = mo.GetID();
+		myUpGizmoID = mo.GetID();
 
 		SpriteComponent& sprite = mo.AddComponent<SpriteComponent>();
-		int textureID = myAssets.textureNameToId["s_gizmo.dds"];
+		int textureID = myAssets.textureNameToId["s_gizmo_up.dds"];
+		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], TextureState::Default);
+		sprite.SetColor({ 1.f, 1.f, 1.f, 0.3f }, TextureState::Default);
+		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], TextureState::Hovered);
+		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, TextureState::Hovered);
+		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], TextureState::Pressed);
+		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, TextureState::Pressed);
+
+		Collider2DComponent& collider = mo.AddComponent<Collider2DComponent>();
+		collider.SetSize({ 16.f, 32.f });
+		collider.SetPosition({ 0.f, 22.f });
+		collider.SetShouldRenderColliders(false);
+	}
+
+	{
+		MenuObject& mo = myEditorObjectManager.CreateNew();
+		mo.SetPosition(myRenderCenter);
+		myRightGizmoID = mo.GetID();
+
+		SpriteComponent& sprite = mo.AddComponent<SpriteComponent>();
+		int textureID = myAssets.textureNameToId["s_gizmo_right.dds"];
 
 		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], TextureState::Default);
 		sprite.SetColor({ 1.f, 1.f, 1.f, 0.3f }, TextureState::Default);
@@ -221,32 +233,22 @@ void MENU::MenuEditor::GenerateEditorColliders()
 		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, TextureState::Pressed);
 
 		Collider2DComponent& collider = mo.AddComponent<Collider2DComponent>();
-		collider.SetShouldRenderColliders(true);
+		collider.SetSize({ 32.f, 16.f });
+		collider.SetPosition({ 22.f, 0.f });
+		collider.SetShouldRenderColliders(false);
 	}
 
-	for (unsigned int i = 0; i < myMenuHandler.GetObjectsSize(); i++)
+	MenuState& currentState = myMenuHandler.GetCurrentState();
+	for (unsigned int i = 0; i < currentState.objectIds.size(); i++)
 	{
-		MenuObject& menuMo = myMenuHandler.GetObjectFromIndex(i);
+		MenuObject& menuMo = myMenuHandler.GetObjectFromID(currentState.objectIds[i]);
 		MenuObject& editorMo = myEditorObjectManager.CreateNew();
 		myEditorIDToMenuIDMap[editorMo.GetID()] = menuMo.GetID();
 		myMenuIDToEditorIDMap[menuMo.GetID()] = editorMo.GetID();
 		editorMo.SetPosition(menuMo.GetPosition());
 		Collider2DComponent& collider = editorMo.AddComponent<Collider2DComponent>();
-		collider.SetShouldRenderColliders(true);
-
-		if (menuMo.HasComponent<SpriteComponent>())
-		{
-			SpriteComponent& sprite = menuMo.GetComponent<SpriteComponent>();
-			Vector2f textureSize = sprite.GetTextureSize();
-			Vector2f scaleMultiplier = sprite.GetScaleMultiplier();
-
-			collider.SetSize({ textureSize.x * scaleMultiplier.x, textureSize.y * scaleMultiplier.y });
-		}
-		else
-		{
-			collider.SetSize({ 150.f, 80.f });
-		}
-
+		collider.SetShouldRenderColliders(false);
+		collider.SetSize({ 150.f, 80.f });
 	}
 }
 
@@ -450,6 +452,13 @@ void MENU::MenuEditor::RecieveMessage(const FE::Message& aMessage)
 	case FE::eMessageType::PushEntityToInspector:
 	{
 		mySelectedObjectID = std::any_cast<unsigned int>(aMessage.myMessage);
+		break;
+	}
+	case FE::eMessageType::UpdateEditorColliders:
+	{
+		GenerateEditorColliders();
+		mySelectedObjectID = UINT_MAX;
+
 		break;
 	}
 	default:

@@ -11,6 +11,7 @@
 #include "../gui/components/SpriteComponent.h"
 #include "../gui/components/TextComponent.h"
 #include "../gui/components/Collider2DComponent.h"
+#include "../gui/components/CommandComponent.h"
 
 #include <shared/postMaster/PostMaster.h>
 
@@ -31,8 +32,6 @@ void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
-
-
 		if (mySelectedObjectID == UINT_MAX) //Early out
 		{
 			ImGui::End();
@@ -49,10 +48,7 @@ void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 				selectedObject.SetPosition(position);
 		}
 
-		if (ImGui::Button("Add Component", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
-		{
-			ImGui::OpenPopup("Add Component");
-		}
+		AddComponentButton(selectedObject);
 
 		if (selectedObject.HasComponent<SpriteComponent>())
 			EditSpriteComponent(aContext, selectedObject);
@@ -63,8 +59,8 @@ void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 		if (selectedObject.HasComponent<Collider2DComponent>())
 			EditCollider2DComponent(selectedObject);
 
-
-		AddComponentPopup(selectedObject);
+		if (selectedObject.HasComponent<CommandComponent>())
+			EditCommandComponent(selectedObject);
 
 		ImGui::PopID();
 	}
@@ -90,24 +86,20 @@ void MENU::InspectorWindow::RecieveMessage(const FE::Message& aMessage)
 	}
 }
 
-void MENU::InspectorWindow::AddComponentPopup(MenuObject& aObject)
+void MENU::InspectorWindow::AddComponentButton(MenuObject& aObject)
 {
-	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-	if (ImGui::BeginPopupModal("Add Component", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	ImGui::Button("Add Component", ImVec2(ImGui::GetContentRegionAvail().x, 24));
+	if (ImGui::BeginPopupContextItem(0, ImGuiPopupFlags_MouseButtonLeft))
 	{
 		ImGui::Text("Chose component: ");
 
-		//TODO: Make this more dynamic
-		const char* componentNames[] = { "SpriteComponent", "ColliderComponent", "TextComponent", "None" };
-		const char* comboPreviewValue = componentNames[mySelectedComponentIndex];  // Pass in the preview value visible before opening the combo (it could be anything)
-
+		const char* comboPreviewValue = ComponentNames[mySelectedComponentIndex];  // Pass in the preview value visible before opening the combo (it could be anything)
 		if (ImGui::BeginCombo("Select Component", comboPreviewValue))
 		{
-			for (unsigned int i = 0; i < IM_ARRAYSIZE(componentNames); i++)
+			for (unsigned int i = 0; i < IM_ARRAYSIZE(ComponentNames); i++)
 			{
 				const bool isSelected = (mySelectedComponentIndex == i);
-				if (ImGui::Selectable(componentNames[i], isSelected))
+				if (ImGui::Selectable(ComponentNames[i], isSelected))
 				{
 					mySelectedComponentIndex = i;
 				}
@@ -123,16 +115,21 @@ void MENU::InspectorWindow::AddComponentPopup(MenuObject& aObject)
 		if (ImGui::Button("Add", ImVec2(120, 0)))
 		{
 			if ((ComponentType)mySelectedComponentIndex == ComponentType::Count)
-				ImGui::CloseCurrentPopup();
-
-			aObject.AddComponentOfType((ComponentType)mySelectedComponentIndex);
-			mySelectedComponentIndex = (size_t)ComponentType::Count;
+			{
+				mySelectedComponentIndex = (size_t)ComponentType::Count;
+			}
+			else
+			{
+				aObject.AddComponentOfType((ComponentType)mySelectedComponentIndex);
+				mySelectedComponentIndex = (size_t)ComponentType::Count;
+			}
 			ImGui::CloseCurrentPopup();
+
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Cancel", ImVec2(120, 0)))
 		{
-			mySelectedComponentIndex = 0;
+			mySelectedComponentIndex = (size_t)ComponentType::Count;
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -187,7 +184,6 @@ void MENU::InspectorWindow::EditSpriteComponent(const UpdateContext& aContext, M
 
 			ImGui::TreePop();
 		}
-
 
 		ImGui::PopID();
 	}
@@ -322,9 +318,37 @@ void MENU::InspectorWindow::EditCollider2DComponent(MenuObject& aObject)
 
 		if (ImGui::Button("RemoveComponent", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
 			aObject.RemoveComponent(collider.GetID());
-	
+
 		ImGui::TreePop();
 	}
+
+	ImGui::Spacing();
+	ImGui::PopID();
+}
+
+void MENU::InspectorWindow::EditCommandComponent(MenuObject& aObject)
+{
+	CommandComponent& command = aObject.GetComponent<CommandComponent>();
+	ImGui::PushID("Command");
+	ImGui::SeparatorText("Command");
+
+	eCommandType currentType = command.GetCommand();
+	if (ImGui::BeginCombo("Commands", CommandNames[(int)currentType]))
+	{
+		for (size_t i = 0; i < IM_ARRAYSIZE(CommandNames); i++)
+		{
+			bool isSelected = ((int)currentType == i);
+
+			if (ImGui::Selectable(CommandNames[i], isSelected))
+				command.SetCommand((eCommandType)i);
+
+			if (isSelected)
+				ImGui::SetItemDefaultFocus();
+		}
+
+		ImGui::EndCombo();
+	}
+
 
 	ImGui::Spacing();
 	ImGui::PopID();

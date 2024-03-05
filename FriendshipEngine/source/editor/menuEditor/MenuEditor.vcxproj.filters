@@ -22,10 +22,16 @@
     <ClInclude Include="gui\MenuObject.h">
       <Filter>gui</Filter>
     </ClInclude>
+    <ClInclude Include="gui\MenuUpdateContext.h">
+      <Filter>gui</Filter>
+    </ClInclude>
     <ClInclude Include="gui\ObjectManager.h">
       <Filter>gui</Filter>
     </ClInclude>
     <ClInclude Include="gui\components\Collider2DComponent.h">
+      <Filter>gui\components</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\components\CommandComponent.h">
       <Filter>gui\components</Filter>
     </ClInclude>
     <ClInclude Include="gui\components\ComponentTypeEnum.h">
@@ -58,9 +64,6 @@
     <ClInclude Include="windows\Window.h">
       <Filter>windows</Filter>
     </ClInclude>
-    <ClInclude Include="gui\MenuUpdateContext.h">
-      <Filter>gui</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MenuEditor.cpp" />
@@ -75,6 +78,9 @@
       <Filter>gui</Filter>
     </ClCompile>
     <ClCompile Include="gui\components\Collider2DComponent.cpp">
+      <Filter>gui\components</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\components\CommandComponent.cpp">
       <Filter>gui\components</Filter>
     </ClCompile>
     <ClCompile Include="gui\components\SpriteComponent.cpp">

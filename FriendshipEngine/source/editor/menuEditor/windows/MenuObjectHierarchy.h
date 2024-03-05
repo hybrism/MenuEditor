@@ -12,10 +12,13 @@ namespace MENU
 		void Show(const UpdateContext& aContext) override;
 
 	private:
-		unsigned int mySelectedID;
-		unsigned int myRightClickedID;
+		unsigned int mySelectedStateID;
+		unsigned int mySelectedObjectID;
+		unsigned int myRightClickedObjectID;
 		Vector2f myViewportCenter;
+		std::string myNewStateName;
 
 		void PushMenuObjectToInspector(unsigned int aID);
+		void AddStatePopup(const UpdateContext& aContext);
 	};
 }

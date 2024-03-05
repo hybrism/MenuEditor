@@ -104,15 +104,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="gui\MenuUpdateContext.h" />
     <ClInclude Include="MenuEditor.h" />
     <ClInclude Include="MenuEditorCommon.h" />
     <ClInclude Include="MenuEditorLauncher.h" />
     <ClInclude Include="UpdateContext.h" />
     <ClInclude Include="gui\MenuHandler.h" />
     <ClInclude Include="gui\MenuObject.h" />
+    <ClInclude Include="gui\MenuUpdateContext.h" />
     <ClInclude Include="gui\ObjectManager.h" />
     <ClInclude Include="gui\components\Collider2DComponent.h" />
+    <ClInclude Include="gui\components\CommandComponent.h" />
     <ClInclude Include="gui\components\ComponentTypeEnum.h" />
     <ClInclude Include="gui\components\MenuComponent.h" />
     <ClInclude Include="gui\components\SpriteComponent.h" />
@@ -131,6 +132,7 @@
     <ClCompile Include="gui\MenuObject.cpp" />
     <ClCompile Include="gui\ObjectManager.cpp" />
     <ClCompile Include="gui\components\Collider2DComponent.cpp" />
+    <ClCompile Include="gui\components\CommandComponent.cpp" />
     <ClCompile Include="gui\components\SpriteComponent.cpp" />
     <ClCompile Include="gui\components\TextComponent.cpp" />
     <ClCompile Include="windows\AssetsWindow.cpp" />

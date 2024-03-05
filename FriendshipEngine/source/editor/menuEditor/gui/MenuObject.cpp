@@ -1,10 +1,10 @@
 #include "MenuObject.h"
 
 #include "components/MenuComponent.h"
-
 #include "components/Collider2DComponent.h"
 #include "components/SpriteComponent.h"
 #include "components/TextComponent.h"
+#include "components/CommandComponent.h"
 
 MENU::MenuObject::MenuObject(const unsigned int aID, const Vector2f& aPosition)
 	: myID(aID)
@@ -38,6 +38,9 @@ void MENU::MenuObject::AddComponentOfType(ComponentType aType)
 		break;
 	case MENU::ComponentType::Text:
 		AddComponent<TextComponent>();
+		break;
+	case MENU::ComponentType::Command:
+		AddComponent<CommandComponent>();
 		break;
 	default:
 		break;

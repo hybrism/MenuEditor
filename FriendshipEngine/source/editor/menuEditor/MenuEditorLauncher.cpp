@@ -28,7 +28,12 @@ LRESULT CALLBACK WndProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In
 
 	if (imguiResult != 0)
 	{
-		return imguiResult;
+		ImGuiIO& io = ImGui::GetIO();
+	
+		if (io.WantCaptureMouse && (uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONDOWN || uMsg == WM_RBUTTONUP || uMsg == WM_MBUTTONDOWN || uMsg == WM_MBUTTONUP || uMsg == WM_MOUSEWHEEL || uMsg == WM_MOUSEMOVE))
+			return true;
+
+		//return imguiResult;
 	}
 
 	if (IsWindowEnabled(hWnd))
@@ -91,7 +96,7 @@ LRESULT CALLBACK WndProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In
 	return 0;
 }
 
-MenuEditorLauncher::MenuEditorLauncher() 
+MenuEditorLauncher::MenuEditorLauncher()
 	: Application()
 {
 	myEngine = Engine::CreateInstance(&myTimer);

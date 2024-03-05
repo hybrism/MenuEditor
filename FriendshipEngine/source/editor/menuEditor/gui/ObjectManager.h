@@ -19,15 +19,12 @@ namespace MENU
 
 		void CheckCollision(const Vector2f& aPosition, bool aIsPressed = false);
 
-		MenuObject& CreateNew(const Vector2f& aPosition = { 0.f, 0.f });
+		MenuObject& CreateNew(unsigned int aID = UINT_MAX, const Vector2f& aPosition = { 0.f, 0.f });
 		MenuObject& GetObjectFromID(unsigned int aID);
 		MenuObject& GetObjectFromIndex(unsigned int aIndex);
 		
 		void RemoveObjectAtID(unsigned int aID);
 		void RemoveObjectAtIndex(unsigned int aIndex);
-
-		void MoveUpObjectAtID(unsigned int aID);
-		void MoveDownObjectAtID(unsigned int aID);
 
 		void ClearAll();
 

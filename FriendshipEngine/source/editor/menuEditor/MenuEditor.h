@@ -44,7 +44,10 @@ namespace MENU
 
 		unsigned int mySelectedObjectID;
 		unsigned int myGizmoID;
+		unsigned int myUpGizmoID;
+		unsigned int myRightGizmoID;
 
+		Vector2f myGizmoPosition;
 		Vector2f myRenderSize;
 		Vector2f myRenderCenter;
 
