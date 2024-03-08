@@ -1,5 +1,7 @@
 #pragma once
 #include "gui/MenuHandler.h"
+#include "gui/IDManager.h"
+
 #include "MenuEditorCommon.h"
 #include "windows/Window.h"
 #include <array>
@@ -42,17 +44,16 @@ namespace MENU
 		MenuHandler myMenuHandler;
 		Assets myAssets;
 
-		unsigned int mySelectedObjectID;
-		unsigned int myGizmoID;
-		unsigned int myUpGizmoID;
-		unsigned int myRightGizmoID;
+		ID mySelectedObjectID;
+		ID myUpGizmoID;
+		ID myRightGizmoID;
 
 		Vector2f myGizmoPosition;
 		Vector2f myRenderSize;
 		Vector2f myRenderCenter;
 
 		//IMGUI
-		std::array<std::shared_ptr<MENU::WindowBase>, (int)MENU::ID::Count> myWindows;
+		std::array<std::shared_ptr<MENU::WindowBase>, (int)MENU::WindowID::Count> myWindows;
 		std::array<bool, (int)ePopup::Count> myPopups;
 
 		bool myFirstFrameSetup;

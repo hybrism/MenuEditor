@@ -40,7 +40,8 @@
 MENU::MenuEditor::MenuEditor()
 	: myFirstFrameSetup(true)
 	, mySelectedObjectID(UINT_MAX)
-	, myGizmoID(UINT_MAX)
+	, myUpGizmoID(500)
+	, myRightGizmoID(501)
 {
 	for (size_t i = 0; i < (int)ePopup::Count; i++)
 	{
@@ -64,13 +65,14 @@ void MENU::MenuEditor::Init()
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::DdsDropped);
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::PushEntityToInspector);
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::UpdateEditorColliders);
+	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::NewMenuLoaded);
 
 	//CREATE EDITOR WINDOWS
-	myWindows[(int)MENU::ID::Assets] = std::make_shared<AssetsWindow>("Assets", true, ImGuiWindowFlags_None);
-	myWindows[(int)MENU::ID::MenuView] = std::make_shared<MenuViewWindow>("MenuView", false, ImGuiWindowFlags_None);
-	myWindows[(int)MENU::ID::Console] = std::make_shared<ConsoleWindow>("Console", true, ImGuiWindowFlags_None);
-	myWindows[(int)MENU::ID::Inspector] = std::make_shared<InspectorWindow>("Inspector", true, ImGuiWindowFlags_None);
-	myWindows[(int)MENU::ID::MenuObjectHierarchy] = std::make_shared<MenuObjectHierarchy>("MenuObjects", true, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::WindowID::Assets] = std::make_shared<AssetsWindow>("Assets", true, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::WindowID::MenuView] = std::make_shared<MenuViewWindow>("MenuView", false, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::WindowID::Console] = std::make_shared<ConsoleWindow>("Console", true, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::WindowID::Inspector] = std::make_shared<InspectorWindow>("Inspector", true, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::WindowID::MenuObjectHierarchy] = std::make_shared<MenuObjectHierarchy>("MenuObjects", true, ImGuiWindowFlags_None);
 
 	//GET SPRITES
 	std::filesystem::create_directory(RELATIVE_SPRITE_ASSET_PATH);
@@ -109,7 +111,6 @@ void MENU::MenuEditor::Init()
 	}
 
 	myMenuHandler.Init("testMenu.json");
-
 	GenerateEditorColliders();
 }
 
@@ -123,12 +124,12 @@ void MENU::MenuEditor::Update(float)
 	updateContext.assets = myAssets;
 	updateContext.menuHandler = &myMenuHandler;
 
-	for (size_t i = 0; i < (int)MENU::ID::Count; i++)
+	for (size_t i = 0; i < (int)MENU::WindowID::Count; i++)
 	{
 		if (!myWindows[i]->myData.isOpen)
 			continue;
 
-		ImGui::SetNextWindowBgAlpha(0.5f);
+		ImGui::SetNextWindowBgAlpha(0.7f);
 		myWindows[i]->Show(updateContext);
 	}
 
@@ -155,13 +156,6 @@ void MENU::MenuEditor::Render()
 	ge->SetRenderState(renderState);
 
 	myMenuHandler.Render();
-
-	if (mySelectedObjectID != UINT_MAX)
-	{
-		myEditorObjectManager.myObjects[myUpGizmoID]->Render();
-		myEditorObjectManager.myObjects[myRightGizmoID]->Render();
-	}
-
 	myEditorObjectManager.Render();
 
 	debugRenderer.Render();
@@ -198,10 +192,7 @@ void MENU::MenuEditor::GenerateEditorColliders()
 
 	//CREATE GIZMO
 	{
-		MenuObject& mo = myEditorObjectManager.CreateNew();
-		mo.SetPosition(myRenderCenter);
-		myUpGizmoID = mo.GetID();
-
+		MenuObject& mo = myEditorObjectManager.CreateNew(myUpGizmoID, myRenderCenter);
 		SpriteComponent& sprite = mo.AddComponent<SpriteComponent>();
 		int textureID = myAssets.textureNameToId["s_gizmo_up.dds"];
 		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], TextureState::Default);
@@ -218,9 +209,7 @@ void MENU::MenuEditor::GenerateEditorColliders()
 	}
 
 	{
-		MenuObject& mo = myEditorObjectManager.CreateNew();
-		mo.SetPosition(myRenderCenter);
-		myRightGizmoID = mo.GetID();
+		MenuObject& mo = myEditorObjectManager.CreateNew(myRightGizmoID, myRenderCenter);
 
 		SpriteComponent& sprite = mo.AddComponent<SpriteComponent>();
 		int textureID = myAssets.textureNameToId["s_gizmo_right.dds"];
@@ -238,16 +227,20 @@ void MENU::MenuEditor::GenerateEditorColliders()
 		collider.SetShouldRenderColliders(false);
 	}
 
+	if (myMenuHandler.GetAllStates().empty())
+		return;
+
 	MenuState& currentState = myMenuHandler.GetCurrentState();
 	for (unsigned int i = 0; i < currentState.objectIds.size(); i++)
 	{
 		MenuObject& menuMo = myMenuHandler.GetObjectFromID(currentState.objectIds[i]);
 		MenuObject& editorMo = myEditorObjectManager.CreateNew();
+
 		myEditorIDToMenuIDMap[editorMo.GetID()] = menuMo.GetID();
 		myMenuIDToEditorIDMap[menuMo.GetID()] = editorMo.GetID();
 		editorMo.SetPosition(menuMo.GetPosition());
 		Collider2DComponent& collider = editorMo.AddComponent<Collider2DComponent>();
-		collider.SetShouldRenderColliders(false);
+		collider.SetShouldRenderColliders(true);
 		collider.SetSize({ 150.f, 80.f });
 	}
 }
@@ -271,7 +264,7 @@ void MENU::MenuEditor::Dockspace()
 	ImGui::Begin("MenuEditorDockspace", NULL, hostWindowFlags);
 	ImGui::PopStyleVar(3);
 
-	ImGuiID dockspaceID = ImGui::GetID(myWindows[(int)MENU::ID::Assets]->myData.handle.c_str());
+	ImGuiID dockspaceID = ImGui::GetID(myWindows[(int)MENU::WindowID::Assets]->myData.handle.c_str());
 	ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
 	MenuBar();
@@ -319,12 +312,11 @@ void MENU::MenuEditor::Dockspace()
 		ImGuiID topRightBottomAreaID = 0;
 		ImGui::DockBuilderSplitNode(topRightAreaID, ImGuiDir_Down, ratioTopRightWindowSplit, &topRightBottomAreaID, &topRightTopAreaID);
 
-
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::ID::MenuView]->myData.handle.c_str(), topLeftAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::ID::MenuObjectHierarchy]->myData.handle.c_str(), topRightTopAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::ID::Inspector]->myData.handle.c_str(), topRightBottomAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::ID::Assets]->myData.handle.c_str(), bottomLeftAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::ID::Console]->myData.handle.c_str(), bottomRightAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::MenuView]->myData.handle.c_str(), topLeftAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::MenuObjectHierarchy]->myData.handle.c_str(), topRightTopAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::Inspector]->myData.handle.c_str(), topRightBottomAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::Assets]->myData.handle.c_str(), bottomLeftAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::Console]->myData.handle.c_str(), bottomRightAreaID);
 
 		ImGui::DockBuilderFinish(dockspaceID);
 
@@ -347,8 +339,6 @@ void MENU::MenuEditor::MenuBar()
 					if (ImGui::MenuItem(myAssets.saveFiles[i].c_str()))
 					{
 						myMenuHandler.LoadFromJson(myAssets.saveFiles[i]);
-						GenerateEditorColliders();
-						mySelectedObjectID = UINT_MAX;
 						FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::NewMenuLoaded, myAssets.saveFiles[i] });
 					}
 				}
@@ -381,7 +371,7 @@ void MENU::MenuEditor::MenuBar()
 
 		if (ImGui::BeginMenu("Windows"))
 		{
-			for (int windowIndex = 0; windowIndex < (int)MENU::ID::Count; windowIndex++)
+			for (int windowIndex = 0; windowIndex < (int)MENU::WindowID::Count; windowIndex++)
 			{
 				ImGui::MenuItem(myWindows[windowIndex]->myData.handle.c_str(), NULL, &myWindows[windowIndex]->myData.isOpen);
 			}
@@ -400,6 +390,7 @@ void MENU::MenuEditor::Popups()
 	{
 		newMenuName = "untitled";
 		ImGui::OpenPopup("Create New");
+		myPopups[(int)ePopup::CreateNew] = false;
 	}
 
 	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -426,6 +417,7 @@ void MENU::MenuEditor::Popups()
 			dataFile.close();
 
 			myMenuHandler.Init(newMenuName);
+			FE::PostMaster::GetInstance()->SendMessage({FE::eMessageType::NewMenuLoaded, newMenuName});
 		}
 
 		ImGui::SameLine();
@@ -458,7 +450,12 @@ void MENU::MenuEditor::RecieveMessage(const FE::Message& aMessage)
 	{
 		GenerateEditorColliders();
 		mySelectedObjectID = UINT_MAX;
-
+		break;
+	}
+	case FE::eMessageType::NewMenuLoaded:
+	{
+		GenerateEditorColliders();
+		mySelectedObjectID = UINT_MAX;
 		break;
 	}
 	default:

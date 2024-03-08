@@ -1,16 +1,13 @@
 #include "ObjectManager.h"
 #include <engine/utility/Error.h>
-#include <memory>
 
 #include "components/Collider2DComponent.h"
 
+#include "IDManager.h"
 #include "MenuObject.h"
 
 MENU::ObjectManager::ObjectManager()
-{
-	myObjectIdCounter = 0;
-	myLastObjectIndex = 0;
-}
+{}
 
 void MENU::ObjectManager::Update(const MenuUpdateContext& aContext)
 {
@@ -43,20 +40,18 @@ void MENU::ObjectManager::CheckCollision(const Vector2f& aPosition, bool aIsPres
 
 MENU::MenuObject& MENU::ObjectManager::CreateNew(unsigned int aID, const Vector2f& aPosition)
 {
+	IDManager* idManager = IDManager::GetInstance();
+
 	if (aID == UINT_MAX)
 	{
-		myObjects.push_back(std::make_shared<MenuObject>(myObjectIdCounter, aPosition));
-
-		myObjectIdCounter++;
+		myObjects.push_back(std::make_shared<MenuObject>(idManager->GetFreeID(), aPosition));
 	}
 	else
 	{
 		myObjects.push_back(std::make_shared<MenuObject>(aID, aPosition));
-		myObjectIdCounter = aID + 1;
 	}
 
 	myLastObjectIndex = myObjects.size() - 1;
-
 	return *myObjects[myLastObjectIndex];
 }
 
@@ -97,13 +92,17 @@ void MENU::ObjectManager::RemoveObjectAtIndex(unsigned int aIndex)
 	assert(aIndex <= myLastObjectIndex && "Index is out of range!");
 
 	myObjects.erase(myObjects.begin() + aIndex);
-	myObjectIdCounter--;
 	myLastObjectIndex = myObjects.size() - 1;
 }
 
 void MENU::ObjectManager::ClearAll()
 {
+	IDManager* idManager = IDManager::GetInstance();
+	for (unsigned int i = 0; i < myObjects.size(); i++)
+	{
+		idManager->FreeID(myObjects[i]->GetID());
+	}
+
 	myObjects.clear();
-	myObjectIdCounter = 0;
 	myLastObjectIndex = 0;
 }

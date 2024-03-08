@@ -24,14 +24,13 @@ namespace MENU
 		MenuObject& GetObjectFromIndex(unsigned int aIndex);
 		
 		void RemoveObjectAtID(unsigned int aID);
-		void RemoveObjectAtIndex(unsigned int aIndex);
 
 		void ClearAll();
 
 	private:
 		std::vector<std::shared_ptr<MenuObject>> myObjects;
-		unsigned int myObjectIdCounter;
 		size_t myLastObjectIndex;
 
+		void RemoveObjectAtIndex(unsigned int aIndex);
 	};
 }

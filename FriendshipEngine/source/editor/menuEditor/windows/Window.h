@@ -6,7 +6,7 @@
 
 namespace MENU
 {
-	enum class ID
+	enum class WindowID
 	{
 		MenuView,
 		MenuObjectHierarchy,

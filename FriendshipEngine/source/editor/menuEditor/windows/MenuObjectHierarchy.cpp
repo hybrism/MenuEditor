@@ -28,21 +28,18 @@ void MENU::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
-		if (ImGui::Button("Add New State"))
-		{
-			ImGui::OpenPopup("Add State");
-			myNewStateName = "(Untitled)";
-		}
-
-		AddStatePopup(aContext);
+		ImGui::SeparatorText("MenuStates");
+		AddStateButton(aContext);
 
 		if (ImGui::BeginChild("MenuStates", ImVec2(ImGui::GetContentRegionAvail().x, 80.f), true))
 		{
 			auto& states = aContext.menuHandler->GetAllStates();
+			mySelectedStateID = aContext.menuHandler->GetCurrentState().id;
 
 			for (size_t i = 0; i < states.size(); i++)
 			{
-				if (ImGui::Selectable(states[i].name.c_str(), states[i].id == mySelectedStateID))
+				std::string displayName = std::to_string(i) + " " + states[i].name;
+				if (ImGui::Selectable(displayName.c_str(), states[i].id == mySelectedStateID))
 				{
 					mySelectedStateID = states[i].id;
 					mySelectedObjectID = UINT_MAX;
@@ -55,10 +52,9 @@ void MENU::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 			ImGui::EndChild();
 		}
 
-		if (ImGui::Button("Add Empty Object"))
-		{
-			aContext.menuHandler->CreateNewObject(myViewportCenter);
-		}
+		ImGui::SeparatorText("Objects");
+
+		AddObjectButton(aContext);
 
 		if (ImGui::BeginChild("MenuObjects", ImGui::GetContentRegionAvail(), true))
 		{
@@ -120,11 +116,12 @@ void MENU::MenuObjectHierarchy::PushMenuObjectToInspector(unsigned int aID)
 	FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::PushEntityToInspector, aID });
 }
 
-void MENU::MenuObjectHierarchy::AddStatePopup(const UpdateContext& aContext)
+void MENU::MenuObjectHierarchy::AddStateButton(const UpdateContext& aContext)
 {
-	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-	if (ImGui::BeginPopupModal("Add State", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::Button("Add new Sub-Menu", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
+		myNewStateName = "(Untitled)";
+
+	if (ImGui::BeginPopupContextItem(0, ImGuiPopupFlags_MouseButtonLeft))
 	{
 		ImGui::InputText("Name", &myNewStateName);
 		ImGui::Spacing();
@@ -142,6 +139,26 @@ void MENU::MenuObjectHierarchy::AddStatePopup(const UpdateContext& aContext)
 
 		ImGui::EndPopup();
 	}
+}
 
+void MENU::MenuObjectHierarchy::AddObjectButton(const UpdateContext& aContext)
+{
+	if (ImGui::Button("Add new Object", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
+	{ }
 
+	if (ImGui::BeginPopupContextItem(0, ImGuiPopupFlags_MouseButtonLeft))
+	{
+		if (ImGui::Button("Add empty", ImVec2(120, 0)))
+		{
+			aContext.menuHandler->CreateNewObject(myViewportCenter);
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
 }

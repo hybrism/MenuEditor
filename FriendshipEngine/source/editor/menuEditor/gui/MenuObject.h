@@ -3,7 +3,10 @@
 #include <vector>
 #include <memory>
 #include <cassert>
+
+#include "IDManager.h"
 #include "MenuUpdateContext.h"
+
 #include "components/ComponentTypeEnum.h"
 #include "components/MenuComponent.h"
 
@@ -15,11 +18,12 @@ namespace MENU
 
 	public:
 		MenuObject(const unsigned int aID, const Vector2f& aPosition = { 0.f, 0.f });
+		~MenuObject();
 
 		template<class T>
 		T& AddComponent();
 
-		void RemoveComponent(const unsigned int aID);
+		void RemoveComponent(const ID aID);
 
 		template<class T>
 		T& GetComponent();
@@ -42,7 +46,7 @@ namespace MENU
 		void SetName(const std::string& aName) { myName = aName; }
 		void SetPosition(const Vector2f& aPosition);
 
-		const unsigned int GetID() const { return myID; }
+		const ID GetID() const { return myID; }
 		std::string& GetName() { return myName; }
 		Vector2f GetPosition() const { return myPosition; }
 
@@ -51,8 +55,7 @@ namespace MENU
 
 		std::vector<std::shared_ptr<MenuComponent>> myComponents;
 
-		const unsigned int myID;
-		unsigned int myComponentIDCounter;
+		const ID myID;
 		std::string myName;
 		Vector2f myPosition;
 	};
@@ -61,7 +64,7 @@ namespace MENU
 template<class T>
 inline T& MENU::MenuObject::AddComponent()
 {
-	std::shared_ptr<T> component = std::make_shared<T>(*this, ++myComponentIDCounter);
+	std::shared_ptr<T> component = std::make_shared<T>(*this, IDManager::GetInstance()->GetFreeID());
 	myComponents.emplace_back(component);
 	return *component;
 }

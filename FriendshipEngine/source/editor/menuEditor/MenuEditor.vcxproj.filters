@@ -16,6 +16,9 @@
     <ClInclude Include="MenuEditorCommon.h" />
     <ClInclude Include="MenuEditorLauncher.h" />
     <ClInclude Include="UpdateContext.h" />
+    <ClInclude Include="gui\IDManager.h">
+      <Filter>gui</Filter>
+    </ClInclude>
     <ClInclude Include="gui\MenuHandler.h">
       <Filter>gui</Filter>
     </ClInclude>
@@ -68,6 +71,9 @@
   <ItemGroup>
     <ClCompile Include="MenuEditor.cpp" />
     <ClCompile Include="MenuEditorLauncher.cpp" />
+    <ClCompile Include="gui\IDManager.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
     <ClCompile Include="gui\MenuHandler.cpp">
       <Filter>gui</Filter>
     </ClCompile>

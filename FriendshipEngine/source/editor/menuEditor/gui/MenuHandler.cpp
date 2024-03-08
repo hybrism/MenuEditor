@@ -1,15 +1,16 @@
 #include "MenuHandler.h"
 #include <fstream>
 #include <ostream>
+#include <engine/Paths.h>
 #include <engine/utility/Error.h>
+#include <engine/graphics/GraphicsEngine.h>
+#include <assets/TextureFactory.h>
 
 #include <nlohmann/json.hpp>
-#include <assets/TextureFactory.h>
-
-#include <engine/Paths.h>
-#include <assets/TextureFactory.h>
 #include <shared/postMaster/PostMaster.h>
+
 #include "MenuObject.h"
+
 #include "../MenuEditorCommon.h"
 #include "components/SpriteComponent.h"
 #include "components/TextComponent.h"
@@ -24,6 +25,10 @@ MENU::MenuHandler::~MenuHandler()
 
 void MENU::MenuHandler::Init(const std::string& aMenuFile)
 {
+	//TODO:  ViewPort != RenderSize, add get RenderSize to graphicsengine 23.f is the height of menubar?
+	Vector2i viewport = GraphicsEngine::GetInstance()->GetViewportDimensions();
+	myRenderSize = { (float)viewport.x, (float)viewport.y + 23.f };
+
 	LoadFromJson(aMenuFile);
 }
 
@@ -32,37 +37,40 @@ void MENU::MenuHandler::Update(const MenuUpdateContext& aContext)
 	if (myStateStack.empty())
 		return;
 
-	for (unsigned int ID : myStateStack.top()->objectIds)
+	for (ID id : myStateStack.top()->objectIds)
 	{
-		MenuObject& currentObj = myObjectManager.GetObjectFromID(ID);
+		MenuObject& currentObj = myObjectManager.GetObjectFromID(id);
 		currentObj.Update(aContext);
 
 		if (currentObj.HasComponent<CommandComponent>())
 		{
-			if (currentObj.IsPressed())
+			if (!currentObj.IsPressed())
+				return;
+
+			auto& command = currentObj.GetComponent<CommandComponent>();
+			switch (command.GetCommand())
 			{
-				auto& command = currentObj.GetComponent<CommandComponent>();
-				switch (command.GetCommand())
-				{
-				case eCommandType::PopMenu:
-					PopState();
-					break;
-				case eCommandType::PushSettingsMenu:
-					PushState(1);
-					break;
-				case eCommandType::PushLevelSelectMenu:
-					PushState(2);
-					break;
-				case eCommandType::LoadLevel3:
-					PrintI("Load Level 3!");
-					break;
-				case eCommandType::LoadFeatureGym:
-					PrintI("Load FeatureGym!");
-					break;
-				case eCommandType::QuitGame:
-					PrintI("Quit Game!");
-					break;
-				}
+			case eCommandType::PopMenu:
+				PrintI("Go back to previous menu");
+				//PopState();
+				break;
+			case eCommandType::PushSettingsMenu:
+				PrintI("Open Settings menu");
+				//PushState(1);
+				break;
+			case eCommandType::PushLevelSelectMenu:
+				PrintI("Open Level Select menu");
+				//PushState(2);
+				break;
+			case eCommandType::LoadLevel3:
+				PrintI("Load Level 3!");
+				break;
+			case eCommandType::LoadFeatureGym:
+				PrintI("Load FeatureGym!");
+				break;
+			case eCommandType::QuitGame:
+				PrintI("Quit Game!");
+				break;
 			}
 		}
 
@@ -74,9 +82,9 @@ void MENU::MenuHandler::Render()
 	if (myStateStack.empty())
 		return;
 
-	for (unsigned int ID : myStateStack.top()->objectIds)
+	for (ID id : myStateStack.top()->objectIds)
 	{
-		myObjectManager.GetObjectFromID(ID).Render();
+		myObjectManager.GetObjectFromID(id).Render();
 	}
 }
 
@@ -85,12 +93,12 @@ void MENU::MenuHandler::AddNewState(const std::string& aName)
 	MenuState newState;
 
 	newState.name = aName;
-	newState.id = myStateIDCounter++;
+	newState.id = IDManager::GetInstance()->GetFreeID();
 
-	myStates.push_back(newState);
+	myStates.push_back(newState); 
 }
 
-void MENU::MenuHandler::PushState(unsigned int aID)
+void MENU::MenuHandler::PushState(ID aID)
 {
 	for (size_t i = 0; i < myStates.size(); i++)
 	{
@@ -107,22 +115,22 @@ void MENU::MenuHandler::PopState()
 	myStateStack.pop();
 }
 
-MENU::MenuObject& MENU::MenuHandler::GetObjectFromID(unsigned int aID)
+MENU::MenuObject& MENU::MenuHandler::GetObjectFromID(ID aID)
 {
 	return myObjectManager.GetObjectFromID(aID);
 }
 
-MENU::MenuObject& MENU::MenuHandler::GetObjectFromIndex(unsigned int aIndex)
+MENU::MenuObject& MENU::MenuHandler::GetObjectFromIndex(ID aIndex)
 {
-	return myObjectManager.GetObjectFromID(GetCurrentState().objectIds[aIndex]);	
+	return myObjectManager.GetObjectFromID(GetCurrentState().objectIds[aIndex]);
 }
 
 MENU::MenuObject& MENU::MenuHandler::CreateNewObject(const Vector2f& aPosition)
 {
-	MenuObject& newObject = myObjectManager.CreateNew(UINT_MAX, aPosition);
+	ID id = IDManager::GetInstance()->GetFreeID();
+	MenuObject& newObject = myObjectManager.CreateNew(id, aPosition);
+	GetCurrentState().objectIds.push_back(id);
 
-	GetCurrentState().objectIds.push_back(newObject.GetID());
-	
 	return newObject;
 }
 
@@ -138,7 +146,7 @@ std::vector<MENU::MenuState>& MENU::MenuHandler::GetAllStates()
 	return myStates;
 }
 
-void MENU::MenuHandler::RemoveObjectAtID(unsigned int aID)
+void MENU::MenuHandler::RemoveObjectAtID(ID aID)
 {
 	for (size_t i = 0; i < myStates.size(); i++)
 	{
@@ -153,9 +161,10 @@ void MENU::MenuHandler::RemoveObjectAtID(unsigned int aID)
 	}
 
 	myObjectManager.RemoveObjectAtID(aID);
+	IDManager::GetInstance()->FreeID(aID);
 }
 
-void MENU::MenuHandler::MoveUpObjectAtID(unsigned int aID)
+void MENU::MenuHandler::MoveUpObjectAtID(ID aID)
 {
 	for (size_t indexOfObjectToMove = 0; indexOfObjectToMove < GetCurrentState().objectIds.size(); indexOfObjectToMove++)
 	{
@@ -165,13 +174,13 @@ void MENU::MenuHandler::MoveUpObjectAtID(unsigned int aID)
 		if (indexOfObjectToMove == 0)
 			return;
 
-		unsigned int temp = GetCurrentState().objectIds[indexOfObjectToMove - 1];
+		ID temp = GetCurrentState().objectIds[indexOfObjectToMove - 1];
 		GetCurrentState().objectIds[indexOfObjectToMove - 1] = GetCurrentState().objectIds[indexOfObjectToMove];
 		GetCurrentState().objectIds[indexOfObjectToMove] = temp;
 	}
 }
 
-void MENU::MenuHandler::MoveDownObjectAtID(unsigned int aID)
+void MENU::MenuHandler::MoveDownObjectAtID(ID aID)
 {
 	for (size_t indexOfObjectToMove = 0; indexOfObjectToMove < GetCurrentState().objectIds.size(); indexOfObjectToMove++)
 	{
@@ -181,7 +190,7 @@ void MENU::MenuHandler::MoveDownObjectAtID(unsigned int aID)
 		if (indexOfObjectToMove == GetCurrentState().objectIds.size() - 1)
 			return;
 
-		unsigned int temp = GetCurrentState().objectIds[indexOfObjectToMove + 1];
+		ID temp = GetCurrentState().objectIds[indexOfObjectToMove + 1];
 		GetCurrentState().objectIds[indexOfObjectToMove + 1] = GetCurrentState().objectIds[indexOfObjectToMove];
 		GetCurrentState().objectIds[indexOfObjectToMove] = temp;
 	}
@@ -189,6 +198,8 @@ void MENU::MenuHandler::MoveDownObjectAtID(unsigned int aID)
 
 void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 {
+	IDManager* idManager = IDManager::GetInstance();
+
 	myObjectManager.ClearAll();
 	myStates.clear();
 
@@ -214,20 +225,20 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 	{
 		MenuState newState;
 		newState.name = menuFile["menuState"][i]["name"];
-		newState.id = menuFile["menuState"][i]["ID"];
+		newState.id = idManager->UseID(menuFile["menuState"][i]["ID"]);
 		for (size_t j = 0; j < menuFile["menuState"][i]["objects"].size(); j++)
 		{
 			newState.objectIds.push_back(menuFile["menuState"][i]["objects"][j]);
 		}
-		myStateIDCounter++;
 		myStates.push_back(newState);
 	}
 
 	for (size_t i = 0; i < menuFile["objectID"].size(); i++)
 	{
-		MenuObject& obj = myObjectManager.CreateNew(menuFile["objectID"][i]["objectID"]);
+		ID id = menuFile["objectID"][i]["objectID"];
+		MenuObject& obj = myObjectManager.CreateNew(id);
 		obj.SetName(menuFile["objectID"][i]["name"]);
-		obj.SetPosition(JsonToVec2(menuFile["objectID"][i]["position"]));
+		obj.SetPosition(JsonToScreenPosition(menuFile["objectID"][i]["position"]));
 	}
 
 	nlohmann::json spriteComponents = menuFile["spriteComponents"];
@@ -249,7 +260,7 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 			sprite.SetColor(JsonToColorVec(textures[textureStateIndex]["color"]), (TextureState)textureStateIndex);
 		}
 
-		sprite.SetPosition(JsonToVec2(spriteComponents[i]["position"]));
+		sprite.SetPosition(JsonToScreenPosition(spriteComponents[i]["position"]));
 		sprite.SetSize(JsonToVec2(spriteComponents[i]["size"]));
 		sprite.SetPivot(JsonToVec2(spriteComponents[i]["pivot"]));
 		sprite.SetScaleMultiplier(JsonToVec2(spriteComponents[i]["scaleMultiplier"]));
@@ -273,7 +284,8 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 		text.SetFont(textComponents[i]["font"]);
 		text.SetFontSize((eSize)textComponents[i]["fontSize"]);
 		text.SetText(textComponents[i]["textString"]);
-		text.SetPosition(JsonToVec2(textComponents[i]["position"]));
+		text.SetPosition(JsonToScreenPosition(textComponents[i]["position"]));
+		text.SetColor(JsonToColorVec(textComponents[i]["color"]));
 		text.SetIsCentered(textComponents[i]["isCentered"]);
 
 	}
@@ -284,7 +296,7 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 		size_t ownerID = colliderComponents[i]["ownerID"];
 		Collider2DComponent& collider = myObjectManager.myObjects[ownerID]->AddComponent<Collider2DComponent>();
 
-		collider.SetPosition(JsonToVec2(colliderComponents[i]["position"]));
+		collider.SetPosition(JsonToScreenPosition(colliderComponents[i]["position"]));
 		collider.SetSize(JsonToVec2(colliderComponents[i]["size"]));
 	}
 
@@ -294,6 +306,15 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 		size_t ownerID = commandComponents[i]["ownerID"];
 		CommandComponent& command = myObjectManager.myObjects[ownerID]->AddComponent<CommandComponent>();
 		command.SetCommand((eCommandType)commandComponents[i]["command"]);
+	}
+
+	if (myStates.empty())
+	{
+		MenuState newState;
+		newState.name = "Base";
+		newState.id = idManager->GetFreeID();
+
+		myStates.push_back(newState);
 	}
 
 	myStateStack.push(&myStates.front());
@@ -317,6 +338,16 @@ Vector2f MENU::MenuHandler::JsonToVec2(nlohmann::json aJson)
 	vec.y = aJson["y"];
 
 	return vec;
+}
+
+Vector2f MENU::MenuHandler::JsonToScreenPosition(nlohmann::json aJson)
+{
+	Vector2f screenPosition = JsonToVec2(aJson);
+
+	screenPosition.x *= myRenderSize.x;
+	screenPosition.y *= myRenderSize.y;
+
+	return screenPosition;
 }
 
 void MENU::MenuHandler::SaveToJson()
@@ -347,7 +378,7 @@ void MENU::MenuHandler::SaveToJson()
 
 		objectData["objectID"] = object.GetID();
 		objectData["name"] = object.GetName();
-		objectData["position"] = Vec2ToJson(object.GetPosition());
+		objectData["position"] = ScreenPositionToJson(object.GetPosition());
 		objectIds.push_back(objectData);
 	}
 
@@ -378,7 +409,7 @@ void MENU::MenuHandler::SaveToJson()
 					spriteEntry["textures"].push_back(textureEntry);
 				}
 
-				spriteEntry["position"] = Vec2ToJson(sprite.GetPosition());
+				spriteEntry["position"] = ScreenPositionToJson(sprite.GetPosition());
 				spriteEntry["size"] = Vec2ToJson(sprite.GetSize());
 				spriteEntry["pivot"] = Vec2ToJson(sprite.GetPivot());
 				spriteEntry["scaleMultiplier"] = Vec2ToJson(sprite.GetScaleMultiplier());
@@ -398,10 +429,11 @@ void MENU::MenuHandler::SaveToJson()
 			nlohmann::json textEntry;
 			textEntry["ownerID"] = i;
 			textEntry["textString"] = text.GetText();
-			textEntry["position"] = Vec2ToJson(text.GetPosition());
+			textEntry["position"] = ScreenPositionToJson(text.GetPosition());
 			textEntry["font"] = text.GetFontName();
 			textEntry["fontSize"] = (int)text.GetFontSize();
 			textEntry["isCentered"] = text.GetIsCentered();
+			textEntry["color"] = ColorVecToJson(text.GetColor());
 			textComponents.push_back(textEntry);
 		}
 
@@ -410,7 +442,7 @@ void MENU::MenuHandler::SaveToJson()
 			Collider2DComponent collider = myObjectManager.myObjects[i]->GetComponent<Collider2DComponent>();
 			nlohmann::json colliderEntry;
 			colliderEntry["ownerID"] = i;
-			colliderEntry["position"] = Vec2ToJson(collider.GetPosition());
+			colliderEntry["position"] = ScreenPositionToJson(collider.GetPosition());
 			colliderEntry["size"] = Vec2ToJson(collider.GetSize());
 			colliderComponents.push_back(colliderEntry);
 		}
@@ -463,4 +495,10 @@ nlohmann::json MENU::MenuHandler::Vec2ToJson(const Vector2f& aVec)
 	vec["y"] = aVec.y;
 
 	return vec;
+}
+
+nlohmann::json MENU::MenuHandler::ScreenPositionToJson(const Vector2f& aPosition)
+{
+	Vector2f screenPos = { aPosition.x / myRenderSize.x, aPosition.y / myRenderSize.y };
+	return Vec2ToJson(screenPos);
 }

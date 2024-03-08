@@ -150,6 +150,7 @@ void MENU::InspectorWindow::EditSpriteComponent(const UpdateContext& aContext, M
 		Vector2f position = sprite.GetPosition();
 		ImGui::PushID(componentIndex);
 		ImGui::SeparatorText("Sprite");
+		ImGui::Text("ComponentID: %i", sprite.GetID());
 
 		Vector2f texSize = sprite.GetTextureSize();
 		ImGui::Text("Texture size x: %i y: %i", (int)texSize.x, (int)texSize.y);
@@ -228,6 +229,7 @@ void MENU::InspectorWindow::EditTextComponent(const UpdateContext& aContext, Men
 
 		ImGui::PushID(componentIndex);
 		ImGui::SeparatorText("Text");
+		ImGui::Text("ComponentID: %i", text.GetID());
 
 		std::string string = text.GetText();
 		Vector2f position = text.GetPosition();
@@ -305,6 +307,7 @@ void MENU::InspectorWindow::EditCollider2DComponent(MenuObject& aObject)
 	Collider2DComponent& collider = aObject.GetComponent<Collider2DComponent>();
 	ImGui::PushID("2DCollider");
 	ImGui::SeparatorText("Collider");
+	ImGui::Text("ComponentID: %i", collider.GetID());
 
 	Vector2f position = collider.GetPosition();
 	Vector2f size = collider.GetSize();
@@ -331,6 +334,7 @@ void MENU::InspectorWindow::EditCommandComponent(MenuObject& aObject)
 	CommandComponent& command = aObject.GetComponent<CommandComponent>();
 	ImGui::PushID("Command");
 	ImGui::SeparatorText("Command");
+	ImGui::Text("ComponentID: %i", command.GetID());
 
 	eCommandType currentType = command.GetCommand();
 	if (ImGui::BeginCombo("Commands", CommandNames[(int)currentType]))

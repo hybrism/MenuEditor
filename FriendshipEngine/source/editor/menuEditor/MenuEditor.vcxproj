@@ -108,6 +108,7 @@
     <ClInclude Include="MenuEditorCommon.h" />
     <ClInclude Include="MenuEditorLauncher.h" />
     <ClInclude Include="UpdateContext.h" />
+    <ClInclude Include="gui\IDManager.h" />
     <ClInclude Include="gui\MenuHandler.h" />
     <ClInclude Include="gui\MenuObject.h" />
     <ClInclude Include="gui\MenuUpdateContext.h" />
@@ -128,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="MenuEditor.cpp" />
     <ClCompile Include="MenuEditorLauncher.cpp" />
+    <ClCompile Include="gui\IDManager.cpp" />
     <ClCompile Include="gui\MenuHandler.cpp" />
     <ClCompile Include="gui\MenuObject.cpp" />
     <ClCompile Include="gui\ObjectManager.cpp" />

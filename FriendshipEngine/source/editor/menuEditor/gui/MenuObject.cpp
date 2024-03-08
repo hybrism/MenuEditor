@@ -10,17 +10,29 @@ MENU::MenuObject::MenuObject(const unsigned int aID, const Vector2f& aPosition)
 	: myID(aID)
 	, myName("(Untitled)")
 	, myPosition(aPosition)
-	, myComponentIDCounter(0)
 {
 }
 
-void MENU::MenuObject::RemoveComponent(const unsigned int aID)
+MENU::MenuObject::~MenuObject()
+{
+	IDManager* idManager = IDManager::GetInstance();
+
+	for (size_t i = 0; i < myComponents.size(); i++)
+	{
+		idManager->FreeID(myComponents[i]->GetID());
+	}
+
+	idManager->FreeID(myID);
+}
+
+void MENU::MenuObject::RemoveComponent(const ID aID)
 {
 	for (size_t i = 0; i < myComponents.size(); i++)
 	{
 		if (myComponents[i]->GetID() == aID)
 		{
 			myComponents.erase(myComponents.begin() + i);
+			IDManager::GetInstance()->FreeID(aID);
 			return;
 		}
 	}

@@ -19,6 +19,7 @@ namespace MENU
 		std::string myNewStateName;
 
 		void PushMenuObjectToInspector(unsigned int aID);
-		void AddStatePopup(const UpdateContext& aContext);
+		void AddStateButton(const UpdateContext& aContext);
+		void AddObjectButton(const UpdateContext& aContext);
 	};
 }

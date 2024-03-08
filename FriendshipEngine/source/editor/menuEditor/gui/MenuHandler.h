@@ -3,6 +3,7 @@
 #include <string>
 #include <nlohmann/json_fwd.hpp>
 
+#include "IDManager.h"
 #include "ObjectManager.h"
 #include "MenuUpdateContext.h"
 
@@ -11,8 +12,8 @@ namespace MENU
 	struct MenuState
 	{
 		std::string name;
-		std::vector<unsigned int> objectIds;
-		unsigned int id;
+		std::vector<ID> objectIds;
+		ID id;
 	};
 
 	class MenuHandler
@@ -28,18 +29,18 @@ namespace MENU
 		void Render();
 		
 		void AddNewState(const std::string& aName);
-		void PushState(unsigned int aID);
+		void PushState(ID aID);
 		void PopState();
 
 		MenuState& GetCurrentState();
 		std::vector<MenuState>& GetAllStates();
 
-		MenuObject& GetObjectFromID(unsigned int aID);
-		MenuObject& GetObjectFromIndex(unsigned int aIndex);
+		MenuObject& GetObjectFromID(ID aID);
+		MenuObject& GetObjectFromIndex(ID aIndex);
 
-		void RemoveObjectAtID(unsigned int aID);
-		void MoveUpObjectAtID(unsigned int aID);
-		void MoveDownObjectAtID(unsigned int aID);
+		void RemoveObjectAtID(ID aID);
+		void MoveUpObjectAtID(ID aID);
+		void MoveDownObjectAtID(ID aID);
 
 		MenuObject& CreateNewObject(const Vector2f& aPosition = { 0.f, 0.f });
 
@@ -47,11 +48,13 @@ namespace MENU
 		void LoadFromJson(const std::string& aMenuFile);
 		Vector4f JsonToColorVec(nlohmann::json aJson);
 		Vector2f JsonToVec2(nlohmann::json aJson);
+		Vector2f JsonToScreenPosition(nlohmann::json aJson);
 
 		//TODO: These are not needed in game
 		void SaveToJson();
 		nlohmann::json ColorVecToJson(const Vector4f& aVec);
 		nlohmann::json Vec2ToJson(const Vector2f& aVec);
+		nlohmann::json ScreenPositionToJson(const Vector2f& aPosition);
 
 	private:
 		ObjectManager myObjectManager;
@@ -63,7 +66,6 @@ namespace MENU
 		std::stack<MenuState*> myStateStack;
 		std::vector<MenuState> myStates;
 
-		//TODO: Fix a general ID-generator class?
-		unsigned int myStateIDCounter;
+		Vector2f myRenderSize;
 	};
 }
