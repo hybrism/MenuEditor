@@ -3,7 +3,6 @@
 
 #include "components/Collider2DComponent.h"
 
-#include "IDManager.h"
 #include "MenuObject.h"
 
 MENU::ObjectManager::ObjectManager()
@@ -29,22 +28,18 @@ void MENU::ObjectManager::CheckCollision(const Vector2f& aPosition, bool aIsPres
 {
 	for (size_t i = 0; i < myObjects.size(); i++)
 	{
-		if (myObjects[i]->HasComponent<Collider2DComponent>())
-		{
-			Collider2DComponent& collider = myObjects[i]->GetComponent<Collider2DComponent>();
+		if (!myObjects[i]->HasComponent<Collider2DComponent>())
+			return;
 
-			collider.CheckCollision(aPosition, aIsPressed);
-		}
+		myObjects[i]->GetComponent<Collider2DComponent>().CheckCollision(aPosition, aIsPressed);
 	}
 }
 
-MENU::MenuObject& MENU::ObjectManager::CreateNew(unsigned int aID, const Vector2f& aPosition)
+MENU::MenuObject& MENU::ObjectManager::CreateNew(ID aID, const Vector2f& aPosition)
 {
-	IDManager* idManager = IDManager::GetInstance();
-
-	if (aID == UINT_MAX)
+	if (aID == INVALID_ID)
 	{
-		myObjects.push_back(std::make_shared<MenuObject>(idManager->GetFreeID(), aPosition));
+		myObjects.push_back(std::make_shared<MenuObject>(IDManager::GetInstance()->GetFreeID(), aPosition));
 	}
 	else
 	{
@@ -55,7 +50,7 @@ MENU::MenuObject& MENU::ObjectManager::CreateNew(unsigned int aID, const Vector2
 	return *myObjects[myLastObjectIndex];
 }
 
-MENU::MenuObject& MENU::ObjectManager::GetObjectFromID(unsigned int aID)
+MENU::MenuObject& MENU::ObjectManager::GetObjectFromID(ID aID)
 {
 	for (size_t i = 0; i < myObjects.size(); i++)
 	{
@@ -74,7 +69,7 @@ MENU::MenuObject& MENU::ObjectManager::GetObjectFromIndex(unsigned int aIndex)
 	return *myObjects[aIndex];
 }
 
-void MENU::ObjectManager::RemoveObjectAtID(unsigned int aID)
+void MENU::ObjectManager::RemoveObjectAtID(ID aID)
 {
 	for (unsigned int i = 0; i < myObjects.size(); i++)
 	{

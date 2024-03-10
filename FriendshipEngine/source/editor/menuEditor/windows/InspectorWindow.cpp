@@ -336,7 +336,7 @@ void MENU::InspectorWindow::EditCommandComponent(MenuObject& aObject)
 	ImGui::SeparatorText("Command");
 	ImGui::Text("ComponentID: %i", command.GetID());
 
-	eCommandType currentType = command.GetCommand();
+	eCommandType currentType = command.GetCommandType();
 	if (ImGui::BeginCombo("Commands", CommandNames[(int)currentType]))
 	{
 		for (size_t i = 0; i < IM_ARRAYSIZE(CommandNames); i++)
@@ -344,13 +344,49 @@ void MENU::InspectorWindow::EditCommandComponent(MenuObject& aObject)
 			bool isSelected = ((int)currentType == i);
 
 			if (ImGui::Selectable(CommandNames[i], isSelected))
-				command.SetCommand((eCommandType)i);
+				command.SetCommandType((eCommandType)i);
 
 			if (isSelected)
 				ImGui::SetItemDefaultFocus();
 		}
 
 		ImGui::EndCombo();
+	}
+
+	switch (command.GetCommandType())
+	{
+	case eCommandType::PopMenu:
+	{
+		break;
+	}
+	case eCommandType::PushMenu:
+	{
+		static int menuID = 0;
+		ImGui::InputInt("Menu to load", &menuID);
+		command.SetCommandData({ (ID)menuID });
+		break;
+	}
+	case eCommandType::LoadLevel:
+	{
+		static std::string level = "(None)";
+		ImGui::InputText("Level to load", &level);
+		command.SetCommandData({ level });
+		break;
+	}
+	case eCommandType::ResumeGame:
+	{
+		break;
+	}
+	case eCommandType::BackToMainMenu:
+	{
+		break;
+	}
+	case eCommandType::QuitGame:
+	{
+		break;
+	}
+	default:
+		break;
 	}
 
 

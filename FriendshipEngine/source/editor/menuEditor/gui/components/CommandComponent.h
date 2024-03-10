@@ -1,4 +1,8 @@
 #pragma once
+#include <variant>
+#include <string>
+
+#include "../IDManager.h"
 #include "MenuComponent.h"
 
 namespace MENU
@@ -8,25 +12,31 @@ namespace MENU
 	enum class eCommandType
 	{
 		PopMenu,
-		PushSettingsMenu,
-		PushLevelSelectMenu,
-		LoadLevel3,
-		LoadFeatureGym,
+		PushMenu,
+		LoadLevel,
+		ResumeGame,
+		BackToMainMenu,
 		QuitGame,
+
 		Count
 	};
 
 	static const char* CommandNames[] =
 	{
 		"Pop Menu",
-		"Push Settings Menu",
-		"Push Level Select Menu",
-		"Load Level 3",
-		"Load Feature Gym",
+		"Push Menu",
+		"Load Level",
+		"Resume Game",
+		"Back to Main Menu",
 		"Quit Game",
 		"None"
 	};
 	
+	struct CommandData
+	{
+		std::variant<std::monostate, std::string, ID> data;
+	};
+
 	class CommandComponent : public MenuComponent
 	{
 	public:
@@ -34,10 +44,14 @@ namespace MENU
 
 		void Update(const MenuUpdateContext& aContext) override;
 
-		void SetCommand(eCommandType aType);
-		eCommandType GetCommand() const;
+		void SetCommandType(eCommandType aType);
+		void SetCommandData(CommandData aData);
+
+		eCommandType GetCommandType() const;
+		CommandData GetCommandData();
 
 	private:
 		eCommandType myCommandType;
+		CommandData myCommandData;
 	};
 }

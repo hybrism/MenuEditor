@@ -10,7 +10,12 @@
 namespace MENU
 {
 	struct MenuState
-	{
+	{ 
+		~MenuState()
+		{
+			IDManager::GetInstance()->FreeID(id);
+		}
+
 		std::string name;
 		std::vector<ID> objectIds;
 		ID id;

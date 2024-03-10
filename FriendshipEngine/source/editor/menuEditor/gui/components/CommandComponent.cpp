@@ -13,12 +13,22 @@ void MENU::CommandComponent::Update(const MenuUpdateContext& aContext)
 	aContext;
 }
 
-void MENU::CommandComponent::SetCommand(eCommandType aType)
+void MENU::CommandComponent::SetCommandType(eCommandType aType)
 {
 	myCommandType = aType;
 }
 
-MENU::eCommandType MENU::CommandComponent::GetCommand() const
+void MENU::CommandComponent::SetCommandData(CommandData aData)
+{
+	myCommandData = aData;
+}
+
+MENU::eCommandType MENU::CommandComponent::GetCommandType() const
 {
 	return myCommandType;
+}
+
+MENU::CommandData MENU::CommandComponent::GetCommandData()
+{
+	return myCommandData;
 }

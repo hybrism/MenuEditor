@@ -144,7 +144,8 @@ void MENU::MenuObjectHierarchy::AddStateButton(const UpdateContext& aContext)
 void MENU::MenuObjectHierarchy::AddObjectButton(const UpdateContext& aContext)
 {
 	if (ImGui::Button("Add new Object", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
-	{ }
+	{
+	}
 
 	if (ImGui::BeginPopupContextItem(0, ImGuiPopupFlags_MouseButtonLeft))
 	{

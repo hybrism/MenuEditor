@@ -5,6 +5,7 @@ namespace MENU
 {
 	using ID = unsigned int;
 	const ID MAX_ID = 512;
+	const ID INVALID_ID = UINT_MAX;
 
 	class IDManager
 	{

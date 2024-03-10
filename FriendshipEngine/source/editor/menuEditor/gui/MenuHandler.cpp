@@ -37,43 +37,61 @@ void MENU::MenuHandler::Update(const MenuUpdateContext& aContext)
 	if (myStateStack.empty())
 		return;
 
-	for (ID id : myStateStack.top()->objectIds)
+	for (size_t i = 0; i < myStateStack.top()->objectIds.size(); i++)
 	{
-		MenuObject& currentObj = myObjectManager.GetObjectFromID(id);
+		MenuObject& currentObj = myObjectManager.GetObjectFromID(myStateStack.top()->objectIds[i]);
 		currentObj.Update(aContext);
 
-		if (currentObj.HasComponent<CommandComponent>())
+		if (!currentObj.HasComponent<CommandComponent>())
+			continue;
+
+		if (!currentObj.IsPressed())
+			continue;
+
+		auto& command = currentObj.GetComponent<CommandComponent>();
+		switch (command.GetCommandType())
 		{
-			if (!currentObj.IsPressed())
-				return;
-
-			auto& command = currentObj.GetComponent<CommandComponent>();
-			switch (command.GetCommand())
-			{
-			case eCommandType::PopMenu:
-				PrintI("Go back to previous menu");
-				//PopState();
-				break;
-			case eCommandType::PushSettingsMenu:
-				PrintI("Open Settings menu");
-				//PushState(1);
-				break;
-			case eCommandType::PushLevelSelectMenu:
-				PrintI("Open Level Select menu");
-				//PushState(2);
-				break;
-			case eCommandType::LoadLevel3:
-				PrintI("Load Level 3!");
-				break;
-			case eCommandType::LoadFeatureGym:
-				PrintI("Load FeatureGym!");
-				break;
-			case eCommandType::QuitGame:
-				PrintI("Quit Game!");
-				break;
-			}
+		case eCommandType::PopMenu:
+		{
+			PrintI("Go back to previous menu");
+			PopState();
+			break;
 		}
+		case eCommandType::PushMenu:
+		{
+			PrintI("Open menu");
 
+			ID menuID = std::get<ID>(command.GetCommandData().data);
+			PushState(menuID);
+
+			Print(std::to_string(menuID));
+			break;
+		}
+		case eCommandType::LoadLevel:
+		{
+			PrintI("Load Level");
+			std::string levelName = std::get<std::string>(command.GetCommandData().data);
+			Print(levelName);
+			break;
+		}
+		case eCommandType::ResumeGame:
+		{
+			PrintI("Resume");
+			break;
+		}
+		case eCommandType::BackToMainMenu:
+		{
+			PrintI("Back to main");
+			break;
+		}
+		case eCommandType::QuitGame:
+		{
+			PrintI("Quit Game");
+			break;
+		}
+		default:
+			break;
+		}
 	}
 }
 
@@ -95,7 +113,8 @@ void MENU::MenuHandler::AddNewState(const std::string& aName)
 	newState.name = aName;
 	newState.id = IDManager::GetInstance()->GetFreeID();
 
-	myStates.push_back(newState); 
+	myStates.push_back(newState);
+	myStateStack.push(&myStates[myStates.size() - 1]);
 }
 
 void MENU::MenuHandler::PushState(ID aID)
@@ -127,9 +146,8 @@ MENU::MenuObject& MENU::MenuHandler::GetObjectFromIndex(ID aIndex)
 
 MENU::MenuObject& MENU::MenuHandler::CreateNewObject(const Vector2f& aPosition)
 {
-	ID id = IDManager::GetInstance()->GetFreeID();
-	MenuObject& newObject = myObjectManager.CreateNew(id, aPosition);
-	GetCurrentState().objectIds.push_back(id);
+	MenuObject& newObject = myObjectManager.CreateNew(INVALID_ID, aPosition);
+	myStateStack.top()->objectIds.push_back(newObject.GetID());
 
 	return newObject;
 }
@@ -305,7 +323,18 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 	{
 		size_t ownerID = commandComponents[i]["ownerID"];
 		CommandComponent& command = myObjectManager.myObjects[ownerID]->AddComponent<CommandComponent>();
-		command.SetCommand((eCommandType)commandComponents[i]["command"]);
+		command.SetCommandType((eCommandType)commandComponents[i]["commandType"]);
+
+		if (commandComponents[i].contains("commandData"))
+		{
+			if (commandComponents[i]["commandData"].is_string())
+				command.SetCommandData({ commandComponents[i]["commandData"].get<std::string>() });
+
+			if (commandComponents[i]["commandData"].is_number_integer())
+				command.SetCommandData({ commandComponents[i]["commandData"].get<ID>() });
+		}
+
+
 	}
 
 	if (myStates.empty())
@@ -452,7 +481,14 @@ void MENU::MenuHandler::SaveToJson()
 			CommandComponent command = myObjectManager.myObjects[i]->GetComponent<CommandComponent>();
 			nlohmann::json commandEntry;
 			commandEntry["ownerID"] = i;
-			commandEntry["command"] = (int)command.GetCommand();
+			commandEntry["commandType"] = (int)command.GetCommandType();
+
+			if (std::holds_alternative<std::string>(command.GetCommandData().data))
+				commandEntry["commandData"] = std::get<std::string>(command.GetCommandData().data);
+
+			if (std::holds_alternative<ID>(command.GetCommandData().data))
+				commandEntry["commandData"] = std::get<ID>(command.GetCommandData().data);
+
 			commandComponents.push_back(commandEntry);
 		}
 	}

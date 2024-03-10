@@ -39,7 +39,7 @@
 
 MENU::MenuEditor::MenuEditor()
 	: myFirstFrameSetup(true)
-	, mySelectedObjectID(UINT_MAX)
+	, mySelectedObjectID(INVALID_ID)
 	, myUpGizmoID(500)
 	, myRightGizmoID(501)
 {
@@ -449,13 +449,13 @@ void MENU::MenuEditor::RecieveMessage(const FE::Message& aMessage)
 	case FE::eMessageType::UpdateEditorColliders:
 	{
 		GenerateEditorColliders();
-		mySelectedObjectID = UINT_MAX;
+		mySelectedObjectID = INVALID_ID;
 		break;
 	}
 	case FE::eMessageType::NewMenuLoaded:
 	{
 		GenerateEditorColliders();
-		mySelectedObjectID = UINT_MAX;
+		mySelectedObjectID = INVALID_ID;
 		break;
 	}
 	default:
