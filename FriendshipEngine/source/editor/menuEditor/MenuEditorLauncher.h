@@ -23,8 +23,10 @@ private:
 	MENU::MenuEditor myMenuEditor;
 };
 
-namespace Utility
+namespace MENU
 {
-	bool IsFbx(std::wstring aPath);
-	bool IsDds(std::wstring aPath);
+	bool IsFbx(const std::wstring& aPath);
+	bool IsDds(const std::wstring& aPath);
+	bool IsTtf(const std::wstring& aPath);
+	std::string ExtractFileName(const std::wstring& aPath);
 }

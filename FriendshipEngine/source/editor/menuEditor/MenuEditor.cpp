@@ -63,6 +63,7 @@ void MENU::MenuEditor::Init()
 
 	//SUBSCRIBE TO EVENTS
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::DdsDropped);
+	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::TtfDropped);
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::PushEntityToInspector);
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::UpdateEditorColliders);
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::NewMenuLoaded);
@@ -234,7 +235,7 @@ void MENU::MenuEditor::GenerateEditorColliders()
 	for (unsigned int i = 0; i < currentState.objectIds.size(); i++)
 	{
 		MenuObject& menuMo = myMenuHandler.GetObjectFromID(currentState.objectIds[i]);
-		MenuObject& editorMo = myEditorObjectManager.CreateNew();
+		MenuObject& editorMo = myEditorObjectManager.CreateNew(IDManager::GetInstance()->GetFreeID());
 
 		myEditorIDToMenuIDMap[editorMo.GetID()] = menuMo.GetID();
 		myMenuIDToEditorIDMap[menuMo.GetID()] = editorMo.GetID();
@@ -438,12 +439,21 @@ void MENU::MenuEditor::RecieveMessage(const FE::Message& aMessage)
 	case FE::eMessageType::DdsDropped:
 	{
 		std::string filename = std::any_cast<std::string>(aMessage.myMessage);
-		PrintI(filename);
+		myAssets.textures.push_back(TextureFactory::CreateTexture(RELATIVE_SPRITE_ASSET_PATH + filename, false));
+		myAssets.textureIdToName.push_back(filename);
+		myAssets.textureNameToId[filename] = (UINT)myAssets.textures.size() - 1;
+		break;
+	}
+	case FE::eMessageType::TtfDropped:
+	{
+		std::string filename = std::any_cast<std::string>(aMessage.myMessage);
+		Print(filename);
+		myAssets.fontFiles.push_back(filename);
 		break;
 	}
 	case FE::eMessageType::PushEntityToInspector:
 	{
-		mySelectedObjectID = std::any_cast<unsigned int>(aMessage.myMessage);
+		mySelectedObjectID = std::any_cast<ID>(aMessage.myMessage);
 		break;
 	}
 	case FE::eMessageType::UpdateEditorColliders:

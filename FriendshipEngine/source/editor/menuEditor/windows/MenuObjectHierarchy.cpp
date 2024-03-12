@@ -34,6 +34,13 @@ void MENU::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 		if (ImGui::BeginChild("MenuStates", ImVec2(ImGui::GetContentRegionAvail().x, 80.f), true))
 		{
 			auto& states = aContext.menuHandler->GetAllStates();
+			if (states.empty())
+			{
+				ImGui::EndChild();
+				ImGui::End();
+				return;
+			}
+
 			mySelectedStateID = aContext.menuHandler->GetCurrentState().id;
 
 			for (size_t i = 0; i < states.size(); i++)
@@ -58,6 +65,9 @@ void MENU::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 
 		if (ImGui::BeginChild("MenuObjects", ImGui::GetContentRegionAvail(), true))
 		{
+			if (aContext.menuHandler->GetAllStates().empty())
+				ImGui::EndChild();
+
 			MenuState& state = aContext.menuHandler->GetCurrentState();
 
 			for (unsigned int objectIndex = 0; objectIndex < state.objectIds.size(); objectIndex++)

@@ -14,6 +14,7 @@ namespace FE
 	{
 		MeshDropped,
 		DdsDropped,
+		TtfDropped,
 		PrintToConsole,
 		PushEntityToInspector,
 		NewLevelLoaded,

@@ -25,7 +25,7 @@ private:
 	ModelViewer myModelViewer;
 };
 
-namespace Utility
+namespace MENU
 {
 	bool IsFbx(std::wstring aPath);
 }

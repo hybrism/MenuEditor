@@ -146,7 +146,7 @@ MENU::MenuObject& MENU::MenuHandler::GetObjectFromIndex(ID aIndex)
 
 MENU::MenuObject& MENU::MenuHandler::CreateNewObject(const Vector2f& aPosition)
 {
-	MenuObject& newObject = myObjectManager.CreateNew(INVALID_ID, aPosition);
+	MenuObject& newObject = myObjectManager.CreateNew(IDManager::GetInstance()->GetFreeID(), aPosition);
 	myStateStack.top()->objectIds.push_back(newObject.GetID());
 
 	return newObject;
@@ -254,7 +254,7 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 	for (size_t i = 0; i < menuFile["objectID"].size(); i++)
 	{
 		ID id = menuFile["objectID"][i]["objectID"];
-		MenuObject& obj = myObjectManager.CreateNew(id);
+		MenuObject& obj = myObjectManager.CreateNew(idManager->UseID(id));
 		obj.SetName(menuFile["objectID"][i]["name"]);
 		obj.SetPosition(JsonToScreenPosition(menuFile["objectID"][i]["position"]));
 	}

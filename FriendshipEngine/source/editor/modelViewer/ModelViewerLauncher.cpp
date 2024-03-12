@@ -67,7 +67,7 @@ LRESULT CALLBACK WndProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In
 			DragQueryFileW(hDropInfo, i, filename, filename_len);
 		}
 
-		if (filename > 0 && Utility::IsFbx(filename))
+		if (filename > 0 && MENU::IsFbx(filename))
 		{
 			Print("You dropped a FBX!");
 
@@ -151,7 +151,7 @@ bool ModelViewerLauncher::BeginFrame()
 	return myEngine->BeginFrame();
 }
 
-bool Utility::IsFbx(std::wstring aPath)
+bool MENU::IsFbx(std::wstring aPath)
 {
 	return (aPath.substr(aPath.find_last_of(L".") + 1) == L"fbx");
 }

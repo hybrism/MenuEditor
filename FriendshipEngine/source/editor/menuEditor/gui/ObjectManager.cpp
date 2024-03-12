@@ -37,14 +37,9 @@ void MENU::ObjectManager::CheckCollision(const Vector2f& aPosition, bool aIsPres
 
 MENU::MenuObject& MENU::ObjectManager::CreateNew(ID aID, const Vector2f& aPosition)
 {
-	if (aID == INVALID_ID)
-	{
-		myObjects.push_back(std::make_shared<MenuObject>(IDManager::GetInstance()->GetFreeID(), aPosition));
-	}
-	else
-	{
-		myObjects.push_back(std::make_shared<MenuObject>(aID, aPosition));
-	}
+	assert(aID != INVALID_ID && "ID is not valid!");
+
+	myObjects.push_back(std::make_shared<MenuObject>(aID, aPosition));
 
 	myLastObjectIndex = myObjects.size() - 1;
 	return *myObjects[myLastObjectIndex];

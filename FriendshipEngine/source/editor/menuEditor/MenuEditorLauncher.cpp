@@ -50,42 +50,53 @@ LRESULT CALLBACK WndProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In
 
 		UINT num_paths = DragQueryFileW(hDropInfo, 0xFFFFFFFF, 0, 512);
 
-		wchar_t* filename = nullptr;
-		UINT max_filename_len = 0;
+		wchar_t* filePath = nullptr;
+		UINT max_filePath_len = 0;
 
 		for (UINT i = 0; i < num_paths; ++i)
 		{
 			UINT filename_len = DragQueryFileW(hDropInfo, i, nullptr, 512) + 1;
 
-			if (filename_len > max_filename_len)
+			if (filename_len > max_filePath_len)
 			{
-				max_filename_len = filename_len;
-				wchar_t* tmp = (wchar_t*)realloc(filename, max_filename_len * sizeof(*filename));
+				max_filePath_len = filename_len;
+				wchar_t* tmp = (wchar_t*)realloc(filePath, max_filePath_len * sizeof(*filePath));
 
 				if (tmp != nullptr)
 				{
-					filename = tmp;
+					filePath = tmp;
 				}
 			}
 
-			DragQueryFileW(hDropInfo, i, filename, filename_len);
+			DragQueryFileW(hDropInfo, i, filePath, filename_len);
 		}
 
-		if (filename > 0 && Utility::IsFbx(filename))
+		if (filePath > 0 && MENU::IsFbx(filePath))
 		{
-			Print("You dropped a FBX!");
-
-			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::MeshDropped, StringHelper::ws2s(filename) });
+			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::MeshDropped, StringHelper::ws2s(filePath) });
 		}
 
-		if (filename > 0 && Utility::IsDds(filename))
+		if (filePath > 0 && MENU::IsDds(filePath))
 		{
-			Print("You dropped a DDS!");
+			std::string filenameOnly = MENU::ExtractFileName(filePath);
+			std::wstring copyTo = StringHelper::s2ws(RELATIVE_SPRITE_ASSET_PATH + filenameOnly);
 
-			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::DdsDropped, StringHelper::ws2s(filename) });
+			CopyFile(filePath, copyTo.c_str(), true);
+
+			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::DdsDropped, filenameOnly });
 		}
 
-		free(filename);
+		if (filePath > 0 && MENU::IsTtf(filePath))
+		{
+			std::string filenameOnly = MENU::ExtractFileName(filePath);
+			std::wstring copyTo = StringHelper::s2ws(RELATIVE_FONT_ASSET_PATH + filenameOnly);
+
+			CopyFile(filePath, copyTo.c_str(), true);
+
+			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::TtfDropped, filenameOnly });
+		}
+
+		free(filePath);
 		DragFinish(hDropInfo);
 		break;
 	}
@@ -164,12 +175,22 @@ bool MenuEditorLauncher::BeginFrame()
 	return myEngine->BeginFrame();
 }
 
-bool Utility::IsFbx(std::wstring aPath)
+bool MENU::IsFbx(const std::wstring& aPath)
 {
 	return (aPath.substr(aPath.find_last_of(L".") + 1) == L"fbx");
 }
 
-bool Utility::IsDds(std::wstring aPath)
+bool MENU::IsDds(const std::wstring& aPath)
 {
 	return (aPath.substr(aPath.find_last_of(L".") + 1) == L"dds");
+}
+
+bool MENU::IsTtf(const std::wstring& aPath)
+{
+	return (aPath.substr(aPath.find_last_of(L".") + 1) == L"ttf");
+}
+
+std::string MENU::ExtractFileName(const std::wstring& aPath)
+{
+	return StringHelper::ws2s(aPath).substr(StringHelper::ws2s(aPath).find_last_of("\\") + 1);
 }
