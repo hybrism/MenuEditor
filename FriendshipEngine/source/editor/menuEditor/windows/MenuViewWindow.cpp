@@ -7,7 +7,7 @@ MENU::MenuViewWindow::MenuViewWindow(const std::string& aHandle, bool aOpen, ImG
 	: WindowBase(aHandle, aOpen, aFlags)
 {}
 
-void MENU::MenuViewWindow::Show(const UpdateContext&)
+void MENU::MenuViewWindow::Show(const MenuEditorUpdateContext&)
 {
 	if (!myData.isOpen)
 		return;

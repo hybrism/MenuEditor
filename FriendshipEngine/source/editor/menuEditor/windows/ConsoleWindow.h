@@ -16,7 +16,7 @@ namespace MENU
 		ConsoleWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags);
 		~ConsoleWindow();
 
-		void Show(const UpdateContext& aContext) override;
+		void Show(const MenuEditorUpdateContext& aContext) override;
 
 	private:
 		//// Portable helpers

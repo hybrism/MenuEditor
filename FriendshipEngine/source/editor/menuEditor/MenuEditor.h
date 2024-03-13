@@ -45,6 +45,8 @@ namespace MENU
 		Assets myAssets;
 
 		ID mySelectedObjectID;
+
+		ID myEditorIDStartIndex;
 		ID myUpGizmoID;
 		ID myRightGizmoID;
 
@@ -56,7 +58,11 @@ namespace MENU
 		std::array<std::shared_ptr<MENU::WindowBase>, (int)MENU::WindowID::Count> myWindows;
 		std::array<bool, (int)ePopup::Count> myPopups;
 
+		bool myShouldShowDebugData;
+		bool myShouldShowEditorColliders;
+		bool myShouldShowMenuColldiers;
 		bool myFirstFrameSetup;
+
 		void Dockspace();
 		void MenuBar();
 		void Popups();

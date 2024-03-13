@@ -34,6 +34,6 @@ namespace MENU
 		}
 
 		WindowData myData = {};
-		virtual void Show(const UpdateContext& aContext) = 0;
+		virtual void Show(const MenuEditorUpdateContext& aContext) = 0;
 	};
 }

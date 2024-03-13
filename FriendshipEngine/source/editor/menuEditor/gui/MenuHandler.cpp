@@ -7,11 +7,9 @@
 #include <assets/TextureFactory.h>
 
 #include <nlohmann/json.hpp>
-#include <shared/postMaster/PostMaster.h>
 
 #include "MenuObject.h"
 
-#include "../MenuEditorCommon.h"
 #include "components/SpriteComponent.h"
 #include "components/TextComponent.h"
 #include "components/Collider2DComponent.h"
@@ -117,6 +115,22 @@ void MENU::MenuHandler::AddNewState(const std::string& aName)
 	myStateStack.push(&myStates[myStates.size() - 1]);
 }
 
+void MENU::MenuHandler::RemoveState(ID aID)
+{
+	for (size_t i = 0; i < myStates.size(); i++)
+	{
+		if (myStates[i].id == aID) 
+		{
+			if (GetCurrentState().id == myStates[i].id)
+				myStateStack.pop();
+
+			myStates.erase(myStates.begin() + i);
+			IDManager::GetInstance()->FreeID(aID);
+			return;
+		}
+	}
+}
+
 void MENU::MenuHandler::PushState(ID aID)
 {
 	for (size_t i = 0; i < myStates.size(); i++)
@@ -132,6 +146,12 @@ void MENU::MenuHandler::PopState()
 		return;
 
 	myStateStack.pop();
+}
+
+void MENU::MenuHandler::PopToBaseState()
+{
+	while (myStateStack.size() > 1)
+		myStateStack.pop();
 }
 
 MENU::MenuObject& MENU::MenuHandler::GetObjectFromID(ID aID)
@@ -219,6 +239,11 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 	IDManager* idManager = IDManager::GetInstance();
 
 	myObjectManager.ClearAll();
+	for (unsigned int i = 0; i < myStates.size(); i++)
+	{
+		idManager->FreeID(myStates[i].id);
+	}
+
 	myStates.clear();
 
 	while (!myStateStack.empty())
@@ -262,8 +287,8 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 	nlohmann::json spriteComponents = menuFile["spriteComponents"];
 	for (size_t i = 0; i < spriteComponents.size(); i++)
 	{
-		size_t ownerID = spriteComponents[i]["ownerID"];
-		SpriteComponent& sprite = myObjectManager.myObjects[ownerID]->AddComponent<SpriteComponent>();
+		ID ownerID = spriteComponents[i]["ownerID"];
+		SpriteComponent& sprite = myObjectManager.GetObjectFromID(ownerID).AddComponent<SpriteComponent>();
 
 		//TODO: AssetDatabase for sprites?
 		nlohmann::json textures = spriteComponents[i]["textures"];
@@ -297,8 +322,8 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 	nlohmann::json textComponents = menuFile["textComponents"];
 	for (size_t i = 0; i < textComponents.size(); i++)
 	{
-		size_t ownerID = textComponents[i]["ownerID"];
-		TextComponent& text = myObjectManager.myObjects[ownerID]->AddComponent<TextComponent>();
+		ID ownerID = textComponents[i]["ownerID"];
+		TextComponent& text = myObjectManager.GetObjectFromID(ownerID).AddComponent<TextComponent>();
 		text.SetFont(textComponents[i]["font"]);
 		text.SetFontSize((eSize)textComponents[i]["fontSize"]);
 		text.SetText(textComponents[i]["textString"]);
@@ -311,8 +336,8 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 	nlohmann::json colliderComponents = menuFile["colliderComponents"];
 	for (size_t i = 0; i < colliderComponents.size(); i++)
 	{
-		size_t ownerID = colliderComponents[i]["ownerID"];
-		Collider2DComponent& collider = myObjectManager.myObjects[ownerID]->AddComponent<Collider2DComponent>();
+		ID ownerID = colliderComponents[i]["ownerID"];
+		Collider2DComponent& collider = myObjectManager.GetObjectFromID(ownerID).AddComponent<Collider2DComponent>();
 
 		collider.SetPosition(JsonToScreenPosition(colliderComponents[i]["position"]));
 		collider.SetSize(JsonToVec2(colliderComponents[i]["size"]));
@@ -321,8 +346,8 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 	nlohmann::json commandComponents = menuFile["commandComponents"];
 	for (size_t i = 0; i < commandComponents.size(); i++)
 	{
-		size_t ownerID = commandComponents[i]["ownerID"];
-		CommandComponent& command = myObjectManager.myObjects[ownerID]->AddComponent<CommandComponent>();
+		ID ownerID = commandComponents[i]["ownerID"];
+		CommandComponent& command = myObjectManager.GetObjectFromID(ownerID).AddComponent<CommandComponent>();
 		command.SetCommandType((eCommandType)commandComponents[i]["commandType"]);
 
 		if (commandComponents[i].contains("commandData"))
@@ -333,8 +358,6 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 			if (commandComponents[i]["commandData"].is_number_integer())
 				command.SetCommandData({ commandComponents[i]["commandData"].get<ID>() });
 		}
-
-
 	}
 
 	if (myStates.empty())
@@ -427,7 +450,7 @@ void MENU::MenuHandler::SaveToJson()
 			{
 				SpriteComponent& sprite = static_cast<SpriteComponent&>(*sprites[componentIndex]);
 				nlohmann::json spriteEntry;
-				spriteEntry["ownerID"] = i;
+				spriteEntry["ownerID"] = sprite.GetParent().GetID();
 
 				for (size_t textureStateIndex = 0; textureStateIndex < (int)TextureState::Count; textureStateIndex++)
 				{
@@ -456,7 +479,7 @@ void MENU::MenuHandler::SaveToJson()
 		{
 			TextComponent text = myObjectManager.myObjects[i]->GetComponent<TextComponent>();
 			nlohmann::json textEntry;
-			textEntry["ownerID"] = i;
+			textEntry["ownerID"] = text.GetParent().GetID();
 			textEntry["textString"] = text.GetText();
 			textEntry["position"] = ScreenPositionToJson(text.GetPosition());
 			textEntry["font"] = text.GetFontName();
@@ -470,7 +493,7 @@ void MENU::MenuHandler::SaveToJson()
 		{
 			Collider2DComponent collider = myObjectManager.myObjects[i]->GetComponent<Collider2DComponent>();
 			nlohmann::json colliderEntry;
-			colliderEntry["ownerID"] = i;
+			colliderEntry["ownerID"] = collider.GetParent().GetID();
 			colliderEntry["position"] = ScreenPositionToJson(collider.GetPosition());
 			colliderEntry["size"] = Vec2ToJson(collider.GetSize());
 			colliderComponents.push_back(colliderEntry);
@@ -480,7 +503,7 @@ void MENU::MenuHandler::SaveToJson()
 		{
 			CommandComponent command = myObjectManager.myObjects[i]->GetComponent<CommandComponent>();
 			nlohmann::json commandEntry;
-			commandEntry["ownerID"] = i;
+			commandEntry["ownerID"] = command.GetParent().GetID();
 			commandEntry["commandType"] = (int)command.GetCommandType();
 
 			if (std::holds_alternative<std::string>(command.GetCommandData().data))

@@ -24,7 +24,7 @@ MENU::ConsoleWindow::~ConsoleWindow()
 		free(History[i]);
 }
 
-void MENU::ConsoleWindow::Show(const UpdateContext&)
+void MENU::ConsoleWindow::Show(const MenuEditorUpdateContext&)
 {
 	if (!myData.isOpen)
 		return;

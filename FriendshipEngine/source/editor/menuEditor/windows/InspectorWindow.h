@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include <engine/math/Vector.h>
 #include <shared/postMaster/Observer.h>
 
 namespace MENU
@@ -10,9 +11,10 @@ namespace MENU
 	{
 	public:
 		InspectorWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags);
-		void Show(const UpdateContext& aContext) override;
+		void Show(const MenuEditorUpdateContext& aContext) override;
 
 	private:
+		Vector2f myViewportSize;
 		unsigned int mySelectedObjectID;
 		unsigned int mySelectedComponentIndex;
 
@@ -22,11 +24,11 @@ namespace MENU
 	private:
 		void AddComponentButton(MenuObject& aObject);
 
-		void EditSpriteComponent(const UpdateContext& aContext, MenuObject& aObject);
-		void EditSpriteTextures(const UpdateContext& aContext, SpriteComponent& aSprite);
-		void EditTextComponent(const UpdateContext& aContext, MenuObject& aObject);
-		void EditCollider2DComponent(MenuObject& aObject);
-		void EditCommandComponent(MenuObject& aObject);
+		void EditSpriteComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject);
+		void EditSpriteTextures(const MenuEditorUpdateContext& aContext, SpriteComponent& aSprite);
+		void EditTextComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject);
+		void EditCollider2DComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject);
+		void EditCommandComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject);
 
 	};
 }

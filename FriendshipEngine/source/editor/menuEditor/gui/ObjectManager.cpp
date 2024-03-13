@@ -88,9 +88,16 @@ void MENU::ObjectManager::RemoveObjectAtIndex(unsigned int aIndex)
 void MENU::ObjectManager::ClearAll()
 {
 	IDManager* idManager = IDManager::GetInstance();
+
+
 	for (unsigned int i = 0; i < myObjects.size(); i++)
 	{
 		idManager->FreeID(myObjects[i]->GetID());
+
+		for (unsigned int j = 0; j < myObjects[i]->myComponents.size(); j++)
+		{
+			idManager->FreeID(myObjects[i]->myComponents[j]->GetID());
+		}
 	}
 
 	myObjects.clear();

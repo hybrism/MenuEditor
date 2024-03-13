@@ -37,6 +37,7 @@ MENU::ID MENU::IDManager::UseID(ID aID)
 void MENU::IDManager::FreeID(ID aID)
 {
 	assert(aID <= MAX_ID && "ID is out of range!");
+
 	myIDs[aID] = true;
 }
 

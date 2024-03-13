@@ -9,7 +9,7 @@ MENU::AssetsWindow::AssetsWindow(const std::string& aHandle, bool aOpen, ImGuiWi
 	: WindowBase(aHandle, aOpen, aFlags)
 {}
 
-void MENU::AssetsWindow::Show(const UpdateContext& aContext)
+void MENU::AssetsWindow::Show(const MenuEditorUpdateContext& aContext)
 {
 	if (!myData.isOpen)
 		return;

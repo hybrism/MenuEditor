@@ -10,18 +10,24 @@
 #include "../gui/ObjectManager.h"
 #include "../gui/MenuHandler.h"
 #include "../gui/MenuObject.h"
+#include "../gui/components/SpriteComponent.h"
+#include "../gui/components/Collider2DComponent.h"
+#include "../gui/components/TextComponent.h"
+#include "../gui/components/CommandComponent.h"
 
 MENU::MenuObjectHierarchy::MenuObjectHierarchy(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
 	: WindowBase(aHandle, aOpen, aFlags)
 {
-	mySelectedObjectID = UINT_MAX;
-	myRightClickedObjectID = UINT_MAX;
 	mySelectedStateID = 0;
+	mySelectedObjectID = INVALID_ID;
+	myRightClickedStateID = INVALID_ID;
+	myRightClickedObjectID = INVALID_ID;
+
 	Vector2i center = GraphicsEngine::GetInstance()->GetViewportDimensions() / 2;
 	myViewportCenter = { (float)center.x, (float)center.y };
 }
 
-void MENU::MenuObjectHierarchy::Show(const UpdateContext& aContext)
+void MENU::MenuObjectHierarchy::Show(const MenuEditorUpdateContext& aContext)
 {
 	if (!myData.isOpen)
 		return;
@@ -43,17 +49,42 @@ void MENU::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 
 			mySelectedStateID = aContext.menuHandler->GetCurrentState().id;
 
-			for (size_t i = 0; i < states.size(); i++)
+			for (unsigned int menuIndex = 0; menuIndex < states.size(); menuIndex++)
 			{
-				std::string displayName = std::to_string(i) + " " + states[i].name;
-				if (ImGui::Selectable(displayName.c_str(), states[i].id == mySelectedStateID))
+				std::string displayName = std::to_string(menuIndex) + " " + states[menuIndex].name;
+				if (ImGui::Selectable(displayName.c_str(), states[menuIndex].id == mySelectedStateID))
 				{
-					mySelectedStateID = states[i].id;
-					mySelectedObjectID = UINT_MAX;
+					mySelectedStateID = states[menuIndex].id;
+					mySelectedObjectID = INVALID_ID;
 					PushMenuObjectToInspector(mySelectedObjectID);
 					aContext.menuHandler->PushState(mySelectedStateID);
-					FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::UpdateEditorColliders, mySelectedStateID });
+
+					FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::UpdateMenuEditorColliders, mySelectedStateID });
 				}
+
+				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+				{
+					ImGui::OpenPopup("Menu State Edit");
+					myRightClickedStateID = states[menuIndex].id;
+				}
+			}
+
+			if (ImGui::BeginPopup("Menu State Edit"))
+			{
+				if (aContext.showDebugData)
+					ImGui::Text("Item pressed: %i", myRightClickedStateID);
+
+				ImGui::InputText("New Name", &aContext.menuHandler->GetCurrentState().name);
+
+				if (ImGui::Selectable("Remove"))
+				{
+					aContext.menuHandler->RemoveState(myRightClickedStateID);
+
+
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
 			}
 
 			ImGui::EndChild();
@@ -65,8 +96,13 @@ void MENU::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 
 		if (ImGui::BeginChild("MenuObjects", ImGui::GetContentRegionAvail(), true))
 		{
-			if (aContext.menuHandler->GetAllStates().empty())
+			auto& states = aContext.menuHandler->GetAllStates();
+			if (states.empty())
+			{
 				ImGui::EndChild();
+				ImGui::End();
+				return;
+			}
 
 			MenuState& state = aContext.menuHandler->GetCurrentState();
 
@@ -88,9 +124,12 @@ void MENU::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 				}
 			}
 
+
+
 			if (ImGui::BeginPopup("Menu Object Edit"))
 			{
-				ImGui::Text("Item pressed: %i", myRightClickedObjectID);
+				if (aContext.showDebugData)
+					ImGui::Text("Item pressed: %i", myRightClickedObjectID);
 
 				if (ImGui::Selectable("Move Up"))
 				{
@@ -107,7 +146,7 @@ void MENU::MenuObjectHierarchy::Show(const UpdateContext& aContext)
 					aContext.menuHandler->RemoveObjectAtID(aContext.menuHandler->GetObjectFromID(myRightClickedObjectID).GetID());
 
 					if (myRightClickedObjectID == mySelectedObjectID)
-						PushMenuObjectToInspector(UINT_MAX);
+						PushMenuObjectToInspector(INVALID_ID);
 
 					ImGui::CloseCurrentPopup();
 				}
@@ -126,7 +165,7 @@ void MENU::MenuObjectHierarchy::PushMenuObjectToInspector(unsigned int aID)
 	FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::PushEntityToInspector, aID });
 }
 
-void MENU::MenuObjectHierarchy::AddStateButton(const UpdateContext& aContext)
+void MENU::MenuObjectHierarchy::AddStateButton(const MenuEditorUpdateContext& aContext)
 {
 	if (ImGui::Button("Add new Sub-Menu", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
 		myNewStateName = "(Untitled)";
@@ -151,20 +190,30 @@ void MENU::MenuObjectHierarchy::AddStateButton(const UpdateContext& aContext)
 	}
 }
 
-void MENU::MenuObjectHierarchy::AddObjectButton(const UpdateContext& aContext)
+void MENU::MenuObjectHierarchy::AddObjectButton(const MenuEditorUpdateContext& aContext)
 {
-	if (ImGui::Button("Add new Object", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
-	{
-	}
-
+	ImGui::Button("Add new Object", ImVec2(ImGui::GetContentRegionAvail().x, 24));
 	if (ImGui::BeginPopupContextItem(0, ImGuiPopupFlags_MouseButtonLeft))
 	{
-		if (ImGui::Button("Add empty", ImVec2(120, 0)))
+		if (ImGui::Selectable("Add Empty"))
 		{
 			aContext.menuHandler->CreateNewObject(myViewportCenter);
+			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::UpdateMenuEditorColliders, this });
 			ImGui::CloseCurrentPopup();
 		}
-		ImGui::SameLine();
+
+		if (ImGui::Selectable("Add Button"))
+		{
+			MenuObject& obj = aContext.menuHandler->CreateNewObject(myViewportCenter);
+
+			obj.AddComponent<SpriteComponent>();
+			obj.AddComponent<Collider2DComponent>();
+			obj.AddComponent<TextComponent>();
+
+			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::UpdateMenuEditorColliders, this });
+			ImGui::CloseCurrentPopup();
+		}
+
 		if (ImGui::Button("Cancel", ImVec2(120, 0)))
 		{
 			ImGui::CloseCurrentPopup();

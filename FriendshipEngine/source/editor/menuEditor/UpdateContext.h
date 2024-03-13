@@ -9,9 +9,10 @@ class Texture;
 namespace MENU
 {
 	class MenuHandler;
-	struct UpdateContext
+	struct MenuEditorUpdateContext
 	{
 		Assets assets;
 		MenuHandler* menuHandler = nullptr;
+		bool showDebugData = false;
 	};
 }

@@ -29,7 +29,8 @@ namespace MENU
 		"Resume Game",
 		"Back to Main Menu",
 		"Quit Game",
-		"None"
+
+		"(None)"
 	};
 	
 	struct CommandData

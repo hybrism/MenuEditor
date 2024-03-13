@@ -11,11 +11,6 @@ namespace MENU
 {
 	struct MenuState
 	{ 
-		~MenuState()
-		{
-			IDManager::GetInstance()->FreeID(id);
-		}
-
 		std::string name;
 		std::vector<ID> objectIds;
 		ID id;
@@ -34,8 +29,10 @@ namespace MENU
 		void Render();
 		
 		void AddNewState(const std::string& aName);
+		void RemoveState(ID aID);
 		void PushState(ID aID);
 		void PopState();
+		void PopToBaseState();
 
 		MenuState& GetCurrentState();
 		std::vector<MenuState>& GetAllStates();

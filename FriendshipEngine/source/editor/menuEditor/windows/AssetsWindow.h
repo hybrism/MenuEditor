@@ -8,7 +8,7 @@ namespace MENU
 	public:
 		AssetsWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags);
 
-		void Show(const UpdateContext& aContext) override;
+		void Show(const MenuEditorUpdateContext& aContext) override;
 
 	private:
 	};

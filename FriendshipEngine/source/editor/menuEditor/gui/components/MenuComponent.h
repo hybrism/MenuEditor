@@ -1,5 +1,6 @@
 #pragma once
 #include "../MenuUpdateContext.h"
+#include "../IDManager.h"
 #include "ComponentTypeEnum.h"
 
 namespace MENU
@@ -25,8 +26,6 @@ namespace MENU
 			, myPosition({ 0.f,0.f })
 			, myID(aID)
 		{}
-
-		virtual ~MenuComponent() {}
 
 		MenuObject& myParent;
 		const ComponentType myType;

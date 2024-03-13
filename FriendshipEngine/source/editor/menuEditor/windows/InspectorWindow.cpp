@@ -4,10 +4,12 @@
 
 #include <engine/text/text.h>
 #include <engine/utility/StringHelper.h>
+#include <engine/graphics/GraphicsEngine.h>
 
 #include "../gui/MenuObject.h"
 #include "../gui/MenuHandler.h"
 #include "../gui/ObjectManager.h"
+
 #include "../gui/components/SpriteComponent.h"
 #include "../gui/components/TextComponent.h"
 #include "../gui/components/Collider2DComponent.h"
@@ -21,11 +23,14 @@ MENU::InspectorWindow::InspectorWindow(const std::string& aHandle, bool aOpen, I
 	mySelectedObjectID = UINT_MAX;
 	mySelectedComponentIndex = (size_t)ComponentType::Count;
 
+	Vector2i center = GraphicsEngine::GetInstance()->GetViewportDimensions();
+	myViewportSize = { (float)center.x, (float)center.y };
+
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::PushEntityToInspector);
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::NewMenuLoaded);
 }
 
-void MENU::InspectorWindow::Show(const UpdateContext& aContext)
+void MENU::InspectorWindow::Show(const MenuEditorUpdateContext& aContext)
 {
 	if (!myData.isOpen)
 		return;
@@ -43,9 +48,14 @@ void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 
 		{
 			ImGui::InputText("##", &selectedObject.GetName());
-			Vector2f position = selectedObject.GetPosition();
-			if (ImGui::DragFloat2("Position", &position.x))
-				selectedObject.SetPosition(position);
+			Vector2f pixelPosition = selectedObject.GetPosition();
+			Vector2f screenPosition = { pixelPosition.x / myViewportSize.x, pixelPosition.y / myViewportSize.y };
+
+			if (ImGui::DragFloat2("Position", &screenPosition.x, 0.01f))
+				selectedObject.SetPosition({ screenPosition.x * myViewportSize.x, screenPosition.y * myViewportSize.y });
+
+			if (ImGui::DragFloat2("Position (Pixel)", &pixelPosition.x))
+				selectedObject.SetPosition(pixelPosition);
 		}
 
 		AddComponentButton(selectedObject);
@@ -57,10 +67,10 @@ void MENU::InspectorWindow::Show(const UpdateContext& aContext)
 			EditTextComponent(aContext, selectedObject);
 
 		if (selectedObject.HasComponent<Collider2DComponent>())
-			EditCollider2DComponent(selectedObject);
+			EditCollider2DComponent(aContext, selectedObject);
 
 		if (selectedObject.HasComponent<CommandComponent>())
-			EditCommandComponent(selectedObject);
+			EditCommandComponent(aContext, selectedObject);
 
 		ImGui::PopID();
 	}
@@ -138,7 +148,7 @@ void MENU::InspectorWindow::AddComponentButton(MenuObject& aObject)
 
 }
 
-void MENU::InspectorWindow::EditSpriteComponent(const UpdateContext& aContext, MenuObject& aObject)
+void MENU::InspectorWindow::EditSpriteComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject)
 {
 	auto sprites = aObject.GetComponents<SpriteComponent>();
 
@@ -150,10 +160,14 @@ void MENU::InspectorWindow::EditSpriteComponent(const UpdateContext& aContext, M
 		Vector2f position = sprite.GetPosition();
 		ImGui::PushID(componentIndex);
 		ImGui::SeparatorText("Sprite");
-		ImGui::Text("ComponentID: %i", sprite.GetID());
 
-		Vector2f texSize = sprite.GetTextureSize();
-		ImGui::Text("Texture size x: %i y: %i", (int)texSize.x, (int)texSize.y);
+		if (aContext.showDebugData)
+		{
+			ImGui::Text("ComponentID: %i", sprite.GetID());
+			ImGui::Text("ParentID: %i", sprite.GetParent().GetID());
+			Vector2f texSize = sprite.GetTextureSize();
+			ImGui::Text("Texture size x: %i y: %i", (int)texSize.x, (int)texSize.y);
+		}
 
 		EditSpriteTextures(aContext, sprite);
 
@@ -192,7 +206,7 @@ void MENU::InspectorWindow::EditSpriteComponent(const UpdateContext& aContext, M
 	ImGui::PopID();
 }
 
-void MENU::InspectorWindow::EditSpriteTextures(const UpdateContext& aContext, SpriteComponent& aSprite)
+void MENU::InspectorWindow::EditSpriteTextures(const MenuEditorUpdateContext& aContext, SpriteComponent& aSprite)
 {
 	const char* textureState[] = { "Default", "Hovered", "Pressed" };
 	Texture* currentItem = aSprite.GetTexture();
@@ -218,7 +232,7 @@ void MENU::InspectorWindow::EditSpriteTextures(const UpdateContext& aContext, Sp
 	}
 }
 
-void MENU::InspectorWindow::EditTextComponent(const UpdateContext& aContext, MenuObject& aObject)
+void MENU::InspectorWindow::EditTextComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject)
 {
 	auto texts = aObject.GetComponents<TextComponent>();
 
@@ -229,7 +243,12 @@ void MENU::InspectorWindow::EditTextComponent(const UpdateContext& aContext, Men
 
 		ImGui::PushID(componentIndex);
 		ImGui::SeparatorText("Text");
-		ImGui::Text("ComponentID: %i", text.GetID());
+		
+		if (aContext.showDebugData)
+		{
+			ImGui::Text("ComponentID: %i", text.GetID());
+			ImGui::Text("ParentID: %i", text.GetParent().GetID());
+		}
 
 		std::string string = text.GetText();
 		Vector2f position = text.GetPosition();
@@ -302,18 +321,34 @@ void MENU::InspectorWindow::EditTextComponent(const UpdateContext& aContext, Men
 	ImGui::PopID();
 }
 
-void MENU::InspectorWindow::EditCollider2DComponent(MenuObject& aObject)
+void MENU::InspectorWindow::EditCollider2DComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject)
 {
 	Collider2DComponent& collider = aObject.GetComponent<Collider2DComponent>();
 	ImGui::PushID("2DCollider");
 	ImGui::SeparatorText("Collider");
-	ImGui::Text("ComponentID: %i", collider.GetID());
+
+	if (aContext.showDebugData)
+	{
+		ImGui::Text("ComponentID: %i", collider.GetID());
+		ImGui::Text("ParentID: %i", collider.GetParent().GetID());
+	}
 
 	Vector2f position = collider.GetPosition();
 	Vector2f size = collider.GetSize();
 
 	if (ImGui::DragFloat2("Size", &size.x))
 		collider.SetSize(size);
+
+	ImGui::SameLine();
+	if (aObject.HasComponent<SpriteComponent>())
+	{
+		if (ImGui::Button("Sprite"))
+		{
+			SpriteComponent& sprite = aObject.GetComponent<SpriteComponent>();
+			collider.SetSize(sprite.GetSize());
+		}
+	}
+
 	if (ImGui::TreeNode("More"))
 	{
 		if (ImGui::DragFloat2("Position", &position.x))
@@ -329,13 +364,19 @@ void MENU::InspectorWindow::EditCollider2DComponent(MenuObject& aObject)
 	ImGui::PopID();
 }
 
-void MENU::InspectorWindow::EditCommandComponent(MenuObject& aObject)
+void MENU::InspectorWindow::EditCommandComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject)
 {
 	CommandComponent& command = aObject.GetComponent<CommandComponent>();
 	ImGui::PushID("Command");
 	ImGui::SeparatorText("Command");
-	ImGui::Text("ComponentID: %i", command.GetID());
 
+	if (aContext.showDebugData)
+	{
+		ImGui::Text("ComponentID: %i", command.GetID());
+		ImGui::Text("ParentID: %i", command.GetParent().GetID());
+	}
+
+	static std::string commandInputString = "(None)";
 	eCommandType currentType = command.GetCommandType();
 	if (ImGui::BeginCombo("Commands", CommandNames[(int)currentType]))
 	{
@@ -344,7 +385,10 @@ void MENU::InspectorWindow::EditCommandComponent(MenuObject& aObject)
 			bool isSelected = ((int)currentType == i);
 
 			if (ImGui::Selectable(CommandNames[i], isSelected))
+			{
 				command.SetCommandType((eCommandType)i);
+				commandInputString = "(None)";
+			}
 
 			if (isSelected)
 				ImGui::SetItemDefaultFocus();
@@ -352,6 +396,7 @@ void MENU::InspectorWindow::EditCommandComponent(MenuObject& aObject)
 
 		ImGui::EndCombo();
 	}
+
 
 	switch (command.GetCommandType())
 	{
@@ -362,15 +407,37 @@ void MENU::InspectorWindow::EditCommandComponent(MenuObject& aObject)
 	case eCommandType::PushMenu:
 	{
 		static int menuID = 0;
-		ImGui::InputInt("Menu to load", &menuID);
-		command.SetCommandData({ (ID)menuID });
+
+		if (ImGui::BeginCombo("Select Menu", commandInputString.c_str()))
+		{
+			auto& states = aContext.menuHandler->GetAllStates();
+			for (size_t i = 0; i < states.size(); i++)
+			{
+				bool isSelected = ((ID)menuID == states[i].id);
+
+				if (ImGui::Selectable(states[i].name.c_str(), isSelected))
+				{
+					menuID = states[i].id;
+					commandInputString = states[i].name;
+					command.SetCommandData({ (ID)menuID });
+				}
+
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+
 		break;
 	}
 	case eCommandType::LoadLevel:
 	{
-		static std::string level = "(None)";
-		ImGui::InputText("Level to load", &level);
-		command.SetCommandData({ level });
+		if (std::holds_alternative<std::string>(command.GetCommandData().data))
+			commandInputString = std::get<std::string>(command.GetCommandData().data);
+
+		ImGui::InputText("Level to load", &commandInputString);
+		command.SetCommandData({ commandInputString });
 		break;
 	}
 	case eCommandType::ResumeGame:
@@ -389,6 +456,13 @@ void MENU::InspectorWindow::EditCommandComponent(MenuObject& aObject)
 		break;
 	}
 
+	if (ImGui::TreeNode("More"))
+	{
+		if (ImGui::Button("RemoveComponent", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
+			aObject.RemoveComponent(command.GetID());
+
+		ImGui::TreePop();
+	}
 
 	ImGui::Spacing();
 	ImGui::PopID();
