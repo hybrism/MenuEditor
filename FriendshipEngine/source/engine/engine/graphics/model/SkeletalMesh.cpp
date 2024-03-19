@@ -10,7 +10,7 @@
 
 #include "../../shaders/PixelShader.h"
 #include "../../shaders/VertexShader.h"
-#ifdef _DEBUG
+#ifndef _RELEASE
 #include "../../debug/DebugLine.h"
 #endif
 
@@ -30,7 +30,7 @@ bool SkeletalMesh::Initialize(
 	myVertexSize = sizeof(AnimatedVertex);
 
 	HRESULT result;
-	auto device = GraphicsEngine::GetInstance()->GetDevice();
+	auto device = GraphicsEngine::GetInstance()->DX().GetDevice();
 	{
 		// Create vertex buffer
 		D3D11_BUFFER_DESC vertexBufferDesc = {};
@@ -77,7 +77,7 @@ bool SkeletalMesh::Initialize(
 
 	for (int i = 0; i < MAX_ANIMATION_BONES; i++)
 	{
-		myPose.jointTransforms[i] = DirectX::XMMatrixIdentity();
+		myPose.transform[i] = DirectX::XMMatrixIdentity();
 	}
 	myPose.count = MAX_ANIMATION_BONES;
 
@@ -87,7 +87,7 @@ bool SkeletalMesh::Initialize(
 void SkeletalMesh::Render(const DirectX::XMMATRIX& aTransform, const VertexShader* aVS, const PixelShader* aPS, const RenderMode& aRenderMode) const
 {
 	auto* instance = GraphicsEngine::GetInstance();
-	auto* context = instance->GetContext();
+	auto* context = instance->DX().GetContext();
 
 	// Object Buffer
 	{
@@ -113,7 +113,7 @@ void SkeletalMesh::Render(const DirectX::XMMATRIX& aTransform, const VertexShade
 	BindTextures();
 
 	if (aPS) { aPS->PrepareRender(); }
-	if (aVS) { aVS->PrepareRender(BufferSlots::Bone, (void*)myPose.jointTransforms, sizeof(DirectX::XMMATRIX) * MAX_ANIMATION_BONES); }
+	if (aVS) { aVS->PrepareRender(BufferSlots::Bone, (void*)myPose.transform, sizeof(DirectX::XMMATRIX) * MAX_ANIMATION_BONES); }
 
 	unsigned int stride = myVertexSize;
 	unsigned int offset = 0;
@@ -123,15 +123,13 @@ void SkeletalMesh::Render(const DirectX::XMMATRIX& aTransform, const VertexShade
 
 	context->DrawIndexed(myIndexCount, 0, 0);
 
-#ifdef _DEBUG
 	instance->IncrementDrawCalls();
-#endif
 }
 
 
 void SkeletalMesh::RenderSkeleton(const DirectX::XMMATRIX& aTransform)
 {
-#ifdef _DEBUG
+#ifndef _RELEASE
 
 	for (int i = 0; i < (int)myDebugLines.size() - 1; ++i)
 	{
@@ -162,7 +160,7 @@ void SkeletalMesh::RenderSkeleton(const DirectX::XMMATRIX& aTransform)
 void SkeletalMesh::SetSkeleton(const Skeleton& aSkeleton)
 {
 	mySkeleton = aSkeleton;
-#ifdef _DEBUG
+#ifndef _RELEASE
 	myDebugLines.clear();
 	myDebugLines.resize(mySkeleton.bones.size(), DebugLine({ 0, 0, 0 }, { 1, 1, 1 }));
 #endif
@@ -177,19 +175,19 @@ void SkeletalMesh::SetPose(const Pose& aLocalSpacePose)
 {
 	if (aLocalSpacePose.count == 0)
 	{
-		memcpy(myPose.jointTransforms, aLocalSpacePose.jointTransforms, sizeof(DirectX::XMMATRIX) * MAX_ANIMATION_BONES);
+		memcpy(myPose.transform, aLocalSpacePose.transform, sizeof(DirectX::XMMATRIX) * MAX_ANIMATION_BONES);
 		return;
 	}
 	Pose modelSpacePose;
 	mySkeleton.ConvertPoseToModelSpace(aLocalSpacePose, modelSpacePose);
 
-	mySkeleton.ApplyBindPoseInverse(modelSpacePose, myPose.jointTransforms);
+	mySkeleton.ApplyBindPoseInverse(modelSpacePose, myPose.transform);
 }
 
 void SkeletalMesh::ResetPose()
 {
 	for (int i = 0; i < MAX_ANIMATION_BONES; i++)
 	{
-		myPose.jointTransforms[i] = DirectX::XMMatrixIdentity();
+		myPose.transform[i] = DirectX::XMMatrixIdentity();
 	}
 }

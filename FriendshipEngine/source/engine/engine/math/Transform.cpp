@@ -50,11 +50,11 @@ Vector3f Transform::GetEulerRotation() const
 	//return { DirectX::XMConvertToDegrees(roll), DirectX::XMConvertToDegrees(pitch), DirectX::XMConvertToDegrees(yaw) };
 
 	
-	float pitch = asinf(myMatrix.r[2].m128_f32[1]);
 	float yaw = atan2f(myMatrix.r[2].m128_f32[0], myMatrix.r[2].m128_f32[2]);
 	float roll = atan2f(myMatrix.r[0].m128_f32[1], myMatrix.r[1].m128_f32[1]);
+	float pitch = asin(-myMatrix.r[2].m128_f32[1]);// DENNA ÄR JÄTTE RÄTT!!!!!!!
 
-	return Vector3f(roll * Rad2Deg, pitch * Rad2Deg, yaw * Rad2Deg);
+	return Vector3f(pitch * Rad2Deg, yaw * Rad2Deg, roll * Rad2Deg);
 }
 
 Vector3f Transform::GetScale() const 

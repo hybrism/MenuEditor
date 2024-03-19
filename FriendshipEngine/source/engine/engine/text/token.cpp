@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "../text/token.h"
+#include "../text/Token.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 Token::Token(int tokenID, std::string tokenAsStr)

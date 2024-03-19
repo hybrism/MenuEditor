@@ -6,6 +6,7 @@
 
 #include "Entity.h"
 #include "../component/Component.h"
+#include "EntitySignatureManager.h"
 
 class EntityManager
 {
@@ -19,8 +20,6 @@ public:
 	{
 		myFreeEntities = {};
 		mySize = 0;
-		delete[] mySignatures;
-		mySignatures = nullptr;
 	}
 
 	void Reset()
@@ -30,8 +29,6 @@ public:
 		{
 			myFreeEntities.insert(myFreeEntities.begin() + i, i + INVALID_ENTITY + 1);
 		}
-		delete[] mySignatures;
-		mySignatures = new EntitySignature[MAX_ENTITIES];
 		mySize = 0;
 	}
 
@@ -57,30 +54,15 @@ public:
 		return aEntity;
 	}
 
-	void DestroyEntity(const Entity& aEntity)
+	void DestroyEntity(const Entity& aEntity, EntitySignatureManager* aEntitySignatureManager)
 	{
 		assert(aEntity < MAX_ENTITIES && "Entity out of range.");
 
-		mySignatures[aEntity].signature.reset();
+		aEntitySignatureManager->ResetComponentSignature(aEntity);
 		myFreeEntities.insert(myFreeEntities.end(), aEntity);
 		--mySize;
 	}
-
-	void UpdateSignature(const Entity& aEntity, size_t aPos, bool aValue)
-	{
-		assert(aEntity < MAX_ENTITIES && "Entity out of range.");
-
-		mySignatures[aEntity].signature[aPos] = aValue;
-	}
-
-	EntitySignature& GetSignature(const Entity& aEntity)
-	{
-		assert(aEntity < MAX_ENTITIES && "Entity out of range.");
-
-		return mySignatures[aEntity];
-	}
 private:
 	std::deque<eid_t> myFreeEntities;
-	EntitySignature* mySignatures;
 	size_t mySize;
 };

@@ -1,8 +1,8 @@
 #include "../common/common.hlsli"
 
-PixelInputType main(AnimatedVertexInputType input)
+DeferredPixelInputType main(AnimatedVertexInputType input)
 {
-	PixelInputType output;
+    DeferredPixelInputType output;
 	
     float4x4 skinnedTransform = mul(bones[input.boneIndices.x], input.weights.x);
     skinnedTransform += mul(bones[input.boneIndices.y], input.weights.y);
@@ -26,6 +26,7 @@ PixelInputType main(AnimatedVertexInputType input)
     output.uv = input.uv;
     output.position = vertexClipPos;
     output.worldPosition = vertexObjectPos;
-	
+    output.entityData = uint2(0, 0);
+    
 	return output;
 }

@@ -9,7 +9,7 @@
 void BinaryFileUtility::ReadStringFromFile(std::ifstream& aFile, std::string& outString)
 {
 	size_t size = 0;
-	aFile.read(reinterpret_cast<char*>(&size), sizeof(size_t));
+	ReadSizeTFromFile(aFile, size);
 
 	std::vector<char> buffer(size + 1);
 	aFile.read(reinterpret_cast<char*>(buffer.data()), size);
@@ -21,7 +21,7 @@ void BinaryFileUtility::ReadStringFromFile(std::ifstream& aFile, std::string& ou
 void BinaryFileUtility::WriteStringToFile(std::ofstream& aFile, const std::string& aString)
 {
 	size_t size = aString.size();
-	aFile.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
+	WriteSizeTToFile(aFile, size);
 	aFile.write(reinterpret_cast<const char*>(aString.c_str()), sizeof(char) * size);
 }
 
@@ -33,8 +33,13 @@ void BinaryFileUtility::WriteBoneToFile(std::ofstream& aFile, Bone& aBone)
 	aFile.write(reinterpret_cast<const char*>(&aBone.inverseBindPose), sizeof(DirectX::XMMATRIX));
 
 	size_t size = aBone.childrenIds.size();
-	aFile.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
+	WriteSizeTToFile(aFile, size);
 	aFile.write(reinterpret_cast<const char*>(aBone.childrenIds.data()), sizeof(unsigned int) * size);
+}
+
+void BinaryFileUtility::WriteSizeTToFile(std::ofstream& aFile, size_t aSize)
+{
+	aFile.write(reinterpret_cast<const char*>(&aSize), sizeof(size_t));
 }
 
 void BinaryFileUtility::ReadBoneFromFile(std::ifstream& file, Skeleton* aSkeleton, Bone& outBone)
@@ -49,10 +54,15 @@ void BinaryFileUtility::ReadBoneFromFile(std::ifstream& file, Skeleton* aSkeleto
 	file.read(reinterpret_cast<char*>(&b.inverseBindPose), sizeof(DirectX::XMMATRIX));
 
 	size_t size = 0;
-	file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
+	ReadSizeTFromFile(file, size);
 
 	b.childrenIds.resize(size);
 	file.read(reinterpret_cast<char*>(b.childrenIds.data()), sizeof(unsigned int) * size);
+}
+
+void BinaryFileUtility::ReadSizeTFromFile(std::ifstream& aFile, size_t& outValue)
+{
+	aFile.read(reinterpret_cast<char*>(&outValue), sizeof(size_t));
 }
 
 std::string BinaryFileUtility::GetModelFileName(const std::string& aName)

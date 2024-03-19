@@ -10,7 +10,7 @@ float DebugCamera::Multiplier() const
 {
 	return 1 + myData.myMoveMultiplier * static_cast<int>(myActiveMultiplier);
 }
-
+#include <iostream>
 void DebugCamera::Update(float aDeltaTime)
 {
 	InputManager* im = InputManager::GetInstance();
@@ -51,17 +51,37 @@ void DebugCamera::Update(float aDeltaTime)
 
 	// Look
 	{
-		Vector2f mouseMovement = im->GetCurrentMousePositionVector2f();
 
-		myYaw += mouseMovement.x * myData.myCameraMoveX * aDeltaTime;
-		myPitch += mouseMovement.y * myData.myCameraMoveY * aDeltaTime;
+		Vector2f currentMousePos = im->GetCurrentMousePositionVector2f();
 
-		myYaw = std::fmodf(myYaw, 360);
-		if (myPitch > 90)
-			myPitch = 90;
-		else if (myPitch < -90)
-			myPitch = -90;
 
-		myCamera.GetTransform().SetEulerAngles({ myPitch, myYaw, 0 });
+		std::cout << currentMousePos.x << " - " << currentMousePos.y << "\n";
+
+		static Vector2f priorMousePos = currentMousePos;
+		Vector2f mouseMovement = priorMousePos - currentMousePos;
+
+
+		if (mySkipFrameUpdate == true)
+		{
+			mySkipFrameUpdate = false;
+			priorMousePos = currentMousePos;
+			return;
+		}
+		if (abs(mouseMovement.x) > 150 || abs(mouseMovement.y) > 150)
+		{
+			priorMousePos = currentMousePos;
+			return;
+		}
+	
+		myYaw = myCamera.GetTransform().GetEulerRotation().y;
+		myPitch = myCamera.GetTransform().GetEulerRotation().x;
+
+		myYaw +=  aDeltaTime * currentMousePos.x * myData.myCameraMoveX;
+		myPitch += currentMousePos.y * aDeltaTime * myData.myCameraMoveY ;
+
+
+		myCamera.GetTransform().SetEulerAngles({ myPitch, myYaw, 0});
+		
+		priorMousePos = currentMousePos;
 	}
 }

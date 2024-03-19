@@ -16,7 +16,7 @@ bool Shader::InternalInit(
 {
 	if (aBufferDesc == nullptr) { return true; }
 
-	HRESULT result = myGraphicsEngine->GetDevice()->CreateBuffer(aBufferDesc, aSubresourceData, &myConstantBuffer);
+	HRESULT result = myGraphicsEngine->DX().GetDevice()->CreateBuffer(aBufferDesc, aSubresourceData, &myConstantBuffer);
 	if (FAILED(result))
 	{
 		PrintW("[Shader.cpp] Failed to create buffer for shader");
@@ -35,7 +35,7 @@ bool Shader::PrepareRender(
 {
 	if (!myConstantBuffer) { return true; }
 
-	auto* context = myGraphicsEngine->GetContext();
+	auto* context = myGraphicsEngine->DX().GetContext();
 
 	D3D11_MAPPED_SUBRESOURCE mappedVResource;
 	auto result = context->Map(myConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedVResource);

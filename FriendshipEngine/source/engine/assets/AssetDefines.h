@@ -7,14 +7,14 @@ class Texture;
 
 struct AssetMetaData
 {
-	size_t id = 0;
 	std::string path = "";
+	size_t id = 0;
 };
 
 struct TextureData
 {
-	Texture* texture = nullptr;
 	std::string path = "";
+	Texture* texture = nullptr;
 };
 
 struct TextureCollection
@@ -23,4 +23,27 @@ struct TextureCollection
 	TextureData normalTexture{};
 	TextureData materialTexture{};
 	TextureData emissiveTexture{};
+	int vertexPaintIndex = -1;
+};
+
+struct MaterialName
+{
+	std::string name = "";
+	int id = -1;
+};
+
+struct VertexMaterialCollection
+{
+	TextureData vertex{};
+	MaterialName r{};
+	MaterialName g{};
+	MaterialName b{};
+	MaterialName a{};
+};
+
+struct VertexTextureCollection
+{
+	VertexMaterialCollection materials{};
+	std::string meshName{};
+	size_t subMeshIndex = 0; // used for debugging, can be removed
 };

@@ -9,7 +9,7 @@
 
 #include <engine/utility/InputManager.h>
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 #include <engine/debug/DebugCamera.h>
 #endif
 
@@ -42,36 +42,38 @@ CameraSystem::~CameraSystem()
 void CameraSystem::Init()
 {
 	//InputManager::GetInstance()->LockMouseScreen(Engine::GetInstance()->GetWindowHandle());
+#ifdef _EDITOR
+	InputManager::GetInstance()->SetMouseMode(DirectX::Mouse::MODE_ABSOLUTE); // _EDITOR
+#else
 	InputManager::GetInstance()->SetMouseMode(DirectX::Mouse::MODE_RELATIVE);
+#endif
 }
 
 
-void CameraSystem::Update(const float& dt)
+void CameraSystem::Update(const SceneUpdateContext& dt)
 {
 	dt;
-	HandleLockMouse();
-
-	if (isLocked) { return; }
-
 	auto* ge = GraphicsEngine::GetInstance();
 
-#ifdef _DEBUG
-	if (InputManager::GetInstance()->IsKeyPressed(VK_F1))
-	{
-		if (ge->GetCamera() == &myDebugCamera.myCamera)
-			ge->ResetToViewCamera();
-		else
-			ge->ChangeCurrentCamera(&myDebugCamera.myCamera);
+	if (ge->IsViewCameraInUse()) { return; }
 
-		return;
-	}
-
-	if (ge->GetCamera() == &myDebugCamera.myCamera)
-	{
-		myDebugCamera.Update(dt);
-		return;
-	}
-#endif
+//#ifndef _RELEASE
+//	if (InputManager::GetInstance()->IsKeyPressed(VK_F1))
+//	{
+//		if (ge->GetCamera() == &myDebugCamera.myCamera)
+//			ge->ResetToViewCamera();
+//		else
+//			ge->ChangeCurrentCamera(&myDebugCamera.myCamera);
+//
+//		return;
+//	}
+//
+//	if (ge->GetCamera() == &myDebugCamera.myCamera)
+//	{
+//		myDebugCamera.Update(dt);
+//		return;
+//	}
+//#endif
 
 	for (auto& entity : myEntities)
 	{
@@ -90,27 +92,66 @@ void CameraSystem::Update(const float& dt)
 
 			auto footPosition = playerComponent.controller->getFootPosition();
 
-			float cameraHeight = (playerComponent.isCrouching || playerComponent.isSliding) ? playerComponent.cameraCrouchHeight : playerComponent.cameraHeight;
 			//cameraHeight = 0;
-			transformComponent.transform.SetPosition(Vector3f((float)footPosition.x, (float)footPosition.y + cameraHeight, (float)footPosition.z));
+			transformComponent.transform.SetPosition(Vector3f((float)footPosition.x, (float)footPosition.y + playerComponent.currentCameraHeight, (float)footPosition.z));
 
 			camera.GetTransform().SetPosition(transformComponent.transform.GetPosition());
 			camera.GetTransform().SetEulerAngles({ playerComponent.cameraRotation.x, playerComponent.cameraRotation.y, 0 });
+			//MouseLean(camera, playerComponent.cameraRotation);
+		
 		}
-	}
-}
+#ifndef _RELEASE
 
-void CameraSystem::HandleLockMouse()
-{
-	InputManager* im = InputManager::GetInstance();
-	if (im->IsKeyPressed(VK_ESCAPE))
-	{
-		if (!isLocked)
-			im->UnlockMouseScreen();
+		//TODO: IS THIS ALLOWED?
+
 		else
-			im->LockMouseScreen(Engine::GetInstance()->GetWindowHandle());
+		{
+			CameraComponent& maCamira = myWorld->GetComponent<CameraComponent>(entity);
 
-		isLocked = !isLocked;
+			Camera& camera = *ge->GetCamera();
+			camera.GetTransform().SetPosition(maCamira.Pos);
+			camera.GetTransform().SetEulerAngles(maCamira.Rot);
+
+		}
+#endif
 	}
 }
+
+#include <iostream>
+void CameraSystem::MouseLean(Camera& camera, const Vector2f& aCameraRotation)
+{
+	aCameraRotation;
+	float currentRot = aCameraRotation.y;
+	static float lastRot;
+	float lean = currentRot - lastRot;
+	static float leanTowards = 0;
+
+	if (lean > 0)
+	{
+		leanTowards -= 1.5f;
+	}
+	else if (lean < 0)
+	{
+		leanTowards += 1.5f;
+	}
+
+
+
+
+	lastRot = currentRot;
+
+
+
+	camera.GetTransform().SetEulerAngles({ aCameraRotation.x, aCameraRotation.y, leanTowards });
+}
+
+
+void CameraSystem::RunWiggle()
+{
+}
+
+void CameraSystem::IdleWiggle()
+{
+}
+
 

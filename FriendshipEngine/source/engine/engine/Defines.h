@@ -1,25 +1,20 @@
 #pragma once
 
-#ifdef _DEBUG
+
+#ifndef _RELEASE
+
 // --- Engine settings ---
-#define EDITOR_VIEWPORT_SIZE 1
+#define WINDOWED_FULLSCREEN 1
 #define SHOW_CONSOLE_WINDOW 1
-#define USE_FE_CONSOLE 1
+#define START_WITH_MAINMENU 1
+
+#define _MODELVIEWER 0
+
+#ifdef _EDITOR
 
 // --- Editor settings ---
-#define START_IN_PLAYER_MODE 0
-#define USE_SCRIPT_EDITOR 1
-#define START_WITH_MAINMENU 0
+#define START_WITH_SCRIPTEDITOR 0
 
-// --- "Retail" ---
-#define USE_LAUNCHER_AS_STARTUP 0
+#endif //!_EDITOR
 
-
-#else
-// --- Build mode --- 
-// (shouldn't need this if we use #ifdef _DEBUG but added just in case)
-#define EDITOR_VIEWPORT_SIZE 0
-#define SHOW_CONSOLE_WINDOW 0
-#define USE_LAUNCHER_AS_STARTUP 1
-
-#endif
+#endif //!_RELEASE

@@ -3,20 +3,20 @@
 #include "GraphicsEngine.h"
 #include <assert.h>
 
-RenderTarget::RenderTarget() : RTV(nullptr), SRV(nullptr), myViewport({}) {}
+RenderTarget::RenderTarget() : RTV(nullptr), myViewport({}) {}
 RenderTarget::~RenderTarget() = default;
 
 RenderTarget RenderTarget::Create(const D3D11_TEXTURE2D_DESC& aDesc)
 {
 	HRESULT result;
 	ID3D11Texture2D* texture;
-	result = GraphicsEngine::GetInstance()->GetDevice()->CreateTexture2D(&aDesc, nullptr, &texture);
+	result = GraphicsEngine::GetInstance()->DX().GetDevice()->CreateTexture2D(&aDesc, nullptr, &texture);
 	assert(SUCCEEDED(result));
 
 	RenderTarget textureResult = Create(texture);
 
 	ID3D11ShaderResourceView* SRV;
-	result = GraphicsEngine::GetInstance()->GetDevice()->CreateShaderResourceView(texture, nullptr, &SRV);
+	result = GraphicsEngine::GetInstance()->DX().GetDevice()->CreateShaderResourceView(texture, nullptr, &SRV);
 	assert(SUCCEEDED(result));
 	textureResult.SRV = SRV;
 	SRV->Release();
@@ -41,13 +41,13 @@ RenderTarget RenderTarget::Create(const Vector2i& aSize, DXGI_FORMAT aFormat)
 	desc.MiscFlags = 0;
 
 	ID3D11Texture2D* texture;
-	result = GraphicsEngine::GetInstance()->GetDevice()->CreateTexture2D(&desc, nullptr, &texture);
+	result = GraphicsEngine::GetInstance()->DX().GetDevice()->CreateTexture2D(&desc, nullptr, &texture);
 	assert(SUCCEEDED(result));
 
 	RenderTarget textureResult = Create(texture);
 
 	ID3D11ShaderResourceView* SRV;
-	result = GraphicsEngine::GetInstance()->GetDevice()->CreateShaderResourceView(texture, nullptr, &SRV);
+	result = GraphicsEngine::GetInstance()->DX().GetDevice()->CreateShaderResourceView(texture, nullptr, &SRV);
 	assert(SUCCEEDED(result));
 	textureResult.SRV = SRV;
 	SRV->Release();
@@ -61,7 +61,7 @@ RenderTarget RenderTarget::Create(ID3D11Texture2D* aTexture)
 	HRESULT result;
 
 	ID3D11RenderTargetView* RTV;
-	result = GraphicsEngine::GetInstance()->GetDevice()->CreateRenderTargetView(
+	result = GraphicsEngine::GetInstance()->DX().GetDevice()->CreateRenderTargetView(
 		aTexture,
 		nullptr,
 		&RTV);
@@ -87,20 +87,22 @@ RenderTarget RenderTarget::Create(ID3D11Texture2D* aTexture)
 	textureResult.RTV = RTV;
 	RTV->Release();
 
-	textureResult.CreateStagingTexture();
+	textureResult.CreateStagingTexture(nullptr);
 
 	return textureResult;
 }
 
-void RenderTarget::Clear(const Vector4f& aColor) const
+void RenderTarget::Clear(const Vector3f& aColor) const
 {
-	GraphicsEngine::GetInstance()->GetContext()->ClearRenderTargetView(RTV.Get(), &aColor.x);
+	Vector4f color = { aColor.x, aColor.y, aColor.z, 1.0f };
+	GraphicsEngine::GetInstance()->DX().GetContext()->ClearRenderTargetView(RTV.Get(), &color.x);
 }
 
 void RenderTarget::SetAsTarget(DepthBuffer* aDepthBuffer)
 {
 	void* depthBuffer = aDepthBuffer ? aDepthBuffer->GetDepthStencilView() : nullptr;
 
-	GraphicsEngine::GetInstance()->GetContext()->OMSetRenderTargets(1, RTV.GetAddressOf(), (ID3D11DepthStencilView*)depthBuffer);
-	GraphicsEngine::GetInstance()->GetContext()->RSSetViewports(1, &myViewport);
+	auto* context = GraphicsEngine::GetInstance()->DX().GetContext();
+	context->OMSetRenderTargets(1, RTV.GetAddressOf(), (ID3D11DepthStencilView*)depthBuffer);
+	context->RSSetViewports(1, &myViewport);
 }

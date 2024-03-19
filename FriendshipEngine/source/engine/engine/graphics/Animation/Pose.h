@@ -3,8 +3,10 @@
 
 constexpr size_t MAX_ANIMATION_BONES = 64;
 
+typedef Transform JointTransforms[MAX_ANIMATION_BONES];
+
 struct Pose
 {
-	Transform jointTransforms[MAX_ANIMATION_BONES];
+	JointTransforms transform;
 	size_t count = 0;
 };

@@ -1,26 +1,7 @@
 #pragma once
 #include "../math/Vector.h"
-#include <memory>
-#include <string>
+#include "FontSizeEnum.h"
 
-enum FontSize
-{
-	FontSize_6 = 6,
-	FontSize_8 = 8,
-	FontSize_9 = 9,
-	FontSize_10 = 10,
-	FontSize_11 = 11,
-	FontSize_12 = 12,
-	FontSize_14 = 14,
-	FontSize_18 = 18,
-	FontSize_24 = 24,
-	FontSize_30 = 30,
-	FontSize_36 = 36,
-	FontSize_48 = 48,
-	FontSize_60 = 60,
-	FontSize_72 = 72,
-	FontSize_Count
-};
 
 class InternalTextAndFontData;
 struct Font
@@ -58,6 +39,8 @@ public:
 	std::wstring GetPathAndName() const { return myFontName; }
 
 protected:
+	int FontEnumToSize(FontSize aSize);
+
 	TextService* myTextService;
 	Font myFont;
 	std::wstring myFontName;

@@ -4,11 +4,12 @@ include "../premake/common.lua"
 
 workspace "FriendshipEngine"
 	location "../"
-	startproject "Editor"
+	startproject "StartApplication"
 	architecture "x64"
 
 	configurations {
-		"Debug",
+		"Editor",
+		"LauncherDebug",
 		"Release"
 	}
 
@@ -17,3 +18,4 @@ include (dirs.engine)
 include (dirs.game)
 include (dirs.launcher)
 include (dirs.editor)
+include (dirs.start_application)

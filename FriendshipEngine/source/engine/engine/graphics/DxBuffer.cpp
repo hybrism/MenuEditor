@@ -13,7 +13,7 @@ bool DxBuffer::Init(
 )
 {
 	HRESULT result;
-	result = GraphicsEngine::GetInstance()->GetDevice()->CreateBuffer(&aDesc, nullptr, myBuffer.ReleaseAndGetAddressOf());
+	result = GraphicsEngine::GetInstance()->DX().GetDevice()->CreateBuffer(&aDesc, nullptr, myBuffer.ReleaseAndGetAddressOf());
 	if (FAILED(result))
 	{
 		PrintE("[DxBuffer.cpp] Buffer error");
@@ -34,7 +34,7 @@ bool DxBuffer::Init(const DxBufferDesc& aDesc)
 bool DxBuffer::Map(void*& aMappableData) const
 {
 	D3D11_MAPPED_SUBRESOURCE mappedObjectResource;
-	HRESULT result = GraphicsEngine::GetInstance()->GetContext()->Map(myBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedObjectResource);
+	HRESULT result = GraphicsEngine::GetInstance()->DX().GetContext()->Map(myBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedObjectResource);
 	if (FAILED(result))
 	{
 		PrintE("[DxBuffer.cpp] Error in rendering! Function: SpriteBatchScope::Map()");
@@ -47,6 +47,6 @@ bool DxBuffer::Map(void*& aMappableData) const
 
 void DxBuffer::UnMap(void*& aMappableData) const
 {
-	GraphicsEngine::GetInstance()->GetContext()->Unmap(myBuffer.Get(), 0);
+	GraphicsEngine::GetInstance()->DX().GetContext()->Unmap(myBuffer.Get(), 0);
 	aMappableData = nullptr;
 }

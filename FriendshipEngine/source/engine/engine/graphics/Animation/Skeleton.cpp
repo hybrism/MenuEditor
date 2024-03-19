@@ -11,11 +11,11 @@ void Skeleton::ConvertPoseToModelSpace(const Pose& in, Pose& out, unsigned aBone
 {
 	const Bone& joint = bones[aBoneIdx];
 
-	out.jointTransforms[aBoneIdx] = in.jointTransforms[aBoneIdx].GetMatrix() * aParentTransform.GetMatrix();
+	out.transform[aBoneIdx] = in.transform[aBoneIdx].GetMatrix() * aParentTransform.GetMatrix();
 
 	for (size_t c = 0; c < joint.childrenIds.size(); c++)
 	{
-		ConvertPoseToModelSpace(in, out, joint.childrenIds[c], out.jointTransforms[aBoneIdx]);
+		ConvertPoseToModelSpace(in, out, joint.childrenIds[c], out.transform[aBoneIdx]);
 	}
 }
 
@@ -24,7 +24,7 @@ void Skeleton::ApplyBindPoseInverse(const Pose& in, Transform* out) const
 	for (size_t i = 0; i < bones.size(); i++)
 	{
 		const Bone& joint = bones[i];
-		out[i] = joint.inverseBindPose * in.jointTransforms[i].GetMatrix();
+		out[i] = joint.inverseBindPose * in.transform[i].GetMatrix();
 	}
 }
 
@@ -38,7 +38,7 @@ Transform Skeleton::GetBoneModelSpaceTransform(const Pose& in, const int aBoneIn
 	const Bone* currentJoint = &bones[aBoneIndex];
 	//DirectX::XMMATRIX result = bones[aBoneIndex].inverseBindPose * in.jointTransforms[aBoneIndex].GetMatrix();
 
-	return DirectX::XMMatrixInverse(nullptr, currentJoint->inverseBindPose) * in.jointTransforms[aBoneIndex].GetMatrix();
+	return DirectX::XMMatrixInverse(nullptr, currentJoint->inverseBindPose) * in.transform[aBoneIndex].GetMatrix();
 	/*
 
 	if (currentJoint->parentId == -1)

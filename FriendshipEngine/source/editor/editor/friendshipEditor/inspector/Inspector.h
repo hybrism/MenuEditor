@@ -1,5 +1,6 @@
 #pragma once
 #include "../windows/Window.h"
+#include <engine/math/Vector.h>
 #include <ecs/entity/Entity.h>
 
 class World;
@@ -30,6 +31,7 @@ namespace FE
 		void DisplayScriptableEventData(World* aWorld);
 		void DisplayOrbData(World* aWorld);
 
+		Vector3f myObjectRotation;
 		Texture* myTextureToDisplay;
 		Entity mySelectedEntity;
 		int myWindowID;

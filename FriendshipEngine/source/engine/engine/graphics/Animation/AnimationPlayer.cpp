@@ -14,6 +14,8 @@ void AnimationPlayer::UpdatePose(
 	const AnimationState* aToState
 )
 {
+	if (!aData.isPlaying) { return; }
+
 	const SharedMeshPackage& meshPackage = AssetDatabase::GetMesh(aMeshId);
 
 	Pose pose = InternalUpdateAndGetPose(aDeltaTime, aMeshId, 0, meshPackage, aData, aFromState);
@@ -29,19 +31,17 @@ void AnimationPlayer::UpdatePose(
 
 void AnimationPlayer::Play(AnimationData& aData)
 {
-	myIsPlaying = true;
-	aData.time[0] = 0;
-	aData.time[1] = 0;
+	aData.isPlaying = true;
 }
 
-void AnimationPlayer::Pause()
+void AnimationPlayer::Pause(AnimationData& aData)
 {
-	myIsPlaying = false;
+	aData.isPlaying = false;
 }
 
 void AnimationPlayer::Stop(AnimationData& aData)
 {
-	myIsPlaying = false;
+	aData.isPlaying = false;
 	aData.time[0] = 0;
 	aData.time[1] = 0;
 }
@@ -89,12 +89,15 @@ Pose AnimationPlayer::InternalUpdateAndGetPose(
 			time = std::fmodf(delta, animation->duration);
 			currentFrame = static_cast<size_t>(std::floor(time / frameRate));
 			nextFrame = currentFrame + 1;
+			aData.isDone = false;
 		}
 		else
 		{
 			time = animation->duration;
 			currentFrame = count;
 			nextFrame = currentFrame;
+			aData.isDone = true;
+
 		}
 	}
 
@@ -120,12 +123,12 @@ Pose AnimationPlayer::GetInterpolatedPose(
 	pose.count = aSkeleton.bones.size();
 	for (size_t i = 0; i < aSkeleton.bones.size(); i++)
 	{
-		const Transform& jointA = aPoseA.jointTransforms[aSkeleton.bones[i].id];
+		const Transform& jointA = aPoseA.transform[aSkeleton.bones[i].id];
 
 		DirectX::XMMATRIX jointXform = jointA.GetMatrix();
 #ifdef SHOULD_INTERPOLATE_ANIMATIONS
 		{
-			const Transform& jointB = aPoseB.jointTransforms[aSkeleton.bones[i].id];
+			const Transform& jointB = aPoseB.transform[aSkeleton.bones[i].id];
 			DirectX::FXMVECTOR rotationA = DirectX::XMQuaternionRotationMatrix(jointA.GetMatrix());
 			DirectX::FXMVECTOR rotationB = DirectX::XMQuaternionRotationMatrix(jointB.GetMatrix());
 
@@ -135,7 +138,7 @@ Pose AnimationPlayer::GetInterpolatedPose(
 			jointXform = DirectX::XMMatrixScaling(S.x, S.y, S.z) * DirectX::XMMatrixRotationQuaternion(R) * DirectX::XMMatrixTranslation(T.x, T.y, T.z);
 		}
 #endif
-		pose.jointTransforms[i] = jointXform;
+		pose.transform[i] = jointXform;
 	}
 
 	return pose;

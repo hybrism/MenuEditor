@@ -78,15 +78,20 @@ void FE::Inspector::DisplayTransformData(World* aWorld)
 		auto& t = aWorld->GetComponent<TransformComponent>(mySelectedEntity);
 		auto& transform = t.transform;
 		Vector3f pos = transform.GetPosition();
-		Vector3f rot = transform.GetEulerRotation();
 		Vector3f scale = transform.GetScale();
+		Vector3f rot = transform.GetEulerRotation();
 
 		Header("TransformComponent");
 
 		if (ImGui::DragFloat3("Position", &pos.x))
 			transform.SetPosition(pos);
 
-		ImGui::DragFloat3("Rotation", &rot.x, 0.1f, 0.f, 360.f);
+		//TOVE Added these for testing purposes, will remove when rotation is resolved
+		//if (ImGui::DragFloat3("SetEulerAngles", &myObjectRotation.x, 0.1f, 0.f))
+		//	transform.SetEulerAngles(myObjectRotation);
+
+		ImGui::DragFloat3("GetEulerRot", &rot.x, 0.1f, 0.f);
+
 		ImGui::DragFloat3("Scale (Can't edit atm)", &scale.x, 0.1f, 0.f);
 
 		std::string parent = t.parent == INVALID_ENTITY ? "N/A" : std::to_string(t.parent);
@@ -218,24 +223,50 @@ void FE::Inspector::DisplayPlayerData(World* aWorld)
 
 		Header("PlayerComponent");
 
-		ImGui::DragFloat2("Move Direction:", &p.inputDirection.x);
+		ImGui::DragFloat2("Move Direction:", &p.input.direction.x);
 		ImGui::DragFloat2("Sensitivity:", &p.cameraSensitivity.x);
 		ImGui::DragFloat3("Velocity:", &p.finalVelocity.x);
 		ImGui::Checkbox("Is Grounded:", &p.isGrounded);
-		ImGui::Checkbox("Is Wallrunning:", &p.isWallRunning);
 		float currentSpeed = p.finalVelocity.Length();
 		ImGui::DragFloat("Current speed:", &currentSpeed, 0, 0, 0, "%.3f", ImGuiSliderFlags_NoInput);
 
-		ImGui::Checkbox("Is Crouching:", &p.isCrouching);
-		ImGui::Checkbox("Is Sliding:", &p.isSliding);
-
-		
-		int playerStateInt = static_cast<int>(p.currentPlayerState->GetID());
-		const char* playerStateNames[static_cast<int>(ePlayerClassStates::Count)] = { "Ground", "Airbourne", "Crouch", "Slide", "Wallrun", "Vault"};
+		int playerStateInt = static_cast<int>(p.currentPlayerState);
+		const char* playerStateNames[static_cast<int>(ePlayerClassStates::Count)] = { "Ground", "Airborne", "Crouch", "Slide", "Wallrun", "Vault" };
 		const char* playerStateName = (playerStateInt >= 0 && playerStateInt < static_cast<int>(ePlayerClassStates::Count)) ? playerStateNames[playerStateInt] : "Unknown";
 		ImGui::SliderInt("Player State", &playerStateInt, 0, static_cast<int>(ePlayerClassStates::Count) - 1, playerStateName, ImGuiSliderFlags_NoInput);
+		if (ImGui::TreeNode("Constants"))
+		{
+
+			ImGui::SeparatorText("Ground Movement");
+			ImGui::DragFloat("Acceleration Speed", &PlayerConstants::accelerationSpeed);
+			ImGui::DragFloat("Max Speed", &PlayerConstants::maxSpeed);
+			ImGui::DragFloat("Crouch Speed Multiplier", &PlayerConstants::crouchSpeedMultiplier);
+			ImGui::DragFloat("Jump Speed", &PlayerConstants::jumpSpeed);
+			ImGui::DragFloat("Friction", &PlayerConstants::friction);
+
+			ImGui::SeparatorText("Air Movement");
+			ImGui::DragFloat("Gravity", &PlayerConstants::gravity);
+			ImGui::DragFloat("Air Mobility Multiplier", &PlayerConstants::airMobilityMultiplier);
+			ImGui::DragFloat("Air Friction", &PlayerConstants::airFriction);
 
 
+			ImGui::SeparatorText("Wall Run");
+			ImGui::DragFloat("Wall Jump Speed", &PlayerConstants::wallJumpSpeed);
+			ImGui::DragFloat("Wall Jump Height", &PlayerConstants::wallJumpHeight);
+			ImGui::DragFloat("Min Wall Run Speed", &PlayerConstants::minWallRunSpeed);
+			ImGui::DragFloat("Wall Run Wall Detection Magnet Speed", &PlayerConstants::wallRunWallDetectionMagnetSpeed);
+
+			ImGui::SeparatorText("Slide");
+			ImGui::DragFloat("Slide Speed Threshold", &PlayerConstants::slideSpeedThreshold);
+			ImGui::DragFloat("Slide Speed Boost", &PlayerConstants::slideSpeedBoost);
+			ImGui::DragFloat("Slide Friction", &PlayerConstants::slideFriction);
+
+			ImGui::SeparatorText("Camera");
+			ImGui::DragFloat("Camera Crouch Height", &PlayerConstants::cameraCrouchHeight);
+			ImGui::DragFloat("Camera Standing Height", &PlayerConstants::cameraHeight);
+
+			ImGui::TreePop();
+		}
 	}
 }
 

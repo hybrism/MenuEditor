@@ -1,4 +1,5 @@
 #include "MenuEditor.h"
+
 #include <d3d11.h>
 #include <filesystem>
 #include <fstream>
@@ -13,12 +14,12 @@
 #include <nlohmann/json.hpp>
 
 //Engine
-#include <assets/TextureFactory.h>
 #include <engine/Paths.h>
 #include <engine/utility/Error.h>
 #include <engine/utility/StringHelper.h>
 #include <engine/utility/InputManager.h>
 #include <engine/graphics/Texture.h>
+#include <assets/TextureFactory.h>
 #include <engine/graphics/GraphicsEngine.h>
 
 //Internal
@@ -29,16 +30,16 @@
 #include "windows/AssetsWindow.h"
 #include "windows/ConsoleWindow.h"
 #include "windows/InspectorWindow.h"
-#include "windows/MenuObjectHierarchy.h"
+#include "windows/ObjectHierarchyWindow.h"
 #include "windows/MenuViewWindow.h"
 
-#include "gui/MenuObject.h"
-#include "gui/components/SpriteComponent.h"
-#include "gui/components/Collider2DComponent.h"
-#include "gui/components/TextComponent.h"
+#include <game/gui/MenuObject.h>
+#include <game/gui/components/SpriteComponent.h>
+#include <game/gui/components/Collider2DComponent.h>
+#include <game/gui/components/TextComponent.h>
 
 MENU::MenuEditor::MenuEditor()
-	: myFirstFrameSetup(true)
+	: myFirstFrameSetup(false)
 	, myShouldShowDebugData(false)
 	, myShouldShowEditorColliders(false)
 	, myShouldShowMenuColldiers(true)
@@ -61,25 +62,25 @@ void MENU::MenuEditor::Init()
 	auto ge = GraphicsEngine::GetInstance();
 
 	//TODO:  ViewPort != RenderSize, add get RenderSize to graphicsengine 23.f is the height of menubar?
-	Vector2i viewport = ge->GetViewportDimensions();
+	Vector2i viewport = ge->DX().GetViewportDimensions();
 	myRenderSize = { (float)viewport.x, (float)viewport.y + 23.f };
 	myRenderCenter = myRenderSize * 0.5f;
 
-	//SUBSCRIBE TO EVENTS
+	////SUBSCRIBE TO EVENTS
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::DdsDropped);
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::TtfDropped);
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::PushEntityToInspector);
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::UpdateMenuEditorColliders);
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::NewMenuLoaded);
 
-	//CREATE EDITOR WINDOWS
+	////CREATE EDITOR WINDOWS
 	myWindows[(int)MENU::WindowID::Assets] = std::make_shared<AssetsWindow>("Assets", true, ImGuiWindowFlags_None);
-	myWindows[(int)MENU::WindowID::MenuView] = std::make_shared<MenuViewWindow>("MenuView", false, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::WindowID::MenuView] = std::make_shared<MenuViewWindow>("MenuView", true, ImGuiWindowFlags_None);
 	myWindows[(int)MENU::WindowID::Console] = std::make_shared<ConsoleWindow>("Console", true, ImGuiWindowFlags_None);
 	myWindows[(int)MENU::WindowID::Inspector] = std::make_shared<InspectorWindow>("Inspector", true, ImGuiWindowFlags_None);
 	myWindows[(int)MENU::WindowID::MenuObjectHierarchy] = std::make_shared<MenuObjectHierarchy>("MenuObjects", true, ImGuiWindowFlags_None);
 
-	//GET SPRITES
+	////GET SPRITES
 	std::filesystem::create_directory(RELATIVE_SPRITE_ASSET_PATH);
 	for (const auto& entry : std::filesystem::directory_iterator(RELATIVE_SPRITE_ASSET_PATH))
 	{
@@ -92,7 +93,7 @@ void MENU::MenuEditor::Init()
 		}
 	}
 
-	//GET FONTS
+	////GET FONTS
 	std::filesystem::create_directory(RELATIVE_FONT_ASSET_PATH);
 	for (const auto& entry : std::filesystem::directory_iterator(RELATIVE_FONT_ASSET_PATH))
 	{
@@ -103,7 +104,7 @@ void MENU::MenuEditor::Init()
 		}
 	}
 
-	//GET MENUFILES
+	////GET MENUFILES
 	std::string menuPath = RELATIVE_IMPORT_DATA_PATH + MENU::MENU_PATH;
 	std::filesystem::create_directory(menuPath);
 	for (const auto& entry : std::filesystem::directory_iterator(menuPath))
@@ -115,16 +116,14 @@ void MENU::MenuEditor::Init()
 		}
 	}
 
-	myMenuHandler.Init("testMenu.json");
+	myMenuHandler.Init("mainMenu.json", nullptr);
 
 	GenerateEditorColliders();
 }
 
 void MENU::MenuEditor::Update(float)
 {
-	//Dockspace();
-
-	MenuBar();
+	Dockspace();
 	Popups();
 
 	MenuEditorUpdateContext editorUpdateContext;
@@ -145,7 +144,7 @@ void MENU::MenuEditor::Update(float)
 	ImVec2 mousePos = ImGui::GetMousePos();
 	menuContext.mousePosition = { mousePos.x, mousePos.y };
 	menuContext.renderSize = myRenderSize;
-	menuContext.mousePressed = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
+	menuContext.mousePressed = ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
 
 	myMenuHandler.Update(menuContext);
 	myEditorObjectManager.Update(menuContext);
@@ -157,6 +156,7 @@ void MENU::MenuEditor::Render()
 {
 	GraphicsEngine* ge = GraphicsEngine::GetInstance();
 	DebugRenderer& debugRenderer = ge->GetDebugRenderer();
+	SpriteRenderer& spriteRenderer = ge->GetSpriteRenderer();
 
 	RenderState renderState;
 	renderState.blendState = BlendState::AlphaBlend;
@@ -166,6 +166,7 @@ void MENU::MenuEditor::Render()
 	myMenuHandler.Render();
 	myEditorObjectManager.Render();
 
+	spriteRenderer.Render();
 	debugRenderer.Render();
 }
 
@@ -208,7 +209,7 @@ void MENU::MenuEditor::GenerateEditorColliders()
 	for (unsigned int i = 0; i < currentState.objectIds.size(); i++)
 	{
 		MenuObject& menuMo = myMenuHandler.GetObjectFromID(currentState.objectIds[i]);
-		MenuObject& editorMo = myEditorObjectManager.CreateNew(IDManager::GetInstance()->UseID(editorID++));
+		MenuObject& editorMo = myEditorObjectManager.CreateNew(editorID++);
 
 		myEditorIDToMenuIDMap[editorMo.GetID()] = menuMo.GetID();
 		myMenuIDToEditorIDMap[menuMo.GetID()] = editorMo.GetID();
@@ -224,12 +225,12 @@ void MENU::MenuEditor::GenerateEditorColliders()
 		myUpGizmoID = mo.GetID();
 		SpriteComponent& sprite = mo.AddComponent<SpriteComponent>();
 		int textureID = myAssets.textureNameToId["s_gizmo_up.dds"];
-		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], TextureState::Default);
-		sprite.SetColor({ 1.f, 1.f, 1.f, 0.3f }, TextureState::Default);
-		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], TextureState::Hovered);
-		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, TextureState::Hovered);
-		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], TextureState::Pressed);
-		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, TextureState::Pressed);
+		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], ObjectState::Default);
+		sprite.SetColor({ 1.f, 1.f, 1.f, 0.3f }, ObjectState::Default);
+		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], ObjectState::Hovered);
+		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, ObjectState::Hovered);
+		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], ObjectState::Pressed);
+		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, ObjectState::Pressed);
 
 		Collider2DComponent& collider = mo.AddComponent<Collider2DComponent>();
 		collider.SetSize({ 16.f, 32.f });
@@ -244,12 +245,12 @@ void MENU::MenuEditor::GenerateEditorColliders()
 		SpriteComponent& sprite = mo.AddComponent<SpriteComponent>();
 		int textureID = myAssets.textureNameToId["s_gizmo_right.dds"];
 
-		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], TextureState::Default);
-		sprite.SetColor({ 1.f, 1.f, 1.f, 0.3f }, TextureState::Default);
-		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], TextureState::Hovered);
-		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, TextureState::Hovered);
-		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], TextureState::Pressed);
-		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, TextureState::Pressed);
+		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], ObjectState::Default);
+		sprite.SetColor({ 1.f, 1.f, 1.f, 0.3f }, ObjectState::Default);
+		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], ObjectState::Hovered);
+		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, ObjectState::Hovered);
+		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], ObjectState::Pressed);
+		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, ObjectState::Pressed);
 
 		Collider2DComponent& collider = mo.AddComponent<Collider2DComponent>();
 		collider.SetSize({ 32.f, 16.f });
@@ -344,7 +345,6 @@ void MENU::MenuEditor::MenuBar()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-
 			if (ImGui::BeginMenu("Open"))
 			{
 				for (size_t i = 0; i < myAssets.saveFiles.size(); i++)
@@ -401,7 +401,6 @@ void MENU::MenuEditor::MenuBar()
 
 			if (ImGui::MenuItem("Show Menu Colliders", NULL, &myShouldShowMenuColldiers))
 			{
-
 				for (unsigned int i = 0; i < myMenuHandler.myObjectManager.myObjects.size(); i++)
 				{
 					if (!myMenuHandler.myObjectManager.myObjects[i]->HasComponent<Collider2DComponent>())
@@ -464,7 +463,7 @@ void MENU::MenuEditor::Popups()
 			dataFile << menu;
 			dataFile.close();
 
-			myMenuHandler.Init(newMenuName);
+			myMenuHandler.Init(newMenuName, nullptr);
 			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::NewMenuLoaded, newMenuName });
 		}
 

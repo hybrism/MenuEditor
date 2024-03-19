@@ -1,44 +1,94 @@
 #include "pch.h"
 
 #include "ObjectManager.h"
+#include <engine/utility/Error.h>
+
+#include "components/Collider2DComponent.h"
+
 #include "MenuObject.h"
 
-ObjectManager::ObjectManager()
+MENU::ObjectManager::ObjectManager()
+{}
+
+void MENU::ObjectManager::Update(const MenuUpdateContext& aContext)
 {
-    myObjectIdCounter = 0;
-    myLastObjectIndex = 0;
+	for (size_t i = 0; i < myObjects.size(); i++)
+	{
+		myObjects[i]->Update(aContext);
+	}
 }
 
-void ObjectManager::Update()
+void MENU::ObjectManager::Render()
 {
-    for (size_t i = 0; i < myObjects.size(); i++)
-    {
-        PrintI("ObjectManager Update!")
-        myObjects[i]->Update();
-    }
+	for (size_t i = 0; i < myObjects.size(); i++)
+	{
+		myObjects[i]->Render();
+	}
 }
 
-void ObjectManager::Render()
+void MENU::ObjectManager::CheckCollision(const Vector2f& aPosition, bool aIsPressed)
 {
-    for (size_t i = 0; i < myObjects.size(); i++)
-    {
-        myObjects[i]->Render();
-    }
+	for (size_t i = 0; i < myObjects.size(); i++)
+	{
+		if (!myObjects[i]->HasComponent<Collider2DComponent>())
+			return;
+
+		myObjects[i]->GetComponent<Collider2DComponent>().CheckCollision(aPosition, aIsPressed);
+	}
 }
 
-MenuObject& ObjectManager::CreateNew()
+MENU::MenuObject& MENU::ObjectManager::CreateNew(ID aID, const Vector2f& aPosition)
 {
-    myObjects.push_back(std::make_shared<MenuObject>(myObjectIdCounter));
-    
-    myObjectIdCounter++;
-    myLastObjectIndex = myObjects.size() - 1;
+	assert(aID != INVALID_ID && "ID is not valid!");
 
-    return *myObjects[myLastObjectIndex];
+	myObjects.push_back(std::make_shared<MenuObject>(aID, aPosition));
+
+	myLastObjectIndex = myObjects.size() - 1;
+	return *myObjects[myLastObjectIndex];
 }
 
-void ObjectManager::ClearAll()
+MENU::MenuObject& MENU::ObjectManager::GetObjectFromID(ID aID)
 {
-    myObjects.clear();
-    myObjectIdCounter = 0;
-    myLastObjectIndex = 0;
+	for (size_t i = 0; i < myObjects.size(); i++)
+	{
+		if (myObjects[i]->GetID() == aID)
+			return *myObjects[i];
+	}
+
+	assert("No object with this ID exists!");
+	return *myObjects.front();
+}
+
+MENU::MenuObject& MENU::ObjectManager::GetObjectFromIndex(unsigned int aIndex)
+{
+	assert(aIndex <= myLastObjectIndex && "Index is out of range!");
+
+	return *myObjects[aIndex];
+}
+
+void MENU::ObjectManager::RemoveObjectAtID(ID aID)
+{
+	for (unsigned int i = 0; i < myObjects.size(); i++)
+	{
+		unsigned int ID = myObjects[i]->GetID();
+		if (ID == aID)
+		{
+			RemoveObjectAtIndex(i);
+			return;
+		}
+	}
+}
+
+void MENU::ObjectManager::RemoveObjectAtIndex(unsigned int aIndex)
+{
+	assert(aIndex <= myLastObjectIndex && "Index is out of range!");
+
+	myObjects.erase(myObjects.begin() + aIndex);
+	myLastObjectIndex = myObjects.size() - 1;
+}
+
+void MENU::ObjectManager::ClearAll()
+{
+	myObjects.clear();
+	myLastObjectIndex = 0;
 }

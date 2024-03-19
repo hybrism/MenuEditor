@@ -4,38 +4,42 @@
 #include "component/ComponentManager.h"
 #include "system/SystemManager.h"
 
+
 World::~World()
 {
 	delete myEntityManager;
+	delete myEntitySignatureManager;
 	delete myComponentManager;
 	delete mySystemManager;
 }
 
 void World::Reset()
 {
-	myComponentManager->Reset(myEntityManager);
+	myComponentManager->Reset(myEntitySignatureManager);
+	myEntitySignatureManager->Reset();
 	myEntityManager->Reset();
 	mySystemManager->Reset();
 
 	myPlayerEntityID = INVALID_ENTITY;
 
-#ifdef _DEBUG
+#ifdef _EDITOR
 	myEntities.clear();
 #endif
 }
 
 void World::Init()
 {
-	// register all the components
-//REGISTER_COMPONENT(CTransform);
+	//register all the components
+  //REGISTER_COMPONENT(CTransform);
+	myEntitySignatureManager = new EntitySignatureManager();
 	myEntityManager = new EntityManager();
 	mySystemManager = new SystemManager(this);
 	myComponentManager = new ComponentManager();
 }
 
-void World::Update(const float& dt)
+void World::Update(const SceneUpdateContext& aContext)
 {
-	mySystemManager->Update(dt);
+	mySystemManager->Update(aContext);
 	DeleteMarkedEntities();
 }
 
@@ -46,7 +50,7 @@ void World::Render()
 
 Entity World::CreateEntity()
 {
-#ifdef _DEBUG
+#ifdef _EDITOR
 	eid_t entity = myEntityManager->CreateEntity();
 	myEntities.push_back(entity);
 	return entity;
@@ -57,7 +61,7 @@ Entity World::CreateEntity()
 
 Entity World::CreateEntityAtID(const eid_t& aEntityID)
 {
-#ifdef _DEBUG
+#ifdef _EDITOR
 	eid_t entity = myEntityManager->CreateEntityAtID(aEntityID);
 	myEntities.push_back(entity);
 	return entity;
@@ -68,12 +72,14 @@ Entity World::CreateEntityAtID(const eid_t& aEntityID)
 
 void World::DestroyEntity(const Entity& aEntity)
 {
+	if (aEntity == INVALID_ENTITY) { return; }
+
 	MarkEntityForDeletion(aEntity);
 	//myEntityManager->DestroyEntity(entity);
 	//myComponentManager->OnEntityDestroyed(entity);
 	//mySystemManager->OnEntityDestroyed(entity);
 
-#ifdef _DEBUG
+#ifdef _EDITOR
 	auto index = std::find(myEntities.begin(), myEntities.end(), aEntity);
 	if (index == myEntities.end()) { return; }
 	myEntities.erase(index);
@@ -95,9 +101,9 @@ void World::DeleteMarkedEntities()
 {
 	for (size_t i = 0; i < myMarkedDeleteCount; i++)
 	{
-		myEntityManager->DestroyEntity(myMarkedForDeletionEntities[i]);
-		myComponentManager->OnEntityDestroyed(myMarkedForDeletionEntities[i], myEntityManager);
+		myComponentManager->OnEntityDestroyed(myMarkedForDeletionEntities[i], myEntitySignatureManager);
 		mySystemManager->OnEntityDestroyed(myMarkedForDeletionEntities[i]);
+		myEntityManager->DestroyEntity(myMarkedForDeletionEntities[i], myEntitySignatureManager);
 	}
 	myMarkedDeleteCount = 0;
 }

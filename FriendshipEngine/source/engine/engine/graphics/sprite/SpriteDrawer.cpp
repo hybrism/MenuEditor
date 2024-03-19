@@ -33,7 +33,7 @@ void SpriteBatchScope::Draw(const SpriteInstanceData* aInstances, size_t aInstan
 {
 	assert(myInstanceCount < BATCH_SIZE);
 
-	Vector2<unsigned int> resolution = GraphicsEngine::GetInstance()->GetViewportDimensions();
+	Vector2<unsigned int> resolution = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
 
 	for (int i = 0; i < aInstanceCount; i++)
 	{
@@ -134,7 +134,7 @@ void SpriteBatchScope::UnMapAndRender()
 {
 	assert(mySpriteDrawer);
 
-	ID3D11DeviceContext* context = GraphicsEngine::GetInstance()->GetContext();
+	ID3D11DeviceContext* context = GraphicsEngine::GetInstance()->DX().GetContext();
 
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	context->Unmap(mySpriteDrawer->myInstanceBuffer.Get(), 0);
@@ -142,9 +142,7 @@ void SpriteBatchScope::UnMapAndRender()
 	//1 QUAD = 6 Indices
 	context->DrawInstanced(6, (UINT)myInstanceCount, 0, 0);
 
-#ifdef _DEBUG
 	GraphicsEngine::GetInstance()->IncrementDrawCalls();
-#endif
 	myInstanceData = nullptr;
 	myInstanceCount = 0;
 }
@@ -155,7 +153,7 @@ void SpriteBatchScope::Map()
 	assert(myInstanceCount == 0);
 
 	D3D11_MAPPED_SUBRESOURCE mappedObjectResource;
-	HRESULT result = GraphicsEngine::GetInstance()->GetContext()->Map(mySpriteDrawer->myInstanceBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedObjectResource);
+	HRESULT result = GraphicsEngine::GetInstance()->DX().GetContext()->Map(mySpriteDrawer->myInstanceBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedObjectResource);
 	if (FAILED(result))
 	{
 		PrintE("[SpriteDrawer.cpp] Error in rendering! Function: SpriteBatchScope::Map()");
@@ -188,7 +186,7 @@ void SpriteDrawer::Init()
 	objectBufferDesc.StructureByteStride = 0;
 
 	HRESULT result;
-	result = GraphicsEngine::GetInstance()->GetDevice()->CreateBuffer(&objectBufferDesc, nullptr, myInstanceBuffer.ReleaseAndGetAddressOf());
+	result = GraphicsEngine::GetInstance()->DX().GetDevice()->CreateBuffer(&objectBufferDesc, nullptr, myInstanceBuffer.ReleaseAndGetAddressOf());
 	if (FAILED(result))
 	{
 		PrintE("[SpriteDrawer.cpp] Object Buffer error");
@@ -259,7 +257,7 @@ bool SpriteDrawer::CreateBuffer()
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
 
-	HRESULT hr = GraphicsEngine::GetInstance()->GetDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, myVertexBuffer.ReleaseAndGetAddressOf());
+	HRESULT hr = GraphicsEngine::GetInstance()->DX().GetDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, myVertexBuffer.ReleaseAndGetAddressOf());
 	if (FAILED(hr))
 	{
 		PrintE("[SpriteDrawer.cpp] Buffer error");
@@ -275,7 +273,7 @@ SpriteBatchScope SpriteDrawer::BeginBatch(const SpriteSharedData& aSharedData, b
 	assert(!myIsInBatch);
 	myIsInBatch = true;
 
-	aSharedData.texture->Bind(ShaderTextureSlot::Cubemap);
+	aSharedData.texture->Bind(PixelShaderTextureSlot::Cubemap);
 
 	if (aUseDefaultVertexShader)
 	{
@@ -301,7 +299,7 @@ SpriteBatchScope SpriteDrawer::BeginBatch(const SpriteSharedData& aSharedData, b
 	spriteBuffer[0] = myVertexBuffer.Get();
 	spriteBuffer[1] = myInstanceBuffer.Get();
 
-	GraphicsEngine::GetInstance()->GetContext()->IASetVertexBuffers(0, 2, spriteBuffer, strides, offsets);
+	GraphicsEngine::GetInstance()->DX().GetContext()->IASetVertexBuffers(0, 2, spriteBuffer, strides, offsets);
 
 	SpriteBatchScope scope(*this);
 	scope.Map();

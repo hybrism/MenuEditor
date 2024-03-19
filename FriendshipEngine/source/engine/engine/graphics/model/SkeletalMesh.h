@@ -2,7 +2,7 @@
 #include "SharedMesh.h"
 #include "../animation/Skeleton.h"
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 #include <vector>
 #include "../../debug/DebugLine.h"
 #endif
@@ -29,7 +29,7 @@ public:
 	void SetSkeleton(const Skeleton& aSkeleton);
 	const Skeleton& GetSkeleton() const;
 private:
-#ifdef _DEBUG
+#ifndef _RELEASE
 	std::vector<DebugLine> myDebugLines;
 #endif
 	Skeleton mySkeleton;

@@ -1,19 +1,12 @@
 #pragma once
 #include <bitset>
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 #include "../entity/Entity.h"
 #endif
 
-const unsigned long MAX_COMPONENTS = 64;
-typedef std::bitset<MAX_COMPONENTS> ComponentSignature;
+constexpr unsigned long MAX_COMPONENTS = 64;
 typedef unsigned long int cid_t;
-
-struct EntitySignature
-{
-	int indices[MAX_COMPONENTS] = {};
-	ComponentSignature signature = {};
-};
 
 template<typename T>
 class ComponentContainer;
@@ -28,12 +21,13 @@ private:
 	static cid_t componentId;
 public:
 	Component() = default;
-	Component(const Component& aComponent) = delete;
-	Component& operator=(const Component& aComponent) = delete;
-#ifdef _DEBUG
+#ifndef _RELEASE
 	Entity myOwner = 0;
 	EntityData* myOwnerData = nullptr;
 #endif
+private:
+	Component(const Component& aComponent) = default;
+	Component& operator=(const Component& aComponent) = default;
 };
 
 // definition of the static variable

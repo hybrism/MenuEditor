@@ -15,6 +15,7 @@
 #include <game/Game.h>
 
 //Internal
+#include <shared/postMaster/PostMaster.h>
 #include "windows/WindowFactory.h"
 
 EditorManager::EditorManager()
@@ -37,6 +38,8 @@ void EditorManager::Init(Game* aGame)
 	{
 		myWindows[(FE::ID)i] = FE::WindowFactory::Create((FE::ID)i);
 	}
+
+	FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::NewLevelLoaded, myGame->GetSceneManager().GetCurrentSceneName() });
 }
 
 void EditorManager::Update(EditorUpdateContext aContext)
@@ -52,40 +55,6 @@ void EditorManager::Update(EditorUpdateContext aContext)
 
 		myWindows[(FE::ID)i]->Show(aContext);
 	}
-
-	ShowDebugData(aContext.dt);
-
-}
-
-void EditorManager::ShowDebugData(const float& dt)
-{
-	auto* ge = GraphicsEngine::GetInstance();
-
-	myFPSTimer += dt;
-	if (myFPSTimer >= myFPSUpdateFrequency)
-	{
-		myFPS = static_cast<int>(1.f / dt);
-		myFPSTimer = 0.f;
-	}
-
-	if (ImGui::Begin(myWindows[FE::ID::GameView]->myData.handle.c_str()))
-	{
-		ImVec2 wPos = ImGui::GetWindowPos();
-		ImVec2 wMin = ImGui::GetWindowContentRegionMin();
-		ImVec2 topLeft = wPos + wMin;
-
-		const ImVec2 textPos = ImVec2(topLeft.x + 10, topLeft.y + 10);
-		ImVec2 textOffset = ImVec2(0, 15);
-
-		std::string fps = "FPS: " + std::to_string(myFPS);
-		std::string drawCall = "Draw Calls: " + std::to_string(ge->GetDrawCalls());
-
-		ImDrawList* tDrawList = ImGui::GetWindowDrawList();
-
-		tDrawList->AddText(textPos, IM_COL32_WHITE, fps.c_str());
-		tDrawList->AddText(textPos + textOffset, IM_COL32_WHITE, drawCall.c_str());
-	}
-	ImGui::End();
 }
 
 void EditorManager::Dockspace()
@@ -199,6 +168,7 @@ void EditorManager::MenuBar()
 				if (ImGui::MenuItem(file.c_str()))
 				{
 					myGame->GetSceneManager().LoadScene({ eSceneType::Game, file });
+					FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::NewLevelLoaded, file });
 				}
 			}
 

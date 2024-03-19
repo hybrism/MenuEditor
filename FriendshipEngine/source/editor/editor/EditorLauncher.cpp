@@ -63,9 +63,7 @@ void EditorLauncher::Update(const float& dt)
 
 	// TODO: Remove this, due to the current editor structure, it is updated before the game loop which in turn causes the draw calls to be updated after editor and reset at the start of the next frame
 	// same todo can be found in GraphicsEngine.h
-#ifdef _DEBUG
 	GraphicsEngine::GetInstance()->ResetDrawCalls();
-#endif
 
 	myGameApplication->Update(dt);
 }

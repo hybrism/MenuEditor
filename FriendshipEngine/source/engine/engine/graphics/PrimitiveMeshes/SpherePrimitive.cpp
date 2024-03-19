@@ -109,7 +109,12 @@ void SpherePrimitive::ConstructSphere()
 
 	mySphereMesh = new Mesh;
 
-	mySphereMesh->Initialize(data.myVertices.data(), data.myVertices.size(), data.myIndices.data(), data.myIndices.size());
+	for (int i = 0; i < data.myVertices.size(); i++)
+	{
+		data.myVertices[i].color = { 255,255,255,255 };
+	}
+	mySphereMesh->Initialize(data.myVertices.data(), data.myVertices.size(), data.myIndices.data(), data.myIndices.size(), true);
+#pragma warning (pop)
 }
 
 const SphereData& SpherePrimitive::GetSphereData()

@@ -9,6 +9,7 @@
 #include "../component/PlayerComponent.h"
 #include "../component/TransformComponent.h"
 #include "engine\debug\DebugLine.h"
+#include "engine\math\helper.h"
 
 #include <engine/utility/InputManager.h>
 #include "../utility/JsonUtility.h"
@@ -36,10 +37,16 @@ void OrbSystem::Init()
 		transform.transform.SetScale(Vector3f{ 0.1f,0.1f,0.1f });
 		LoadInOrbData(ORB_DATA, orbComponent);
 	}
+
+	SetVignetteRegular();
+	myNewVignetteStrength = 0.f;
 }
 
-void OrbSystem::Update(const float& dt)
+void OrbSystem::Update(const SceneUpdateContext& aContext)
 {
+	myPostProcess = aContext.postProcess;
+	LerpVignette(aContext.dt, 1.0f);
+
 	for (Entity entity : myEntities)
 	{
 		auto playerID = myWorld->GetPlayerEntityID();
@@ -51,11 +58,11 @@ void OrbSystem::Update(const float& dt)
 		TransformComponent& transformComponent = myWorld->GetComponent<TransformComponent>(entity);
 		OrbComponent& orbComponent = myWorld->GetComponent<OrbComponent>(entity);
 
-		if (orbComponent.playerHealth > 0)
+		if (playerComp.health.playerHealth > 0)
 		{
-			CreateFollowPath(playerComp, dt);
-			FollowPath(playerComp,transformComponent, orbComponent, dt);
-			PlayerRegainHealth(orbComponent, dt);
+			CreateFollowPath(playerComp, aContext.dt);
+			FollowPath(playerComp,transformComponent, orbComponent, aContext.dt);
+			PlayerRegainHealth(playerComp,orbComponent, aContext.dt);
 		}
 
 		orbComponent.OrbPos = transformComponent.transform.GetPosition();
@@ -64,7 +71,7 @@ void OrbSystem::Update(const float& dt)
 
 void OrbSystem::Render()
 {
-#ifdef _DEBUG	
+#ifndef _RELEASE	
 	if (myFollowPath.size() >= 2) // Ensure at least two points for drawing lines
 	{
 		// Create DebugLine objects based on myFollowPath
@@ -164,38 +171,66 @@ void OrbSystem::FollowPath(PlayerComponent& aPlayer,TransformComponent& atransfo
 				myPathIndex = 0;
 
 				//Take damage
-				PlayerTakeDamage(aOrb);
+				PlayerTakeDamage(aPlayer,aOrb);
 			}
 		}
 	}
 }
 
-void OrbSystem::PlayerRegainHealth(OrbComponent& aOrb, const float& dt)
+void OrbSystem::PlayerRegainHealth(PlayerComponent& aPlayer, OrbComponent& aOrb, const float& dt)
 {
-	if (aOrb.playerHealth < aOrb.playerMaxHealth)
+	if (aPlayer.health.playerHealth < aPlayer.health.playerMaxHealth)
 	{
 		aOrb.HPRegainTimer -= dt;
 
 		if (aOrb.HPRegainTimer <= 0)
 		{
-			aOrb.playerHealth++;
+			myPreviousVigStrength = myNewVignetteStrength;
+			myNewVignetteStrength = 0.0f;
+
+			aPlayer.health.playerHealth++;
 			std::cout << "Health +1" << std::endl;
 		}
 	}
 }
 
-void OrbSystem::PlayerTakeDamage(OrbComponent& aOrb)
+void OrbSystem::PlayerTakeDamage(PlayerComponent& aPlayer, OrbComponent& aOrb)
 {
-	aOrb.playerHealth--;
+	aPlayer.health.playerHealth--;
 	std::cout << "Damage taken" << std::endl;
 
+	myPreviousVigStrength = myNewVignetteStrength;
+	myNewVignetteStrength = 2.0f;
+
 	//player died
-	if (aOrb.playerHealth <= 0)
+	if (aPlayer.health.playerHealth <= 0)
 	{
 		std::cout << "player killed" << std::endl;
+
+		myPreviousVigStrength = myNewVignetteStrength;
+		myNewVignetteStrength = 0.0f;
 	}
 	else
 	{
 		aOrb.HPRegainTimer = aOrb.HPRegaintime;
 	}
+}
+
+void OrbSystem::LerpVignette(const float& aDT, const float& aScaling)
+{
+	myPreviousVigStrength = FriendMath::Lerp(myPreviousVigStrength,myNewVignetteStrength,aScaling * aDT);
+
+	myPostProcess->SetVignetteData(myVigData);
+	myPostProcess->SetVignetteStrength(myPreviousVigStrength);
+}
+
+void OrbSystem::SetVignetteRegular()
+{
+	myVigData.vignetteInner = 0.3f;
+	myVigData.vignetteOuter = 1.6f;
+	myVigData.vignetteCurvature = 0.5f;
+}
+
+void OrbSystem::SetVignetteWholeScreen()
+{
 }

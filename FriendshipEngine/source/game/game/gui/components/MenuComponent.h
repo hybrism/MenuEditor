@@ -1,19 +1,41 @@
 #pragma once
+#include "../MenuUpdateContext.h"
+#include "ComponentTypeEnum.h"
 
-class MenuObject;
-class MenuComponent
+namespace MENU
 {
-public:
-	virtual void Init() {};
-	virtual void Update() {};
-	virtual void Render() {};
+	class MenuObject;
+	class MenuComponent
+	{
 
-	MenuObject& GetParent() const { return myParent; }
+	public:
+		virtual void Update(const MenuUpdateContext& aContext) 
+		{ 
+		
+			aContext; 
+		};
+		virtual void Render() {};
 
-protected:
-	MenuComponent(MenuObject& aParent) :
-		myParent(aParent) {}
-	virtual ~MenuComponent() {}
+		MenuObject& GetParent() const { return myParent; }
+		ComponentType GetType() const { return myType; }
+		Vector2f& GetPosition() { return myPosition; }
+		const unsigned int GetID() const { return myID; }
 
-	MenuObject& myParent;
-};
+		virtual void UpdatePosition() {};
+
+	protected:
+		MenuComponent(MenuObject& aParent, unsigned int aID, ComponentType aType)
+			: myParent(aParent)
+			, myType(aType)
+			, myPosition({ 0.f,0.f })
+			, myID(aID)
+		{}
+
+		virtual ~MenuComponent() {}
+
+		MenuObject& myParent;
+		const ComponentType myType;
+		const unsigned int myID;
+		Vector2f myPosition;
+	};
+}

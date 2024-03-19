@@ -29,7 +29,7 @@ CollisionSystem::~CollisionSystem()
 {
 }
 
-void CollisionSystem::Update(const float& /*dt*/)
+void CollisionSystem::Update(const SceneUpdateContext& /*dt*/)
 {
 	Entity playerID = myWorld->GetPlayerEntityID();
 	if (playerID == INVALID_ENTITY)
@@ -65,7 +65,7 @@ void CollisionSystem::Update(const float& /*dt*/)
 
 void CollisionSystem::Render()
 {
-#ifdef _DEBUG
+#ifndef _RELEASE
 	DrawAllColliders();
 #endif
 }
@@ -82,33 +82,32 @@ bool CollisionSystem::IsCloseEnoughToCheckCollision(Entity aFirstEntity, Entity 
 
 bool CollisionSystem::IsColliding(Entity aFirstEntityIndex, Entity aSecondEntityIndex)
 {
-
 	auto& firstTransform = myWorld->GetComponent<TransformComponent>(aFirstEntityIndex);
 	auto& firstCollider = myWorld->GetComponent<ColliderComponent>(aFirstEntityIndex);
 
 	auto& secondTransform = myWorld->GetComponent<TransformComponent>(aSecondEntityIndex);
 	auto& secondCollider = myWorld->GetComponent<ColliderComponent>(aSecondEntityIndex);
 
-	Vector3f firstMin = firstTransform.transform.GetPosition() - firstCollider.extents;
-	Vector3f firstMax = firstTransform.transform.GetPosition() + firstCollider.extents;
+	Vector3f firstMin = firstCollider.aabb3D.GetMin();
+	Vector3f firstMax = firstCollider.aabb3D.GetMax();
+	firstMin += firstTransform.transform.GetPosition();
+	firstMax += firstTransform.transform.GetPosition();
 
-	Vector3f secondMin = secondTransform.transform.GetPosition() - secondCollider.extents;
-	Vector3f secondMax = secondTransform.transform.GetPosition() + secondCollider.extents;
+	Vector3f secondMin = secondCollider.aabb3D.GetMin();
+	Vector3f secondMax = secondCollider.aabb3D.GetMax();
+	secondMin += secondTransform.transform.GetPosition();
+	secondMax += secondTransform.transform.GetPosition();
 
-
-	//AABB CHECK
-	if (
-		firstMax.x > secondMin.x &&
-		firstMin.x < secondMax.x &&
-		firstMax.y > secondMin.y &&
-		firstMin.y < secondMax.y &&
-		firstMax.z > secondMin.z &&
-		firstMin.z < secondMax.z
-		)
+	if (firstMax.x > secondMin.x &&
+			firstMin.x < secondMax.x &&
+			firstMax.y > secondMin.y &&
+			firstMin.y < secondMax.y &&
+			firstMax.z > secondMin.z &&
+			firstMin.z < secondMax.z) 
 	{
 		return true;
 	}
-
+	
 	return false;
 }
 
@@ -139,7 +138,6 @@ void CollisionSystem::DrawAllColliders()
 
 		Vector3f min = collider.aabb3D.GetMin();
 		Vector3f max = collider.aabb3D.GetMax();
-
 		min += transform.transform.GetPosition();
 		max += transform.transform.GetPosition();
 
@@ -215,7 +213,7 @@ Ray<float> CollisionSystem::CreateRayFromMousePosition()
 {
 	Ray<float> newRay;
 	auto* camera = GraphicsEngine::GetInstance()->GetCamera();
-	auto viewportDimensions = GraphicsEngine::GetInstance()->GetViewportDimensions();
+	auto viewportDimensions = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
 	auto nearPlaneDimensions = camera->GetNearPlaneDimensions();
 	auto farPlaneDimensions = camera->GetFarPlaneDimensions();
 

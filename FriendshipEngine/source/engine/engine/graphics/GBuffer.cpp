@@ -44,24 +44,22 @@ GBuffer GBuffer::Create(const Vector2i& aSize)
 		buffer.mySRVs[idx] = buffer.myRenderTargets[idx].SRV;
 	}
 
-	buffer.myViewport = std::make_shared<D3D11_VIEWPORT>(
-		D3D11_VIEWPORT{
-			0,
-			0,
-			static_cast<float>(desc.Width),
-			static_cast<float>(desc.Height),
-			0,
-			1
-		}
-	);
+	buffer.myViewport = {
+		0,
+		0,
+		static_cast<float>(desc.Width),
+		static_cast<float>(desc.Height),
+		0,
+		1
+	};
 
 	return buffer;
 }
 
 void GBuffer::ClearTextures()
 {
-	auto* graphicsEngine = GraphicsEngine::GetInstance();
-	auto* context = graphicsEngine->GetContext();
+	auto* ge = GraphicsEngine::GetInstance();
+	auto* context = ge->DX().GetContext();
 
 	Vector4f clearColor = { 0,0,0,0 };
 	for (unsigned int idx = 0; idx < (int)GBufferTexture::Count; idx++)
@@ -73,27 +71,27 @@ void GBuffer::ClearTextures()
 void GBuffer::SetAsActiveTarget()
 {
 	auto* ge = GraphicsEngine::GetInstance();
-	ge->SetAsActiveTarget((int)GBufferTexture::Count, myRTVs.data(), &ge->GetDepthBuffer(), myViewport.get());
+	ge->SetAsActiveTarget((int)GBufferTexture::Count, myRTVs.data(), &ge->GetDepthBuffer(), &myViewport);
 }
 
 void GBuffer::SetAsResourceOnSlot(GBufferTexture aTexture, unsigned int aSlot)
 {
-	auto* graphicsEngine = GraphicsEngine::GetInstance();
-	auto* context = graphicsEngine->GetContext();
+	auto* ge = GraphicsEngine::GetInstance();
+	auto* context = ge->DX().GetContext();
 
 	context->PSSetShaderResources(aSlot, 1, mySRVs[(int)aTexture].GetAddressOf());
 }
 
 void GBuffer::SetAllAsResources(const unsigned int& aStartSlot)
 {
-	auto* context = GraphicsEngine::GetInstance()->GetContext();
+	auto* context = GraphicsEngine::GetInstance()->DX().GetContext();
 
 	context->PSSetShaderResources(aStartSlot, (unsigned int)GBufferTexture::Count, mySRVs[0].GetAddressOf());
 }
 
 void GBuffer::ClearAllResources(const unsigned int& aStartSlot)
 {
-	auto* context = GraphicsEngine::GetInstance()->GetContext();
+	auto* context = GraphicsEngine::GetInstance()->DX().GetContext();
 
 	ID3D11ShaderResourceView* nullSRV = nullptr;
 	for (unsigned int idx = 0; idx < (unsigned int)GBufferTexture::Count; idx++)
@@ -102,7 +100,7 @@ void GBuffer::ClearAllResources(const unsigned int& aStartSlot)
 	}
 }
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 void GBuffer::CopyToStaging()
 {
 	for (unsigned int idx = 0; idx < (int)GBufferTexture::Count; idx++)

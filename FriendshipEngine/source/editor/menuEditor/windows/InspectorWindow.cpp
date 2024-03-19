@@ -6,14 +6,13 @@
 #include <engine/utility/StringHelper.h>
 #include <engine/graphics/GraphicsEngine.h>
 
-#include "../gui/MenuObject.h"
-#include "../gui/MenuHandler.h"
-#include "../gui/ObjectManager.h"
-
-#include "../gui/components/SpriteComponent.h"
-#include "../gui/components/TextComponent.h"
-#include "../gui/components/Collider2DComponent.h"
-#include "../gui/components/CommandComponent.h"
+#include <game/gui/MenuObject.h>
+#include <game/gui/MenuHandler.h>
+#include <game/gui/ObjectManager.h>
+#include <game/gui/components/SpriteComponent.h>
+#include <game/gui/components/TextComponent.h>
+#include <game/gui/components/Collider2DComponent.h>
+#include <game/gui/components/CommandComponent.h>
 
 #include <shared/postMaster/PostMaster.h>
 
@@ -23,7 +22,7 @@ MENU::InspectorWindow::InspectorWindow(const std::string& aHandle, bool aOpen, I
 	mySelectedObjectID = UINT_MAX;
 	mySelectedComponentIndex = (size_t)ComponentType::Count;
 
-	Vector2i center = GraphicsEngine::GetInstance()->GetViewportDimensions();
+	Vector2i center = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
 	myViewportSize = { (float)center.x, (float)center.y };
 
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::PushEntityToInspector);
@@ -35,6 +34,8 @@ void MENU::InspectorWindow::Show(const MenuEditorUpdateContext& aContext)
 	if (!myData.isOpen)
 		return;
 
+	ImGui::SetNextWindowSize(ImVec2(350.f, 550.f), ImGuiCond_Appearing);
+	ImGui::SetNextWindowPos(ImVec2(1560.f, 400.f), ImGuiCond_Appearing);
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
 		if (mySelectedObjectID == UINT_MAX) //Early out
@@ -47,11 +48,11 @@ void MENU::InspectorWindow::Show(const MenuEditorUpdateContext& aContext)
 		ImGui::PushID(selectedObject.GetID());
 
 		{
-			ImGui::InputText("##", &selectedObject.GetName());
+			ImGui::InputText("##", &selectedObject.GetName(), ImGuiInputTextFlags_AutoSelectAll);
 			Vector2f pixelPosition = selectedObject.GetPosition();
 			Vector2f screenPosition = { pixelPosition.x / myViewportSize.x, pixelPosition.y / myViewportSize.y };
 
-			if (ImGui::DragFloat2("Position", &screenPosition.x, 0.01f))
+			if (ImGui::DragFloat2("Position", &screenPosition.x, 0.001f))
 				selectedObject.SetPosition({ screenPosition.x * myViewportSize.x, screenPosition.y * myViewportSize.y });
 
 			if (ImGui::DragFloat2("Position (Pixel)", &pixelPosition.x))
@@ -103,7 +104,7 @@ void MENU::InspectorWindow::AddComponentButton(MenuObject& aObject)
 	{
 		ImGui::Text("Chose component: ");
 
-		const char* comboPreviewValue = ComponentNames[mySelectedComponentIndex];  // Pass in the preview value visible before opening the combo (it could be anything)
+		const char* comboPreviewValue = ComponentNames[mySelectedComponentIndex];
 		if (ImGui::BeginCombo("Select Component", comboPreviewValue))
 		{
 			for (unsigned int i = 0; i < IM_ARRAYSIZE(ComponentNames); i++)
@@ -208,18 +209,17 @@ void MENU::InspectorWindow::EditSpriteComponent(const MenuEditorUpdateContext& a
 
 void MENU::InspectorWindow::EditSpriteTextures(const MenuEditorUpdateContext& aContext, SpriteComponent& aSprite)
 {
-	const char* textureState[] = { "Default", "Hovered", "Pressed" };
 	Texture* currentItem = aSprite.GetTexture();
-	for (size_t textureStateIndex = 0; textureStateIndex < (int)TextureState::Count; textureStateIndex++)
+	for (size_t textureStateIndex = 0; textureStateIndex < (int)ObjectState::Count; textureStateIndex++)
 	{
-		if (ImGui::BeginCombo(textureState[textureStateIndex], aSprite.GetTexturePath((TextureState)textureStateIndex).c_str()))
+		if (ImGui::BeginCombo(ObjectStates[textureStateIndex], aSprite.GetTexturePath((ObjectState)textureStateIndex).c_str()))
 		{
 			for (size_t i = 0; i < aContext.assets.textures.size(); i++)
 			{
 				bool isSelected = (currentItem == aContext.assets.textures[i]);
 
 				if (ImGui::Selectable(aContext.assets.textureIdToName[i].c_str(), isSelected))
-					aSprite.SetTexture(aContext.assets.textures[i], aContext.assets.textureIdToName[i], (TextureState)textureStateIndex);
+					aSprite.SetTexture(aContext.assets.textures[i], aContext.assets.textureIdToName[i], (ObjectState)textureStateIndex);
 
 				if (isSelected)
 					ImGui::SetItemDefaultFocus();
@@ -228,7 +228,7 @@ void MENU::InspectorWindow::EditSpriteTextures(const MenuEditorUpdateContext& aC
 			ImGui::EndCombo();
 		}
 
-		ImGui::ColorEdit4(textureState[textureStateIndex], &aSprite.GetColor((TextureState)textureStateIndex).x);
+		ImGui::ColorEdit4(ObjectStates[textureStateIndex], &aSprite.GetColor((ObjectState)textureStateIndex).x);
 	}
 }
 
@@ -243,7 +243,7 @@ void MENU::InspectorWindow::EditTextComponent(const MenuEditorUpdateContext& aCo
 
 		ImGui::PushID(componentIndex);
 		ImGui::SeparatorText("Text");
-		
+
 		if (aContext.showDebugData)
 		{
 			ImGui::Text("ComponentID: %i", text.GetID());
@@ -252,13 +252,12 @@ void MENU::InspectorWindow::EditTextComponent(const MenuEditorUpdateContext& aCo
 
 		std::string string = text.GetText();
 		Vector2f position = text.GetPosition();
-		Vector4f color = text.GetColor();
 
-		if (ImGui::InputText("Text", &string))
+		if (ImGui::InputText("Text", &string, ImGuiInputTextFlags_AutoSelectAll))
 			text.SetText(string);
 
 		std::string currentFont = text.GetFontName();
-		if (ImGui::BeginCombo("Select Font", text.GetFontName().c_str()))
+		if (ImGui::BeginCombo("Font", text.GetFontName().c_str()))
 		{
 			for (size_t i = 0; i < aContext.assets.fontFiles.size(); i++)
 			{
@@ -276,17 +275,17 @@ void MENU::InspectorWindow::EditTextComponent(const MenuEditorUpdateContext& aCo
 			ImGui::EndCombo();
 		}
 
-		const char* sizeDisplayNames[] = { "Small", "Medium", "Large" };
-		const char* comboPreviewValue = sizeDisplayNames[(int)text.GetFontSize()];  // Pass in the preview value visible before opening the combo (it could be anything)
 
-		if (ImGui::BeginCombo("Select Font Size", comboPreviewValue))
+		const char* comboPreviewValue = FontSizeDisplayNames[(int)text.GetFontSize()];
+
+		if (ImGui::BeginCombo("Font Size", comboPreviewValue))
 		{
-			for (int i = 0; i < IM_ARRAYSIZE(sizeDisplayNames); i++)
+			for (int i = 0; i < IM_ARRAYSIZE(FontSizeDisplayNames); i++)
 			{
 				const bool isSelected = ((int)text.GetFontSize() == i);
-				if (ImGui::Selectable(sizeDisplayNames[i], isSelected))
+				if (ImGui::Selectable(FontSizeDisplayNames[i], isSelected))
 				{
-					text.SetFontSize((eSize)i);
+					text.SetFontSize((FontSize)i);
 				}
 
 				if (isSelected)
@@ -306,8 +305,13 @@ void MENU::InspectorWindow::EditTextComponent(const MenuEditorUpdateContext& aCo
 			if (ImGui::DragFloat2("Position", &position.x))
 				text.SetPosition(position);
 
-			if (ImGui::ColorEdit4("Color", &color.x))
-				text.SetColor(color);
+			for (size_t i = 0; i < (int)ObjectState::Count; i++)
+			{
+				Vector4f color = text.GetColor((ObjectState)i);
+				if (ImGui::ColorEdit4(ObjectStates[i], &color.x))
+					text.SetColor(color, (ObjectState)i);
+			}
+
 
 			if (ImGui::Button("RemoveComponent", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
 				aObject.RemoveComponent(text.GetID());
@@ -436,7 +440,7 @@ void MENU::InspectorWindow::EditCommandComponent(const MenuEditorUpdateContext& 
 		if (std::holds_alternative<std::string>(command.GetCommandData().data))
 			commandInputString = std::get<std::string>(command.GetCommandData().data);
 
-		ImGui::InputText("Level to load", &commandInputString);
+		ImGui::InputText("Level to load", &commandInputString, ImGuiInputTextFlags_AutoSelectAll);
 		command.SetCommandData({ commandInputString });
 		break;
 	}

@@ -92,7 +92,7 @@ const DirectX::XMMATRIX Camera::GetModelMatrix() const
 
 const Vector2<float> Camera::ProjectionToPixel(const Vector3<float>& aVec) const
 {
-	auto size = Vector2f(myGraphicsEngine->GetWindowDimensions());
+	auto size = Vector2f(myGraphicsEngine->DX().GetWindowDimensions());
 	auto copy = PointToPostProjection(aVec);
 	
 	return Vector2<float>(copy.x * size.x / 2.f + size.x / 2.f, copy.y * size.y / 2.f + size.y / 2.f);

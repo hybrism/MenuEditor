@@ -9,6 +9,9 @@
 
 #include "Paths.h"
 
+#define WINDOWED_STYLE WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX
+#define FULLSCREEN_STYLE WS_POPUP
+
 Engine* Engine::myInstance = nullptr;
 
 Engine* Engine::CreateInstance(Timer* aTimer)
@@ -65,6 +68,54 @@ Engine::~Engine()
 	InputManager::DestroyInstance();
 }
 
+void Engine::SetResolution(const int aWidth, const int aHeight)
+{
+	//myGraphicsEngine->InitializeSwapChain();
+
+	SetWindowDimensions(myWindowPositionX, myWindowPositionY, aWidth, aHeight, myIsFullscreen);
+}
+
+void Engine::SetWindowDimensions(const int aX,
+	const int aY,
+	int aWidth,
+	int aHeight,
+	const bool aFullscreen
+)
+{
+	aWidth = aWidth == -1 ? myWindowWidth : aWidth;
+	aHeight = aHeight == -1 ? myWindowHeight : aHeight;
+
+	RECT wr = {};
+	wr.left = aX;
+	wr.right = aWidth + wr.left;
+	wr.top = aY;
+	wr.bottom = aHeight + wr.top;
+
+	myIsFullscreen = aFullscreen;
+
+	if (aFullscreen)
+	{
+		SetWindowLong(hWnd, GWL_STYLE, FULLSCREEN_STYLE);
+	}
+	else
+	{
+		SetWindowLong(hWnd, GWL_STYLE, WINDOWED_STYLE);
+		AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE);
+	}
+
+	aWidth = wr.right - wr.left;
+	aHeight = wr.bottom - wr.top;
+
+	//std::cout << aWidth << ", " << aHeight << std::endl;
+
+	//adjust window size to account for window borders
+	myWindowWidth = aWidth;
+	myWindowHeight = aHeight;
+	myWindowPositionX = aX;
+	myWindowPositionY = aY;
+	SetWindowPos(hWnd, nullptr, aX, aY, aWidth, aHeight, SWP_NOZORDER);
+}
+
 bool Engine::Init(
 	const int& aWindowWidth,
 	const int& aWindowHeight,
@@ -91,9 +142,12 @@ bool Engine::Init(
 	myWindowHeight = aWindowHeight;
 	myViewPortWidth = aWindowWidth;
 	myViewPortHeight = aWindowHeight;
+	myWindowPositionX = 0;
+	myWindowPositionY = 0;
 
-#ifdef _DEBUG
-#if EDITOR_VIEWPORT_SIZE
+#ifndef _RELEASE
+#if WINDOWED_FULLSCREEN
+	myIsFullscreen = true;
 	//TODO: Instead of magic number, find size of available sceen size?
 	unsigned int titlebarSize = GetSystemMetrics(SM_CXMENUSIZE) + 30;
 
@@ -103,9 +157,9 @@ bool Engine::Init(
 	hWnd = CreateWindow(
 		aClassName,
 		aWindowName,
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX,
-		0,
-		0,
+		WINDOWED_STYLE,
+		myWindowPositionX,
+		myWindowPositionY,
 		myViewPortWidth,
 		myViewPortHeight,
 		nullptr,
@@ -116,8 +170,8 @@ bool Engine::Init(
 	hWnd = CreateWindow(
 		aClassName,
 		aWindowName,
-		WS_POPUP, // Use WS_POPUP style for fullscreen borderless
-		0, 0,     // Set position to (0, 0)
+		WINDOWED_FULLSCREEN_STYLE, // Use WS_POPUP style for fullscreen borderless
+		myWindowPosition.x, myWindowPosition.y,     // Set position to (0, 0)
 		myWindowWidth,
 		myWindowHeight,
 		nullptr,
@@ -131,18 +185,17 @@ bool Engine::Init(
 	InputManager::GetInstance()->Init();
 
 	// https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow
-#ifdef _DEBUG
-#if EDITOR_VIEWPORT_SIZE
+#ifndef _RELEASE
+#if WINDOWED_FULLSCREEN
 	ShowWindow(hWnd, SW_SHOWMAXIMIZED);
 #else
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
 #endif
 #else
+	myIsFullscreen = true;
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
 #endif
 	UpdateWindow(hWnd);
-
-
 
 	//system("mode con COLS=700");
 	//ShowWindow(hWnd, SW_SHOW);

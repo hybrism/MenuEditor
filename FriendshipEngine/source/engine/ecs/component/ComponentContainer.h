@@ -1,14 +1,12 @@
 #pragma once
 #include "IComponentContainer.h"
 #include "../entity/Entity.h"
-#include "../entity/EntityManager.h"
+#include "../entity/EntitySignatureManager.h"
 
 #include <cassert>
 #include <set>
 #include <unordered_map>
 #include <vector>
-
-// https://austinmorlan.com/posts/entity_component_system/
 
 template<typename Derived>
 struct Component;
@@ -17,88 +15,65 @@ template<typename T>
 class ComponentContainer : public IComponentContainer
 {
 public:
-	ComponentContainer(size_t MAX_SIZE) : myMaxSize(MAX_SIZE), myComponentToEntityMap()
+	ComponentContainer(size_t aMaxSize) : myMaxSize(aMaxSize), myComponentToEntityMap()
 	{
-		// since we want segmented memory we use an array instead of a vector:(, additionally it is of the size of max entities since it is possible for every entity to have every component
-		myComponents1DVector = new T[MAX_SIZE];
-		myComponentToEntityMap = new eid_t[MAX_SIZE];
+		// since we want segmented memory we block allocate an array, additionally the defai;t size is MAX_ENTITES since it is possible for every entity to have every component
+		myComponents = new T[aMaxSize];
+		myComponentToEntityMap = new eid_t[aMaxSize];
 		mySize = 0;
 	}
 
 	~ComponentContainer() override
 	{
-		delete[] myComponents1DVector;
+		delete[] myComponents;
 		delete[] myComponentToEntityMap;
 		mySize = 0;
 	}
 
-	void Reset(EntityManager* aManager) override
+	void Reset(EntitySignatureManager* aManager) override
 	{
 		while (mySize > 0)
 		{
-			RemoveComponent(myComponentToEntityMap[mySize - 1], aManager);
+			RemoveComponentInternal(myComponentToEntityMap[mySize - 1], aManager);
 		}
 	}
 
-	T& AddComponent(const Entity& aEntity, EntitySignature& aSignature)
+	T& AddComponent(const Entity& aEntity, EntitySignatureManager* aManager)
 	{
 		assert(mySize < myMaxSize && "ComponentContainer is full");
-		assert(!aSignature.signature.test(T::componentId) && "Entity contains the component you are trying to add");
+		assert(!aManager->GetComponentSignature(aEntity).test(T::componentId) && "Entity contains the component you are trying to add");
 
-		aSignature.signature.set(T::componentId, true);
-		aSignature.indices[T::componentId] = static_cast<int>(mySize);
+		aManager->SetSignatureIndex(aEntity, T::componentId, static_cast<int>(mySize));
+		aManager->UpdateComponentSignature(aEntity, T::componentId, true);
 		myComponentToEntityMap[mySize] = aEntity;
 		++mySize;
 
-		return myComponents1DVector[mySize - 1];
+		return myComponents[mySize - 1];
 	}
 
-	void RemoveComponent(const Entity& aEntity, EntityManager* aManager)
+	void RemoveComponent(const Entity& aEntity, EntitySignatureManager* aManager)
 	{
-		assert(aManager->GetSignature(aEntity).signature.test(T::componentId) && "Entity does not exist in ComponentContainer");
-		assert(mySize > 0 && "ComponentContainer is empty");
-
-		size_t lastElementIndex = mySize - 1;
-		size_t indexOfRemovedEntity = aManager->GetSignature(aEntity).indices[T::componentId];
-		eid_t lastEntity = myComponentToEntityMap[lastElementIndex];
-
-		memcpy(&myComponents1DVector[indexOfRemovedEntity], &myComponents1DVector[lastElementIndex], sizeof(myComponents1DVector[indexOfRemovedEntity]));
-		T copy{};
-		memcpy(&myComponents1DVector[lastElementIndex], &copy, sizeof(T));  // resets the component
-		aManager->GetSignature(lastEntity).indices[T::componentId] = static_cast<int>(indexOfRemovedEntity);
-
-		aManager->GetSignature(aEntity).signature.set(T::componentId, false);
-
-		--mySize;
+		assert(aManager->GetComponentSignature(aEntity).test(T::componentId) && "Entity does not exist in ComponentContainer");
+		RemoveComponentInternal(aEntity, aManager);
 	}
 
-	T& GetComponent(EntitySignature& aSignature) const
+	T& GetComponent(int aIndex) const
 	{
-		assert(aSignature.signature.test(T::componentId) && "Entity does not exist in ComponentContainer");
-		
-		return myComponents1DVector[aSignature.indices[T::componentId]];
+		assert(aIndex < mySize && "Index out of range");
+		return myComponents[aIndex];
 	}
 
-#ifdef _DEBUG
-	T* TryGetComponent(EntitySignature& aSignature) const
-	{
-		if (!aSignature.signature.test(T::componentId)) { return nullptr; }
-
-		return &myComponents1DVector[aSignature.indices[T::componentId]];
-	}
-#endif
-
-	void OnEntityDestroyed(const Entity& aEntity, EntityManager* aManager) override
+	void OnEntityDestroyed(const Entity& aEntity, EntitySignatureManager* aManager) override
 	{
 		// if the entity is not in the container, do nothing
-		if (!aManager->GetSignature(aEntity).signature.test(T::componentId)) { return; }
+		if (!aManager->GetComponentSignature(aEntity).test(T::componentId)) { return; }
 
 		RemoveComponent(aEntity, aManager);
 	}
 
 	const size_t& GetMaxSize() const { return myMaxSize; }
 
-//#ifdef _DEBUG
+//#ifndef _RELEASE
 //	virtual void OnEntityDestroyed(EntityData& aEntity) override
 //	{
 //		// if the entity is not in the container, do nothing
@@ -111,13 +86,30 @@ public:
 //	}
 //#endif
 private:
+	void RemoveComponentInternal(const Entity& aEntity, EntitySignatureManager* aManager)
+	{
+		assert(mySize > 0 && "ComponentContainer is empty");
+
+		size_t lastElementIndex = mySize - 1;
+		int indexOfRemovedEntity = aManager->GetSignatureIndex(aEntity, T::componentId);
+		eid_t lastEntity = myComponentToEntityMap[lastElementIndex];
+
+		memcpy(&myComponents[indexOfRemovedEntity], &myComponents[lastElementIndex], sizeof(myComponents[indexOfRemovedEntity]));
+		T copy{};
+		memcpy(&myComponents[lastElementIndex], &copy, sizeof(T));  // resets the component
+
+		aManager->SetSignatureIndex(lastEntity, T::componentId, indexOfRemovedEntity);
+		aManager->UpdateComponentSignature(aEntity, T::componentId, false);
+		--mySize;
+	}
+
 	const size_t myMaxSize;
 	size_t mySize;
-	T* myComponents1DVector;
+	T* myComponents;
 	eid_t* myComponentToEntityMap;
 	// TODO: optimize initialization of components if they contain too lot of data?
 	
-#ifdef _DEBUG
+#ifndef _RELEASE
 	std::vector<EntityData*> myEntities;
 #endif
 };

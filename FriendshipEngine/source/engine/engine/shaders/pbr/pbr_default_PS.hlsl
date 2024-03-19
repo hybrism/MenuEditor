@@ -46,7 +46,7 @@ PixelOutput main(PixelInputType input)
     float3 pixelNormal = normalize(mul(TBN, normal));
     float3 vertexNormal = input.normal;
     
-    float3 cameraPosition = modelToWorld[3].xyz;
+    float3 cameraPosition = GetCameraPosition();
     float3 toEye = normalize(cameraPosition - input.worldPosition.xyz);
     
     float ambientOcclusion = material.r;

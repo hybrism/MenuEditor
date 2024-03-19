@@ -105,7 +105,7 @@
 //void DirectionalLightManager::EndOfRenderPassReset()
 //{
 //	ID3D11ShaderResourceView* empty = nullptr;
-//	GraphicsEngine::GetInstance()->GetContext()->PSSetShaderResources(7, 1, &empty);
+//	GraphicsEngine::GetInstance()->DX().GetContext()->PSSetShaderResources(7, 1, &empty);
 //}
 //
 //void DirectionalLightManager::SetDirCamerasPos(const Vector3f& aPos)

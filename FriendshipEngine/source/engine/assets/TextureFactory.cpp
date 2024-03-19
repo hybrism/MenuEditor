@@ -7,8 +7,10 @@
 #include <engine/graphics/Texture.h>
 #include <engine/utility/Error.h>
 
-Texture* TextureFactory::CreateTexture(const std::string& aTexturePath, const bool& aUseRelative)
+Texture* TextureFactory::CreateTexture(const std::string& aTexturePath, const bool& aUseRelative, bool aShouldPrintError)
 {
+	aShouldPrintError;
+
 	std::string path = aTexturePath;
 	if (aUseRelative)
 	{
@@ -18,22 +20,36 @@ Texture* TextureFactory::CreateTexture(const std::string& aTexturePath, const bo
 	if (StringHelper::GetFileExtension(path) == "png")
 	{
 		Texture* texture = nullptr;
-		if (CreatePNGTexture(path, texture))
+		if (!CreatePNGTexture(path, texture))
 		{
-			return texture;
+#ifndef _RELEASE
+			if (aShouldPrintError)
+			{
+				PrintPathError(path);
+			}
+#endif
 		}
+		return texture;
 	}
-	else
+
+	ComPtr<ID3D11Resource> texture;
+	ComPtr<ID3D11ShaderResourceView> shaderResourceView;
+	if (CreateDDSTexture(StringHelper::s2ws(path), texture, shaderResourceView))
 	{
-		ComPtr<ID3D11ShaderResourceView> shaderResourceView;
-		if (CreateDDSTexture(StringHelper::s2ws(path), shaderResourceView))
-		{
-			return new Texture(shaderResourceView);
-		}
+		ID3D11Texture2D* pTextureInterface = 0;
+		texture->QueryInterface<ID3D11Texture2D>(&pTextureInterface);
+
+		D3D11_TEXTURE2D_DESC desc;
+		pTextureInterface->GetDesc(&desc);
+		return new Texture(shaderResourceView, desc.Width, desc.Height);
 	}
 
-	PrintPathError(path);
-
+#ifndef _RELEASE
+	if (aShouldPrintError)
+	{
+		PrintPathError(path);
+	}
+#endif
 	//// TODO: Proper error handling
 	//assert("Failed to init texture" && false);
 
@@ -81,7 +97,7 @@ bool TextureFactory::CreatePNGTexture(const std::string& aPath, Texture*& outTex
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
-	auto device = GraphicsEngine::GetInstance()->GetDevice();
+	auto device = GraphicsEngine::GetInstance()->DX().GetDevice();
 
 	ID3D11Texture2D* myTexture;
 	HRESULT hra = device->CreateTexture2D(&desc, nullptr, &myTexture);
@@ -97,7 +113,7 @@ bool TextureFactory::CreatePNGTexture(const std::string& aPath, Texture*& outTex
 		return false;
 	}
 
-	GraphicsEngine::GetInstance()->GetContext()->GenerateMips(myShaderResourceView.Get());
+	GraphicsEngine::GetInstance()->DX().GetContext()->GenerateMips(myShaderResourceView.Get());
 	myTexture->Release();
 
 	outTexture = new Texture(myShaderResourceView, width, height, rgbaPixels, myTexture);
@@ -105,16 +121,37 @@ bool TextureFactory::CreatePNGTexture(const std::string& aPath, Texture*& outTex
 	return true;
 }
 
-bool TextureFactory::CreateDDSTexture(const std::wstring& aPath, ComPtr<ID3D11ShaderResourceView>& outShaderResourceView)
+bool TextureFactory::CreateDDSTexture(const std::wstring& aPath, ComPtr<ID3D11Resource>& outTexture, ComPtr<ID3D11ShaderResourceView>& outShaderResourceView)
 {
-	auto& device = GraphicsEngine::GetInstance()->GetDevice();
-	HRESULT result = DirectX::CreateDDSTextureFromFile(
+	auto& device = GraphicsEngine::GetInstance()->DX().GetDevice();
+
+	//HRESULT result = DirectX::CreateDDSTextureFromFile(
+	//	device.Get(),
+	//	aPath.c_str(),
+	//	outTexture.GetAddressOf(),
+	//	outShaderResourceView.GetAddressOf()
+	//);
+
+	HRESULT result = DirectX::CreateDDSTextureFromFileEx(
 		device.Get(),
 		aPath.c_str(),
-		nullptr,
-		&outShaderResourceView
+		UINT_MAX,
+		D3D11_USAGE_DEFAULT,
+		D3D11_BIND_SHADER_RESOURCE,
+		0,
+		0,
+		DirectX::DDS_LOADER_IGNORE_SRGB,		
+		outTexture.GetAddressOf(),
+		outShaderResourceView.GetAddressOf()
 	);
+
 	return !FAILED(result);
+}
+
+bool TextureFactory::CreateDDSTexture(const std::wstring& aPath, ComPtr<ID3D11ShaderResourceView>& outShaderResourceView)
+{
+	ComPtr<ID3D11Resource> temp;
+	return CreateDDSTexture(aPath, temp, outShaderResourceView);
 }
 
 void TextureFactory::WriteDDSToFile(

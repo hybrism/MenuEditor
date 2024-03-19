@@ -8,7 +8,7 @@ struct PhysXComponent;
 struct ColliderComponent;
 class PhysXSceneManager;
 
-class PhysXSystem : public System
+class PhysXSystem : public System<PhysXSystem>
 {
 public:
 	// Inherited via System
@@ -16,7 +16,7 @@ public:
 	~PhysXSystem() override;
 
 	void Init();
-	void Update(const float& dt) override;
+	void Update(const SceneUpdateContext& dt) override;
 
 	//Quaternion conversion to matrix
 	void QuatToMat(PhysXComponent& aPhysX, TransformComponent& aTransform);

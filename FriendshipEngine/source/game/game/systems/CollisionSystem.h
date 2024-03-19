@@ -7,13 +7,13 @@ struct ColliderComponent;
 
 class DebugLine;
 
-class CollisionSystem : public System
+class CollisionSystem : public System<CollisionSystem>
 {
 public:
 	CollisionSystem(World* aWorld);
 	~CollisionSystem() override;
 
-	void Update(const float&) override;
+	void Update(const SceneUpdateContext&) override;
 	void Render() override;
 
 private:

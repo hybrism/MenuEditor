@@ -109,6 +109,9 @@
     <Filter Include="PhysX\vehicle2\wheel">
       <UniqueIdentifier>{E62F3197-D2BE-BA60-7BDD-CE5B674BCB06}</UniqueIdentifier>
     </Filter>
+    <Filter Include="directxtex">
+      <UniqueIdentifier>{09474914-F5FE-8A61-5E06-64BD4ADD2552}</UniqueIdentifier>
+    </Filter>
     <Filter Include="directxtk">
       <UniqueIdentifier>{77380294-E3A2-B60A-2CE1-67B0988A945F}</UniqueIdentifier>
     </Filter>
@@ -1295,6 +1298,12 @@
     </ClInclude>
     <ClInclude Include="PhysX\vehicle2\wheel\PxVehicleWheelStates.h">
       <Filter>PhysX\vehicle2\wheel</Filter>
+    </ClInclude>
+    <ClInclude Include="directxtex\DirectXTex.h">
+      <Filter>directxtex</Filter>
+    </ClInclude>
+    <ClInclude Include="directxtex\DirectXTex.inl">
+      <Filter>directxtex</Filter>
     </ClInclude>
     <ClInclude Include="directxtk\Audio.h">
       <Filter>directxtk</Filter>

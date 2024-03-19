@@ -18,12 +18,16 @@
     <ClInclude Include="BinaryReader\BinaryMeshFactory.h">
       <Filter>BinaryReader</Filter>
     </ClInclude>
+    <ClInclude Include="BinaryReader\BinaryVertexPaintingFileFactory.h">
+      <Filter>BinaryReader</Filter>
+    </ClInclude>
     <ClInclude Include="FBXLoadStructs.h" />
     <ClInclude Include="FactoryStructs.h" />
     <ClInclude Include="ModelFactory.h" />
     <ClInclude Include="ShaderDatabase.h" />
     <ClInclude Include="ShaderTypeEnum.h" />
     <ClInclude Include="SharedFactoryFunctions.h" />
+    <ClInclude Include="TextureDatabase.h" />
     <ClInclude Include="TextureFactory.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -39,9 +43,13 @@
     <ClCompile Include="BinaryReader\BinaryMeshFactory.cpp">
       <Filter>BinaryReader</Filter>
     </ClCompile>
+    <ClCompile Include="BinaryReader\BinaryVertexPaintingFileFactory.cpp">
+      <Filter>BinaryReader</Filter>
+    </ClCompile>
     <ClCompile Include="ModelFactory.cpp" />
     <ClCompile Include="ShaderDatabase.cpp" />
     <ClCompile Include="SharedFactoryFunctions.cpp" />
+    <ClCompile Include="TextureDatabase.cpp" />
     <ClCompile Include="TextureFactory.cpp" />
     <ClCompile Include="pch.cpp" />
   </ItemGroup>

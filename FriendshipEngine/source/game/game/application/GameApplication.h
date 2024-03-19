@@ -21,4 +21,7 @@ public:
 private:
 	Engine* myEngine = nullptr;
 	Game* myGame = nullptr;
+#ifndef _RELEASE
+	bool myShouldStep = false;
+#endif
 };

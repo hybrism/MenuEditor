@@ -3,8 +3,8 @@ This class handles all texts that will be rendered, don't use this to show text,
 */
 #pragma once
 
-#include "fontfile.h"
-#include "text.h"
+#include "FontFile.h"
+#include "Text.h"
 
 class Text;
 class TextService

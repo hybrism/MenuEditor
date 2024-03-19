@@ -39,7 +39,7 @@ void AnimatorSystem::Init()
 }
 
 // TODO: Add time, transitions etc to animation data component and use that instead of multiple animation players
-void AnimatorSystem::Update(const float& dt)
+void AnimatorSystem::Update(const SceneUpdateContext& aContext)
 {
 	for (auto& entity : myEntities)
 	{
@@ -51,7 +51,7 @@ void AnimatorSystem::Update(const float& dt)
 		auto* controller = AssetDatabase::GetAnimationController(meshId);
 
 		// Prevents crash if no animation states are added to skinned mesh, though this should never happen
-#ifdef _DEBUG
+#ifndef _RELEASE
 		if (!controller->HasAnimationStates())
 		{
 			continue;
@@ -63,7 +63,7 @@ void AnimatorSystem::Update(const float& dt)
 
 		Animation* animation = AssetDatabase::GetAnimation(meshId, currentAnimIndex);
 
-		controller->Update(dt, *animation, animData);
+		controller->Update(aContext.dt, *animation, animData);
 
 		AnimationState* toState = nullptr;
 		if (animData.IsTransitioning())
@@ -71,6 +71,6 @@ void AnimatorSystem::Update(const float& dt)
 			toState = &controller->GetState(animData.nextStateIndex);
 		}
 
-		myAnimationPlayer->UpdatePose(dt, meshId, animData, controller->GetCurrentState(animData), toState);
+		myAnimationPlayer->UpdatePose(aContext.dt, meshId, animData, controller->GetCurrentState(animData), toState);
 	}
 }

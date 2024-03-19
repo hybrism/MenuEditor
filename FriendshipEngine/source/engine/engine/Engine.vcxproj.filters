@@ -102,6 +102,9 @@
     <ClInclude Include="graphics\DxBuffer.h">
       <Filter>graphics</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\DxData.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
     <ClInclude Include="graphics\GBuffer.h">
       <Filter>graphics</Filter>
     </ClInclude>
@@ -117,8 +120,14 @@
     <ClInclude Include="graphics\Light\LightStructs.h">
       <Filter>graphics\Light</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\Light\SkyBox.h">
+      <Filter>graphics\Light</Filter>
+    </ClInclude>
     <ClInclude Include="graphics\PostProcess.h">
       <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\PrimitiveMeshes\CubePrimitive.h">
+      <Filter>graphics\PrimitiveMeshes</Filter>
     </ClInclude>
     <ClInclude Include="graphics\PrimitiveMeshes\SpherePrimitive.h">
       <Filter>graphics\PrimitiveMeshes</Filter>
@@ -163,6 +172,9 @@
       <Filter>graphics\renderer</Filter>
     </ClInclude>
     <ClInclude Include="graphics\renderer\Renderer.h">
+      <Filter>graphics\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\renderer\SpriteRenderer.h">
       <Filter>graphics\renderer</Filter>
     </ClInclude>
     <ClInclude Include="graphics\sprite\Sprite.h">
@@ -247,22 +259,25 @@
     <ClInclude Include="shaders\VertexShader.h">
       <Filter>shaders</Filter>
     </ClInclude>
+    <ClInclude Include="text\FontSizeEnum.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="text\Fontfile.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="text\Parser.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="text\Text.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="text\TextFile.h">
+      <Filter>text</Filter>
+    </ClInclude>
     <ClInclude Include="text\TextService.h">
       <Filter>text</Filter>
     </ClInclude>
-    <ClInclude Include="text\fontfile.h">
-      <Filter>text</Filter>
-    </ClInclude>
-    <ClInclude Include="text\parser.h">
-      <Filter>text</Filter>
-    </ClInclude>
-    <ClInclude Include="text\text.h">
-      <Filter>text</Filter>
-    </ClInclude>
-    <ClInclude Include="text\textfile.h">
-      <Filter>text</Filter>
-    </ClInclude>
-    <ClInclude Include="text\token.h">
+    <ClInclude Include="text\Token.h">
       <Filter>text</Filter>
     </ClInclude>
     <ClInclude Include="utility\Error.h">
@@ -304,6 +319,9 @@
     <ClCompile Include="graphics\DxBuffer.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\DxData.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
     <ClCompile Include="graphics\GBuffer.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
@@ -313,8 +331,14 @@
     <ClCompile Include="graphics\Light\LightManager.cpp">
       <Filter>graphics\Light</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\Light\SkyBox.cpp">
+      <Filter>graphics\Light</Filter>
+    </ClCompile>
     <ClCompile Include="graphics\PostProcess.cpp">
       <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\PrimitiveMeshes\CubePrimitive.cpp">
+      <Filter>graphics\PrimitiveMeshes</Filter>
     </ClCompile>
     <ClCompile Include="graphics\PrimitiveMeshes\SpherePrimitive.cpp">
       <Filter>graphics\PrimitiveMeshes</Filter>
@@ -349,6 +373,9 @@
     <ClCompile Include="graphics\renderer\ForwardRenderer.cpp">
       <Filter>graphics\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\renderer\SpriteRenderer.cpp">
+      <Filter>graphics\renderer</Filter>
+    </ClCompile>
     <ClCompile Include="graphics\sprite\SpriteDrawer.cpp">
       <Filter>graphics\sprite</Filter>
     </ClCompile>
@@ -371,22 +398,22 @@
     <ClCompile Include="shaders\VertexShader.cpp">
       <Filter>shaders</Filter>
     </ClCompile>
+    <ClCompile Include="text\Fontfile.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
+    <ClCompile Include="text\Parser.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
+    <ClCompile Include="text\Text.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
+    <ClCompile Include="text\TextFile.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
     <ClCompile Include="text\TextService.cpp">
       <Filter>text</Filter>
     </ClCompile>
-    <ClCompile Include="text\fontfile.cpp">
-      <Filter>text</Filter>
-    </ClCompile>
-    <ClCompile Include="text\parser.cpp">
-      <Filter>text</Filter>
-    </ClCompile>
-    <ClCompile Include="text\text.cpp">
-      <Filter>text</Filter>
-    </ClCompile>
-    <ClCompile Include="text\textfile.cpp">
-      <Filter>text</Filter>
-    </ClCompile>
-    <ClCompile Include="text\token.cpp">
+    <ClCompile Include="text\Token.cpp">
       <Filter>text</Filter>
     </ClCompile>
     <ClCompile Include="utility\Error.cpp">
@@ -403,10 +430,16 @@
     <FxCompile Include="shaders\common\debug_line_PS.hlsl">
       <Filter>shaders\common</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\common\debug_point_ligth_sphere_PS.hlsl">
+      <Filter>shaders\common</Filter>
+    </FxCompile>
     <FxCompile Include="shaders\common\missing_texture_PS.hlsl">
       <Filter>shaders\common</Filter>
     </FxCompile>
     <FxCompile Include="shaders\common\missing_texture_deferred_PS.hlsl">
+      <Filter>shaders\common</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\common\skybox_PS.hlsl">
       <Filter>shaders\common</Filter>
     </FxCompile>
     <FxCompile Include="shaders\fullscreen\fullscreen_PS.hlsl">
@@ -457,6 +490,9 @@
     <FxCompile Include="shaders\pbr\pbr_skinned_instanced_VS.hlsl">
       <Filter>shaders\pbr</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\pbr\pbr_vertex_painted_instanced_VS.hlsl">
+      <Filter>shaders\pbr</Filter>
+    </FxCompile>
     <FxCompile Include="shaders\sprite\instanced_3D_sprite_VS.hlsl">
       <Filter>shaders\sprite</Filter>
     </FxCompile>
@@ -478,6 +514,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\common\common.hlsli">
+      <Filter>shaders\common</Filter>
+    </None>
+    <None Include="shaders\common\constants.hlsli">
       <Filter>shaders\common</Filter>
     </None>
     <None Include="shaders\pbr\pbr_functions.hlsli">

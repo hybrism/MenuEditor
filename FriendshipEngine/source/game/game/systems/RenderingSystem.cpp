@@ -34,9 +34,14 @@ RenderingSystem::~RenderingSystem()
 
 }
 
-void RenderingSystem::Update(const float&)
+void RenderingSystem::Init()
 {
-#ifdef _DEBUG
+	myMeshOrderCounter.resize(AssetDatabase::GetMeshCount(), std::vector<unsigned int>(0));
+}
+
+void RenderingSystem::Update(const SceneUpdateContext&)
+{
+#ifndef _RELEASE
 	auto* im = InputManager::GetInstance();
 	if (im->IsKeyPressed(VK_F6))
 	{
@@ -65,20 +70,47 @@ void RenderingSystem::Render()
 	for (auto& entity : myEntities)
 	{
 		auto& meshComponent = myWorld->GetComponent<MeshComponent>(entity);
-		auto& meshes = AssetDatabase::GetMesh(meshComponent.id);
 
-		for (auto& mesh : meshes.meshData)
+		if (!meshComponent.shouldRender) { continue; }
+
+		size_t meshId = meshComponent.id;
+		auto& meshes = AssetDatabase::GetMesh(meshId);
+
+		size_t size = meshes.meshData.size();
+		for (size_t i = 0; i < size; ++i)
 		{
-			Transform hierarchyTransform = GetWorldTransform(myWorld,entity);
+			auto& mesh = meshes.meshData[i];
+
+			if (myMeshOrderCounter.size() < meshId)
+			{
+				myMeshOrderCounter.resize(meshId + 1, std::vector<unsigned int>(size));
+			}
+			else if (myMeshOrderCounter[meshId].size() < size)
+			{
+				myMeshOrderCounter[meshId].resize(size);
+			}
+
+			meshComponent.renderOrder = myMeshOrderCounter[meshId][i];
+			++myMeshOrderCounter[meshId][i];
+
+			auto& transformComponent = myWorld->GetComponent<TransformComponent>(entity);
+
+			Transform hierarchyTransform = transformComponent.GetWorldTransform(myWorld, entity);
 
 			if (meshComponent.type == MeshType::Skeletal)
 			{
 				auto& anim = myWorld->GetComponent<AnimationDataComponent>(entity);
 
+				SkeletalMeshInstanceData instanceData;
+				instanceData.entityData = Vector2ui{ static_cast<unsigned int>(entity), 0 };
+				instanceData.pose = anim.localSpacePose;
+				instanceData.transform = hierarchyTransform;
+				instanceData.transform *= meshComponent.offset;
+
 				deferredRenderer.Render(
 					static_cast<SkeletalMesh*>(mesh),
 					MeshInstanceRenderData{
-						SkeletalMeshInstanceData { hierarchyTransform, anim.localSpacePose },
+						instanceData,
 						mesh->GetVertexShader()->GetType(),
 						mesh->GetPixelShader()->GetType(),
 						RenderMode::TRIANGLELIST
@@ -88,16 +120,26 @@ void RenderingSystem::Render()
 				continue;
 			}
 
+			StaticMeshInstanceData instanceData;
+			instanceData.entityData = Vector2ui{ static_cast<unsigned int>(entity), 0 };
+			instanceData.transform = hierarchyTransform;
+			instanceData.transform *= meshComponent.offset;
+
 			deferredRenderer.Render(
 				static_cast<Mesh*>(mesh),
 				{
-					StaticMeshInstanceData{ hierarchyTransform },
+					instanceData,
 					mesh->GetVertexShader()->GetType(),
 					mesh->GetPixelShader()->GetType(),
 					RenderMode::TRIANGLELIST,
 				}
 			);
 		}
+	}
+
+	for (size_t i = 0; i < myMeshOrderCounter.size(); ++i)
+	{
+		std::fill(myMeshOrderCounter[i].begin(), myMeshOrderCounter[i].end(), 0);
 	}
 }
 

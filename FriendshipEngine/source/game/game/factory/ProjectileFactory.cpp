@@ -22,6 +22,7 @@ void ProjectileFactory::Init(World* aWorld, int poolSize, PhysXSceneManager& aPh
 		transform.transform.SetPosition(myInQuiverPos);
 		auto& mesh = myWorld->AddComponent<MeshComponent>(arrow.eID);
 		mesh.id = meshID;
+		mesh.shouldRender = false;
 
 		//PhysX
 		auto& physXComponent = myWorld->AddComponent<PhysXComponent>(arrow.eID);
@@ -44,7 +45,7 @@ void ProjectileFactory::Init(World* aWorld, int poolSize, PhysXSceneManager& aPh
 		//Adjust collider pos
 		OffsetCollider(physXComponent.dynamicPhysX, { 0,0,130.f });
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 		myWorld->AddComponent<MetaDataComponent>(arrow.eID);
 #endif
 
@@ -78,6 +79,7 @@ void ProjectileFactory::releaseObject(Arrow& obj)
 {
 	auto& transform = myWorld->GetComponent<TransformComponent>(obj.eID);
 	transform.transform.SetPosition(myInQuiverPos);
+	myWorld->GetComponent<MeshComponent>(obj.eID).shouldRender = false;
 	objectPool.push_back(obj);
 }
 
@@ -87,6 +89,7 @@ void ProjectileFactory::ShootArrow(Vector3f aStartPos, Vector3f aDir)
 	auto& proj = myWorld->GetComponent<ProjectileComponent>(arrow.eID);
 	auto& physX = myWorld->GetComponent<PhysXComponent>(arrow.eID);
 	auto& transf = myWorld->GetComponent<TransformComponent>(arrow.eID);
+	myWorld->GetComponent<MeshComponent>(arrow.eID).shouldRender = true;
 	physX.dynamicPhysX->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, false);
 	physX.dynamicPhysX->clearForce();
 	physX.dynamicPhysX->clearTorque();

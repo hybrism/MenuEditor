@@ -120,7 +120,7 @@ namespace DirectX
             uint32_t                                                vertexStride;
             D3D_PRIMITIVE_TOPOLOGY                                  primitiveType;
             DXGI_FORMAT                                             indexFormat;
-            Microsoft::WRL::ComPtr<ID3D11InputLayout>               myInputLayout;
+            Microsoft::WRL::ComPtr<ID3D11InputLayout>               inputLayout;
             Microsoft::WRL::ComPtr<ID3D11Buffer>                    indexBuffer;
             Microsoft::WRL::ComPtr<ID3D11Buffer>                    vertexBuffer;
             std::shared_ptr<IEffect>                                effect;

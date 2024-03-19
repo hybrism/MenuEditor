@@ -5,14 +5,15 @@
 #include "../utility/Error.h"
 #include "../text/TextService.h"
 #include "../graphics/GraphicsEngine.h"
+#include "../graphics/renderer/SpriteRenderer.h"
 
 Text::Text(const wchar_t* aFontFile, FontSize aFontSize, unsigned char aBorderSize)
-	: myTextService(&GraphicsEngine::GetInstance()->GetTextService())
+	: myTextService(GraphicsEngine::GetInstance()->GetSpriteRenderer().GetTextService())
 {
 	myColor = Vector4f(1.f, 1.f, 1.f, 1.f);
 	myScale = 1.0f;
 	myFontName = aFontFile;
-	myFont = myTextService->GetOrLoad(myFontName, aBorderSize, aFontSize);
+	myFont = myTextService->GetOrLoad(myFontName, aBorderSize, FontEnumToSize(aFontSize));
 	myRotation = 0.0f;
 }
 
@@ -21,13 +22,9 @@ Text::~Text() {}
 void Text::Render()
 {
 	if (!myTextService)
-	{
 		return;
-	}
-	if (!myTextService->Draw(*this))
-	{
-		PrintE("[Text.cpp] Text rendering error! Trying to render a text where the resource has been deleted! Did you clear the memory for this font? OR: Did you set the correct working directory?");
-	}
+
+	GraphicsEngine::GetInstance()->GetSpriteRenderer().DrawText(this);
 }
 
 float Text::GetWidth()
@@ -82,4 +79,44 @@ void Text::SetRotation(float aRotation)
 void Text::SetScale(float aScale)
 {
 	myScale = aScale;
+}
+
+int Text::FontEnumToSize(FontSize aSize)
+{
+	switch (aSize)
+	{
+	case FontSize_6:
+		return 6;
+	case FontSize_8:
+		return 8; 
+	case FontSize_9:
+		return 9; 
+	case FontSize_10:
+		return 10;
+	case FontSize_11:
+		return 11; 
+	case FontSize_12:
+		return 12; 
+	case FontSize_14:
+		return 14; 
+	case FontSize_18:
+		return 15; 
+	case FontSize_24:
+		return 24; 
+	case FontSize_30:
+		return 30; 
+	case FontSize_36:
+		return 36; 
+	case FontSize_48:
+		return 48; 
+	case FontSize_60:
+		return 60; 
+	case FontSize_72:
+		return 72;
+	case FontSize_Count:
+	default:
+		break;
+	}
+
+	return 0;
 }

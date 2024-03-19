@@ -18,6 +18,8 @@ AnimationController::~AnimationController()
 
 void AnimationController::Update(const float& aDeltaTime, Animation& aAnimation, AnimationData& aData)
 {
+	if (!aData.isPlaying) { return; }
+
 	aData.previousStateIndex = aData.currentStateIndex;
 	if (aData.transitionIndex == -1) { return; }
 
@@ -52,6 +54,8 @@ void AnimationController::Update(const float& aDeltaTime, Animation& aAnimation,
 	aData.exitTimer = 0.0f;
 	aData.transitionIndex = -1;
 	aData.blendFactor = 0.0f;
+	aData.time[0] = aData.time[1];
+	aData.time[1] = 0.0f;
 
 	//myStates[myCurrentAnimation].Update(aDeltaTime);
 }
@@ -66,7 +70,9 @@ size_t AnimationController::AddState(const AnimationState& aAnimationState)
 	size_t index = myAnimationStates.size();
 
 	myAnimationStates.push_back(aAnimationState);
-
+#ifdef _EDITOR
+	myAnimationStates[index].stateIndex = static_cast<int>(index);
+#endif
 	return index;
 }
 
@@ -101,17 +107,18 @@ void AnimationController::RunTransitionCheck(AnimationData& aData, AnimationData
 
 	AnimationState& currentState = GetCurrentState(aData);
 	size_t animationCount = currentState.GetTransitionCount();
-	bool shouldTransition = false;
 	for (size_t i = 0; i < animationCount; i++)
 	{
+		bool shouldTransition = true;
+
 		const AnimationTransition* transition = currentState.GetTransition(i);
 
 		for (size_t j = 0; j < transition->conditions.size(); j++)
 		{
 			const AnimationCondition& condition = transition->conditions[j];
-			if (IsAnimationConditionMet(condition.parameterIndex, condition, aParameter))
+			if (!IsAnimationConditionMet(condition.parameterIndex, condition, aParameter))
 			{
-				shouldTransition = true;
+				shouldTransition = false;
 				break;
 			}
 		}
@@ -140,17 +147,17 @@ bool AnimationController::IsAnimationConditionMet(
 	switch (aCondition.type)
 	{
 	case AnimationConditionType::eIsEqual:
-		return type.f == aCondition.target || type.i == aCondition.target;
+		return type.f == aCondition.target;
 	case AnimationConditionType::eIsNotEqual:
-		return type.f != aCondition.target || type.i != aCondition.target;
+		return type.f != aCondition.target;
 	case AnimationConditionType::eIsGreaterThan:
-		return type.f > aCondition.target || type.i > aCondition.target;
+		return type.f > aCondition.target;
 	case AnimationConditionType::eIsGreaterThanOrEqual:
-		return type.f >= aCondition.target || type.i >= aCondition.target;
+		return type.f >= aCondition.target;
 	case AnimationConditionType::eIsLessThan:
-		return type.f < aCondition.target || type.i < aCondition.target;
+		return type.f < aCondition.target;
 	case AnimationConditionType::eIsLessThanOrEqual:
-		return type.f <= aCondition.target || type.i <= aCondition.target;
+		return type.f <= aCondition.target;
 	case AnimationConditionType::eIsTrue:
 		return type.b;
 	case AnimationConditionType::eIsFalse:

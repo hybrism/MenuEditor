@@ -391,14 +391,14 @@ FT_BEGIN_HEADER
     FT_Error
     (*load_field)( PS_Parser       parser,
                    const T1_Field  field,
-                   void**          objectIds,
+                   void**          objects,
                    FT_UInt         max_objects,
                    FT_ULong*       pflags );
 
     FT_Error
     (*load_field_table)( PS_Parser       parser,
                          const T1_Field  field,
-                         void**          objectIds,
+                         void**          objects,
                          FT_UInt         max_objects,
                          FT_ULong*       pflags );
 

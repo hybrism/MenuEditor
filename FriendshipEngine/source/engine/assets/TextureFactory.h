@@ -49,7 +49,8 @@ public:
 	TextureFactory() = delete;
 	~TextureFactory() = delete;
 
-	static Texture* CreateTexture(const std::string& aTexturePath, const bool& aUseRelative = true);
+	static Texture* CreateTexture(const std::string& aTexturePath, const bool& aUseRelative = true, bool aShouldPrintError = true);
+	static bool CreateDDSTexture(const std::wstring& aPath, ComPtr<ID3D11Resource>& outTexture, ComPtr<ID3D11ShaderResourceView>& outShaderResourceView);
 	static bool CreateDDSTexture(const std::wstring& aPath, ComPtr<ID3D11ShaderResourceView>& outShaderResourceView);
 	static void WriteDDSToFile(const std::wstring& aPath, const char* aData, const int& aWidth, const int& aHeight);
 private:

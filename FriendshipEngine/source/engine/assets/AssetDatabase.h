@@ -5,12 +5,12 @@
 
 #include "AssetDefines.h"
 #include "FactoryStructs.h"
+#include "TextureDatabase.h"
 
 #include <nlohmann\json_fwd.hpp>
 #include <engine\graphics\Light\LightStructs.h>
 
 class SharedMesh;
-class TextureFactory;
 class AnimationController;
 
 enum class PrimitiveMeshID
@@ -56,6 +56,29 @@ public:
 		return myInstance->myMeshes.at(index);
 	}
 
+#ifdef _EDITOR
+	static SharedMeshPackage& GetMeshRef(const size_t& aId)
+	{
+		assert(myInstance->myMeshes.size() > aId && "ID does not exist");
+		return myInstance->myMeshes.at(aId);
+	}
+
+	static SharedMeshPackage& GetMeshRef(const std::string& aMeshName)
+	{
+		assert(myInstance->myMeshNameToMeshId.find(aMeshName) != myInstance->myMeshNameToMeshId.end() && "Mesh Name does not exist");
+		size_t index = myInstance->myMeshNameToMeshId.at(aMeshName);
+		return myInstance->myMeshes.at(index);
+	}
+
+	// WARNING: may cause memory leaks if not handled properly
+	static void ModifyTextures(const size_t& aId, const TextureCollection& aTextureCollection)
+	{
+		myInstance->myTextureDatabase.ModifyTextures(aId, aTextureCollection);
+	}
+#endif
+
+	static void UpdateMeshTexture(const size_t& aTextureId, const size_t& aMeshId, const size_t& aMeshDataIndex);
+
 	static std::string GetMeshPath(size_t aMeshPathID)
 	{
 		assert(myInstance->myMeshPaths.size() > aMeshPathID && "ID does not exist");
@@ -76,8 +99,7 @@ public:
 
 	static const TextureCollection& GetTextures(const size_t& aId)
 	{
-		assert(myInstance->myTextures.find(aId) != myInstance->myTextures.end() && "ID does not exist");
-		return myInstance->myTextures.at(aId);
+		return myInstance->myTextureDatabase.GetTextures(aId);
 	}
 
 	static std::vector<Animation*> GetAnimations(const size_t& aMeshId) 
@@ -104,13 +126,12 @@ public:
 
 	static size_t GetTextureIndex(const std::string& aMaterialName)
 	{
-		assert(myInstance->myMaterialNameToTextureIndex.find(aMaterialName) != myInstance->myMaterialNameToTextureIndex.end() && "Material name does not exist");
-		return myInstance->myMaterialNameToTextureIndex.at(aMaterialName);
+		return myInstance->myTextureDatabase.GetTextureIndex(aMaterialName);
 	}
 
 	static bool DoesTextureExist(const std::string& aMaterialName)
 	{
-		return myInstance->myMaterialNameToTextureIndex.find(aMaterialName) != myInstance->myMaterialNameToTextureIndex.end();
+		return myInstance->myTextureDatabase.DoesTextureExist(aMaterialName);
 	}
 
 	static bool DoesAnimationControllerExist(const size_t& aMeshId)
@@ -156,39 +177,40 @@ public:
 
 	static size_t GetMeshCount() { return myInstance->myMeshes.size(); }
 
+	static void LoadVertexTextures(const std::string& aSceneName);
+
 	//LIGHTS
 	static void StoreDirectionalLight(DirectionalLight aDirectionalLight);
 	static void StorePointLight(PointLight aPointLight);
 	static DirectionalLight& GetDirectionalLight();
 	static std::vector<PointLight>& GetPointLight();
 
+	static TextureDatabase& GetTextureDatabase() { return myInstance->myTextureDatabase; }
+
 private:
 	AssetDatabase();
 
 	nlohmann::json OpenJson(std::string aJsonPath);
 	void ReadMeshes(const nlohmann::json& jsonObject);
-	void ReadTextures(const nlohmann::json& jsonObject);
 	void ReadAnimations(const nlohmann::json& jsonObject);
 
-	std::vector<SharedMeshPackage> myMeshes; // when moving from unity, change this to a vector
-	std::unordered_map<size_t, TextureCollection> myTextures;
-	std::vector<std::string> myMeshPaths;
+	static AssetDatabase* myInstance;
+
+	DirectionalLight myStoredDirectionalLightInformation;
+	TextureDatabase myTextureDatabase;
+
 	std::unordered_map<std::string, size_t> myMeshNameToMeshId;
 	std::unordered_map<size_t, size_t> myUnityMeshIdToMeshId;
 	std::unordered_map<size_t, AnimationController*> myAnimationControllers;
 	std::unordered_map<std::string, size_t> myAnimationNameToIndex; // this only exists for convinience atm since we use unity to export animations
-	std::unordered_map<std::string, size_t> myMaterialNameToTextureIndex;
-
 	std::unordered_map<size_t, std::vector<Animation*>> myAnimations;
-
-	const std::string myMissingPathText = "";
-
-	volatile bool myHasLoadedAssets = false;
-	static AssetDatabase* myInstance;
-
+	std::vector<SharedMeshPackage> myMeshes; // when moving from unity, change this to a vector
+	std::vector<std::string> myMeshPaths;
 
 	//LIGHT
 	std::vector<int> test;
 	std::vector<PointLight> myStoredPointLightInformation;
-	DirectionalLight myStoredDirectionalLightInformation;
+
+	const std::string myMissingPathText = "";
+	volatile bool myHasLoadedAssets = false;
 };

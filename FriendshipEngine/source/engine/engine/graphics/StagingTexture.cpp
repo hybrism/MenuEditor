@@ -3,15 +3,19 @@
 #include <d3d11.h>
 #include "GraphicsEngine.h"
 
-#ifdef _DEBUG
 void StagingTexture::CopyToStaging() const
 {
-	GraphicsEngine::GetInstance()->GetContext()->CopyResource(myStagingTexture, myTexture);
+	auto* context = GraphicsEngine::GetInstance()->DX().GetContext();
+#ifdef _EDITOR
+	context->CopyResource(myStagingTexture, myTexture);
+#endif
+	context->CopyResource(myIntermediateTexture, myTexture);
 }
 
+#ifdef _EDITOR
 bool StagingTexture::Map(D3D11_MAPPED_SUBRESOURCE& outData) const
 {
-	auto* context = GraphicsEngine::GetInstance()->GetContext();
+	auto* context = GraphicsEngine::GetInstance()->DX().GetContext();
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT result = context->Map(myStagingTexture, 0, D3D11_MAP_READ, 0, &mappedResource);
@@ -27,25 +31,42 @@ bool StagingTexture::Map(D3D11_MAPPED_SUBRESOURCE& outData) const
 
 void StagingTexture::Unmap() const
 {
-	GraphicsEngine::GetInstance()->GetContext()->Unmap(myStagingTexture, 0);
+	GraphicsEngine::GetInstance()->DX().GetContext()->Unmap(myStagingTexture, 0);
 }
 #endif
 
-void StagingTexture::CreateStagingTexture()
+void StagingTexture::CreateStagingTexture(D3D11_SHADER_RESOURCE_VIEW_DESC* aSRVDesc)
 {
-#ifdef _DEBUG
-	auto& device = GraphicsEngine::GetInstance()->GetDevice();//GlobalStuff::GetInstance().GetGraphicsEngine()->GetDevice();
+	HRESULT result = S_OK;
 
-	D3D11_TEXTURE2D_DESC stagingDesc{};
-	myTexture->GetDesc(&stagingDesc);
+	auto& device = GraphicsEngine::GetInstance()->DX().GetDevice();//GlobalStuff::GetInstance().GetGraphicsEngine()->GetDevice();
+#ifdef _EDITOR
+	{
+		D3D11_TEXTURE2D_DESC stagingDesc{};
+		myTexture->GetDesc(&stagingDesc);
 
-	stagingDesc.BindFlags = 0;
-	stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-	stagingDesc.Usage = D3D11_USAGE_STAGING;
+		stagingDesc.BindFlags = 0;
+		stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+		stagingDesc.Usage = D3D11_USAGE_STAGING;
 
-	HRESULT result = device->CreateTexture2D(&stagingDesc, nullptr, &myStagingTexture);
-	assert(SUCCEEDED(result));
-#else
-	__noop;
+		result = device->CreateTexture2D(&stagingDesc, nullptr, &myStagingTexture);
+		assert(SUCCEEDED(result));
+	}
 #endif
+
+	{
+		D3D11_TEXTURE2D_DESC stagingDesc{};
+		myTexture->GetDesc(&stagingDesc);
+
+		stagingDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
+		result = device->CreateTexture2D(&stagingDesc, nullptr, &myIntermediateTexture);
+		assert(SUCCEEDED(result));
+	}
+
+	ID3D11ShaderResourceView* tempSRV;
+	result = device->CreateShaderResourceView(myIntermediateTexture, aSRVDesc, &tempSRV);
+	assert(SUCCEEDED(result));
+	myIntermediateSRV = tempSRV;
+	tempSRV->Release();
 }

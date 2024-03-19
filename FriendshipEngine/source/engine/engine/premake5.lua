@@ -46,11 +46,16 @@ project "Engine"
 	--links	{"PhysX_64.lib", "PhysXCommon_64.lib", "PhysXFoundation_64.lib", "PVDRuntime_64.lib", "PhysXExtensions_static_64.lib", "PhysXPvdSDK_static_64.lib", "PhysXCooking_64.lib"}
 
 	
-	filter "configurations:Debug"
-		defines {"_DEBUG"}
+	filter "configurations:Editor"
+		defines "_EDITOR"
 		runtime "Debug"
 		symbols "on"
 		libdirs { dirs.dependencies_debug }	
+	filter "configurations:LauncherDebug"
+		defines "_LAUNCHER"
+		runtime "Debug"
+		symbols "on"
+		libdirs { dirs.dependencies_debug }
 	filter "configurations:Release"
 		defines "_RELEASE"
 		runtime "Release"

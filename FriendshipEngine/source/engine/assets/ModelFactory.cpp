@@ -34,7 +34,7 @@ SharedMeshPackage ModelFactory::LoadMesh(const std::string& aFilePath, AssetData
 {
 	SharedMeshPackage package = BinaryMeshFactory::LoadMeshFromFile(aFilePath, RELATIVE_CUSTOM_MESH_DATA_PATH, aAssetDatabase);
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 	if (package.meshData.size() == 0)
 	{
 		auto meshPackage = LoadMeshFromFBX(aFilePath);
@@ -161,7 +161,7 @@ MeshDataPackage ModelFactory::LoadMeshFromFBX(const std::string& aFilePath)
 	LoadMeshNodes(scene->GetRootNode(), meshNodes);
 
 	// debug since this should not happen
-#ifdef _DEBUG
+#ifndef _RELEASE
 	for (FbxNode* meshNode : meshNodes)
 	{
 		FbxMesh* fbxMesh = meshNode->GetMesh();

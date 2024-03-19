@@ -51,7 +51,7 @@ void BinaryAnimationFactory::WriteAnimationToFile(Animation* aAnimation, const s
 			for (size_t j = 0; j < size; ++j)
 			{
 				// Write transform
-				DirectX::XMMATRIX m = aAnimation->frames[i].jointTransforms[j].GetMatrix();
+				DirectX::XMMATRIX m = aAnimation->frames[i].transform[j].GetMatrix();
 				file.write(reinterpret_cast<const char*>(&m), sizeof(DirectX::XMMATRIX));
 			}
 		}
@@ -115,7 +115,7 @@ Animation* BinaryAnimationFactory::GetAnimationFromFile(const std::string& aFile
 				DirectX::XMMATRIX m{};
 				file.read(reinterpret_cast<char*>(&m), sizeof(DirectX::XMMATRIX));
 				
-				frame.jointTransforms[j] = Transform(m);
+				frame.transform[j] = Transform(m);
 			}
 			anim->frames[i] = frame;
 		}

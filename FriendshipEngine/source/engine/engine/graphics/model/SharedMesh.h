@@ -31,13 +31,15 @@ public:
 	virtual void Render(const DirectX::XMMATRIX& aTransform, const VertexShader* aVS, const PixelShader* aPS, const RenderMode& aRenderMode = RenderMode::TRIANGLELIST) const = 0;
 	
 	void SetTextures(const TextureCollection& aTextures);
-	const TextureCollection& GetTextures() { return myTextures; }
+	void SetVertexTextureId(const int aTextureId);
+	int GetVertexTextureId() const { return myTextures.vertexPaintIndex; }
+	const TextureCollection& GetTextures() const { return myTextures; }
 		
 	void SetMaterialName(std::string aMaterialName);
-	const std::string GetMaterialPath() { return myMaterialName; }
+	const std::string GetMaterialName() const { return myMaterialName; }
 	
 	void SetFileName(const std::string& aFileName) { myFileName = aFileName; }
-	const std::string GetFileName() { return myFileName; }
+	const std::string GetFileName() const { return myFileName; }
 
 	void SetVertexShader(const VertexShader* aVertexShader) { myVertexShader = aVertexShader; }
 	void SetPixelShader(const PixelShader* aPixelShader) { myPixelShader = aPixelShader; }
@@ -52,9 +54,20 @@ public:
 	unsigned int GetVertexSize() const { return myVertexSize; }
 
 	void BindTextures() const;
+
+#ifdef _EDITOR
+	Vertex* GetVertices() { return myVertices; }
+	unsigned int GetVertexCount() { return myVertexCount; }
+#endif
 protected:
-	unsigned int myIndexCount = 0;
+#ifdef _EDITOR
+	Vertex* myVertices = nullptr;
+	unsigned int myVertexCount = 0;
+#endif
 	unsigned int* myIndices = nullptr;
+	unsigned int myIndexCount = 0;
+
+	// sizeof(Vertex) etc
 	unsigned int myVertexSize = 0;
 
 	const VertexShader* myVertexShader = nullptr;

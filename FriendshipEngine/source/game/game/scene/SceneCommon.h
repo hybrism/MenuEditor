@@ -1,4 +1,16 @@
 #pragma once
+class SceneManager;
+class LightManager;
+class PostProcess;
+class Game;
+
+struct SceneUpdateContext
+{
+	float dt;
+	PostProcess* postProcess;
+	LightManager* lightManager;
+	SceneManager* sceneManager;
+};
 
 enum class eSceneType
 {
@@ -11,8 +23,12 @@ enum class eLevel
 {
 	None,
 	FeatureGym,
+	Lvl0_Tutorial,
+	Lvl1,
+	Lvl2,
 	Lvl3_FamilyHeirloom,
-	AxelFeatureGym,
 	AssetGym,
+
+	AxelFeatureGym,
 	Count
 };

@@ -17,6 +17,13 @@ public:
 
 	void Update(float aDeltaTime);
 	Camera myCamera;
+
+	void SetYawPitch(float aYaw, float aPitch);
+
+	void SetSkipFrameUpdateBool(bool aBool)
+	{
+		mySkipFrameUpdate = aBool;
+	}
 private:
 	float Multiplier() const;
 
@@ -24,4 +31,6 @@ private:
 	float myYaw;
 	float myPitch;
 	bool myActiveMultiplier;
+
+	bool mySkipFrameUpdate = false;
 };

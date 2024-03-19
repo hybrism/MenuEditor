@@ -75,7 +75,7 @@ private:
 
 	physx::PxController* myController;
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 	//DebugLine myFinalLine = DebugLine({},{});
 #endif // _DEBUG
 };

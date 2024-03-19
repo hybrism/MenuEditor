@@ -11,9 +11,16 @@ class Scene
 	friend class UnityImporter;
 
 public:
+	Scene() = delete;
+	Scene(SceneManager* aSceneManager)
+		: mySceneManager(aSceneManager)
+	{}
+
 	virtual void Init(PhysXSceneManager& aPhysXManager) { aPhysXManager; }
-	virtual bool Update(float dt) { dt; return true; }
+	virtual bool Update(const SceneUpdateContext& dt) { dt; return true; }
 	virtual void Render() { __noop; }
+
+	virtual void OnEnter() { __noop; }
 
 	eSceneType GetType() const { return myType; }
 	eLevel GetLevel() const { return myLevel; }
@@ -23,6 +30,7 @@ protected:
 	eLevel myLevel = eLevel::Count;
 
 	World* myWorld = nullptr;
+	SceneManager* mySceneManager = nullptr;
 	
 	std::vector<std::unique_ptr<ScriptRuntimeInstance>> myScripts;
 

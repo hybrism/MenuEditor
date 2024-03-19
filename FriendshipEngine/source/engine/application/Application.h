@@ -15,8 +15,9 @@ public:
 
 	static LRESULT WindowProcedure(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
 	virtual const Timer& GetTimer() const { return myTimer; }
-protected:
+
 	virtual bool BeginFrame() = 0;
 	virtual void EndFrame();
+protected:
 	Timer myTimer;
 };

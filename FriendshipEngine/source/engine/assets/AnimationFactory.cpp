@@ -9,7 +9,7 @@ Animation* AnimationFactory::LoadAnimation(const std::string& aFilePath, AssetDa
 {
 	Animation* anim = BinaryAnimationFactory::LoadAnimationFromFile(aFilePath, RELATIVE_CUSTOM_ANIMATION_DATA_PATH, aAssetDatabase);
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 	if (anim == nullptr)
 	{
 		anim = LoadAnimationFromFBX(aFilePath);
@@ -145,7 +145,7 @@ Animation* AnimationFactory::LoadAnimationFromFBX(const std::string& aFilePath)
 			{
 				DirectX::XMMATRIX localMatrix = boneTransform;
 
-				returnAnimation->frames[f].jointTransforms[skeleton.boneNameToIndexMap.at(boneName)] = localMatrix;
+				returnAnimation->frames[f].transform[skeleton.boneNameToIndexMap.at(boneName)] = localMatrix;
 			}
 		}
 

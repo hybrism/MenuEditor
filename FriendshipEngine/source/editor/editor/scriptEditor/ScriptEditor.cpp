@@ -13,6 +13,8 @@
 #include <engine/utility/Error.h>
 #include <engine/Defines.h>
 
+#include <ecs/World.h>
+
 //Game
 #include <game/scripting/utility/ScriptJson.h>
 #include <game/scripting/nodes/ScriptNodeTypeRegistry.h>
@@ -21,6 +23,7 @@
 #include <game/scripting/ScriptManager.h>
 #include <game/Game.h>
 #include <game/utility/JsonUtility.h>
+#include <game/component/MetaDataComponent.h>
 
 //Internal
 #include <shared/postMaster/PostMaster.h>
@@ -153,8 +156,6 @@ ScriptNodeTypeId ShowNodeTypeSelectorForCategory(const ScriptNodeTypeRegistry::C
 void ScriptEditor::Update(const EditorUpdateContext& aContext)
 {
 	aContext;
-	std::string level(myActiveLevel);
-	Print(level);
 
 	if (ImGui::BeginChild("NodeEditor"))
 	{
@@ -525,7 +526,9 @@ void ScriptEditor::RedoButton()
 
 void ScriptEditor::NodeEditor(EditorScriptData& aActiveScript, const EditorUpdateContext& aContext)
 {
-	aContext;
+	//TODO: Fix this
+	if (!aContext.world)
+		return;
 
 	ImNodes::BeginNodeEditor();
 	Script& script = *aActiveScript.script;
@@ -667,6 +670,59 @@ void ScriptEditor::NodeEditor(EditorScriptData& aActiveScript, const EditorUpdat
 						}
 						break;
 					}
+					case ScriptLinkDataType::Entity:
+					{
+						auto entities = aContext.world->GetEntities();
+						Entity selectedEntity = std::get<Entity>(pinCurrentValue.data);
+						std::string entityAsString = std::to_string(selectedEntity);
+
+						const char* displayValue = (selectedEntity == INVALID_ENTITY) ? "(None)" : entityAsString.c_str();
+
+						if (ImGui::BeginCombo("Entity", displayValue))
+						{
+							for (size_t entityIndex = 0; entityIndex < entities.size(); entityIndex++)
+							{
+								const bool isSelected = (selectedEntity == entities[entityIndex]);
+
+								std::string name = aContext.world->GetComponent<MetaDataComponent>(entities[entityIndex]).name;
+
+								std::string entityDisplayName = std::to_string((int)entities[entityIndex]) + " " + name;
+
+								if (ImGui::Selectable(entityDisplayName.c_str(), isSelected))
+								{
+									selectedEntity = entities[entityIndex];
+									CommandManager::DoCommand(std::make_shared<SetOverriddenValueCommand>(script, aActiveScript.selection, pinId, ScriptLinkData{ entities[entityIndex] }));
+								}
+
+								if (isSelected)
+									ImGui::SetItemDefaultFocus();
+							}
+
+							ImGui::EndCombo();
+						}
+
+						break;
+					}
+					case ScriptLinkDataType::Vector3f:
+					{
+						Vector3f value = std::get<Vector3f>(pinCurrentValue.data);
+
+						if (ImGui::InputFloat("X", &value.x, 0) && value != std::get<Vector3f>(pinCurrentValue.data))
+						{
+							CommandManager::DoCommand(std::make_shared<SetOverriddenValueCommand>(script, aActiveScript.selection, pinId, ScriptLinkData{ value }));
+						}
+
+						if (ImGui::InputFloat("Y", &value.y, 0) && value != std::get<Vector3f>(pinCurrentValue.data))
+						{
+							CommandManager::DoCommand(std::make_shared<SetOverriddenValueCommand>(script, aActiveScript.selection, pinId, ScriptLinkData{ value }));
+						}
+
+						if (ImGui::InputFloat("Z", &value.z, 0) && value != std::get<Vector3f>(pinCurrentValue.data))
+						{
+							CommandManager::DoCommand(std::make_shared<SetOverriddenValueCommand>(script, aActiveScript.selection, pinId, ScriptLinkData{ value }));
+						}
+						break;
+					}
 					}
 
 					ImGui::PopItemWidth();
@@ -759,7 +815,6 @@ void ScriptEditor::OnNewLevelLoaded(const std::string& aLevelName)
 	myActiveScript = "";
 
 	myOpenScripts.clear();
-
 
 	for (size_t i = 0; i < myLevels[myActiveLevel].size(); i++)
 	{

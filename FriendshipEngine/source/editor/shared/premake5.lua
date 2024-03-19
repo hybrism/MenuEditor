@@ -31,11 +31,16 @@ project "Shared"
 
 	--verify_or_create_settings("Game")
 
-	filter "configurations:Debug"
-		defines {"_DEBUG"}
+	filter "configurations:Editor"
+		defines "_EDITOR"
 		runtime "Debug"
 		symbols "on"
 		libdirs { dirs.dependencies_debug }	
+	filter "configurations:LauncherDebug"
+		defines "_LAUNCHER"
+		runtime "Debug"
+		symbols "on"
+		libdirs { dirs.dependencies_debug }
 	filter "configurations:Release"
 		defines "_RELEASE"
 		runtime "Release"

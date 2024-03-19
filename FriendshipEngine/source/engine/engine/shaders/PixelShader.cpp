@@ -24,7 +24,7 @@ bool PixelShader::Init(
 	std::ifstream psFile;
 	psFile.open(RELATIVE_SHADER_PATH + aName + "_PS.cso", std::ios::binary);
 	std::string psData = { std::istreambuf_iterator<char>(psFile), std::istreambuf_iterator<char>() };
-	result = myGraphicsEngine->GetDevice()->CreatePixelShader(psData.data(), psData.size(), nullptr, &myShader);
+	result = myGraphicsEngine->DX().GetDevice()->CreatePixelShader(psData.data(), psData.size(), nullptr, &myShader);
 	if (FAILED(result))
 	{
 		PrintE("[Shader.cpp] Could not create PixelShader!");
@@ -49,7 +49,7 @@ bool PixelShader::PrepareRender(
 		return false;
 	}
 
-	auto* context = myGraphicsEngine->GetContext();
+	auto* context = myGraphicsEngine->DX().GetContext();
 	context->PSSetShader(myShader.Get(), NULL, 0);
 
 	if (!Shader::PrepareRender(aSlot, aBufferData, aSize)) { return false; }

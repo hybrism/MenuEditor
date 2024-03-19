@@ -29,6 +29,13 @@ void ScriptLinkData::LoadFromJson(ScriptLinkDataType type, const ScriptJson& jso
 		case ScriptLinkDataType::Entity:
 		{
 			data = json.json.get<Entity>();
+			break;
+		}
+		case ScriptLinkDataType::Vector3f:
+		{
+			Vector3f vector = { json.json[0].get<float>(), json.json[1].get<float>(), json.json[2].get<float>() };
+			data = vector;
+			break;
 		}
 		}
 	}
@@ -58,6 +65,12 @@ void ScriptLinkData::WriteToJson(ScriptLinkDataType type, ScriptJson& json) cons
 		case ScriptLinkDataType::Entity:
 		{
 			json.json = std::get<Entity>(data);
+			break;
+		}
+		case ScriptLinkDataType::Vector3f:
+		{
+			Vector3f vector = std::get<Vector3f>(data);
+			json.json = { vector.x, vector.y, vector.z };
 			break;
 		}
 		}

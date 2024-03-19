@@ -82,6 +82,9 @@
     <ClInclude Include="component\CollisionDataComponent.h">
       <Filter>component</Filter>
     </ClInclude>
+    <ClInclude Include="component\DeathZoneComponent.h">
+      <Filter>component</Filter>
+    </ClInclude>
     <ClInclude Include="component\EnemyComponent.h">
       <Filter>component</Filter>
     </ClInclude>
@@ -118,11 +121,11 @@
     <ClInclude Include="component\TransformComponent.h">
       <Filter>component</Filter>
     </ClInclude>
-    <ClInclude Include="factory\EventFactory.h">
-      <Filter>factory</Filter>
-    </ClInclude>
     <ClInclude Include="factory\ProjectileFactory.h">
       <Filter>factory</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\IDManager.h">
+      <Filter>gui</Filter>
     </ClInclude>
     <ClInclude Include="gui\MenuHandler.h">
       <Filter>gui</Filter>
@@ -130,10 +133,19 @@
     <ClInclude Include="gui\MenuObject.h">
       <Filter>gui</Filter>
     </ClInclude>
+    <ClInclude Include="gui\MenuUpdateContext.h">
+      <Filter>gui</Filter>
+    </ClInclude>
     <ClInclude Include="gui\ObjectManager.h">
       <Filter>gui</Filter>
     </ClInclude>
     <ClInclude Include="gui\components\Collider2DComponent.h">
+      <Filter>gui\components</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\components\CommandComponent.h">
+      <Filter>gui\components</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\components\ComponentTypeEnum.h">
       <Filter>gui\components</Filter>
     </ClInclude>
     <ClInclude Include="gui\components\MenuComponent.h">
@@ -152,7 +164,10 @@
     <ClInclude Include="physics\PhysXSceneManager.h">
       <Filter>physics</Filter>
     </ClInclude>
-    <ClInclude Include="playerStates\PlayerAirbourneState.h">
+    <ClInclude Include="playerStates\PlayerAirborneState.h">
+      <Filter>playerStates</Filter>
+    </ClInclude>
+    <ClInclude Include="playerStates\PlayerConstants.h">
       <Filter>playerStates</Filter>
     </ClInclude>
     <ClInclude Include="playerStates\PlayerCrouchState.h">
@@ -165,6 +180,9 @@
       <Filter>playerStates</Filter>
     </ClInclude>
     <ClInclude Include="playerStates\PlayerState.h">
+      <Filter>playerStates</Filter>
+    </ClInclude>
+    <ClInclude Include="playerStates\PlayerStateMachine.h">
       <Filter>playerStates</Filter>
     </ClInclude>
     <ClInclude Include="playerStates\PlayerStatesInclude.h">
@@ -239,6 +257,9 @@
     <ClInclude Include="systems\CollisionSystem.h">
       <Filter>systems</Filter>
     </ClInclude>
+    <ClInclude Include="systems\DeathZoneSystem.h">
+      <Filter>systems</Filter>
+    </ClInclude>
     <ClInclude Include="systems\EnemySystem.h">
       <Filter>systems</Filter>
     </ClInclude>
@@ -264,9 +285,6 @@
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="systems\RenderingSystem.h">
-      <Filter>systems</Filter>
-    </ClInclude>
-    <ClInclude Include="systems\ScriptableEventSystem.h">
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="utility\Events.h">
@@ -299,11 +317,11 @@
     <ClCompile Include="collision\Bitmask.cpp">
       <Filter>collision</Filter>
     </ClCompile>
-    <ClCompile Include="factory\EventFactory.cpp">
-      <Filter>factory</Filter>
-    </ClCompile>
     <ClCompile Include="factory\ProjectileFactory.cpp">
       <Filter>factory</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\IDManager.cpp">
+      <Filter>gui</Filter>
     </ClCompile>
     <ClCompile Include="gui\MenuHandler.cpp">
       <Filter>gui</Filter>
@@ -313,6 +331,12 @@
     </ClCompile>
     <ClCompile Include="gui\ObjectManager.cpp">
       <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\components\Collider2DComponent.cpp">
+      <Filter>gui\components</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\components\CommandComponent.cpp">
+      <Filter>gui\components</Filter>
     </ClCompile>
     <ClCompile Include="gui\components\SpriteComponent.cpp">
       <Filter>gui\components</Filter>
@@ -324,7 +348,10 @@
     <ClCompile Include="physics\PhysXSceneManager.cpp">
       <Filter>physics</Filter>
     </ClCompile>
-    <ClCompile Include="playerStates\PlayerAirbourneState.cpp">
+    <ClCompile Include="playerStates\PlayerAirborneState.cpp">
+      <Filter>playerStates</Filter>
+    </ClCompile>
+    <ClCompile Include="playerStates\PlayerConstants.cpp">
       <Filter>playerStates</Filter>
     </ClCompile>
     <ClCompile Include="playerStates\PlayerCrouchState.cpp">
@@ -334,6 +361,9 @@
       <Filter>playerStates</Filter>
     </ClCompile>
     <ClCompile Include="playerStates\PlayerSlideState.cpp">
+      <Filter>playerStates</Filter>
+    </ClCompile>
+    <ClCompile Include="playerStates\PlayerStateMachine.cpp">
       <Filter>playerStates</Filter>
     </ClCompile>
     <ClCompile Include="playerStates\PlayerVaultState.cpp">
@@ -375,10 +405,19 @@
     <ClCompile Include="scripting\ScriptStringRegistry.cpp">
       <Filter>scripting</Filter>
     </ClCompile>
+    <ClCompile Include="scripting\nodes\CollisionNodes.cpp">
+      <Filter>scripting\nodes</Filter>
+    </ClCompile>
     <ClCompile Include="scripting\nodes\CommonNodes.cpp">
       <Filter>scripting\nodes</Filter>
     </ClCompile>
-    <ClCompile Include="scripting\nodes\ExampleNodes.cpp">
+    <ClCompile Include="scripting\nodes\DebugNodes.cpp">
+      <Filter>scripting\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="scripting\nodes\EntityNodes.cpp">
+      <Filter>scripting\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="scripting\nodes\MathNodes.cpp">
       <Filter>scripting\nodes</Filter>
     </ClCompile>
     <ClCompile Include="scripting\nodes\ScriptNodeTypeRegistry.cpp">
@@ -391,6 +430,9 @@
       <Filter>systems</Filter>
     </ClCompile>
     <ClCompile Include="systems\CollisionSystem.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
+    <ClCompile Include="systems\DeathZoneSystem.cpp">
       <Filter>systems</Filter>
     </ClCompile>
     <ClCompile Include="systems\EnemySystem.cpp">
@@ -420,8 +462,8 @@
     <ClCompile Include="systems\RenderingSystem.cpp">
       <Filter>systems</Filter>
     </ClCompile>
-    <ClCompile Include="systems\ScriptableEventSystem.cpp">
-      <Filter>systems</Filter>
+    <ClCompile Include="utility\GameHelperFunctions.cpp">
+      <Filter>utility</Filter>
     </ClCompile>
     <ClCompile Include="utility\JsonUtility.cpp">
       <Filter>utility</Filter>

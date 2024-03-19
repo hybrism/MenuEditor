@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="gui">
-      <UniqueIdentifier>{8A78880B-F681-887C-7FFD-9E7CEB05947C}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="gui\components">
-      <UniqueIdentifier>{7FD7FC1B-6BA5-F021-5439-614840A6CC86}</UniqueIdentifier>
-    </Filter>
     <Filter Include="windows">
       <UniqueIdentifier>{70CAFEC8-DCA9-7D64-E5C1-083B5120E4C5}</UniqueIdentifier>
     </Filter>
@@ -16,39 +10,6 @@
     <ClInclude Include="MenuEditorCommon.h" />
     <ClInclude Include="MenuEditorLauncher.h" />
     <ClInclude Include="UpdateContext.h" />
-    <ClInclude Include="gui\IDManager.h">
-      <Filter>gui</Filter>
-    </ClInclude>
-    <ClInclude Include="gui\MenuHandler.h">
-      <Filter>gui</Filter>
-    </ClInclude>
-    <ClInclude Include="gui\MenuObject.h">
-      <Filter>gui</Filter>
-    </ClInclude>
-    <ClInclude Include="gui\MenuUpdateContext.h">
-      <Filter>gui</Filter>
-    </ClInclude>
-    <ClInclude Include="gui\ObjectManager.h">
-      <Filter>gui</Filter>
-    </ClInclude>
-    <ClInclude Include="gui\components\Collider2DComponent.h">
-      <Filter>gui\components</Filter>
-    </ClInclude>
-    <ClInclude Include="gui\components\CommandComponent.h">
-      <Filter>gui\components</Filter>
-    </ClInclude>
-    <ClInclude Include="gui\components\ComponentTypeEnum.h">
-      <Filter>gui\components</Filter>
-    </ClInclude>
-    <ClInclude Include="gui\components\MenuComponent.h">
-      <Filter>gui\components</Filter>
-    </ClInclude>
-    <ClInclude Include="gui\components\SpriteComponent.h">
-      <Filter>gui\components</Filter>
-    </ClInclude>
-    <ClInclude Include="gui\components\TextComponent.h">
-      <Filter>gui\components</Filter>
-    </ClInclude>
     <ClInclude Include="windows\AssetsWindow.h">
       <Filter>windows</Filter>
     </ClInclude>
@@ -58,7 +19,7 @@
     <ClInclude Include="windows\InspectorWindow.h">
       <Filter>windows</Filter>
     </ClInclude>
-    <ClInclude Include="windows\MenuObjectHierarchy.h">
+    <ClInclude Include="windows\ObjectHierarchyWindow.h">
       <Filter>windows</Filter>
     </ClInclude>
     <ClInclude Include="windows\MenuViewWindow.h">
@@ -71,30 +32,6 @@
   <ItemGroup>
     <ClCompile Include="MenuEditor.cpp" />
     <ClCompile Include="MenuEditorLauncher.cpp" />
-    <ClCompile Include="gui\IDManager.cpp">
-      <Filter>gui</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\MenuHandler.cpp">
-      <Filter>gui</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\MenuObject.cpp">
-      <Filter>gui</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\ObjectManager.cpp">
-      <Filter>gui</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\components\Collider2DComponent.cpp">
-      <Filter>gui\components</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\components\CommandComponent.cpp">
-      <Filter>gui\components</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\components\SpriteComponent.cpp">
-      <Filter>gui\components</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\components\TextComponent.cpp">
-      <Filter>gui\components</Filter>
-    </ClCompile>
     <ClCompile Include="windows\AssetsWindow.cpp">
       <Filter>windows</Filter>
     </ClCompile>
@@ -104,7 +41,7 @@
     <ClCompile Include="windows\InspectorWindow.cpp">
       <Filter>windows</Filter>
     </ClCompile>
-    <ClCompile Include="windows\MenuObjectHierarchy.cpp">
+    <ClCompile Include="windows\ObjectHierarchyWindow.cpp">
       <Filter>windows</Filter>
     </ClCompile>
     <ClCompile Include="windows\MenuViewWindow.cpp">

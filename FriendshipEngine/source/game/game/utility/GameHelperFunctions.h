@@ -1,16 +1,30 @@
 #pragma once
-#include <pch.h>
-#include <component\TransformComponent.h>
+//#include <component\TransformComponent.h>
 
-static DirectX::XMMATRIX GetWorldTransform(World* aWorld, Entity aEntity)
+//static DirectX::XMMATRIX GetWorldTransform(World* aWorld, Entity aEntity)
+//{
+//	auto& globalTransform = aWorld->GetComponent<TransformComponent>(aEntity);
+//	auto parent = globalTransform.parent;
+//
+//	if (parent == INVALID_ENTITY)
+//	{
+//		return globalTransform.globalTransform.GetMatrix();
+//	}
+//
+//	return globalTransform.globalTransform.GetMatrix() * GetWorldTransform(aWorld, parent);
+//}
+struct TransformComponent;
+
+class GameHelperFunctions
 {
-	auto& transform = aWorld->GetComponent<TransformComponent>(aEntity);
-	auto parent = transform.parent;
+public:
+	static DirectX::XMMATRIX GetWorldTransform(World* aWorld, Entity aEntity);
+	//friend struct TransformComponent;
+};
 
-	if (parent == INVALID_ENTITY)
-	{
-		return transform.transform.GetMatrix();
-	}
 
-	return transform.transform.GetMatrix() * GetWorldTransform(aWorld, parent);
-}
+//extern Transform SetWorldTransform(World* aWorld, Entity aEntity);
+
+
+
+

@@ -1,10 +1,32 @@
 #include "pbr_functions.hlsli"
 
+/*
+enum class PixelShaderTextureSlot : int
+{
+    Cubemap = 0,
+    Albedo = 1,
+	Normal = 2,
+	VertexNormal = 3,
+    Material = 4,
+    Emissive = 5,
+    Slot5 = 6, //TGE: Below 4 is the standard texture slots, keep above it! (: register( t4 ); in the shader)
+	Slot6 = 7,  //"enum class GBufferTexture", in "GBuffer.h" uses enum slots 0 - 6
+    ShadowMap = 8,
+	DirectionalLight = 9,
+	LightBound = 10,
+};
+*/
+
 TextureCube aEnvironmentTexture : register(t0);
 Texture2D aAlbedoTexture : register(t1);
 Texture2D aNormalTexture : register(t2);
-Texture2D aMaterialTexture : register(t3);
-Texture2D aEffectsTexture : register(t4);
+Texture2D aMaterialTexture : register(t4);
+Texture2D aEffectsTexture : register(t5);
+
+Texture2D aVertexPaintedAlbedoTextureR : register(t16);
+Texture2D aVertexPaintedAlbedoTextureG : register(t17);
+Texture2D aVertexPaintedAlbedoTextureB : register(t18);
+Texture2D aVertexPaintedAlbedoTextureA : register(t19);
 
 // INPUT
 //ALBEDO:       R           G           B                     A
@@ -19,13 +41,33 @@ float3 expandNormal(float3 normalTexture)
     return normalize(normal);
 }
 
-GBufferOutput main(PixelInputType input)
+GBufferOutput main(DeferredPixelInputType input)
 {
     float4 albedo = aAlbedoTexture.Sample(aDefaultSampler, input.uv).rgba;
     
-    if (albedo.a < 0.1f) { discard; }
+    if (input.color.r > 0.0f)
+    {
+        albedo = lerp(albedo, aVertexPaintedAlbedoTextureR.Sample(aDefaultSampler, input.uv).rgba, input.color.r);
+    }
+    if (input.color.g > 0.0f)
+    {
+        albedo = lerp(albedo, aVertexPaintedAlbedoTextureG.Sample(aDefaultSampler, input.uv).rgba, input.color.g);
+    }
+    if (input.color.b > 0.0f)
+    {
+        albedo = lerp(albedo, aVertexPaintedAlbedoTextureB.Sample(aDefaultSampler, input.uv).rgba, input.color.b);
+    }
+    if (input.color.a > 0.0f)
+    {
+        albedo = lerp(albedo, aVertexPaintedAlbedoTextureA.Sample(aDefaultSampler, input.uv).rgba, input.color.a);
+    }
     
-    float3 normal = aNormalTexture.Sample(aDefaultSampler, input.uv).xyz;
+    if (albedo.a < 0.1f)
+    {
+        discard;
+    }
+    
+    float3 normal = float3(aNormalTexture.Sample(aDefaultSampler, input.uv).xy, 1.0f);
     float3 material = aMaterialTexture.Sample(aDefaultSampler, input.uv).rgb;
     float2 effects = aEffectsTexture.Sample(aDefaultSampler, input.uv).rg;
     
@@ -43,10 +85,10 @@ GBufferOutput main(PixelInputType input)
     GBufferOutput output;
     output.worldPosition = input.worldPosition;
     output.albedo = albedo;
-    output.normal = float4(pixelNormal, 1.0f);
+    output.normal = float4(0.5f + 0.5f * pixelNormal, 1.0f);
     output.vertexNormal = float4(input.normal, 1.0f);
     output.material = float4(material, 1.0f);
-    output.effects = float4(effects, 0.f, 0.f); // a is unused, TODO: make use of the height value/ask graphics about what it is?
+    output.effects = float4(effects, EntityIDToEffect(input.entityData.x)); // TODO: make use of the height value/ask graphics about what it is?
     
     return output;
 }

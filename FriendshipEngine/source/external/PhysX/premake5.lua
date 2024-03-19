@@ -22,7 +22,7 @@ project "PhysX"
 	}
     libdirs { dirs.lib }
 	filter "configurations:Debug"
-		defines {"_DEBUG"}
+		defines "_LAUNCHER"
 		runtime "Debug"
 		symbols "on"
 	

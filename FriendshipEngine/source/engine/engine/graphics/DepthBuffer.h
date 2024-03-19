@@ -20,7 +20,6 @@ public:
 
 	Vector2i GetSize() const;
 	inline ID3D11DepthStencilView* GetDepthStencilView() { return myDepth.Get(); };
-	ComPtr<ID3D11ShaderResourceView> mySRV;
 private:
 	D3D11_VIEWPORT myViewport = {};
 	ComPtr<ID3D11DepthStencilView> myDepth = 0;

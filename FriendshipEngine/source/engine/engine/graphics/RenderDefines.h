@@ -12,7 +12,12 @@ enum ShaderDataID
     ShaderDataID_8,
 };
 
-enum class ShaderTextureSlot : int
+enum class VertexShaderTextureSlot : int
+{
+	VertexColor = 0
+};
+
+enum class PixelShaderTextureSlot : int
 {
     Cubemap = 0,
     Albedo = 1,
@@ -25,6 +30,11 @@ enum class ShaderTextureSlot : int
     ShadowMap = 8,
 	DirectionalLight = 9,
 	LightBound = 10,
+
+	VertexAlbedoR = 16,
+	VertexAlbedoG = 17,
+	VertexAlbedoB = 18,
+	VertexAlbedoA = 19,
 };
 
 enum class ShaderDataBufferIndex
@@ -73,6 +83,24 @@ enum class RasterizerState
 	Count,
 };
 
+enum class SamplerFilter
+{
+	Point,
+	Bilinear,
+	Trilinear,
+	Count
+};
+
+enum class SamplerAddressMode
+{
+	Wrap,
+	Mirror,
+	Clamp,
+	Border,
+	MirrorOnce,
+	Count
+};
+
 enum class BlendState : int
 {
 	Disabled = 0,
@@ -100,4 +128,6 @@ struct RenderState
 	DepthStencilState depthStencilState = DepthStencilState::ReadWrite;
 	RasterizerState rasterizerState = RasterizerState::BackfaceCulling;
 	BlendState blendState = BlendState::Disabled;
+	SamplerFilter samplerFilter = SamplerFilter::Bilinear;
+	SamplerAddressMode samplerAddressMode = SamplerAddressMode::Wrap;
 };

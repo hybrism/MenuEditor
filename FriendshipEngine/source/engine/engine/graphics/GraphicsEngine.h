@@ -9,9 +9,10 @@
 #include "renderer/DeferredRenderer.h"
 #include "renderer/ForwardRenderer.h"
 #include "renderer/DebugRenderer.h"
-
+#include "renderer/SpriteRenderer.h"
 #include "RenderDefines.h"
 #include <array>
+#include "DxData.h"
 
 using Microsoft::WRL::ComPtr;
 struct ID3D11RenderTargetView;
@@ -30,15 +31,34 @@ struct ID3D11BlendState;
 struct Vertex;
 struct RenderTarget;
 class Camera;
-class TextService;
-class SpriteDrawer;
 class GBuffer;
 class DirectionalLightManager;
 
 class GraphicsEngine
 {
-	friend class Text;
-	friend class TextService;
+private:
+	struct GERenderers
+	{
+		ForwardRenderer forwardRenderer;
+		DeferredRenderer deferredRenderer;
+		DebugRenderer debugRenderer;
+		SpriteRenderer spriteRenderer;
+		MeshDrawer meshDrawer;
+
+		GERenderers() : debugRenderer(), spriteRenderer(), meshDrawer(), forwardRenderer(meshDrawer), deferredRenderer(meshDrawer)
+		{
+
+		}
+	};
+
+	struct GERenderStateCollection
+	{
+		std::array<ComPtr<ID3D11DepthStencilState>, static_cast<int>(DepthStencilState::Count)> myDepthStencilStates;
+		std::array<ComPtr<ID3D11RasterizerState>, static_cast<int>(RasterizerState::Count)> myRasterizerStates;
+		std::array<ComPtr<ID3D11BlendState>, (int)BlendState::Count> myBlendStates;
+		std::array<std::array<ComPtr<ID3D11SamplerState>, (int)SamplerAddressMode::Count>, (int)SamplerFilter::Count> mySamplerStates;
+	};
+	friend class Engine;
 public:
 	inline static GraphicsEngine* GetInstance() 
 	{ 
@@ -57,44 +77,28 @@ public:
 			myInstance = nullptr;
 		}
 	}
-
-	inline ID3D11DeviceContext* GetContext() { return myContext.Get(); }
 	inline ComPtr<ID3D11Buffer>& GetObjectBuffer() { return myObjectBuffer; }
-	inline ComPtr<ID3D11Buffer>& GetPointLightBuffer() { return myPointLightBuffer; }
-	inline ComPtr<ID3D11Device>& GetDevice() { return myDevice; }
 	inline ComPtr<ID3D11Buffer>& GetInputBuffer() { return myInputBuffer; }
 
 	~GraphicsEngine();
 	bool Initialize(int width, int height, HWND windowHandle);
 	void BeginFrame();
 	void EndFrame();
-	void SetClearColor(float r, float g, float b)
-	{
-		myClearColor.x = r;
-		myClearColor.y = g;
-		myClearColor.z = b;
-		myClearColor.w = 1.0f;
-	}
 
-	Vector4f GetClearColor() const { return myClearColor; }
-
-	const Vector2<int>& GetWindowDimensions() const { return myWindowDimensions; }
-	const Vector2<int>& GetViewportDimensions() const { return myViewportDimensions; }
-	const D3D11_VIEWPORT& GetViewPort() const { return *myViewport; }
 	ComPtr<ID3D11RenderTargetView>& GetBackBuffer();
 	ComPtr<ID3D11ShaderResourceView>& GetBackBufferSRV();
 	RenderTarget& GetBackBufferRenderTarget();
-	DepthBuffer& GetDepthBuffer() { return myDepthBuffer; }
-	bool SetResolution(const Vector2<int>& aResolution);
+	DepthBuffer& GetDepthBuffer() { return myDxData.GetDepthBuffer(); }
+	bool SetResolution(Vector2i aResolution);
 
 	Camera* GetCamera() { return myCurrentCamera; }
 	Camera* GetViewCamera() { return myViewCamera; }
 	Camera const* GetCamera() const { return myCurrentCamera; }
 	void ChangeCurrentCamera(Camera* aCamera);
 	void ResetToViewCamera();
+	void SetUseOfFreeCamera(const bool& aBool);
 
-	SpriteDrawer& GetSpriteDrawer() { return *mySpriteDrawer; }
-	MeshDrawer& GetMeshDrawer() { return myMeshDrawer; }
+	MeshDrawer& GetMeshDrawer() { return myRenderers.meshDrawer; }
 
 	GBuffer& GetGBuffer() { return myGBuffer; }
 
@@ -102,6 +106,7 @@ public:
 	void SetDepthStencilState(const DepthStencilState& aDepthStencilState);
 	void SetBlendState(const BlendState& aBlendState);
 	void SetRenderState(const RenderState& aRenderState);
+	void SetSamplerState(const SamplerFilter& aSamplerFilter, const SamplerAddressMode& aSamplerAddressMode);
 	RenderState GetRenderState() const { return myRenderState; }
 
 	void SetCubemap(const std::string& aCubemapLocation);
@@ -111,27 +116,41 @@ public:
 	void IncrementRenderMode();
 	void IncrementDrawCalls()
 	{
-#ifdef _DEBUG
 		myDrawCalls++;
-#endif
 	}
 	// TODO: Remove this, due to the current editor structure, it is updated before the game loop which in turn causes the draw calls to be updated after editor and reset at the start of the next frame
-
-#ifdef _DEBUG
 	void ResetDrawCalls() { myDrawCalls = 0; }
 	unsigned int GetDrawCalls() const { return myDrawCalls; }
-#endif
+
 	unsigned int GetRenderMode() const { return myRenderMode; }
 	DirectionalLightManager* GetDirectionalLightManager() { return myDirectionalLightManager; }
 
 	void SetRawBackBufferAsRenderTarget();
 	void SetRawBackBufferAsRenderTarget(DepthBuffer* aDepth);
-	ComPtr<ID3D11RenderTargetView> GetRawBackBufferRenderTarget() { return myBackBuffer; }
+	ComPtr<ID3D11RenderTargetView> GetRawBackBufferRenderTarget() { return myDxData.GetBackBuffer(); }
 
-	DeferredRenderer& GetDeferredRenderer() { return myDeferredRenderer; }
-	ForwardRenderer& GetForwardRenderer() { return myForwardRenderer; }
-	DebugRenderer& GetDebugRenderer() { return myDebugRenderer; }
+	DeferredRenderer& GetDeferredRenderer() { return myRenderers.deferredRenderer; }
+	ForwardRenderer& GetForwardRenderer() { return myRenderers.forwardRenderer; }
+	DebugRenderer& GetDebugRenderer() { return myRenderers.debugRenderer; }
+	SpriteRenderer& GetSpriteRenderer() { return myRenderers.spriteRenderer; }
 
+	DxData& DX() { return myDxData; }
+
+	void SetClearColor(const Vector3f& aColor)
+	{
+		myClearColor.x = aColor.x;
+		myClearColor.y = aColor.y;
+		myClearColor.z = aColor.z;
+	}
+	void SetClearColor(float aX, float aY, float aZ)
+	{
+		myClearColor.x = aX;
+		myClearColor.y = aY;
+		myClearColor.z = aZ;
+	}
+	Vector3f GetClearColor() const { return { myClearColor.x, myClearColor.y, myClearColor.z }; }
+
+	bool IsViewCameraInUse() const { return myIsUsingViewCamera; }
 private:
 	GraphicsEngine();
 
@@ -140,65 +159,36 @@ private:
 	bool CreateBlendStates();
 	bool CreateDepthStencilStates();
 	bool CreateRasterizerStates();
-	void CalculateBinormalTangent(Vertex* vertices, const size_t& vertexCount);
+	bool CreateSamplerStates();
 	void UpdateFrameBuffer();
+	
 
-	TextService& GetTextService() const { return *myTextService; }
-
-	std::array<ComPtr<ID3D11DepthStencilState>, static_cast<int>(DepthStencilState::Count)> myDepthStencilStates;
-	std::array<ComPtr<ID3D11RasterizerState>, static_cast<int>(RasterizerState::Count)> myRasterizerStates;
-	std::array<ComPtr<ID3D11BlendState>, (int)BlendState::Count> myBlendStates;
-
-
-	ComPtr<ID3D11Device> myDevice;
-	ComPtr<ID3D11DeviceContext> myContext;
-	ComPtr<IDXGISwapChain> mySwapChain;
 	ComPtr<ID3D11Buffer> myFrameBuffer;
 	ComPtr<ID3D11Buffer> myObjectBuffer;
-	ComPtr<ID3D11Buffer> myPointLightBuffer;
 	ComPtr<ID3D11Buffer> myCameraBuffer;
 	ComPtr<ID3D11Buffer> myInputBuffer;
-	ComPtr<ID3D11SamplerState> mySamplerState;
-	ComPtr<ID3D11SamplerState> my2dSamplerState; // TODO: use same sampler??? in 2d Mips LOD is not working
-	ComPtr<ID3D11SamplerState> myClampSamplerState;
+
 	ComPtr<ID3D11ShaderResourceView> myCubemap;
-	ComPtr<ID3D11RasterizerState> myFrontFaceCullingRasterizerState;
-	ComPtr<ID3D11RenderTargetView> myBackBuffer = nullptr;
 
-	D3D11_VIEWPORT* myViewport = nullptr;
 	GBuffer myGBuffer;
-	DepthBuffer myDepthBuffer;
-	ForwardRenderer myForwardRenderer;
-	DeferredRenderer myDeferredRenderer;
-	DebugRenderer myDebugRenderer;
+	GERenderers myRenderers;
+	GERenderStateCollection myRenderStates;
 
-	RenderTarget* myBackBufferRenderTarget;
-
-	ComPtr<ID3D11BlendState> myInactivatedBlendState;
-	ComPtr<ID3D11BlendState> myAdditiveBlendState;
-	ComPtr<ID3D11BlendState> myAlphaBlendState;
-	ID3D11DepthStencilState* myDepthStencilState;
-	ID3D11DepthStencilState* myAdditiveStencilState;
-
+	RenderTarget myBackBufferRenderTarget;
 
 	Camera* myViewCamera;
 	Camera* myCurrentCamera;
-	TextService* myTextService;
-	SpriteDrawer* mySpriteDrawer;
-	MeshDrawer myMeshDrawer;
+	
+	DxData myDxData;
+
 	DirectionalLightManager* myDirectionalLightManager;
 
-	Vector2i myWindowDimensions;
-	Vector2i myViewportDimensions;
 	Vector4f myClearColor;
 
-#ifdef _DEBUG
 	unsigned int myDrawCalls = 0;
-#endif
 	unsigned int myNumMips = 0;
 	static GraphicsEngine* myInstance;
 	RenderState myRenderState;
 	unsigned int myRenderMode = 0;
-
-	Vector2f myBackBufferTextureSize;
+	bool myIsUsingViewCamera = false;
 };

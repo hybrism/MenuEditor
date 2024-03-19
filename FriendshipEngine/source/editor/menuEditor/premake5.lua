@@ -1,6 +1,6 @@
 project "MenuEditor"
 	location (dirs.menuEditor)
-	dependson { "external", "engine", "application", "assets", "shared" }
+	dependson { "external", "engine", "application", "game", "assets", "shared" }
 	
 	kind "WindowedApp"
 	language "C++"
@@ -11,7 +11,7 @@ project "MenuEditor"
 	targetname("%{prj.name}_%{cfg.buildcfg}")
 	objdir ("%{dirs.temp}/%{prj.name}/%{cfg.buildcfg}")
 
-	links { "external", "engine", "application","assets", "shared" }
+	links { "external", "engine", "application", "game", "assets", "shared" }
 
 	includedirs
 	{
@@ -31,16 +31,21 @@ project "MenuEditor"
 
 	--verify_or_create_settings("Game")
 
-	filter "configurations:Debug"
-		defines {"_DEBUG"}
+	filter "configurations:Editor"
+		defines "_EDITOR"
 		runtime "Debug"
 		symbols "on"
 		libdirs { dirs.dependencies_debug }	
+	filter "configurations:LauncherDebug"
+		defines "_LAUNCHER"
+		runtime "Debug"
+		symbols "on"
+		libdirs { dirs.dependencies_debug }
 	filter "configurations:Release"
 		defines "_RELEASE"
 		runtime "Release"
 		optimize "on"
-		libdirs { dirs.dependencies_release }	
+		libdirs { dirs.dependencies_release }
 	filter "system:windows"
 --		kind "StaticLib"
 		staticruntime "off"

@@ -22,7 +22,7 @@
 
 #include "../graphics/sprite/Sprite.h"
 #include "../text/TextService.h"
-#include "../text/textfile.h"
+#include "../text/TextFile.h"
 #include <sstream>
 
 #define X_OFFSET 8
@@ -568,19 +568,21 @@ Font TextService::GetOrLoad(std::wstring aFontFile, unsigned char aBorderSize, i
 	info.CPUAccessFlags = 0;
 
 	auto graphicsEngine = GraphicsEngine::GetInstance();
+	auto* context = graphicsEngine->DX().GetContext();
+	auto& device = graphicsEngine->DX().GetDevice();
 
 	ID3D11Texture2D* texture;
-	HRESULT hr = graphicsEngine->GetDevice()->CreateTexture2D(&info, nullptr, &texture);
+	HRESULT hr = device->CreateTexture2D(&info, nullptr, &texture);
 	if (FAILED(hr))
 	{
 		PrintE("[TextService.cpp] Failed to load texture for text!");
 		return { nullptr };
 	}
 
-	graphicsEngine->GetContext()->UpdateSubresource(texture, 0, NULL, fontData->myAtlas.data(), atlasSize * 4, 0);
+	context->UpdateSubresource(texture, 0, NULL, fontData->myAtlas.data(), atlasSize * 4, 0);
 
-	graphicsEngine->GetDevice()->CreateShaderResourceView(texture, nullptr, fontData->myAtlasView.ReleaseAndGetAddressOf());
-	graphicsEngine->GetContext()->GenerateMips(fontData->myAtlasView.Get());
+	device->CreateShaderResourceView(texture, nullptr, fontData->myAtlasView.ReleaseAndGetAddressOf());
+	context->GenerateMips(fontData->myAtlasView.Get());
 	texture->Release();
 
 	fontData->myAtlasHeight = atlasSize;
@@ -715,7 +717,7 @@ bool TextService::Draw(Text& aText, SpriteShader* aCustomShader)
 
 	{
 		//SpriteBatchScope batchScope = Engine::GetInstance()->GetGraphicsEngine().GetSpriteDrawer().BeginBatch(spriteSharedData);
-		SpriteBatchScope batchScope = GraphicsEngine::GetInstance()->GetSpriteDrawer().BeginBatch(spriteSharedData);
+		SpriteBatchScope batchScope = GraphicsEngine::GetInstance()->GetSpriteRenderer().BeginBatch(spriteSharedData);
 
 		float drawX = 0.f;
 		float drawY = 0.f;

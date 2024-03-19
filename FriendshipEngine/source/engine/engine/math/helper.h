@@ -44,6 +44,16 @@ public:
 		return (value > 0) - (value < 0);
 	}
 
+	static char Signc(float value)
+	{
+		return static_cast<char>(value > 0) - static_cast<char>(value < 0);
+	}
+
+	static float Signf(float value)
+	{
+		return static_cast<float>((value > 0) - (value < 0));
+	}
+
 	static float Lerp(float a, float b, float t)
 	{
 		return a + t * (b - a);

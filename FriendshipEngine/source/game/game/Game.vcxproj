@@ -1,8 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Editor|x64">
+      <Configuration>Editor</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="LauncherDebug|x64">
+      <Configuration>LauncherDebug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
@@ -18,7 +22,13 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LauncherDebug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
@@ -33,17 +43,26 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='LauncherDebug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\..\bin\Debug\</OutDir>
-    <IntDir>..\..\..\intermediate\Game\Debug\</IntDir>
-    <TargetName>Game_Debug</TargetName>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
+    <OutDir>..\..\..\bin\Editor\</OutDir>
+    <IntDir>..\..\..\intermediate\Game\Editor\</IntDir>
+    <TargetName>Game_Editor</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LauncherDebug|x64'">
+    <OutDir>..\..\..\bin\LauncherDebug\</OutDir>
+    <IntDir>..\..\..\intermediate\Game\LauncherDebug\</IntDir>
+    <TargetName>Game_LauncherDebug</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -52,13 +71,39 @@
     <TargetName>Game_Release</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_EDITOR;WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\..\external;..\..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>PhysX_64.lib;PhysXCommon_64.lib;PhysXFoundation_64.lib;PVDRuntime_64.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXCooking_64.lib;PhysXCharacterKinematic_static_64.lib;fmod_vc.lib;fmodstudio_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\dependencies\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='LauncherDebug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PreprocessorDefinitions>_LAUNCHER;WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;..\..\external;..\..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -121,6 +166,7 @@
     <ClInclude Include="component\CameraComponent.h" />
     <ClInclude Include="component\ColliderComponent.h" />
     <ClInclude Include="component\CollisionDataComponent.h" />
+    <ClInclude Include="component\DeathZoneComponent.h" />
     <ClInclude Include="component\EnemyComponent.h" />
     <ClInclude Include="component\EventComponent.h" />
     <ClInclude Include="component\HitboxComponent.h" />
@@ -133,23 +179,28 @@
     <ClInclude Include="component\ProjectileComponent.h" />
     <ClInclude Include="component\ScriptableEventComponent.h" />
     <ClInclude Include="component\TransformComponent.h" />
-    <ClInclude Include="factory\EventFactory.h" />
     <ClInclude Include="factory\ProjectileFactory.h" />
+    <ClInclude Include="gui\IDManager.h" />
     <ClInclude Include="gui\MenuHandler.h" />
     <ClInclude Include="gui\MenuObject.h" />
+    <ClInclude Include="gui\MenuUpdateContext.h" />
     <ClInclude Include="gui\ObjectManager.h" />
     <ClInclude Include="gui\components\Collider2DComponent.h" />
+    <ClInclude Include="gui\components\CommandComponent.h" />
+    <ClInclude Include="gui\components\ComponentTypeEnum.h" />
     <ClInclude Include="gui\components\MenuComponent.h" />
     <ClInclude Include="gui\components\SpriteComponent.h" />
     <ClInclude Include="gui\components\TextComponent.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="physics\PhysXControllerReportCallbackWrapper.h" />
     <ClInclude Include="physics\PhysXSceneManager.h" />
-    <ClInclude Include="playerStates\PlayerAirbourneState.h" />
+    <ClInclude Include="playerStates\PlayerAirborneState.h" />
+    <ClInclude Include="playerStates\PlayerConstants.h" />
     <ClInclude Include="playerStates\PlayerCrouchState.h" />
     <ClInclude Include="playerStates\PlayerGroundState.h" />
     <ClInclude Include="playerStates\PlayerSlideState.h" />
     <ClInclude Include="playerStates\PlayerState.h" />
+    <ClInclude Include="playerStates\PlayerStateMachine.h" />
     <ClInclude Include="playerStates\PlayerStatesInclude.h" />
     <ClInclude Include="playerStates\PlayerVaultState.h" />
     <ClInclude Include="playerStates\PlayerWallrunState.h" />
@@ -174,6 +225,7 @@
     <ClInclude Include="systems\AnimatorSystem.h" />
     <ClInclude Include="systems\CameraSystem.h" />
     <ClInclude Include="systems\CollisionSystem.h" />
+    <ClInclude Include="systems\DeathZoneSystem.h" />
     <ClInclude Include="systems\EnemySystem.h" />
     <ClInclude Include="systems\EventSystem.h" />
     <ClInclude Include="systems\HitboxSystem.h" />
@@ -183,7 +235,6 @@
     <ClInclude Include="systems\PlayerSystem.h" />
     <ClInclude Include="systems\ProjectileSystem.h" />
     <ClInclude Include="systems\RenderingSystem.h" />
-    <ClInclude Include="systems\ScriptableEventSystem.h" />
     <ClInclude Include="utility\Events.h" />
     <ClInclude Include="utility\GameHelperFunctions.h" />
     <ClInclude Include="utility\JsonUtility.h" />
@@ -196,21 +247,25 @@
     <ClCompile Include="audio\AudioManager.cpp" />
     <ClCompile Include="audio\FMODImplementation.cpp" />
     <ClCompile Include="collision\Bitmask.cpp" />
-    <ClCompile Include="factory\EventFactory.cpp" />
     <ClCompile Include="factory\ProjectileFactory.cpp" />
+    <ClCompile Include="gui\IDManager.cpp" />
     <ClCompile Include="gui\MenuHandler.cpp" />
     <ClCompile Include="gui\MenuObject.cpp" />
     <ClCompile Include="gui\ObjectManager.cpp" />
+    <ClCompile Include="gui\components\Collider2DComponent.cpp" />
+    <ClCompile Include="gui\components\CommandComponent.cpp" />
     <ClCompile Include="gui\components\SpriteComponent.cpp" />
     <ClCompile Include="gui\components\TextComponent.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="physics\PhysXSceneManager.cpp" />
-    <ClCompile Include="playerStates\PlayerAirbourneState.cpp" />
+    <ClCompile Include="playerStates\PlayerAirborneState.cpp" />
+    <ClCompile Include="playerStates\PlayerConstants.cpp" />
     <ClCompile Include="playerStates\PlayerCrouchState.cpp" />
     <ClCompile Include="playerStates\PlayerGroundState.cpp" />
     <ClCompile Include="playerStates\PlayerSlideState.cpp" />
+    <ClCompile Include="playerStates\PlayerStateMachine.cpp" />
     <ClCompile Include="playerStates\PlayerVaultState.cpp" />
     <ClCompile Include="playerStates\PlayerWallrunState.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
@@ -224,12 +279,16 @@
     <ClCompile Include="scripting\ScriptManager.cpp" />
     <ClCompile Include="scripting\ScriptRuntimeInstance.cpp" />
     <ClCompile Include="scripting\ScriptStringRegistry.cpp" />
+    <ClCompile Include="scripting\nodes\CollisionNodes.cpp" />
     <ClCompile Include="scripting\nodes\CommonNodes.cpp" />
-    <ClCompile Include="scripting\nodes\ExampleNodes.cpp" />
+    <ClCompile Include="scripting\nodes\DebugNodes.cpp" />
+    <ClCompile Include="scripting\nodes\EntityNodes.cpp" />
+    <ClCompile Include="scripting\nodes\MathNodes.cpp" />
     <ClCompile Include="scripting\nodes\ScriptNodeTypeRegistry.cpp" />
     <ClCompile Include="systems\AnimatorSystem.cpp" />
     <ClCompile Include="systems\CameraSystem.cpp" />
     <ClCompile Include="systems\CollisionSystem.cpp" />
+    <ClCompile Include="systems\DeathZoneSystem.cpp" />
     <ClCompile Include="systems\EnemySystem.cpp" />
     <ClCompile Include="systems\EventSystem.cpp" />
     <ClCompile Include="systems\HitboxSystem.cpp" />
@@ -239,7 +298,7 @@
     <ClCompile Include="systems\PlayerSystem.cpp" />
     <ClCompile Include="systems\ProjectileSystem.cpp" />
     <ClCompile Include="systems\RenderingSystem.cpp" />
-    <ClCompile Include="systems\ScriptableEventSystem.cpp" />
+    <ClCompile Include="utility\GameHelperFunctions.cpp" />
     <ClCompile Include="utility\JsonUtility.cpp" />
     <ClCompile Include="utility\StateMachine.cpp" />
   </ItemGroup>

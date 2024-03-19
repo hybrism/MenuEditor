@@ -4,6 +4,8 @@
 #include "../../../engine/math/Vector3.h"
 #include "../../../engine/math/Vector4.h"
 #include "../../../engine/math/VectorFwd.h"
+#include "../../../engine/math/Transform.h"
+
 #include <engine\graphics\DepthBuffer.h>
 
 class DepthBuffer;
@@ -41,7 +43,10 @@ struct DirectionalLight
 
 	Vector3f myColor;
 	Vector3f myDirection;
-	float myIntensity = -1.f;;
+	float myIntensity = -1.f;
+	float myAmbientIntensity = 0.75f;
+	Transform myTransform;
+	Vector3<float> myEuler;
 
 	DepthBuffer myShadowMapDepthBuffer;
 	Camera* myDirectionalLightCamera = nullptr;

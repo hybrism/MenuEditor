@@ -16,7 +16,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR,
 {
 	nCmdShow;
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 	//Properties -> Preprocessor -> Preprocessor Definitions -> _CRT_SECURE_NO_WARNINGS
 #if SHOW_CONSOLE_WINDOW
 	AllocConsole(); // Create a new console window

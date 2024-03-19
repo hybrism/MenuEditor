@@ -34,7 +34,7 @@ PhysXSceneManager::PhysXSceneManager() :
 
 	assert(myFoundation != nullptr && "Failed to create PxFoundation!");
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 #ifdef USE_VISUAL_DEBUGGER
 	// Visual Debugger
 	myPvd = PxCreatePvd(*myFoundation);
@@ -73,7 +73,7 @@ void PhysXSceneManager::Init()
 
 	myControllerManager = PxCreateControllerManager(*myScene);
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 #ifdef USE_VISUAL_DEBUGGER
 	// Visual Debugger
 	PxPvdSceneClient* pvdClient = myScene->getScenePvdClient();
@@ -108,7 +108,7 @@ void PhysXSceneManager::Update(float dt)
 
 
 //	//Debug
-//#ifdef _DEBUG
+//#ifndef _RELEASE
 //	const PxRenderBuffer& rb = myScene->getRenderBuffer();
 //	for (PxU32 i = 0; i < rb.getNbLines(); i++)
 //	{
@@ -160,14 +160,13 @@ physx::PxController* PhysXSceneManager::CreateCharacterController(Transform& aTr
 	desc.reportCallback = aHitReport;
 	desc.scaleCoeff = 1.0f;
 	desc.slopeLimit = cos(30.0f * Deg2Rad);
-	//desc.stepOffset = STEP_OFFSET;
-	desc.stepOffset = 0;
+	desc.stepOffset = STEP_OFFSET;
 	desc.upDirection = physx::PxVec3(0.0f, 1.0f, 0.0f);
 	desc.userData = nullptr;
 	desc.volumeGrowth = 1.5f;
 
 	myController = myControllerManager->createController(desc);
-
+	myController->getActor();
 
 
 

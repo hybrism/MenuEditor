@@ -17,7 +17,7 @@ void ProjectileSystem::Init()
 
 }
 
-void ProjectileSystem::Update(const float& dt)
+void ProjectileSystem::Update(const SceneUpdateContext& dt)
 {
 	for (Entity entity : myEntities)
 	{

@@ -1,17 +1,33 @@
 #include "pch.h"
 #include "PlayerVaultState.h"
+#include "PlayerStateMachine.h"
+#include "../component/PlayerComponent.h"
+#include <physics/PhysXSceneManager.h>
 
-void PlayerVaultState::OnEnter()
+PlayerVaultState::PlayerVaultState(PlayerStateMachine* aStateMachine) : PlayerState(aStateMachine)
 {
-	Error::DebugPrintString("Vault Enter");
 }
 
-void PlayerVaultState::OnExit()
+void PlayerVaultState::OnEnter(PlayerStateUpdateContext& aContext)
 {
-	Error::DebugPrintString("Vault Exit");
+	PlayerComponent& p = aContext.playerComponent;
+	p.currentCameraHeight = PlayerConstants::cameraHeight;
+	p.controller->resize(CHARACTER_HEIGHT);
 }
 
-void PlayerVaultState::Update(const float& dt)
+void PlayerVaultState::OnExit(PlayerStateUpdateContext&)
 {
-	dt;
+}
+
+void PlayerVaultState::Update(PlayerStateUpdateContext& aContext)
+{
+	PlayerComponent& p = aContext.playerComponent;
+
+	p.controller->setFootPosition({ p.vaultLocation.x, p.vaultLocation.y, p.vaultLocation.z });
+	p.yVelocity = 0;
+
+	// Kan vi lägga till leap glitch :3c
+	p.finalVelocity = { p.xVelocity.x, p.yVelocity, p.xVelocity.y };
+
+	myStateMachine->SetState(ePlayerClassStates::Ground, aContext);
 }

@@ -1,18 +1,20 @@
 #pragma once
-#include "gui/MenuHandler.h"
-#include "gui/IDManager.h"
+
+#include <game/gui/IDManager.h>
+#include <game/gui/MenuHandler.h>
 
 #include "MenuEditorCommon.h"
 #include "windows/Window.h"
+
+#include <string>
 #include <array>
 #include <map>
 #include <engine/math/Vector.h>
 #include <shared/postMaster/Observer.h>
 
 class Game;
-class Texture;
 
-namespace MENU
+namespace MENU 
 {
 	const std::string MENU_PATH = "menus/";
 
@@ -35,7 +37,6 @@ namespace MENU
 
 	private:
 		void GizmoUpdate();
-
 		void GenerateEditorColliders();
 
 		std::map<unsigned int, unsigned int> myEditorIDToMenuIDMap;

@@ -77,8 +77,7 @@ void ScriptManager::SaveLevelScript(const std::string& aActiveLevel, const std::
 {
 	std::string path = RELATIVE_IMPORT_DATA_PATH + (std::string)"scripts/Scripts.json";
 	nlohmann::json scriptFile = JsonUtility::OpenJson(path);
-	//nlohmann::json jsonLevels = scriptFile["levels"];
-	nlohmann::json jsonLevels;
+	nlohmann::json jsonLevels = scriptFile["levels"];
 
 	std::string activeLevel(aActiveLevel);
 	std::string activeScript(aActiveScript);

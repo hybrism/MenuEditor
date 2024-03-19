@@ -1,8 +1,10 @@
 #include "pch.h"
-#include "../text/fontfile.h"
-#include "../text/textfile.h"
+
+#include "../text/FontFile.h"
+#include "../text/TextFile.h"
 #include "../text/Parser.h"
 #include "../engine.h"
+
 #include <sstream>
 
 

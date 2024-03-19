@@ -15,14 +15,14 @@ HitboxSystem::HitboxSystem(World* aWorld) : System(aWorld)
 
 }
 
-void HitboxSystem::Update(const float& dt)
+void HitboxSystem::Update(const SceneUpdateContext& aContext)
 {
 	for (Entity entity : myEntities)
 	{
 		auto& hitBoxComponent = myWorld->GetComponent<HitboxComponent>(entity);
 		auto& collisionDataComponent = myWorld->GetComponent<CollisionDataComponent>(entity);
 		collisionDataComponent;
-		hitBoxComponent.timer += dt;
+		hitBoxComponent.timer += aContext.dt;
 		//std::string stringTimer = std::to_string(hitBoxComponent.timer);
 		//When the timer goes over the duration or the hitbox is colliding destory it
 		if (hitBoxComponent.shouldDestroyOnCollide)

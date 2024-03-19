@@ -51,7 +51,7 @@ void Launcher::Render()
 void Launcher::RenderBackbuffer()
 {
 	auto* ge = GraphicsEngine::GetInstance();
-	auto* context = ge->GetContext();
+	auto* context = ge->DX().GetContext();
 
 	context->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
 	context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
@@ -72,7 +72,7 @@ void Launcher::RenderBackbuffer()
 	ID3D11ShaderResourceView* nullSRV = nullptr;
 	context->PSSetShaderResources(0, 1, &nullSRV);
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 	ge->IncrementDrawCalls();
 #endif
 }

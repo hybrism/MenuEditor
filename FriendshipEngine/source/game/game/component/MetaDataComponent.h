@@ -1,5 +1,5 @@
 #pragma once
-#ifdef _DEBUG
+#ifndef _RELEASE
 #include <ecs/component/Component.h>
 #include <string>
 

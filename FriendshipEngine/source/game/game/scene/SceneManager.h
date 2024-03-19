@@ -10,6 +10,11 @@
 
 #include "SceneCommon.h"
 
+namespace MENU
+{
+	class MenuHandler;
+}
+
 class Scene;
 
 struct SceneParameter
@@ -25,28 +30,40 @@ public:
 	~SceneManager();
 
 	void Init();
-	bool Update(float dt);
+	bool Update(const SceneUpdateContext& dt);
 	void LateUpdate();
 	void Render();
 
-	void LoadScene(const SceneParameter& aScene);
+	void SetIsPaused(bool aIsPaused);
+	void TogglePaused();
 
+	void LoadScene(const SceneParameter& aScene);
+	void PopScene();
+	void ReloadCurrentScene();
+
+	bool GetIsPaused() const;
 	World* GetCurrentWorld();
 	Scene* GetCurrentScene();
 	eLevel GetCurrentLevel();
+	std::string GetCurrentSceneName();
 
 private:
 	UnityImporter myUnityImporter;
 	PhysXSceneManager myPhysXManager;
-	ScriptManager myScriptManager;
 
 	std::stack<Scene*> mySceneStack;
 
 	std::array<Scene*, (int)eSceneType::Count> myScenes;
 	std::array<std::string, (int)eLevel::Count> myGameLevels;
-	
-	SceneParameter mySceneToLoad;
 
-	void LoadSceneInternal(const SceneParameter& aScene);
+	SceneParameter mySceneToLoad;
+	SceneParameter myCurrentScene;
+
+	ScriptManager myScriptManager;
+	bool myIsPaused;
+
+	MENU::MenuHandler* myLoadingScreen;
+
+	bool LoadSceneInternal(const SceneParameter& aScene);
 	void LoadLevelInternal(const std::string& aSceneName);
 };

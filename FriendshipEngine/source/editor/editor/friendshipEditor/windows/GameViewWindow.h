@@ -18,5 +18,13 @@ namespace FE
 		void Show(const EditorUpdateContext& aContext) override;
 
 	private:
+
+		int myFPS = 0;
+		float myFPSTimer = 0.f;
+		float myFPSUpdateFrequency = 1.f;
+		bool myShouldPauseFirstFrame = false;
+
+		const char* myGameStates[2] = { "Paused", "Play" };
 	};
+
 }

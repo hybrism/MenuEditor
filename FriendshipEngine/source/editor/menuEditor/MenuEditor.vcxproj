@@ -1,8 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Editor|x64">
+      <Configuration>Editor</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="LauncherDebug|x64">
+      <Configuration>LauncherDebug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
@@ -18,7 +22,13 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LauncherDebug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
@@ -33,18 +43,28 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='LauncherDebug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\..\bin\Debug\</OutDir>
-    <IntDir>..\..\..\intermediate\MenuEditor\Debug\</IntDir>
-    <TargetName>MenuEditor_Debug</TargetName>
+    <OutDir>..\..\..\bin\Editor\</OutDir>
+    <IntDir>..\..\..\intermediate\MenuEditor\Editor\</IntDir>
+    <TargetName>MenuEditor_Editor</TargetName>
+    <TargetExt>.exe</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LauncherDebug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\..\..\bin\LauncherDebug\</OutDir>
+    <IntDir>..\..\..\intermediate\MenuEditor\LauncherDebug\</IntDir>
+    <TargetName>MenuEditor_LauncherDebug</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -54,12 +74,34 @@
     <TargetName>MenuEditor_Release</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_EDITOR;WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\external;..\..\external\imgui;..\..\engine;..;..\..\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\..\..\dependencies\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='LauncherDebug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PreprocessorDefinitions>_LAUNCHER;WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\external;..\..\external\imgui;..\..\engine;..;..\..\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -108,39 +150,20 @@
     <ClInclude Include="MenuEditorCommon.h" />
     <ClInclude Include="MenuEditorLauncher.h" />
     <ClInclude Include="UpdateContext.h" />
-    <ClInclude Include="gui\IDManager.h" />
-    <ClInclude Include="gui\MenuHandler.h" />
-    <ClInclude Include="gui\MenuObject.h" />
-    <ClInclude Include="gui\MenuUpdateContext.h" />
-    <ClInclude Include="gui\ObjectManager.h" />
-    <ClInclude Include="gui\components\Collider2DComponent.h" />
-    <ClInclude Include="gui\components\CommandComponent.h" />
-    <ClInclude Include="gui\components\ComponentTypeEnum.h" />
-    <ClInclude Include="gui\components\MenuComponent.h" />
-    <ClInclude Include="gui\components\SpriteComponent.h" />
-    <ClInclude Include="gui\components\TextComponent.h" />
     <ClInclude Include="windows\AssetsWindow.h" />
     <ClInclude Include="windows\ConsoleWindow.h" />
     <ClInclude Include="windows\InspectorWindow.h" />
-    <ClInclude Include="windows\MenuObjectHierarchy.h" />
+    <ClInclude Include="windows\ObjectHierarchyWindow.h" />
     <ClInclude Include="windows\MenuViewWindow.h" />
     <ClInclude Include="windows\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MenuEditor.cpp" />
     <ClCompile Include="MenuEditorLauncher.cpp" />
-    <ClCompile Include="gui\IDManager.cpp" />
-    <ClCompile Include="gui\MenuHandler.cpp" />
-    <ClCompile Include="gui\MenuObject.cpp" />
-    <ClCompile Include="gui\ObjectManager.cpp" />
-    <ClCompile Include="gui\components\Collider2DComponent.cpp" />
-    <ClCompile Include="gui\components\CommandComponent.cpp" />
-    <ClCompile Include="gui\components\SpriteComponent.cpp" />
-    <ClCompile Include="gui\components\TextComponent.cpp" />
     <ClCompile Include="windows\AssetsWindow.cpp" />
     <ClCompile Include="windows\ConsoleWindow.cpp" />
     <ClCompile Include="windows\InspectorWindow.cpp" />
-    <ClCompile Include="windows\MenuObjectHierarchy.cpp" />
+    <ClCompile Include="windows\ObjectHierarchyWindow.cpp" />
     <ClCompile Include="windows\MenuViewWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +175,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\engine\application\Application.vcxproj">
       <Project>{D9DE78AF-4594-F1A4-CE88-EB7B3A3DE8A8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\game\game\Game.vcxproj">
+      <Project>{7FA9857C-6BE0-860D-14CD-6C1000E3020F}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\engine\assets\Assets.vcxproj">
       <Project>{3824E0A7-24C6-0A7E-0D81-1ED2F9C191CE}</Project>

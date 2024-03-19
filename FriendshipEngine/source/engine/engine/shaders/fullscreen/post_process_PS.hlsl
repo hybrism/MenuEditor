@@ -2,19 +2,7 @@
 
 cbuffer PostProcessBufferData : register(b5)
 {
-    int downScaleLevel;
-    float alphaBlendLevel;
-    float saturation;
-    float exposure;
-    
-    float3 contrast;
-    float trash1;
-    
-    float3 tint;
-    float trash2;
-    
-    float3 blackPoint;
-    float trash3;
+    PostProcessData postProcessData;
 };
 
 Texture2D postProcessTexture : register(t11);
@@ -23,7 +11,7 @@ float4 main(FullscreenVertexOutput input) : SV_Target
 {
     float4 result = 0;
     
-    float2 scaledUv = input.uv * ((downScaleLevel / 100) + 1);
+    float2 scaledUv = input.uv * ((postProcessData.downScaleLevel / 100) + 1);
     float2 pixelOffset = float2(ddx(scaledUv.x), ddy(scaledUv.y));
     
     float3 p00 = postProcessTexture.Sample(aClampingSampler, input.uv + pixelOffset * float2(-0.5f, -0.5f)).rgb;
@@ -36,22 +24,22 @@ float4 main(FullscreenVertexOutput input) : SV_Target
     
     //SATURATION
     float luminance = dot(float3(0.2126, 0.7152, 0.0722), color);
-    color = luminance + saturation * (color - luminance);
+    color = luminance + postProcessData.saturation * (color - luminance);
     
     //EXPOSURE
-    color = exp2(exposure) * color;
+    color = exp2(postProcessData.exposure) * color;
      
     //CONTRAST
-    color = 0.18f * pow(color / 0.18f, contrast);
+    color = 0.18f * pow(color / 0.18f, postProcessData.contrast);
     
     //TINT
-    color = color * tint;
+    color = color * postProcessData.tint;
     
     //BLACKPOINT
-    color = max(0.0f, color - blackPoint);
+    color = max(0.0f, color - postProcessData.blackPoint);
     
     result.rgb = color.rgb;
-    result.a = alphaBlendLevel;
+    result.a = postProcessData.alphaBlendLevel;
     
     return result;
 }

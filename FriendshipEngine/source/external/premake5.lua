@@ -39,15 +39,18 @@ project "External"
 		"imgui/",
 		"fbxsdk/",
 		"PhysX/",
-		"directxtk/"
+		"directxtk/",
+		"directxtex/",
 	}
 
-	filter "configurations:Debug"
-		defines {"_DEBUG"}
+	filter "configurations:Editor"
+		defines "_EDITOR"
 		runtime "Debug"
 		symbols "on"
-		--files {"tools/**"}
-		--includedirs {"tools/"}
+	filter "configurations:LauncherDebug"
+		defines "_LAUNCHER"
+		runtime "Debug"
+		symbols "on"
 	filter "configurations:Release"
 		defines "_RELEASE"
 		runtime "Release"

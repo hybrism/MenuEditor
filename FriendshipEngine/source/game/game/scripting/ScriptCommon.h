@@ -1,9 +1,9 @@
 #pragma once
 
 #include <variant>
-#include <engine/math/Vector.h>
 #include <string>
 #include <ecs/entity/Entity.h>
+#include <engine/math/Vector.h>
 
 class NodeEntity;
 class ScriptRuntimeInstance;
@@ -37,6 +37,7 @@ enum class ScriptLinkDataType
 	Float,
 	String,
 	Entity,
+	Vector3f,
 	Count
 };
 
@@ -48,12 +49,13 @@ constexpr char* ScriptLinkDataTypeNames[(size_t)ScriptLinkDataType::Count] =
 	"Int",
 	"Float",
 	"String",
-	"Entity"
+	"Entity",
+	"Vector3f"
 };
 
 struct ScriptLinkData
 {
-	std::variant<std::monostate, bool, int, float, ScriptStringId, Entity> data;
+	std::variant<std::monostate, bool, int, float, ScriptStringId, Entity, Vector3f> data;
 
 	void LoadFromJson(ScriptLinkDataType type, const ScriptJson& json);
 	void WriteToJson(ScriptLinkDataType type, ScriptJson& data) const;

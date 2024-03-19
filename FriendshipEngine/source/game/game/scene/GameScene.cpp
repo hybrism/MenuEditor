@@ -3,12 +3,16 @@
 
 #include <ecs/World.h>
 #include <engine/utility/InputManager.h>
+#include <engine/Engine.h>
 #include <nlohmann/json.hpp>
 
 #include "../utility/JsonUtility.h"
 #include "../scripting/ScriptManager.h"
 #include "../scripting/ScriptRuntimeInstance.h"
 #include "../scripting/ScriptUpdateContext.h"
+
+#include "../gui/MenuUpdateContext.h"
+#include "SceneManager.h"
 
 #pragma region Systems and Components Includes
 //Systems
@@ -22,9 +26,11 @@
 #include "../systems/AnimatorSystem.h"
 #include "../systems/ProjectileSystem.h"
 #include "../systems/EventSystem.h"
-#include "../systems/ScriptableEventSystem.h"
+//#include "../systems/ScriptableEventSystem.h"
 #include "../systems/PhysXSystem.h"
 #include "../systems/OrbSystem.h"
+#include "../systems/DeathZoneSystem.h"
+
 #include "../systems/NpcSystem.h"
 
 //Components
@@ -37,6 +43,8 @@
 #include "../component/MeshComponent.h"
 #include "../component/AnimationDataComponent.h"
 #include "../component/MetaDataComponent.h"
+#include "../component/DeathZoneComponent.h"
+
 #include "../component/EventComponent.h"
 #include "../component/ScriptableEventComponent.h"
 #include "../component/EnemyComponent.h"
@@ -48,7 +56,8 @@
 
 #pragma endregion
 
-GameScene::GameScene()
+GameScene::GameScene(SceneManager* aSceneManager)
+	: Scene(aSceneManager)
 {
 	myType = eSceneType::Game;
 	myWorld = new World();
@@ -57,25 +66,54 @@ GameScene::GameScene()
 void GameScene::Init(PhysXSceneManager& aPhysXManager)
 {
 	myWorld->Init();
-
+	myMenuHandler.Init("pauseMenu.json", mySceneManager);
 	InitComponents();
 	InitSystems(aPhysXManager);
 }
 
-bool GameScene::Update(float dt)
+bool GameScene::Update(const SceneUpdateContext& aContext)
 {
-	myWorld->Update(dt);
-
-	for (size_t i = 0; i < myScripts.size(); i++)
-	{
-		myScripts[i]->Update({ dt });
-	}
+	assert(mySceneManager && "SceneManager is nullptr!");
 
 	auto* im = InputManager::GetInstance();
+
+	if (!mySceneManager->GetIsPaused())
+	{
+		myWorld->Update(aContext);
+
+		for (size_t i = 0; i < myScripts.size(); i++)
+		{
+			myScripts[i]->Update({ aContext.dt, myWorld });
+		}
+	}
+	else
+	{
+#ifndef _EDITOR
+		auto renderSize = GraphicsEngine::GetInstance()->GetViewportDimensions();
+		Vector2i mousePos = im->GetTentativeMousePosition();
+
+		MENU::MenuUpdateContext context;
+		context.renderSize = renderSize;
+		context.mousePosition = { (float)mousePos.x, (float)mousePos.y };
+		context.mousePressed = im->IsLeftMouseButtonDown();
+		myMenuHandler.Update(context);
+#endif // !_EDITOR
+	}
+
+
+#ifdef _DEBUG
 	if (im->IsKeyHeld(VK_SHIFT) && im->IsKeyPressed(VK_ESCAPE))
 	{
 		return false;
 	}
+#endif // _DEBUG
+
+#ifndef _EDITOR
+	if (im->IsKeyPressed(VK_ESCAPE))
+	{
+		mySceneManager->TogglePaused();
+	}
+#endif // !_EDITOR
 
 	return true;
 }
@@ -83,28 +121,40 @@ bool GameScene::Update(float dt)
 void GameScene::Render()
 {
 	myWorld->Render();
+
+#ifndef _EDITOR
+	if (mySceneManager->GetIsPaused())
+		myMenuHandler.Render();
+#endif // !_EDITOR
+}
+
+void GameScene::OnEnter()
+{
+	mySceneManager->SetIsPaused(false);
 }
 
 void GameScene::InitComponents()
 {
 	myWorld->RegisterComponent<TransformComponent>();
 	myWorld->RegisterComponent<MeshComponent>();
-	myWorld->RegisterComponent<PlayerComponent, 1>();
+	myWorld->RegisterComponent<PlayerComponent>(1);
 	myWorld->RegisterComponent<ColliderComponent>();
 	myWorld->RegisterComponent<CollisionDataComponent>();
 	myWorld->RegisterComponent<MeshComponent>();
-	myWorld->RegisterComponent<EnemyComponent, 32>();
-	myWorld->RegisterComponent<HitboxComponent, 64>();
-	myWorld->RegisterComponent<CameraComponent, 8>();
-	myWorld->RegisterComponent<AnimationDataComponent, 64>();
-	myWorld->RegisterComponent<PhysXComponent, 128>();
-	myWorld->RegisterComponent<OrbComponent, 1>();
-	myWorld->RegisterComponent<ProjectileComponent, 32>();
-	myWorld->RegisterComponent<NpcComponent, 32>();
-	myWorld->RegisterComponent<EventComponent>();
-	myWorld->RegisterComponent<ScriptableEventComponent, 64>();
+	myWorld->RegisterComponent<EnemyComponent>(32);
+	myWorld->RegisterComponent<HitboxComponent>(64);
+	myWorld->RegisterComponent<CameraComponent>(8);
+	myWorld->RegisterComponent<AnimationDataComponent>(64);
+	myWorld->RegisterComponent<PhysXComponent>(128);
+	myWorld->RegisterComponent<OrbComponent>(1);
+	myWorld->RegisterComponent<DeathZoneComponent>();
 
-#ifdef _DEBUG
+	myWorld->RegisterComponent<ProjectileComponent>(32);
+	myWorld->RegisterComponent<NpcComponent>(32);
+	myWorld->RegisterComponent<EventComponent>(64);
+	myWorld->RegisterComponent<ScriptableEventComponent>(64);
+
+#ifndef _RELEASE
 	myWorld->RegisterComponent<MetaDataComponent>();
 #endif
 }
@@ -124,7 +174,7 @@ void GameScene::InitSystems(PhysXSceneManager& aPhysXManager)
 	myWorld->RegisterSystem<PlayerSystem, PhysXSceneManager*>(&aPhysXManager);
 	myWorld->RegisterSystem<CameraSystem>();
 	myWorld->RegisterSystem<CollisionSystem>();
-	myWorld->RegisterSystem<EnemySystem>();
+	myWorld->RegisterSystem<EnemySystem, PhysXSceneManager*>(&aPhysXManager);
 
 	// HitboxSystem
 	{
@@ -138,7 +188,7 @@ void GameScene::InitSystems(PhysXSceneManager& aPhysXManager)
 	{
 		ComponentSignature eventSystemSignature;
 		eventSystemSignature.set(myWorld->GetComponentSignatureID<EventComponent>());
-		myWorld->RegisterSystem<EventSystem>(eventSystemSignature);
+		myWorld->RegisterSystem<EventSystem>(eventSystemSignature)->SetSceneManager(mySceneManager);
 	}
 
 	// AnimatorSystem
@@ -149,10 +199,10 @@ void GameScene::InitSystems(PhysXSceneManager& aPhysXManager)
 		myWorld->RegisterSystem<AnimatorSystem>(animationSystemSignature);
 	}
 
-	//ScriptableEventSystem
-	{
-		myWorld->RegisterSystem<ScriptableEventSystem>();
-	}
+	////ScriptableEventSystem
+	//{
+	//	myWorld->RegisterSystem<ScriptableEventSystem>();
+	//}
 
 	//PhysXSystem
 	{
@@ -180,9 +230,14 @@ void GameScene::InitSystems(PhysXSceneManager& aPhysXManager)
 		ComponentSignature npcSystemSignature;
 		npcSystemSignature.set(myWorld->GetComponentSignatureID<NpcComponent>());
 		npcSystemSignature.set(myWorld->GetComponentSignatureID<TransformComponent>());
+		npcSystemSignature.set(myWorld->GetComponentSignatureID<AnimationDataComponent>());
 		myWorld->RegisterSystem<NpcSystem>(npcSystemSignature);
 	}
+	//DEAHTZONE
+	{
+		myWorld->RegisterSystem<DeathZoneSystem, PhysXSceneManager*>(&aPhysXManager);
 
+	}
 }
 
 void GameScene::InitScripts(const std::string& aLevelName)

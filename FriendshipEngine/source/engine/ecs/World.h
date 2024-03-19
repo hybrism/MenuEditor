@@ -2,16 +2,16 @@
 
 #include "entity/Entity.h"
 #include "entity/EntityManager.h"
+#include "entity/EntitySignatureManager.h"
+#include "../../game/game/scene/SceneCommon.h"
 
 #include "component/ComponentManager.h"
 #include "system/SystemManager.h"
 #include <cassert>
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 #include <vector>
 #endif
-
-class System;
 
 // ACTS AS ADAPTER FOR ALL MANAGERS
 class World
@@ -22,7 +22,7 @@ public:
 
 	void Reset();
 	void Init();
-	void Update(const float& aDeltaTime);
+	void Update(const SceneUpdateContext& aDeltaTime);
 	void Render();
 
 	// Entity Adapter
@@ -38,8 +38,8 @@ public:
 	};
 
 	// Component Adapter
-	template<typename T, size_t MAX_SIZE = MAX_ENTITIES>
-	void RegisterComponent();
+	template<typename T>
+	void RegisterComponent(size_t aMaxSize = MAX_ENTITIES);
 
 	template<typename T>
 	T& AddComponent(const Entity& aEntity);
@@ -69,9 +69,17 @@ public:
 	void InitSystems();
 
 	template<typename T>
-	T* TryGetComponent(const Entity& aEntity);
+	bool HasComponent(const Entity& aEntity) const
+	{
+		return myComponentManager->HasComponent<T>(aEntity, myEntitySignatureManager);
+	}
 
-#ifdef _DEBUG
+#ifndef _RELEASE
+	template<typename T>
+	T* TryGetComponent(const Entity& aEntity);
+#endif
+
+#ifndef _RELEASE
 	std::vector<Entity>& GetEntities() { return myEntities; }
 #endif
 
@@ -85,30 +93,31 @@ private:
 	void MarkEntityForDeletion(const Entity& entity);
 	void DeleteMarkedEntities();
 
-	std::array<Entity, MAX_ENTITIES> myMarkedForDeletionEntities;
+	std::array<Entity, MAX_ENTITIES> myMarkedForDeletionEntities = {};
 	size_t myMarkedDeleteCount = 0;
 
 	EntityManager* myEntityManager = nullptr;
+	EntitySignatureManager* myEntitySignatureManager = nullptr;
 	SystemManager* mySystemManager = nullptr;
 	ComponentManager* myComponentManager = nullptr;
 
 	eid_t myPlayerEntityID = INVALID_ENTITY;
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 	std::vector<Entity> myEntities = {};
 #endif
 };
 
-template<typename T, size_t MAX_SIZE>
-void World::RegisterComponent()
+template<typename T>
+void World::RegisterComponent(size_t aMaxSize)
 {
-	myComponentManager->RegisterComponent<T, MAX_SIZE>();
+	myComponentManager->RegisterComponent<T>(aMaxSize);
 }
 
 template<typename T>
 T& World::AddComponent(const Entity& aEntity)
 {
-	T& component = myComponentManager->AddComponent<T>(aEntity, myEntityManager);
+	T& component = myComponentManager->AddComponent<T>(aEntity, myEntitySignatureManager);
 	UpdateSignature<T>(aEntity, true);
 	return component;
 }
@@ -116,14 +125,14 @@ T& World::AddComponent(const Entity& aEntity)
 template<typename T>
 void World::RemoveComponent(const Entity& aEntity)
 {
-	myComponentManager->RemoveComponent<T>(aEntity, myEntityManager);
+	myComponentManager->RemoveComponent<T>(aEntity, myEntitySignatureManager);
 	UpdateSignature<T>(aEntity, false);
 }
 
 template<typename T>
 inline T& World::GetComponent(const Entity& aEntity)
 {
-	return myComponentManager->GetComponent<T>(aEntity, myEntityManager);
+	return myComponentManager->GetComponent<T>(aEntity, myEntitySignatureManager);
 }
 
 template<typename T, typename... Param>
@@ -131,6 +140,7 @@ T* World::RegisterSystem(Param... aParams)
 {
 	return mySystemManager->RegisterSystem<T>(aParams...);
 }
+
 template<typename T>
 T* World::GetSystem()
 {
@@ -160,14 +170,14 @@ inline cid_t World::GetComponentSignatureID()
 template<typename T>
 void World::UpdateSignature(const Entity& aEntity, const bool& aValue)
 {
-	myEntityManager->UpdateSignature(aEntity, myComponentManager->GetComponentSignatureID<T>(), aValue);
-	mySystemManager->OnEntitySignatureChanged(aEntity, myEntityManager->GetSignature(aEntity).signature);
+	myEntitySignatureManager->UpdateComponentSignature(aEntity, myComponentManager->GetComponentSignatureID<T>(), aValue);
+	mySystemManager->OnEntitySignatureChanged(aEntity, myEntitySignatureManager->GetComponentSignature(aEntity));
 }
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 template<typename T>
 inline T* World::TryGetComponent(const Entity& aEntity)
 {
-	return myComponentManager->TryGetComponent<T>(aEntity, myEntityManager);
+	return myComponentManager->TryGetComponent<T>(aEntity, myEntitySignatureManager);
 }
 #endif

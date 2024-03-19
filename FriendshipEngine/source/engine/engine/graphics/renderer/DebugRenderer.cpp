@@ -20,10 +20,10 @@ void DebugRenderer::Init()
 	using namespace DirectX;
 
 	auto ge = GraphicsEngine::GetInstance();
-	auto device = ge->GetDevice();
-	auto context = ge->GetContext();
+	auto device = ge->DX().GetDevice();
+	auto context = ge->DX().GetContext();
 
-	auto size = ge->GetViewportDimensions();
+	auto size = ge->DX().GetViewportDimensions();
 	myRenderSize = { (float)size.x, (float)size.y };
 
 	myPrimitiveBatch = std::make_unique<DX11::PrimitiveBatch<DX11::VertexPositionColor>>(context);
@@ -56,7 +56,7 @@ void DebugRenderer::Render()
 {
 	using namespace DirectX;
 	auto ge = GraphicsEngine::GetInstance();
-	auto context = ge->GetContext();
+	auto context = ge->DX().GetContext();
 
 	myPrimitiveBatch->Begin();
 

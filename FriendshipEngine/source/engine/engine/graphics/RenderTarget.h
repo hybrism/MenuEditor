@@ -16,10 +16,9 @@ public:
 	static RenderTarget Create(const Vector2i& aSize, DXGI_FORMAT aFormat);
 	static RenderTarget Create(ID3D11Texture2D* aTexture);
 
-	void Clear(const Vector4f& aColor) const;
+	void Clear(const Vector3f& aColor) const;
 	void SetAsTarget(DepthBuffer* aDepthBuffer = nullptr);
 
-	D3D11_VIEWPORT myViewport = {};
+	D3D11_VIEWPORT myViewport = { 0 };
 	ComPtr<ID3D11RenderTargetView> RTV;
-	ComPtr<ID3D11ShaderResourceView> SRV;
 };

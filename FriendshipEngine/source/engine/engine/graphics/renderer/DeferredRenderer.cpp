@@ -20,8 +20,12 @@ DeferredRenderer::~DeferredRenderer()
 	Clear();
 }
 
-void DeferredRenderer::Render(Mesh* aMesh, const MeshInstanceRenderData& aInstanceData)
+void DeferredRenderer::Render(Mesh* aMesh, MeshInstanceRenderData aInstanceData)
 {
+	if (std::holds_alternative<StaticMeshInstanceData>(aInstanceData.data))
+	{
+		std::get<StaticMeshInstanceData>(aInstanceData.data).entityData.y = static_cast<unsigned int>(myStaticMeshes[aMesh].size());
+	}
 	myStaticMeshes[aMesh].push_back(aInstanceData);
 }
 
@@ -92,10 +96,10 @@ void DeferredRenderer::RenderMeshes(bool aUsePixelShader)
 
 		if (!aUsePixelShader)
 		{
-			myMeshDrawer.Draw(*staticMesh, instances.data(), instances.size(), staticMesh->GetVertexShader(), nullptr);
+			myMeshDrawer.Draw(*staticMesh, instances.data(), instances.size(), ShaderDatabase::GetVertexShader(instances[0].vsType), nullptr);
 			continue;
 		}
-		myMeshDrawer.Draw(*staticMesh, instances.data(), instances.size(), staticMesh->GetVertexShader(), ShaderDatabase::GetPixelShader(instances[0].psType));
+		myMeshDrawer.Draw(*staticMesh, instances.data(), instances.size(), ShaderDatabase::GetVertexShader(instances[0].vsType), ShaderDatabase::GetPixelShader(instances[0].psType));
 	}
 
 	// We don't support instancing for skeletal meshes yet
@@ -146,9 +150,11 @@ void DeferredRenderer::RenderMeshes(bool aUsePixelShader)
 				ps = ShaderDatabase::GetPixelShader(instances[i].psType);
 			}
 
+			Transform copy = data.transform;
+			copy.Translate(copy.GetForward() * 10.0f);
 			ge->SetDepthStencilState(DepthStencilState::Disabled);
 			skeletalMesh->Render(
-				data.transform.GetMatrix(),
+				copy.GetMatrix(),
 				vs,
 				ps,
 				instances[i].renderMode
@@ -162,7 +168,7 @@ void DeferredRenderer::RenderDeferred()
 {
 	GraphicsEngine* ge = GraphicsEngine::GetInstance();
 	auto& gBuffer = ge->GetGBuffer();
-	auto* context = ge->GetContext();
+	auto* context = ge->DX().GetContext();
 
 	context->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
 	context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
@@ -177,7 +183,7 @@ void DeferredRenderer::RenderDeferred()
 	ShaderDatabase::GetVertexShader(VsType::Fullscreen)->PrepareRender();
 	ShaderDatabase::GetPixelShader(PsType::DeferredPBR)->PrepareRender();
 
-	ge->SetBlendState(BlendState::AlphaBlend);
+	ge->SetBlendState(BlendState::Disabled);
 	gBuffer.SetAllAsResources(1);
 	context->Draw(3, 0);
 	gBuffer.ClearAllResources(1);

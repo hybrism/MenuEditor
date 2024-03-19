@@ -1,15 +1,16 @@
 #pragma once
 #include "PlayerState.h"
 
-
-
 class PlayerWallrunState : public PlayerState
 {
 public:
-	void OnEnter() override;
-	void OnExit() override;
-	void Update(const float& dt) override;
-	int GetID() override { return myStateID; };
+	PlayerWallrunState(PlayerStateMachine* aStateMachine);
+	void OnEnter(PlayerStateUpdateContext& aContext) override;
+	void OnExit(PlayerStateUpdateContext& aContext) override;
+	void Update(PlayerStateUpdateContext& aContext) override;
+private:
+	bool CanWallrun(PlayerStateUpdateContext& aContext);
 
-	int myStateID = 4;
+	bool IsOnWallNextFrame(PlayerStateUpdateContext& aContext);
+
 };

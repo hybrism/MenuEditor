@@ -5,7 +5,7 @@
 
 DepthBuffer DepthBuffer::Create(const Vector2i& aSize)
 {
-	auto& device = GraphicsEngine::GetInstance()->GetDevice();//GlobalStuff::GetInstance().GetGraphicsEngine()->GetDevice();
+	auto& device = GraphicsEngine::GetInstance()->DX().GetDevice();//GlobalStuff::GetInstance().GetGraphicsEngine()->GetDevice();
 
 	DepthBuffer depthBufferResult;
 
@@ -39,14 +39,14 @@ DepthBuffer DepthBuffer::Create(const Vector2i& aSize)
 	DSV->Release();
 
 	ID3D11ShaderResourceView* SRV;
-	D3D11_SHADER_RESOURCE_VIEW_DESC srDesc{};
-	srDesc.Format = DXGI_FORMAT_R32_FLOAT;
-	srDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	srDesc.Texture2D.MostDetailedMip = 0;
-	srDesc.Texture2D.MipLevels = UINT_MAX;
-	result = device->CreateShaderResourceView(depthBufferResult.myTexture, &srDesc, &SRV);
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = UINT_MAX;
+	result = device->CreateShaderResourceView(depthBufferResult.myTexture, &srvDesc, &SRV);
 	assert(SUCCEEDED(result));
-	depthBufferResult.mySRV = SRV;
+	depthBufferResult.SRV = SRV;
 	SRV->Release();
 
 	depthBufferResult.myViewport = {
@@ -58,21 +58,21 @@ DepthBuffer DepthBuffer::Create(const Vector2i& aSize)
 			1
 	};
 	
-	depthBufferResult.CreateStagingTexture();
+	depthBufferResult.CreateStagingTexture(&srvDesc);
 
 	return depthBufferResult;
 }
 
 void DepthBuffer::Clear(float aClearDepthValue, unsigned char aClearStencilValue)
 {
-	auto context = GraphicsEngine::GetInstance()->GetContext();
+	auto context = GraphicsEngine::GetInstance()->DX().GetContext();
 
 	context->ClearDepthStencilView(myDepth.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, aClearDepthValue, aClearStencilValue);
 }
 
 void DepthBuffer::SetAsActiveTarget()
 {
-	auto context = GraphicsEngine::GetInstance()->GetContext();
+	auto context = GraphicsEngine::GetInstance()->DX().GetContext();
 
 	context->OMSetRenderTargets(0, nullptr, GetDepthStencilView());
 	context->RSSetViewports(1, &myViewport);

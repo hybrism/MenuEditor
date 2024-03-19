@@ -33,23 +33,11 @@ ForwardRenderer::~ForwardRenderer()
 void ForwardRenderer::Render(Mesh* aMesh, const MeshInstanceRenderData& aInstanceData, BlendState aBlendState)
 {
 	myStaticMeshes[(size_t)aBlendState][aMesh].push_back(aInstanceData);
-#if SHOULD_SORT_ALPHA_LAYERS
-	if (aBlendState == BlendState::AlphaBlend)
-	{
-		myAlphaBlendingInstanceDataContainer.push_back(&myStaticMeshes[(size_t)aBlendState][aMesh].back());
-	}
-#endif
 }
 
 void ForwardRenderer::Render(SkeletalMesh* aMesh, const MeshInstanceRenderData& aInstanceData, BlendState aBlendState)
 {
 	mySkeletalMeshes[(size_t)aBlendState][aMesh].push_back(aInstanceData);
-#if SHOULD_SORT_ALPHA_LAYERS
-	if (aBlendState == BlendState::AlphaBlend)
-	{
-		myAlphaBlendingInstanceDataContainer.push_back(&mySkeletalMeshes[(size_t)aBlendState][aMesh].back());
-	}
-#endif
 }
 
 void ForwardRenderer::DoShadowRenderPass()
@@ -61,17 +49,23 @@ void ForwardRenderer::DoShadowRenderPass()
 
 void ForwardRenderer::DoRenderPass()
 {
+	GraphicsEngine* ge = GraphicsEngine::GetInstance();
 	{
-		GraphicsEngine* ge = GraphicsEngine::GetInstance();
 
-		//ge->SetDepthStencilState(DepthStencilState::Disabled);
+		ge->SetDepthStencilState(DepthStencilState::ReadOnly);
 		ge->SetBlendState(BlendState::AlphaBlend);
-	
+		ge->SetRasterizerState(RasterizerState::NoFaceCulling);
 		//ge->SetBlendState(BlendState::AdditiveBlend);
 	}
+	ge->DX().GetContext()->PSSetShaderResources(14, 1, ge->GetDepthBuffer().myIntermediateSRV.GetAddressOf());
 
 	RenderMeshes(true);
 	Clear();
+	ge->SetRasterizerState(RasterizerState::BackfaceCulling);
+	ge->SetDepthStencilState(DepthStencilState::ReadWrite);
+
+	ID3D11ShaderResourceView* nullSRV = nullptr;
+	ge->DX().GetContext()->PSSetShaderResources(14, 1, &nullSRV);
 }
 
 void ForwardRenderer::Clear()
@@ -85,9 +79,6 @@ void ForwardRenderer::Clear()
 		myStaticMeshes[i].clear();
 		mySkeletalMeshes[i].clear();
 	}
-#if SHOULD_SORT_ALPHA_LAYERS
-	myAlphaBlendingInstanceDataContainer.clear();
-#endif
 }
 
 #include "../GraphicsData.h"
@@ -98,16 +89,6 @@ void ForwardRenderer::RenderMeshes(bool aUsePixelShader)
 
 	// TODO: Sort alpha blending meshes by distance to camera doesnt work when using different InstanceData
 
-//#if SHOULD_SORT_ALPHA_LAYERS
-//	Vector3f cameraPosition = ge->GetCamera()->GetPosition();
-//
-//	std::sort(myAlphaBlendingInstanceDataContainer.begin(), myAlphaBlendingInstanceDataContainer.end(),
-//		[cameraPosition](const MeshInstanceRenderData* v0, const MeshInstanceRenderData* v1)
-//		{
-//			return (std::get<StaticMeshInstanceData>(v0->data).transform.GetPosition() - cameraPosition).LengthSqr() > (std::get<StaticMeshInstanceData>(v1->data).transform.GetPosition() - cameraPosition).LengthSqr();
-//		});
-//#endif
-
 	for (size_t blendState = 0; blendState < (size_t)BlendState::Count; blendState++)
 	{
 		ge->SetBlendState((BlendState)blendState);
@@ -116,31 +97,26 @@ void ForwardRenderer::RenderMeshes(bool aUsePixelShader)
 			const Mesh* staticMesh = mesh.first;
 			std::vector<MeshInstanceRenderData>& instances = mesh.second;
 
-			for (size_t i = 0; i < instances.size(); i++)
+#if SHOULD_SORT_ALPHA_LAYERS
+			if (blendState == (size_t)BlendState::AlphaBlend && instances.size() > 1)
 			{
-				{
-					auto* instance = GraphicsEngine::GetInstance();
-					auto* context = instance->GetContext();
-					auto objectBuffer = instance->GetObjectBuffer();
-
-					D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
-					context->Map(objectBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
-
-					ObjectBufferData* data = (ObjectBufferData*)mappedBuffer.pData;
-					data->objectTransform = instances[i].transform.GetMatrix();
-
-					context->Unmap(objectBuffer.Get(), 0);
-					context->VSSetConstantBuffers((UINT)BufferSlots::Object, 1, objectBuffer.GetAddressOf());
-					context->PSSetConstantBuffers((UINT)BufferSlots::Object, 1, objectBuffer.GetAddressOf());
-				}
-
-				if (!aUsePixelShader)
-				{
-					myMeshDrawer.Draw(*staticMesh, instances[i], ShaderDatabase::GetVertexShader(instances[i].vsType), nullptr);
-					continue;
-				}
-				myMeshDrawer.Draw(*staticMesh, instances[i], ShaderDatabase::GetVertexShader(instances[i].vsType), ShaderDatabase::GetPixelShader(instances[i].psType));
+				Vector3f cameraPosition = ge->GetCamera()->GetTransform().GetPosition();
+				std::sort(instances.begin(), instances.end(),
+					[cameraPosition](const MeshInstanceRenderData& v0, const MeshInstanceRenderData& v1)
+					{
+						Vector3f delta0 = std::get<VfxMeshInstanceData>(v0.data).transform.GetPosition() - cameraPosition;
+						Vector3f delta1 = std::get<VfxMeshInstanceData>(v1.data).transform.GetPosition() - cameraPosition;
+						return delta0.Length() > delta1.Length();
+					});
 			}
+#endif
+
+			if (!aUsePixelShader)
+			{
+				myMeshDrawer.Draw(*staticMesh, instances.data(), instances.size(), ShaderDatabase::GetVertexShader(instances[0].vsType), nullptr);
+				continue;
+			}
+			myMeshDrawer.Draw(*staticMesh, instances.data(), instances.size(), ShaderDatabase::GetVertexShader(instances[0].vsType), ShaderDatabase::GetPixelShader(instances[0].psType));
 		}
 
 		// We don't support instancing for skeletal meshes yet
@@ -151,7 +127,7 @@ void ForwardRenderer::RenderMeshes(bool aUsePixelShader)
 
 			for (size_t i = 0; i < instances.size(); i++)
 			{
-				auto data = std::get<SkeletalMeshInstanceData>(instances[i].data);
+				auto& data = std::get<SkeletalMeshInstanceData>(instances[i].data);
 				skeletalMesh->SetPose(data.pose);
 
 				const VertexShader* vs = ShaderDatabase::GetVertexShader(instances[i].vsType);

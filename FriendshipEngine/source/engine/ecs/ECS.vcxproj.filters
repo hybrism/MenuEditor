@@ -31,6 +31,9 @@
     <ClInclude Include="entity\EntityManager.h">
       <Filter>entity</Filter>
     </ClInclude>
+    <ClInclude Include="entity\EntitySignatureManager.h">
+      <Filter>entity</Filter>
+    </ClInclude>
     <ClInclude Include="system\System.h">
       <Filter>system</Filter>
     </ClInclude>

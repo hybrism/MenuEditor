@@ -2,7 +2,6 @@ project "Editor"
 	location (dirs.editor)
 	dependson { "external", "engine", "application", "game", "ecs", "shared" }
 	
-	kind "WindowedApp"
 	language "C++"
 	cppdialect "C++17"
 
@@ -29,18 +28,30 @@ project "Editor"
         "**.hlsli",
 	}
 
+	links {
+		"DirectXTex.lib",
+		"DirectXTex_Spectre.lib",
+	}
 	--verify_or_create_settings("Game")
 
-	filter "configurations:Debug"
-		defines {"_DEBUG"}
+	filter "configurations:Editor"
+		defines "_EDITOR"
 		runtime "Debug"
 		symbols "on"
 		libdirs { dirs.dependencies_debug }	
+		kind "StaticLib"
+	filter "configurations:LauncherDebug"
+		defines "_LAUNCHER"
+		runtime "Debug"
+		symbols "on"
+		libdirs { dirs.dependencies_debug }
+		kind "None"
 	filter "configurations:Release"
 		defines "_RELEASE"
 		runtime "Release"
 		optimize "on"
 		libdirs { dirs.dependencies_release }	
+		kind "None"
 	filter "system:windows"
 --		kind "StaticLib"
 		staticruntime "off"

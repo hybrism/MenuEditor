@@ -12,6 +12,15 @@ Texture::Texture(ComPtr<ID3D11ShaderResourceView> aShaderResourceView)
 	myTexture = nullptr;
 }
 
+Texture::Texture(ComPtr<ID3D11ShaderResourceView> aShaderResourceView, const int& aWidth, const int& aHeight)
+{
+	myShaderResourceView = aShaderResourceView;
+	myWidth = aWidth;
+	myHeight = aHeight;
+	myRgbaPixels = nullptr;
+	myTexture = nullptr;
+}
+
 Texture::Texture(
 	ComPtr<ID3D11ShaderResourceView> aShaderResourceView,
 	const int& aWidth,
@@ -29,21 +38,33 @@ Texture::Texture(
 
 Texture::~Texture() = default;
 
-void Texture::Bind(const ShaderTextureSlot& aSlot) const
+void Texture::Bind(const PixelShaderTextureSlot& aSlot) const
 {
-	Bind(static_cast<int>(aSlot));
+	Bind(static_cast<unsigned int>(aSlot), true);
 }
 
-void Texture::Bind(const int& aSlot) const
+void Texture::Bind(const VertexShaderTextureSlot& aSlot) const
 {
-	auto* context = GraphicsEngine::GetInstance()->GetContext();
+	Bind(static_cast<unsigned int>(aSlot), false);
+}
+
+void Texture::Bind(const unsigned int& aSlot, bool aShouldBindToPixelShader) const
+{
+	auto* context = GraphicsEngine::GetInstance()->DX().GetContext();
 
 	if (myTexture != nullptr)
 	{
 		context->UpdateSubresource(myTexture, 0, nullptr, (void*)myRgbaPixels, myWidth * 4, myWidth * myHeight * 4);
 	}
 
-	context->PSSetShaderResources(aSlot, 1, myShaderResourceView.GetAddressOf());
+	if (aShouldBindToPixelShader)
+	{
+		context->PSSetShaderResources(aSlot, 1, myShaderResourceView.GetAddressOf());
+	}
+	else
+	{
+		context->VSSetShaderResources(aSlot, 1, myShaderResourceView.GetAddressOf());
+	}
 }
 
 Vector2f Texture::GetTextureSize() const

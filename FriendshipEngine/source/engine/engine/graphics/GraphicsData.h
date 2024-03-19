@@ -37,9 +37,10 @@ struct InputBufferData
 
 struct LightBufferData
 {
-	Vector4<float> directionalLightsDirection;
-	Vector3<float> directionalLightsColor;
+	Vector3<float> directionalLightsDirection;
 	float directionalLightsIntensity;
+	Vector3<float> directionalLightsColor;
+	float ambientLightIntensity;
 	DirectX::XMMATRIX dLightShadowSpaceToWorldSpace;
 
 	struct PointLights
@@ -51,7 +52,13 @@ struct LightBufferData
 	}myPointLights[32];
 
 	int amountOfPointLights;
-	float unused[3];
+	int useShadows = 0; //   1 = NO   :  0 = YES      Math reasons.. ask Oscar Ruselius Karl Onsomkit Ekarnan
+	float unused[2];
+};
+
+struct PointLightSphereColorData
+{
+	Vector4<float>  SphereColor;
 };
 
 
@@ -64,12 +71,17 @@ struct PostProcessBufferData
 	float saturation = 1.1f;
 	float exposure = 0.0f;
 
-	Vector3f contrast = { 1.f, 1.f, 1.f };
-	float trash1 = 0.0f;
+	float contrast = 1.0f;
+	float vignetteInner = 0.3f;
+	float vignetteOuter = 1.6f;
+	float vignetteStrength = 0.0f;
 
-	Vector3f tint = { 1.f, 1.f,1.f };
-	float trash2 = 0.0f;
+	Vector3f tint = { 1.f, 1.f, 1.f };
+	float vignetteCurvature = 0.5f;
 
 	Vector3f blackPoint = { 0.f , 0.f, 0.f };
 	float trash3 = 0.0f;
+
+	Vector3f vignetteColor = { 1.f, 0.f, 0.f };
+	float trash = 0.0f;
 };

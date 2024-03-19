@@ -2,22 +2,11 @@
 
 enum class eEvent
 {
-	OpenDoor,
-	LevelUp,
-	Checkpoint,
-	Cutscene,
-	BossDead,
-	UnlockAbilityLMB,
-	UnlockAbilityRMB,
-	UnlockAbilityAOE,
-	UnlockAbilityDash,
-	UnlockAbilityShield,
-	UnlockAbilityUltimate,
-	LoadSwamp,
-	LoadDeepSwamp,
-	LoadCave,
-	LoadBoss,
-	LoadVillage,
-
-	Count
+  Lvl0_Tutorial = 0,
+  LoadLevel_1 = 1,
+  LoadLevel_2 = 2,
+  LoadLevel_3 = 3,
+  Checkpoint = 4,
+  WinGame = 5,
+  Count
 };

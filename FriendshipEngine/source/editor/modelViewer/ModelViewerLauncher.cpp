@@ -10,6 +10,13 @@
 #include <engine/utility/InputManager.h>
 #include <engine/Paths.h>
 
+
+#include <engine/graphics/renderer/DeferredRenderer.h>
+#include <engine/graphics/renderer/ForwardRenderer.h>
+#include <assets/ShaderDatabase.h>
+#include <engine/shaders/VertexShader.h>
+#include <engine/shaders/PixelShader.h>
+
 //External
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_win32.h>
@@ -67,7 +74,7 @@ LRESULT CALLBACK WndProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In
 			DragQueryFileW(hDropInfo, i, filename, filename_len);
 		}
 
-		if (filename > 0 && MENU::IsFbx(filename))
+		if (filename > 0 && Utility::IsFbx(filename))
 		{
 			Print("You dropped a FBX!");
 
@@ -100,10 +107,8 @@ ModelViewerLauncher::~ModelViewerLauncher()
 void ModelViewerLauncher::Init(HINSTANCE hInstance, WNDPROC wndProc)
 {
 	Vector2i resolution = { 1000, 900 };
-	std::wstring icon = std::wstring(StringHelper::s2ws(RELATIVE_EDITOR_ASSET_PATH) + L"icon.ico");
-	const wchar_t* ICON_PATH = icon.c_str();
 
-	if (!myEngine->Init(resolution.x, resolution.y, L"Engine", L"FriendshipEngine", ICON_PATH, hInstance, wndProc))
+	if (!myEngine->Init(resolution.x, resolution.y, L"Engine", L"FriendshipEngine", L"icon.ico", hInstance, wndProc))
 	{
 		PrintE("Engine could not Initiate!");
 		return;
@@ -116,7 +121,15 @@ void ModelViewerLauncher::Init(HINSTANCE hInstance, WNDPROC wndProc)
 
 	ImGuiHandler::Init();
 
-	myModelViewer.Init();
+	ImVec4* colors = ImGui::GetStyle().Colors;
+	colors[ImGuiCol_Button] = ImVec4(0.37f, 0.38f, 0.38f, 0.54f);
+
+	myPostProcess.Init();
+
+	myLightManager.Init({ 0.f,-1.f,0.f }, { 118.f / 256.f, 75.f / 256.f, 35.f / 256.f ,0 }, { 0, 10, 0 });
+	myLightManager.SetAmbientLight(1.0f);
+
+	myModelViewer.Init(&myLightManager);
 }
 
 
@@ -128,14 +141,69 @@ void ModelViewerLauncher::Update(const float& dt)
 	InputManager::GetInstance()->Update();
 
 	myModelViewer.Update(dt);
-
 }
 
 void ModelViewerLauncher::Render()
 {
 	myModelViewer.Render();
 
-	GraphicsEngine::GetInstance()->SetRawBackBufferAsRenderTarget();
+	GraphicsEngine* ge = GraphicsEngine::GetInstance();
+	GBuffer& gBuffer = ge->GetGBuffer();
+	DeferredRenderer& deferred = ge->GetDeferredRenderer();
+	ForwardRenderer& forward = ge->GetForwardRenderer();
+	auto prevDrawCalls = ge->GetDrawCalls();
+
+	// Shadows
+	myLightManager.BeginShadowRendering();
+	deferred.DoShadowRenderPass();
+	forward.DoShadowRenderPass();
+	myLightManager.EndShadowRendering();
+
+	if ((ge->GetDrawCalls() - prevDrawCalls) > 0)
+	{
+		deferred.DoGBufferPass();
+		//mySkyBox.Render(); //TO:DO Find a nicer place for the SkyBox to live.  Utkommenterad tills jag vet varför vingarna försvinner när man titttar på skyboxen
+
+		myPostProcess.FirstFrame();
+		{
+			gBuffer.SetAllAsResources(1);
+
+			myLightManager.LightRender();
+			myLightManager.SetResourcesOnSlot();
+
+			deferred.DoFinalPass();
+			forward.DoRenderPass();
+		}
+
+		myLightManager.ClearAllResources();
+	}
+	myPostProcess.Render();
+
+	{
+		ge->SetRawBackBufferAsRenderTarget();
+
+		auto* context = ge->DX().GetContext();
+
+		context->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
+		context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->IASetInputLayout(nullptr);
+
+		context->GSSetShader(nullptr, nullptr, 0);
+
+		ShaderDatabase::GetVertexShader(VsType::Fullscreen)->PrepareRender();
+		ShaderDatabase::GetPixelShader(PsType::Fullscreen)->PrepareRender();
+
+		ge->SetRawBackBufferAsRenderTarget();
+
+		context->PSSetShaderResources(0, 1, ge->GetBackBufferSRV().GetAddressOf());
+		context->Draw(3, 0);
+
+		ID3D11ShaderResourceView* nullSRV = nullptr;
+		context->PSSetShaderResources(0, 1, &nullSRV);
+	}
+
 	ImGuiHandler::Render();
 }
 
@@ -151,7 +219,7 @@ bool ModelViewerLauncher::BeginFrame()
 	return myEngine->BeginFrame();
 }
 
-bool MENU::IsFbx(std::wstring aPath)
+bool Utility::IsFbx(std::wstring aPath)
 {
 	return (aPath.substr(aPath.find_last_of(L".") + 1) == L"fbx");
 }

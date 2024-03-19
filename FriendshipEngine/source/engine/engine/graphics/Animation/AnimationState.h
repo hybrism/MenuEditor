@@ -25,11 +25,17 @@ struct AnimationCondition
 		const AnimationConditionType& aType
 	) : parameterIndex(aParameterIndex), target(aComparisonValue), type(aType)
 	{ }
+
+	AnimationCondition(
+		const size_t & aParameterIndex,
+		const AnimationConditionType & aType
+	) : parameterIndex(aParameterIndex), target(0), type(aType)
+	{ }
 };
 
 struct AnimationTransition
 {
-	int fromStateIndex = -1;
+	//int fromStateIndex = -1;
 	int toStateIndex = -1;
 	float exitTime = 0;
 	float duration = 0; // if fixedDuration is true this is used as seconds, else as a % of the total animation time
@@ -42,13 +48,13 @@ struct AnimationTransition
 
 class AnimationState
 {
+	friend class AnimationController;
 public:
 	AnimationState(const std::string& aAnimationName);
 	AnimationState(const int& aAnimationIndex) : animationIndex(aAnimationIndex) { }
 
 	void AddTransition(AnimationTransition aTransition)
 	{
-		assert(aTransition.fromStateIndex != aTransition.toStateIndex && "You cannot transition to your own state");
 		transitions.push_back(aTransition);
 	}
 	void RemoveTransition(const size_t& aTransitionIndex) { transitions.erase(transitions.begin() + aTransitionIndex); }
@@ -67,6 +73,9 @@ public:
 		return &transitions[aTransitionIndex];
 	}
 private:
+#ifdef _EDITOR
+	int stateIndex = -1;
+#endif
 	int animationIndex = -1;
 	float speed = 1.0f;
 	bool looping = true;

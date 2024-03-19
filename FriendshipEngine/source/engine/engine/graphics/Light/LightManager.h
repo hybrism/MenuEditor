@@ -19,7 +19,11 @@ public:
 	LightManager();
 	~LightManager();
 
-	void Init(const Vector3f& aDirection = { 0.0f, -1.0f, 0.0f }, const Vector4f& aColor = { 255.f, 255.f, 255.f, 1.0f });
+	void Init(
+		const Vector3f& aDirection = { 0.0f, -1.0f, 0.0f },
+		const Vector4f& aColor = { 255.f, 255.f, 255.f, 1.0f },
+		const Vector3f& aPosition = { 0.0f, 0.0f, 0.0f }
+	);
 	
 	void SetLightsOnBuffer();
 	void ImportLights();
@@ -35,12 +39,17 @@ public:
 	void SetDirectionalLightsDirection(const Vector3f& aDirection);
 	void SetDirectionalLightsColor(const Vector4f& aColor);
 	void SetDirectionalLightsCameraToPosition(const Vector3f& aPos);
+	void SetAmbientLight(float aIntensity);
 	void BeginShadowRendering();
 	void EndShadowRendering();
 	void EndOfRenderPassReset();
 
 	void SetResourcesOnSlot();
 	void ClearAllResources();
+	
+
+	DirectionalLight& GetDirectionalLight() { return *myDirectionalLight; }
+	bool myDoNotUseShadows = false;
 private:
 	LightBufferData myLightData;
 	ComPtr<ID3D11Buffer> myLightBuffer;
@@ -57,4 +66,5 @@ private:
 	//DirectionalLight
 	DirectionalLight* myDirectionalLight = nullptr;
 	Camera* myLastUsedCamera = nullptr;
+
 };

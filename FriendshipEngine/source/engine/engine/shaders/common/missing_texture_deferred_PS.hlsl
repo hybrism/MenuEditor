@@ -1,6 +1,6 @@
 #include "common.hlsli"
 
-GBufferOutput main(PixelInputType input)
+GBufferOutput main(DeferredPixelInputType input)
 {
     GBufferOutput output;
     output.worldPosition = input.worldPosition;
@@ -8,7 +8,6 @@ GBufferOutput main(PixelInputType input)
     output.normal = float4(input.normal.xyz, 1);
     output.vertexNormal = float4(input.normal, 1);
     output.material = float4(0.2, 0.5, 0, 1);
-    output.effects = float4(0, 0, 0, 0); // ba are unused, TODO: make use of the height value/ask graphics about what it is?
-    
+    output.effects = float4(0, 0, EntityIDToEffect(input.entityData.x));
     return output;
 }

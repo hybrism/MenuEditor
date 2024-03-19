@@ -8,7 +8,6 @@ Texture2D aVertexNormalTexture : register(t4);
 Texture2D aMaterialTexture : register(t5);
 Texture2D aEffectsTexture : register(t6);
 
-
 Texture2D aShadowMapTexture : register(t8);
 Texture2D aDirectionlaLightTexture : register(t9);
 Texture2D aPointLightTexture : register(t10);
@@ -100,7 +99,7 @@ PixelOutput main(FullscreenVertexOutput input)
     
     
     float3 worldPosition = aWorldPositionTexture.Sample(aDefaultSampler, scaledUV).xyz;
-    float3 pixelNormal = aNormalTexture.Sample(aDefaultSampler, scaledUV).xyz;
+    float3 pixelNormal = UnpackNormal(aNormalTexture.Sample(aDefaultSampler, scaledUV).xyz);
     float3 vertexNormal = aVertexNormalTexture.Sample(aDefaultSampler, scaledUV).xyz;
     
     float3 cameraPosition = modelToWorld[3].xyz;
@@ -116,11 +115,10 @@ PixelOutput main(FullscreenVertexOutput input)
     float4 effects = aEffectsTexture.Sample(aDefaultSampler, scaledUV).rgba;
     float1 emissive = effects.r;
     //float1 heightDP = effects.g;
-    float1 colorOverride = effects.b;
     
     //LIGHT
     float4 pointLight = aPointLightTexture.Sample(aDefaultSampler, scaledUV).rgba;
-    float4 directionalLight = aDirectionlaLightTexture.Sample(aDefaultSampler, scaledUV).rgba;
+    float4 shadow = aDirectionlaLightTexture.Sample(aDefaultSampler, scaledUV).rgba;
     
     
     float3 specularColor = lerp((float3) 0.04f, albedo.rgb, metalness);
@@ -128,22 +126,26 @@ PixelOutput main(FullscreenVertexOutput input)
     
     float3 ambiance = EvaluateAmbiance(
 		aEnvironmentTexture, pixelNormal, vertexNormal,
-		toEye, roughness,
-		ambientOcclusion, diffuseColor, specularColor
-	);
+		toEye, roughness, ambientOcclusion,
+        diffuseColor, specularColor
+	) * ambientLightIntensity;
+    
+        
+    float3 dir = directionalLightsDirection.xyz * -1.f;
+    float3 directionalLight = EvaluateDirectionalLight(
+		diffuseColor, specularColor, pixelNormal, roughness,
+		directionalLightsColor.xyz, dir, toEye.xyz
+	) * directionalLightsIntensity;
     
 
-    
-
-    float4 wPos = float4(worldPosition.x, worldPosition.y, worldPosition.z, 1);
-    float4 directionalLightProjectedPositionTemp = mul(directionalLightShadowSpaceToWorldSpace, wPos);
-    float3 directionalLightProjectedPosition = directionalLightProjectedPositionTemp.xyz / directionalLightProjectedPositionTemp.w;
-    float shadowFactor = 1.0f;
+    //float4 wPos = float4(worldPosition.x, worldPosition.y, worldPosition.z, 1);
+    //float4 directionalLightProjectedPositionTemp = mul(directionalLightShadowSpaceToWorldSpace, wPos);
+    //float3 directionalLightProjectedPosition = directionalLightProjectedPositionTemp.xyz / directionalLightProjectedPositionTemp.w;
+    //float shadowFactor = 1.0f;
     
 
     float3 emissiveAlbedo = albedo.rgb * emissive;
-    float3 radiance = ambiance  + emissiveAlbedo + pointLight.rgb + directionalLight.rgb;
-    radiance = radiance * (colorOverride == 0) + albedo.rgb * (colorOverride != 0);
+    float3 radiance = ambiance + emissiveAlbedo + pointLight.rgb + directionalLight.rgb * shadow.r;
     result.color.rgb = radiance;
     result.color.a = albedo.a;
     
@@ -158,7 +160,7 @@ PixelOutput main(FullscreenVertexOutput input)
             result.color = albedo;
             break;
         case 3:
-            result.color = float4(pixelNormal, 1.f);
+            result.color = float4(aNormalTexture.Sample(aDefaultSampler, scaledUV).xyz, 1.f);
             break;
         case 4:
             result.color = float4(vertexNormal, 1.f);
@@ -168,6 +170,7 @@ PixelOutput main(FullscreenVertexOutput input)
             break;
         case 6:
             result.color = effects;
+            //result.color.a = 1.0f; // temp?
             break;
         default:
             break;

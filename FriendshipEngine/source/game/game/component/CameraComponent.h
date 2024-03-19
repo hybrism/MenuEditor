@@ -10,4 +10,6 @@ struct CameraComponent : public Component<CameraComponent>
 	float cameraMoveX = 8.f;
 	float cameraMoveY = 5.f;
 	bool activeMultiplier = false;
+	Vector3f Pos;
+	Vector3f Rot;
 };

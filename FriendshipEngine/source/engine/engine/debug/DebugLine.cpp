@@ -78,12 +78,28 @@ void DebugLine::SetEndPosition(const Vector3f& aEndPoint)
 
 void DebugLine::DrawLine()
 {
-	MeshInstanceRenderData instanceData;
+	/*MeshInstanceRenderData instanceData;
 	instanceData.renderMode = RenderMode::LINELIST;
 	instanceData.psType = myMesh.GetPixelShader()->GetType();
 	instanceData.data = StaticMeshInstanceData{ myTransform };
+	instanceData;*/
+	StaticMeshInstanceData instanceData{};
 
-	GraphicsEngine::GetInstance()->GetForwardRenderer().Render(&myMesh, instanceData);
+	instanceData.transform.SetPosition(myTransform.GetPosition());
+	
+
+	GraphicsEngine::GetInstance()->GetForwardRenderer().Render(
+		static_cast<Mesh*>(&myMesh),
+		{
+				instanceData,
+				VsType::DefaultPBRInstanced,
+				PsType::DebugLine,
+				RenderMode::LINELIST,
+				{}
+		});
+
+		
+	//GraphicsEngine::GetInstance()->GetForwardRenderer().Render(&myMesh, instanceData);
 }
 
 void DebugLine::SetPosition(const Vector3f& aPosition)

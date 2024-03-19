@@ -28,16 +28,14 @@ void MeshDrawer::UnMapAndRender(
 	D3D11_PRIMITIVE_TOPOLOGY aTopology
 )
 {
-	ID3D11DeviceContext* context = GraphicsEngine::GetInstance()->GetContext();
+	ID3D11DeviceContext* context = GraphicsEngine::GetInstance()->DX().GetContext();
 
 	context->IASetPrimitiveTopology(aTopology);
 
 	myCurrentInstanceBuffer->UnMap((void*&)aMappableData);
 
 	context->DrawIndexedInstanced((UINT)aSharedData.GetIndexCount(), (UINT)aInstanceCount, 0, 0, 0);
-#ifdef _DEBUG
 	GraphicsEngine::GetInstance()->IncrementDrawCalls();
-#endif
 	aInstanceCount = 0;
 }
 
@@ -62,7 +60,7 @@ void MeshDrawer::InternalDraw(
 
 	void* currentMappedInstanceDataCluster = nullptr;
 	auto* ge = GraphicsEngine::GetInstance();
-	auto* context = ge->GetContext();
+	auto* context = ge->DX().GetContext();
 
 	{
 		aSharedData.BindTextures();
@@ -75,9 +73,9 @@ void MeshDrawer::InternalDraw(
 		context->IASetIndexBuffer(aSharedData.GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
 		if (aVertexShader) { aVertexShader->PrepareRender(); }
-		else { ge->GetContext()->VSSetShader(nullptr, NULL, 0); }
+		else { ge->DX().GetContext()->VSSetShader(nullptr, NULL, 0); }
 		if (aPixelShader) { aPixelShader->PrepareRender(); }
-		else { ge->GetContext()->PSSetShader(nullptr, NULL, 0); }
+		else { ge->DX().GetContext()->PSSetShader(nullptr, NULL, 0); }
 	}
 
 	Map(currentMappedInstanceDataCluster);

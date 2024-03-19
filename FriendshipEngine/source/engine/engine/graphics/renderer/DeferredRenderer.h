@@ -17,7 +17,7 @@ public:
 	DeferredRenderer(MeshDrawer& aMeshDrawer);
 	~DeferredRenderer() override;
 
-	void Render(Mesh* aMesh, const MeshInstanceRenderData& aInstanceData);
+	void Render(Mesh* aMesh, MeshInstanceRenderData aInstanceData);
 	void Render(SkeletalMesh* aMesh, const MeshInstanceRenderData& aInstanceData, bool aShouldDisregardDepth = false);
 
 	// TODO: add support to disable shadows on one instance
@@ -35,6 +35,8 @@ private:
 
 	// TODO: när vi tar bort unity eller ändrar hur meshIds fungerar
 	// så borde vi byta till att använda en array som är lika stor som antalet meshes i systemet
+
+	// TODO: optimize this since push_back is EXTREMLY slow D:
 	std::unordered_map<Mesh*, std::vector<MeshInstanceRenderData>> myStaticMeshes;
 	std::unordered_map<SkeletalMesh*, std::vector<MeshInstanceRenderData>> mySkeletalMeshes;
 	std::unordered_map<SkeletalMesh*, std::vector<MeshInstanceRenderData>> myDisregardDepthMeshes;

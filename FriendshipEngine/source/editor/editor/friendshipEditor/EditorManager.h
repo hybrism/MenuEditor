@@ -31,30 +31,21 @@ public:
 
 	void SetGameWindowRect(const GameWindowRect& aRect) { myGameWindowRect = aRect; }
 	GameWindowRect GetGameWindowRect() const { return myGameWindowRect; }
+
 private:
 	std::unordered_map<FE::ID, std::shared_ptr<FE::WindowBase>> myWindows; 
+	std::vector<std::string> myJsonFileNames;
+	GameWindowRect myGameWindowRect;
 	Game* myGame;
+	bool myFirstFrameSetup;
 
 	void Dockspace();
 	void MenuBar();
 
-	//TODO: Move this to GameWindow
-	GameWindowRect myGameWindowRect;
-	int myFPS = 0;
-	float myFPSTimer = 0.f;
-	float myFPSUpdateFrequency = 1.f;
-	bool myFirstFrameSetup;
-	void ShowDebugData(const float& dt);
-	
 	//This is used for debug-level selector
 	void LoadImportFiles();
-	std::vector<std::string> myJsonFileNames;
 
 	//TODO: Test it out and move this to editorUtility?
 	void MakeTabVisible(const char* window_name);
 
-	// TODO: Move these to separate classes
-	void ViewLevelSelector();
-	//void ViewMenuHandlerWindow();
-	//MenuEditor myMenuEditor;
 };

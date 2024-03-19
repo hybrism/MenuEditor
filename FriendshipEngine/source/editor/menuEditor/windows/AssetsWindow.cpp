@@ -1,6 +1,7 @@
 #include "AssetsWindow.h"
-#include "../gui/IDManager.h"
+//#include "../gui/IDManager.h"
 
+#include <d3d11.h>
 #include <engine/graphics/Texture.h>
 #include <shared/postMaster/PostMaster.h>
 #include <imgui/imgui.h>
@@ -49,12 +50,12 @@ void MENU::AssetsWindow::Show(const MenuEditorUpdateContext& aContext)
 
 			if (ImGui::TreeNode("IDs"))
 			{
-				auto ids = IDManager::GetInstance()->GetIDs();
-				for (size_t i = 0; i < ids.size(); i++)
-				{
-					std::string status = ids[i] ? "Free" : "-";
-					ImGui::Text("ID: %i %s", i, status.c_str());
-				}
+				//auto ids = IDManager::GetInstance()->GetIDs();
+				//for (size_t i = 0; i < ids.size(); i++)
+				//{
+				//	std::string status = ids[i] ? "Free" : "-";
+				//	ImGui::Text("ID: %i %s", i, status.c_str());
+				//}
 				ImGui::TreePop();
 			}
 

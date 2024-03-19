@@ -6,7 +6,7 @@
 
 using Microsoft::WRL::ComPtr;
 
-#define USE_POST_PROCESSING 0
+#define USE_POST_PROCESSING 1
 
 class PostProcess
 {
@@ -15,7 +15,16 @@ class PostProcess
 		RenderTarget target;
 		int downscaleLevel = 0;
 	};
+
 public:
+	struct VignetteData
+	{
+		float vignetteInner = 0.2f;
+		float vignetteOuter = 3.2f;
+		float vignetteStrength = 0.0f;
+		float vignetteCurvature = 0.3f;
+	};
+
 	PostProcess();
 	~PostProcess();
 
@@ -28,8 +37,19 @@ public:
 	void SetSaturation(float aSaturation) { myBufferData.saturation = aSaturation; }
 	void SetExposure(float aExposure) { myBufferData.exposure = aExposure; }
 	void SetTint(const Vector3f& aTint) { myBufferData.tint = aTint; }
-	void SetContrast(const Vector3f& aContrast) { myBufferData.contrast = aContrast; }
+	void SetContrast(const float& aContrast) { myBufferData.contrast = aContrast; }
 	void SetBlackPoint(const Vector3f& aBlackPoint) { myBufferData.blackPoint = aBlackPoint; }
+	void SetVignetteData(const VignetteData& aVignetteData)
+	{
+		myBufferData.vignetteInner = aVignetteData.vignetteInner;
+		myBufferData.vignetteOuter = aVignetteData.vignetteOuter;
+		myBufferData.vignetteStrength = aVignetteData.vignetteStrength;
+		myBufferData.vignetteCurvature = aVignetteData.vignetteCurvature;
+	}
+	void SetVignetteStrength(float aStrength) { myBufferData.vignetteStrength = aStrength; }
+#ifdef _EDITOR
+	PostProcessBufferData& GetBufferData() { return myBufferData; }
+#endif
 private:
 	void ClearShaderResources();
 

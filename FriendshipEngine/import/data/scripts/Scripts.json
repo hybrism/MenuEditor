@@ -1,0 +1,24 @@
+{
+  "levels": [
+    {
+      "name": "lvl_scriptedEventTestScene.json",
+      "scripts": [
+        "new script.json",
+        "untitled.json",
+        "testScript.json"
+      ]
+    },
+    {
+      "name": "lvl_familyHeirloom.json",
+      "scripts": [
+        "Event 1.json"
+      ]
+    },
+    {
+      "name": "lvl_tutorial.json",
+      "scripts": [
+        
+      ]
+    }
+  ]
+}

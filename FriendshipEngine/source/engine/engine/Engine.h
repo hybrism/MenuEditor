@@ -18,6 +18,15 @@ public:
 	Timer* const GetTimer() { return myTimer; }
 	const HWND& GetWindowHandle() { return hWnd; }
 
+	void SetResolution(const int aWidth, const int aHeight);
+	void SetWindowDimensions(
+		const int aX,
+		const int aY,
+		int aWidth,
+		int aHeight,
+		const bool aFullscreen = true
+	);
+
 	bool Init(
 		const int& aWindowWidth,
 		const int& aWindowHeight,
@@ -35,10 +44,13 @@ private:
 	Engine() = delete;
 
 	bool myShouldExit = false;
+	bool myIsFullscreen = false;
 	int myWindowWidth = 0;
 	int myWindowHeight = 0;
 	int myViewPortWidth = 0;
 	int myViewPortHeight = 0;
+	int myWindowPositionX = 0;
+	int myWindowPositionY = 0;
 	HWND hWnd = {};
 
 	Timer* myTimer = nullptr;

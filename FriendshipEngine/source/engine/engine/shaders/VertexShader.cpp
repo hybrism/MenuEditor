@@ -24,7 +24,7 @@ bool VertexShader::Init(
 {
 	HRESULT result;
 	std::string vsData;
-	auto& device = myGraphicsEngine->GetDevice();
+	auto& device = myGraphicsEngine->DX().GetDevice();
 
 	std::ifstream vsFile;
 	vsFile.open(RELATIVE_SHADER_PATH + aName + "_VS.cso", std::ios::binary);
@@ -76,7 +76,7 @@ bool VertexShader::SetInputLayout(D3D11_INPUT_ELEMENT_DESC aLayout[], const size
 		};
 		numElements = static_cast<unsigned int>(aSize / sizeof(D3D11_INPUT_ELEMENT_DESC));
 
-		result = myGraphicsEngine->GetDevice()->CreateInputLayout(l, numElements, aVsData.data(), aVsData.size(), myInputLayout.ReleaseAndGetAddressOf());
+		result = myGraphicsEngine->DX().GetDevice()->CreateInputLayout(l, numElements, aVsData.data(), aVsData.size(), myInputLayout.ReleaseAndGetAddressOf());
 		if (FAILED(result))
 		{
 			PrintE("[Shader.cpp] Could not create InputLayout!");
@@ -85,7 +85,7 @@ bool VertexShader::SetInputLayout(D3D11_INPUT_ELEMENT_DESC aLayout[], const size
 		return true;
 	}
 
-	result = myGraphicsEngine->GetDevice()->CreateInputLayout(layout, numElements, aVsData.data(), aVsData.size(), myInputLayout.ReleaseAndGetAddressOf());
+	result = myGraphicsEngine->DX().GetDevice()->CreateInputLayout(layout, numElements, aVsData.data(), aVsData.size(), myInputLayout.ReleaseAndGetAddressOf());
 	if (FAILED(result))
 	{
 		PrintE("[Shader.cpp] Could not create InputLayout!");
@@ -108,7 +108,7 @@ bool VertexShader::PrepareRender(
 		return false;
 	}
 
-	auto* context = myGraphicsEngine->GetContext();
+	auto* context = myGraphicsEngine->DX().GetContext();
 	context->VSSetShader(myShader.Get(), NULL, 0);
 	context->IASetInputLayout(myInputLayout.Get());
 

@@ -11,7 +11,9 @@
 #include "../Paths.h"
 #include <assets/ShaderDatabase.h>
 
-PostProcess::PostProcess() = default;
+PostProcess::PostProcess() : myBufferData()
+{
+}
 
 PostProcess::~PostProcess()
 {
@@ -22,7 +24,7 @@ void PostProcess::Init()
 {
 	auto* ge = GraphicsEngine::GetInstance();
 
-	Vector2i size = ge->GetViewportDimensions();
+	Vector2i size = ge->DX().GetViewportDimensions();
 	myRenderTargets[0] = RenderTarget::Create(size, DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_FLOAT);
 	myRenderTargets[1] = RenderTarget::Create(size, DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_FLOAT);
 
@@ -30,7 +32,7 @@ void PostProcess::Init()
 	// Create several rendertargets with different viewtargets for blur.
 	for (int i = 1; i < 5; i++)
 	{
-		size = ge->GetViewportDimensions();
+		size = ge->DX().GetViewportDimensions();
 		size.x /= divider;
 		size.y /= divider;
 
@@ -52,21 +54,13 @@ void PostProcess::FirstFrame()
 {
 	auto ge = GraphicsEngine::GetInstance();
 
-#if !USE_POST_PROCESSING
-	ge->SetBackBufferAsActiveTarget();
-	return;
-#endif
-
-#ifdef _DEBUG
+#ifndef _RELEASE
 	if (ge->GetRenderMode() != 0)
 	{
 		ge->SetBackBufferAsActiveTarget();
 		return;
 	}
 #endif
-
-	// TODO: Should fetch clear color from engine
-	ClearShaderResources();
 
 	myRenderTargets[0].SetAsTarget(&ge->GetDepthBuffer());
 	auto clearColor = ge->GetClearColor();
@@ -78,20 +72,42 @@ void PostProcess::Render()
 {
 	auto ge = GraphicsEngine::GetInstance();
 
-#if !USE_POST_PROCESSING
-	return;
-#endif
-
-#ifdef _DEBUG
+#ifndef _RELEASE
 	if (ge->GetRenderMode() != 0)
 	{
 		return;
 	}
 #endif
 
-	auto context = ge->GetContext();
-	ShaderDatabase::GetVertexShader(VsType::Fullscreen)->PrepareRender();
+	auto context = ge->DX().GetContext();
+
+	context->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
+	context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->IASetInputLayout(nullptr);
+
+	context->GSSetShader(nullptr, nullptr, 0);
+
 	ge->SetDepthStencilState(DepthStencilState::Disabled);
+
+#if !USE_POST_PROCESSING // We need to tone map since we are using a linear color space prior to the back buffer, which is sRGB
+	{
+		ShaderDatabase::GetVertexShader(VsType::Fullscreen)->PrepareRender();
+		ShaderDatabase::GetPixelShader(PsType::ToneMap)->PrepareRender();
+
+		ge->SetBlendState(BlendState::Disabled);
+		ge->SetBackBufferAsActiveTarget();
+		ge->GetBackBufferRenderTarget().Clear(ge->GetClearColor());
+		context->PSSetShaderResources(11, 1, myRenderTargets[0].SRV.GetAddressOf());
+		context->Draw(3, 0);
+		ClearShaderResources();
+
+		return;
+	}
+#endif
+
+	ShaderDatabase::GetVertexShader(VsType::Fullscreen)->PrepareRender();
 	{
 		ge->SetBlendState(BlendState::Disabled);
 
@@ -171,5 +187,5 @@ void PostProcess::Render()
 void PostProcess::ClearShaderResources()
 {
 	ID3D11ShaderResourceView* nullSRV = nullptr;
-	GraphicsEngine::GetInstance()->GetContext()->PSSetShaderResources(11, 1, &nullSRV);
+	GraphicsEngine::GetInstance()->DX().GetContext()->PSSetShaderResources(11, 1, &nullSRV);
 }

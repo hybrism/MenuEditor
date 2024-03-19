@@ -9,17 +9,18 @@ struct NpcComponent;
 struct TransformComponent;
 enum class npcState;
 
-class NpcSystem : public System
+class NpcSystem : public System<NpcSystem>
 {
 public:
 	NpcSystem(World* aWorld);
 	
 	void Init() override;
-	void Update(const float& dt) override;
-	void FollowPath(const float& dt,NpcComponent& aNpc,TransformComponent& aTransform);
+	void Update(const SceneUpdateContext& dt) override;
+	void FollowPath(const float& dt);
 	void ActivateGroup(int aGroupID);
 
 private:
+	DirectX::XMMATRIX myMatrix;
 
 };
 

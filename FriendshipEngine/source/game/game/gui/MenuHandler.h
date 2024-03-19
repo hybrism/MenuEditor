@@ -1,38 +1,76 @@
 #pragma once
 #include <stack>
+#include <string>
+#include <nlohmann/json_fwd.hpp>
 
+#include "IDManager.h"
 #include "ObjectManager.h"
+#include "MenuUpdateContext.h"
 
-struct MenuState
+class SceneManager;
+
+namespace MENU
 {
-	unsigned int id;
-	std::string name;
-	std::vector<unsigned int> objects;
-};
+	struct MenuState
+	{ 
+		std::string name;
+		std::vector<ID> objectIds;
+		ID id;
+	};
 
-class TextureFactory;
+	class MenuHandler
+	{
+		friend class MenuEditor;
 
-class MenuHandler
-{
-public:
-	MenuHandler();
-	~MenuHandler();
+	public:
+		MenuHandler();
+		~MenuHandler();
 
-	void Init(const std::string& aMenuFile, TextureFactory* aTextureFactory);
-	void Update();
-	void Render();
+		void Init(const std::string& aMenuFile, SceneManager* aSceneManager = nullptr);
+		void Update(const MenuUpdateContext& aContext);
+		void Render();
+		
+		void AddNewState(const std::string& aName);
+		void RemoveState(ID aID);
+		void PushState(ID aID);
+		void PopState();
+		void PopToBaseState();
 
-	ObjectManager myObjectManager;
+		MenuState& GetCurrentState();
+		std::vector<MenuState>& GetAllStates();
 
-	//TODO: Move these to a "MenuLoader"
-	void LoadFromJson(const std::string& aMenuFile, TextureFactory* aTextureFactory);
-	void SaveToJson();
+		MenuObject& GetObjectFromID(ID aID);
+		MenuObject& GetObjectFromIndex(ID aIndex);
 
-private:
-	std::string myName;
-	std::string myFileName;
+		void RemoveObjectAtID(ID aID);
+		void MoveUpObjectAtID(ID aID);
+		void MoveDownObjectAtID(ID aID);
 
-	std::stack<MenuState*> myStateStack;
-	std::vector<MenuState> myStates;
+		MenuObject& CreateNewObject(const Vector2f& aPosition = { 0.f, 0.f });
 
-};
+		//TODO: Move these to a "MenuLoader"
+		void LoadFromJson(const std::string& aMenuFile);
+		Vector4f JsonToColorVec(nlohmann::json aJson);
+		Vector2f JsonToVec2(nlohmann::json aJson);
+		Vector2f JsonToScreenPosition(nlohmann::json aJson);
+
+		//TODO: These are not needed in game
+		void SaveToJson();
+		nlohmann::json ColorVecToJson(const Vector4f& aVec);
+		nlohmann::json Vec2ToJson(const Vector2f& aVec);
+		nlohmann::json ScreenPositionToJson(const Vector2f& aPosition);
+
+	private:
+		ObjectManager myObjectManager;
+		IDManager myIDManager;
+		SceneManager* mySceneManager;
+
+		std::string myName;
+		std::string myFileName;
+
+		std::stack<MenuState*> myStateStack;
+		std::vector<MenuState> myStates;
+
+		Vector2f myRenderSize;
+	};
+}

@@ -3,7 +3,7 @@
 
 #include "../Defines.h"
 
-#if USE_FE_CONSOLE
+#if _EDITOR
 #include "../editor/shared/postMaster/PostMaster.h"
 #endif
 
@@ -63,7 +63,7 @@ namespace Error
 
 		std::cout << aString << std::endl;
 
-#if USE_FE_CONSOLE
+#ifdef _EDITOR
 		FE::Message message;
 		message.myEventType = FE::eMessageType::PrintToConsole;
 		message.myMessage = std::string(aString);
@@ -75,7 +75,7 @@ namespace Error
 	{
 		std::cout << "[" << aFile << "] " << aString << std::endl;
 
-#if USE_FE_CONSOLE
+#ifdef _EDITOR
 		FE::Message message;
 		message.myEventType = FE::eMessageType::PrintToConsole;
 		message.myMessage = std::string("[" + aFile + "] " + aString);
@@ -90,7 +90,7 @@ namespace Error
 		std::cout << "[WARNING] " << aString << " :S" << std::endl;
 		SetConsoleTextAttribute(console, TEXT_DEFAULT);
 
-#if USE_FE_CONSOLE
+#ifdef _EDITOR
 		FE::Message message;
 		message.myEventType = FE::eMessageType::PrintToConsole;
 		message.myMessage = std::string("[WARNING] " + aString);
@@ -105,7 +105,7 @@ namespace Error
 		std::cout << "[ERROR] " << aString << " :(" << std::endl;
 		SetConsoleTextAttribute(console, TEXT_DEFAULT);
 
-#if USE_FE_CONSOLE
+#ifdef _EDITOR
 		FE::Message message;
 		message.myEventType = FE::eMessageType::PrintToConsole;
 		message.myMessage = std::string("[ERROR] " + aString);
@@ -120,7 +120,7 @@ namespace Error
 		std::cout << "[INFO] " << aString << std::endl;
 		SetConsoleTextAttribute(console, TEXT_DEFAULT);
 
-#if USE_FE_CONSOLE
+#ifdef _EDITOR
 		FE::Message message;
 		message.myEventType = FE::eMessageType::PrintToConsole;
 		message.myMessage = std::string("[INFO] " + aString);
@@ -131,30 +131,26 @@ namespace Error
 
 	void DebugPrintPosition(const std::string& aObjectName, const Vector3f& aPos)
 	{
-		std::cout << "[" << aObjectName << "]\t Position x: " << aPos.x << " y: " << aPos.y << " z: " << aPos.z << std::endl;
-
-#if USE_FE_CONSOLE
-		std::string text = "[" + aObjectName + "]\t Position x: " + std::to_string(aPos.x) + " y: " + std::to_string(aPos.y) + " z: " + std::to_string(aPos.z);
-		FE::Message message;
-		message.myEventType = FE::eMessageType::PrintToConsole;
-		message.myMessage = std::string(text);
-		FE::PostMaster::GetInstance()->SendMessage(message);
-#endif
+		std::string position = "[" + aObjectName + "]\t Position x: " + std::to_string(aPos.x) + " y: " + std::to_string(aPos.y) + " z: " + std::to_string(aPos.z);
+		DebugPrintString(position);
 	}
 
 	void DebugPrintRotation(const std::string& aObjectName, const Vector3f& aRot)
 	{
-		std::cout << "[" << aObjectName << "]\t Rotation x: " << aRot.x << " y: " << aRot.y << " z: " << aRot.z << std::endl;
+		std::string rotation = "[" + aObjectName + "]\t Rotation x: " + std::to_string(aRot.x) + " y: " + std::to_string(aRot.y) + " z: " + std::to_string(aRot.z);
+		DebugPrintString(rotation);
 	}
 
 	void DebugPrintScale(const std::string& aObjectName, const Vector3f& aSca)
 	{
-		std::cout << "[" << aObjectName << "]\t Scale x: " << aSca.x << " y: " << aSca.y << " z: " << aSca.z << std::endl;
+		std::string scale = "[" + aObjectName + "]\t Scale x: " + std::to_string(aSca.x) + " y: " + std::to_string(aSca.y) + " z: " + std::to_string(aSca.z);
+		DebugPrintString(scale);
 	}
 
 	void DebugPrintVector3(const std::string& aObjectName, const Vector3f& aVec)
 	{
-		std::cout << "[" << aObjectName << "]\t x: " << aVec.x << " y: " << aVec.y << " z: " << aVec.z << std::endl;
+		std::string vec = "[" + aObjectName + "]\t x: " + std::to_string(aVec.x) + " y: " + std::to_string(aVec.y) + " z: " + std::to_string(aVec.z);
+		DebugPrintString(vec);
 	}
 
 	void DebugPrintTransform(const std::string& aObjectName, const Transform& aTransform)

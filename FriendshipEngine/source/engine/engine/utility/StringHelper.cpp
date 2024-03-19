@@ -27,3 +27,36 @@ std::string StringHelper::GetFileName(std::string aString)
 	aString = aString.substr(0, aString.find_last_of("."));
 	return aString;
 }
+
+std::string StringHelper::GetNameFromPath(std::string aPath)
+{
+	size_t n = aPath.rfind("/");
+	if (n != std::string::npos)
+	{
+		aPath = aPath.substr(n + 1);
+	}
+
+	n = aPath.rfind("\\");
+	if (n != std::string::npos)
+	{
+		aPath = aPath.substr(n + 1);
+	}
+
+	n = aPath.rfind(".");
+	if (n != std::string::npos)
+	{
+		aPath = aPath.substr(0, n);
+	}
+
+	return aPath;
+}
+
+std::string StringHelper::GetMaterialNameFromPath(std::string aPath)
+{
+	std::string name = GetNameFromPath(aPath);
+	
+	name = name.substr(name.find_first_of("_") + 1);
+	name = name.substr(0, name.rfind("_"));
+	
+	return name;
+}

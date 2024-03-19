@@ -14,13 +14,14 @@ PixelInputType main(AnimatedVertexInstancedInputType input)
     float4 vertexViewPos = mul(modelToWorld, vertexObjectPos);
     float4 vertexClipPos = mul(worldToClipMatrix, vertexViewPos);
 	
-    output.color = float4(input.color.xyz, 1.0f);
+    output.color = float4(input.color.xyz, 0);
     output.binormal = input.binormal;
     output.normal = input.normal;
     output.tangent = input.tangent;
     output.uv = input.uv;
     output.position = vertexClipPos;
     output.worldPosition = vertexObjectPos;
+    output.color = float4(0, 0, 0, 0);
 	
 	return output;
 }

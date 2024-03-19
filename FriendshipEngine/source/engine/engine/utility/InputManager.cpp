@@ -4,6 +4,7 @@
 #include "iostream"
 #include <string> 
 #include <engine/Engine.h>
+#include <engine/utility/Error.h>
 
 InputManager* InputManager::myInstance = nullptr;
 
@@ -33,6 +34,15 @@ void InputManager::Init()
 {
 	myMouse = std::make_unique<DirectX::Mouse>();
 	myMouse->SetWindow(Engine::GetInstance()->GetWindowHandle());
+	myMouse->SetVisible(true);
+	ShowCursor(true);
+
+	myMouseIsVisible = false;
+}
+
+bool InputManager::IsMouseVisible()
+{
+	return myMouseIsVisible;
 }
 
 bool InputManager::UpdateEvents(UINT message, WPARAM wParam, LPARAM lParam)  //LPARAM lParam
@@ -42,32 +52,41 @@ bool InputManager::UpdateEvents(UINT message, WPARAM wParam, LPARAM lParam)  //L
 	lParam;
 	switch (message)
 	{
-		case WM_KEYDOWN:
-			myTentativeState[wParam] = true;
-			return true;
-		case WM_KEYUP:
-			myTentativeState[wParam] = false;
-			return true;
-		case WM_ACTIVATE:
-		case WM_ACTIVATEAPP:
-		case WM_INPUT:
-		case WM_MOUSEMOVE:
-		case WM_LBUTTONDOWN:
-		case WM_LBUTTONUP:
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
-		case WM_MBUTTONDOWN:
-		case WM_MBUTTONUP:
-		case WM_MOUSEWHEEL:
-		case WM_XBUTTONDOWN:
-		case WM_XBUTTONUP:
-		case WM_MOUSEHOVER:
-		case WM_MOUSEACTIVATE:
+	case WM_KEYDOWN:
+		myTentativeState[wParam] = true;
+		return true;
+	case WM_KEYUP:
+		myTentativeState[wParam] = false;
+		return true;
+	case WM_RBUTTONDOWN:
+		myTentativeState[VK_RBUTTON] = true;
+		return true;
+	case WM_RBUTTONUP:
+		myTentativeState[VK_RBUTTON] = false;
+		return false;
+	case WM_ACTIVATE:
+	case WM_ACTIVATEAPP:
+	case WM_INPUT:
+	case WM_MOUSEMOVE:
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+	case WM_MBUTTONDOWN:
+	case WM_MBUTTONUP:
+	case WM_MOUSEWHEEL:
+	case WM_XBUTTONDOWN:
+	case WM_XBUTTONUP:
+	case WM_MOUSEHOVER:
+	case WM_MOUSEACTIVATE:
+	{
+		myCurrentMouseState = myMouse->GetState();
+		myMouse->ProcessMessage(message, wParam, lParam);
+
+		if (GetCurrentMousePosition().x + GetCurrentMousePosition().y != 0)
 		{
-			myPreviousMouseState = myMouse->GetState();
-			myMouse->ProcessMessage(message, wParam, lParam);
-			return true;
+			myTentativeMousePosition = GetCurrentMousePositionVector2i();
 		}
+		return true;
+	}
 	}
 
 	return false;
@@ -93,21 +112,31 @@ void InputManager::LockMouseScreen(HWND mWindow)
 
 	ClipCursor(&rect);
 	myMouse->SetMode(DirectX::Mouse::MODE_RELATIVE);
+	if (IsMouseVisible())
+	{
+		ShowCursor(0);
+		myMouse->SetVisible(false);
+		myMouseIsVisible = false;
+	}
 }
 
 void InputManager::UnlockMouseScreen()
 {
-	myMouse->SetVisible(true);
-	myMouse->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
 	ClipCursor(nullptr);
+	myMouse->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
+	if (!IsMouseVisible())
+	{
+		ShowCursor(1);
+		myMouse->SetVisible(true);
+		myMouseIsVisible = true;
+	}
+	//myMouse->IsVisible();
 }
 
 void InputManager::Update()
 {
-	//myPreviousMousePosition = myCurrentMousePosition;
-	//myCurrentMousePosition = myTentativeMousePosition;
-
 	myPreviousState = myCurrentState;
 	myCurrentState = myTentativeState;
-	myPreviousMouseState = {};
+	myPreviousMouseState = myCurrentMouseState;
+	myCurrentMouseState = {};
 }

@@ -23,8 +23,14 @@ bool Mesh::Initialize(
 {
 	myVertexSize = sizeof(Vertex);
 
+#ifndef _RELEASE
+	myVertices = new Vertex[aVertexCount];
+	memcpy(myVertices, aVerts, myVertexSize * aVertexCount);
+	myVertexCount = static_cast<unsigned int>(aVertexCount);
+#endif
+
 	HRESULT result;
-	auto device = GraphicsEngine::GetInstance()->GetDevice();
+	auto device = GraphicsEngine::GetInstance()->DX().GetDevice();
 	{
 		// Create vertex buffer
 		D3D11_BUFFER_DESC vertexBufferDesc = {};
@@ -75,8 +81,8 @@ bool Mesh::Initialize(
 void Mesh::Render(const DirectX::XMMATRIX& aTransform, const VertexShader* aVS, const PixelShader* aPS, const RenderMode& aRenderMode) const
 {
 	auto* instance = GraphicsEngine::GetInstance();
-	auto* context = instance->GetContext();
-	auto objectBuffer = instance->GetObjectBuffer();
+	auto* context = instance->DX().GetContext();
+	auto& objectBuffer = instance->GetObjectBuffer();
 
 	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
 	auto result = context->Map(objectBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
@@ -108,15 +114,13 @@ void Mesh::Render(const DirectX::XMMATRIX& aTransform, const VertexShader* aVS, 
 	context->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)aRenderMode);
 
 	context->DrawIndexed(myIndexCount, 0, 0);
-#ifdef _DEBUG
 	instance->IncrementDrawCalls();
-#endif
 }
 
 void Mesh::UpdateVertices(Vertex aVertices[], const unsigned int& aVertexCount)
 {
 	auto* instance = GraphicsEngine::GetInstance();
-	auto* context = instance->GetContext();
+	auto* context = instance->DX().GetContext();
 	auto objectBuffer = instance->GetObjectBuffer();
 
 	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};

@@ -48,11 +48,23 @@ void GameApplication::Init(HINSTANCE hInstance, WNDPROC wndProc)
 	Vector2i resolution = {};
 	std::wstring icon; 
 
-#ifdef _DEBUG
-	resolution = { 1600, 900 };
+	{
+		std::vector<RECT> monitorRects;
+		EnumDisplayMonitors(NULL, NULL, [](HMONITOR, HDC, LPRECT lprcMonitor, LPARAM dwData)->BOOL {
+				std::vector<RECT>* monitorRects = reinterpret_cast<std::vector<RECT>*>(dwData);
+				monitorRects->push_back(*lprcMonitor);
+				return TRUE;
+		}, reinterpret_cast<LPARAM>(&monitorRects));
+
+		RECT primaryMonitorRect = monitorRects[0];
+		resolution.x = primaryMonitorRect.right - primaryMonitorRect.left;
+		resolution.y = primaryMonitorRect.bottom - primaryMonitorRect.top;
+	}
+#ifndef _RELEASE
+	resolution.x = static_cast<int>(static_cast<float>(resolution.x) * 0.8f);
+	resolution.y = static_cast<int>(static_cast<float>(resolution.y) * 0.8f);
 	icon = std::wstring(StringHelper::s2ws(RELATIVE_EDITOR_ASSET_PATH) + L"icon.ico");
 #else
-	resolution = { 1920, 1080 };
 	icon = L"icon.ico";
 #endif
 
@@ -66,14 +78,16 @@ void GameApplication::Init(HINSTANCE hInstance, WNDPROC wndProc)
 		return;
 	}
 
-#ifdef _DEBUG
+#ifndef _RELEASE
 	WELCOME_TO_FRIENDSHIPENGINE
 #endif
 
 	//Register Nodes
 	RegisterExampleNodes();
 	RegisterCommonNodes();
-
+	RegisterEntityNodes();
+	RegisterCollisionNodes();
+	RegisterMathNodes();
 
 	myGame = new Game();
 	myGame->Init();
@@ -83,7 +97,30 @@ void GameApplication::Init(HINSTANCE hInstance, WNDPROC wndProc)
 void GameApplication::Update(const float& dt)
 {
 	::Application::Update(dt);
+#ifndef _RELEASE
+	auto* im = InputManager::GetInstance();
+	if (im->IsKeyPressed('0'))
+	{
+		myShouldStep = !myShouldStep;
+	}
+
+	if (myShouldStep)
+	{
+		if (im->IsKeyPressed('9'))
+		{
+			float multiplier = 1.0f;
+			if (im->IsKeyHeld(VK_SHIFT))
+				multiplier = 10.0f;
+			myGame->Update(0.016f * multiplier);
+		}
+	}
+	else
+	{
+		myGame->Update(dt);
+	}
+#else
 	myGame->Update(dt);
+#endif
 	InputManager::GetInstance()->Update();
 }
 

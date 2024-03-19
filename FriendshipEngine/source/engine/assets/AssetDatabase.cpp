@@ -8,6 +8,8 @@
 #include <engine/graphics/animation/AnimationController.h>
 #include <engine/graphics/Texture.h>
 #include "engine\graphics\PrimitiveMeshes\SpherePrimitive.h"
+#include "engine\graphics\PrimitiveMeshes\CubePrimitive.h"
+#include <engine/utility/StringHelper.h>
 
 #undef snprintf
 #include <nlohmann/json.hpp>
@@ -28,6 +30,19 @@ AssetDatabase::AssetDatabase()
 	myMeshNameToMeshId.insert({ "PrimitiveSphere", (int)PrimitiveMeshID::Sphere });
 	myUnityMeshIdToMeshId.insert({ (int)PrimitiveMeshID::Sphere,  (int)PrimitiveMeshID::Sphere });
 	myMeshes.push_back(spherePackage);
+	myMeshPaths.push_back("NoPath");
+
+
+	CubePrimitive cube;
+	cube.ConstructCube();
+
+	SharedMeshPackage cubePackage;
+	cubePackage.meshData.push_back(cube.GetMesh());
+
+
+	myMeshNameToMeshId.insert({ "PrimitiveCube", (int)PrimitiveMeshID::Cube });
+	myUnityMeshIdToMeshId.insert({ (int)PrimitiveMeshID::Cube,  (int)PrimitiveMeshID::Cube });
+	myMeshes.push_back(cubePackage);
 	myMeshPaths.push_back("NoPath");
 }
 
@@ -50,15 +65,6 @@ AssetDatabase::~AssetDatabase()
 		pair.name = "";
 	}
 	myMeshes.clear();
-
-	for (auto& pair : myTextures)
-	{
-		delete pair.second.albedoTexture.texture;
-		delete pair.second.materialTexture.texture;
-		delete pair.second.normalTexture.texture;
-		delete pair.second.emissiveTexture.texture;
-	}
-	myTextures.clear();
 
 	for (auto& pair : myAnimationControllers)
 	{
@@ -110,13 +116,17 @@ void AssetDatabase::LoadAssetsFromJson(const std::string& aJsonPath)
 {
 	myInstance->myHasLoadedAssets = false;
 	nlohmann::json jsonRootObject = myInstance->OpenJson(aJsonPath);
-	myInstance->ReadTextures(jsonRootObject);
+	myInstance->myTextureDatabase.ReadTextures(jsonRootObject);
 	myInstance->ReadMeshes(jsonRootObject);
 	myInstance->ReadAnimations(jsonRootObject);
 	myInstance->myHasLoadedAssets = true;
 }
 
-#include <engine/utility/StringHelper.h>
+void AssetDatabase::UpdateMeshTexture(const size_t& aTextureId, const size_t& aMeshId, const size_t& aMeshDataIndex)
+{
+	myInstance->myMeshes[aMeshId].meshData[aMeshDataIndex]->SetTextures(myInstance->myTextureDatabase.GetTextures(aTextureId));
+}
+
 // TODO: Initialize different shaders?
 void AssetDatabase::ReadMeshes(const nlohmann::json& jsonObject)
 {
@@ -163,52 +173,12 @@ void AssetDatabase::ReadMeshes(const nlohmann::json& jsonObject)
 
 		for (auto& mesh : package.meshData)
 		{
-			if (mesh->GetMaterialPath().length() == 0 && textureId != -1)
+			if (mesh->GetMaterialName().length() == 0 && textureId != -1)
 			{
 				auto& textures = GetTextures(textureId);
 				mesh->SetTextures(textures);
 			}
 		}
-	}
-}
-
-void AssetDatabase::ReadTextures(const nlohmann::json& jsonObject)
-{
-	const char* jsonKey = "textures";
-	if (!jsonObject.contains(jsonKey)) { return; }
-
-	for (auto& json : jsonObject[jsonKey]) {
-		size_t id = json["textureID"].get<size_t>();
-
-		assert(myTextures.find(id) == myTextures.end() && "Trying to add texture that already exist");
-
-		// material name extraction
-		{
-			std::string materialName = json["albedoPath"].get<std::string>();
-
-			size_t n = materialName.find("t_");
-			if (n != std::string::npos)
-			{
-				materialName.erase(materialName.begin(), materialName.begin() + n + 2);
-			}
-			n = materialName.rfind("_");
-			if (n != std::string::npos)
-			{
-				materialName.erase(materialName.begin() + n, materialName.end());
-			}
-
-			myMaterialNameToTextureIndex.insert({ materialName, id });
-		}
-
-		myTextures.insert({
-			id,
-			{
-				{ TextureFactory::CreateTexture(json["albedoPath"].get<std::string>()), json["albedoPath"].get<std::string>() },
-				{ TextureFactory::CreateTexture(json["normalPath"].get<std::string>()), json["normalPath"].get<std::string>() },
-				{ TextureFactory::CreateTexture(json["materialPath"].get<std::string>()), json["materialPath"].get<std::string>() },
-				{ TextureFactory::CreateTexture(json["fxPath"].get<std::string>()), json["fxPath"].get<std::string>() }
-			}
-			});
 	}
 }
 
@@ -227,7 +197,7 @@ void AssetDatabase::ReadAnimations(const nlohmann::json& jsonObject)
 
 		Animation* animation = AnimationFactory::LoadAnimation(RELATIVE_ASSET_PATH + path, this);
 
-		
+
 
 		if (myAnimations.find(meshId) == myAnimations.end())
 		{
@@ -251,7 +221,23 @@ void AssetDatabase::ReadAnimations(const nlohmann::json& jsonObject)
 #endif
 }
 
+void AssetDatabase::LoadVertexTextures(const std::string& aSceneName)
+{
+	myInstance->myTextureDatabase.LoadVertexTextures(aSceneName);
 
+	for (size_t i = 0; i < myInstance->myMeshes.size(); i++)
+	{
+		auto& container = myInstance->myMeshes[i];
+
+		for (size_t j = 0; j < container.meshData.size(); j++)
+		{
+			container.meshData[j]->SetVertexTextureId(
+				myInstance->myTextureDatabase.TryGetVertexTextureIndex(container.meshData[j]->GetFileName(), j)
+			);
+		}
+		//myInstance->myMeshes[i].meshData[0]->SetVertexTextureId(myInstance->myTextureDatabase.GetTextures(i));
+	}
+}
 
 void AssetDatabase::StoreDirectionalLight(DirectionalLight aDirectionalLight)
 {

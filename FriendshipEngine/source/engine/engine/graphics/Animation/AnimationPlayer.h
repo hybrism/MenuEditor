@@ -24,7 +24,7 @@ public:
 	//void UpdatePose(AnimationData& aData);
 
 	void Play(AnimationData& aData);
-	void Pause();
+	void Pause(AnimationData& aData);
 	void Stop(AnimationData& aData);
 
 	void SetFrame(AnimationData& aData, const Animation& aAnimation, const unsigned int& aFrame);
@@ -45,6 +45,4 @@ private:
 		const Skeleton& aSkeleton,
 		const float& aBlendFactor
 	) const;
-
-	bool myIsPlaying = false;
 };

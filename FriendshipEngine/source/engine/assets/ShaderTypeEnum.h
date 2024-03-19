@@ -6,6 +6,7 @@ enum class VsType
 	DefaultPBR,
 	SkinnedPBR,
 	DefaultPBRInstanced,
+	VertexPaintedPBRInstanced,
 
 	// fullscreen
 	Fullscreen,
@@ -41,6 +42,7 @@ enum class PsType
 	MissingTextureDeferred,
 	MissingTextureLegacy,
 	DebugLine,
+	DebugLightSphere,
 
 	// vfx
 	TestVFX,
@@ -48,6 +50,7 @@ enum class PsType
 	//Light
 	DirectionalLight,
 	LightBounds,
+	SkyBox,
 
 	Count
 };

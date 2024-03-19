@@ -4,6 +4,7 @@
 #include <vector>
 
 class Texture;
+
 namespace MENU
 {
 	struct Assets

@@ -26,6 +26,8 @@ public:
 	virtual void WriteToJson(ScriptJson&) const { return; }
 
 	virtual ScriptNodeResult Execute(ScriptExecutionContext&, ScriptPinId) const { return ScriptNodeResult::Finished; }
+
 	virtual bool ShouldExecuteAtStart() const { return false; }
 	virtual bool ShouldExecuteEachFrame() const { return false; }
+
 };

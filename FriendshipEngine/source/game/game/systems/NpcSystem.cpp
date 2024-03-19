@@ -2,10 +2,18 @@
 #include "NpcSystem.h"
 #include <ecs/World.h>
 #include "../component/NpcComponent.h"
-#include <engine\graphics\Animation\AnimationController.h>
-
+#include "../component/AnimationDataComponent.h"
 #include "../component/TransformComponent.h"
+
+
+#include <engine\utility\InputManager.h>
+#include "utility\GameHelperFunctions.h"
+
 #include <iostream>
+#include <engine\graphics\Animation\AnimationController.h>
+#include <assets\AssetDatabase.h>
+#include <random>
+
 NpcSystem::NpcSystem(World* aWorld) : System(aWorld)
 {
 }
@@ -14,78 +22,114 @@ void NpcSystem::Init()
 {
 	for (Entity entity : myEntities)
 	{
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_real_distribution<float> dis(0.f, 1.f );
+
+		
 
 		auto& npcComponent = myWorld->GetComponent<NpcComponent>(entity);
-		auto& transform = myWorld->GetComponent<TransformComponent>(entity);
+	//	auto& transform = myWorld->GetComponent<TransformComponent>(entity);
 
-		npcComponent.StartPos = transform.transform.GetPosition();
+		//transform.transform.SetPosition(myPos);
+		//myPlayerPos = playerTransform.transform.GetPosition();
+		
+
+		npcComponent.DelayTimer = dis(gen);
 		npcComponent.lerpingPos = npcComponent.StartPos;
+
+
+
 
 	}
 
 }
 
-void NpcSystem::Update(const float& dt)
+void NpcSystem::Update(const SceneUpdateContext& aContext)
 {
 
 
 	for (Entity entity : myEntities)
 	{
-
 		auto& npcComponent = myWorld->GetComponent<NpcComponent>(entity);
-		auto& transform = myWorld->GetComponent<TransformComponent>(entity);
+		/*auto& transform = myWorld->GetComponent<TransformComponent>(entity);*/
+		auto& anim = myWorld->GetComponent<AnimationDataComponent>(entity);
+
+
 
 		AnimationDataParameter parameter;
-		parameter.i = static_cast<int>(npcComponent.myNpcState);
-		
-		FollowPath(dt, npcComponent, transform);
+
+		auto controller = AssetDatabase::GetAnimationController(myWorld->GetComponent<MeshComponent>(entity).id);
+
+		parameter = static_cast<int>(npcComponent.myNpcState);
+
+		controller->SetParameter("state", parameter, anim, anim.parameters);
+
+
+		auto im = InputManager::GetInstance();
+
+		if (im->IsKeyPressed('1'))
+		{
+			npcComponent.myNpcState = npcState::walk;
+		}
+		if (im->IsKeyPressed('2'))
+		{
+			npcComponent.myNpcState = npcState::dead;
+
+		}
+
+		FollowPath(aContext.dt);
 	}
 
 	
 }
 
-void NpcSystem::FollowPath(const float& dt, NpcComponent& aNpc, TransformComponent& aTransform)
+void NpcSystem::FollowPath(const float& dt)
 {
 	if (GetAsyncKeyState('Z'))
 	{
 		ActivateGroup(1);
 	}
 
-	if (aNpc.GroupID == 1 && aNpc.IsActive == true)
+	for (Entity entity : myEntities)
 	{
-		Vector3f dir = aNpc.walkToPos - aNpc.lerpingPos;
-		dir.Normalize();
-		Vector3f movement = dir * 250.f * dt;
-		aNpc.lerpingPos += movement;
+		auto& npcComponent = myWorld->GetComponent<NpcComponent>(entity);
+		auto& transformComponent = myWorld->GetComponent<TransformComponent>(entity);
 
-		if ((aNpc.walkToPos - aNpc.lerpingPos).LengthSqr() <= (movement.LengthSqr()))
+		if (npcComponent.GroupID == 1 && npcComponent.IsActive == true)
 		{
-			//	aTransform.transform.SetEulerAngles();
-			aNpc.lerpingPos = aNpc.walkToPos;
+			npcComponent.DelayTimer -= dt;
 
-			Vector3f temp = aNpc.walkToPos;
-			aNpc.walkToPos = aNpc.StartPos;
-			aNpc.StartPos = temp;
+			if (npcComponent.DelayTimer <= 0.f)
+			{
+				npcComponent.myNpcState = npcState::walk;
+				Vector3f dir = (npcComponent.walkToPos - npcComponent.lerpingPos).GetNormalized();
+				Vector3f movement = dir * npcComponent.movementSpeed * dt;
+				npcComponent.lerpingPos += movement;
+
+				if ((npcComponent.walkToPos - npcComponent.lerpingPos).LengthSqr() <= (movement.LengthSqr()))
+				{
+
+					npcComponent.lerpingPos = npcComponent.walkToPos;
+					std::swap(npcComponent.walkToPos, npcComponent.StartPos);
+
+				}
+
+
+				transformComponent.transform.SetPosition(npcComponent.lerpingPos);
+
+
+
+				if (dir != Vector3f(0, 0, 0))
+				{
+					float yaw = atan2f(dir.x, dir.z) * 180.0f / M_FRIEND_PI;
+
+					transformComponent.transform.SetEulerAngles(Vector3f(0, yaw, 0));
+
+				}
+			}
+
 		}
-
-		aTransform.transform.SetPosition(aNpc.lerpingPos);
-
-		if (dir != Vector3f(0, 0, 0))
-		{
-			float yaw = atan2f(-dir.x, dir.z) * 180.0f / M_FRIEND_PI;
-
-			aTransform.transform.SetEulerAngles(Vector3f(0, yaw, 0));
-
-		}
-
-		else if (aNpc.GroupID == 2 && aNpc.IsActive == true)
-		{
-
-
-
-		}
-
-
 	}
 }
 

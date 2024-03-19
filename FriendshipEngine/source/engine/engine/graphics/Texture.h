@@ -2,7 +2,8 @@
 #include <wrl/client.h>
 #include "../math/Vector.h"
 
-enum class ShaderTextureSlot;
+enum class PixelShaderTextureSlot;
+enum class VertexShaderTextureSlot;
 
 using Microsoft::WRL::ComPtr;
 struct ID3D11ShaderResourceView;
@@ -14,6 +15,11 @@ class Texture
 public:
 	// DDS
 	Texture(ComPtr<ID3D11ShaderResourceView> aShaderResourceView);
+	Texture(
+		ComPtr<ID3D11ShaderResourceView> aShaderResourceView,
+		const int& aWidth,
+		const int& aHeight
+	);
 
 	// PNG
 	Texture(
@@ -24,11 +30,16 @@ public:
 		ID3D11Texture2D* aTexture
 	);
 	~Texture();
-	void Bind(const int& aSlot) const;
-	void Bind(const ShaderTextureSlot& aSlot) const;
+	void Bind(const unsigned int& aSlot, bool aShouldBindToPixelShader = true) const;
+	void Bind(const PixelShaderTextureSlot& aSlot) const;
+	void Bind(const VertexShaderTextureSlot& aSlot) const;
 	Vector2f GetTextureSize() const;
 	ID3D11ShaderResourceView* GetShaderResourceView() const { return myShaderResourceView.Get(); };
 
+	// TEMP: SHOULD BE REMOVED AFTER MODIFYING SRV DIRECTLY
+#ifdef _EDITOR
+	void SetShaderResourceView(ComPtr<ID3D11ShaderResourceView> aShaderResourceView) { myShaderResourceView = aShaderResourceView; }
+#endif
 private:
 	int myWidth, myHeight;
 	unsigned char* myRgbaPixels = nullptr;

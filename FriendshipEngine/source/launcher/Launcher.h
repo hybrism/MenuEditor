@@ -12,9 +12,9 @@ public:
 	void Update(const float& dt) override;
 	void Render() override;
 	const Timer& GetTimer() const override;
-private:
-	void RenderBackbuffer();
 	bool BeginFrame() override;
 	void EndFrame() override;
+private:
+	void RenderBackbuffer();
 	GameApplication* myGameApplication;
 };

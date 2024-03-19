@@ -156,10 +156,9 @@ void MenuEditorLauncher::Update(const float& dt)
 
 void MenuEditorLauncher::Render()
 {
-
-	GraphicsEngine::GetInstance()->SetRawBackBufferAsRenderTarget();
 	myMenuEditor.Render();
 
+	GraphicsEngine::GetInstance()->SetRawBackBufferAsRenderTarget();
 	ImGuiHandler::Render();
 }
 

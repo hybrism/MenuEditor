@@ -12,7 +12,7 @@ PixelOutput main(PixelInputType input)
     result.color = saturate(float4(1, 0, 1, 1) * lightIntensity);
     result.color.a = 1.f;
     
-    float3 cameraPosition = modelToWorld[3].xyz;
+    float3 cameraPosition = GetCameraPosition();
     float3 toEye = normalize(cameraPosition - input.worldPosition.xyz);
     
     

@@ -1,100 +1,104 @@
 #include "pch.h"
-#include "SpriteComponent.h"
 
+#include "SpriteComponent.h"
+#include "../MenuObject.h"
+
+#include <engine/graphics/GraphicsEngine.h>
 #include <engine/graphics/sprite/SpriteDrawer.h>
 
-void SpriteComponent::Init()
+MENU::SpriteComponent::SpriteComponent(MenuObject& aParent, unsigned int aID)
+	: MenuComponent(aParent, aID, ComponentType::Sprite)
+{}
+
+void MENU::SpriteComponent::Update(const MenuUpdateContext& aContext)
 {
+	aContext;
+
+	myInstance.position = myParent.GetPosition() + myPosition;
 }
 
-void SpriteComponent::Update()
+void MENU::SpriteComponent::Render()
 {
-}
-
-void SpriteComponent::Render()
-{
-	if (!mySharedData.texture)
+	if (!myTextures[(int)myParent.GetState()].shared.texture)
 		return;
 
+	myInstance.color = myTextures[(int)myParent.GetState()].color;
+
 	//TODO: Don't do this for all components
-	SpriteDrawer& spriteDrawer = GraphicsEngine::GetInstance()->GetSpriteDrawer();
-	spriteDrawer.Draw(mySharedData, myInstance);
+	GraphicsEngine::GetInstance()->GetSpriteRenderer().DrawSprite(myTextures[(int)myParent.GetState()].shared, myInstance);
 }
 
-SpriteInstanceData& SpriteComponent::GetInstanceData()
+Texture* MENU::SpriteComponent::GetTexture(ObjectState aType) const
 {
-	return myInstance;
+	return myTextures[(int)aType].shared.texture;
 }
 
-Vector2f& SpriteComponent::GetPosition()
+Vector4f& MENU::SpriteComponent::GetColor(ObjectState aType)
 {
-	return myInstance.position;
+	return myTextures[(int)aType].color;
 }
 
-Vector2f& SpriteComponent::GetSize()
+Vector2f MENU::SpriteComponent::GetTextureSize(ObjectState aType) const
 {
-	return myInstance.size;
-}
-
-Vector2f& SpriteComponent::GetPivot()
-{
-	return myInstance.pivot;
-}
-
-Vector2f& SpriteComponent::GetScaleMultiplier()
-{
-	return myInstance.scaleMultiplier;
-}
-
-Vector4f& SpriteComponent::GetColor()
-{
-	return myInstance.color;
-}
-
-ClipValue& SpriteComponent::GetClipValue()
-{
-	return myInstance.clip;
-}
-
-float& SpriteComponent::GetRotation()
-{
-	return myInstance.rotation;
-}
-
-bool& SpriteComponent::GetIsHidden()
-{
-	return myInstance.isHidden;
-}
-
-Texture* SpriteComponent::GetTexture() const
-{
-	return mySharedData.texture;
-}
-
-Vector2f SpriteComponent::GetTextureSize() const
-{
-	if (mySharedData.texture == nullptr)
+	if (myTextures[(int)aType].shared.texture == nullptr)
 		return Vector2f(0, 0);
 
-	return mySharedData.texture->GetTextureSize();
+	return myTextures[(int)aType].shared.texture->GetTextureSize();
 }
 
-std::string SpriteComponent::GetTexturePath()
+std::string MENU::SpriteComponent::GetTexturePath(ObjectState aType)
 {
-	if (mySharedData.texture == nullptr)
-		return "";
+	if (myTextures[(int)aType].shared.texture == nullptr)
+		return "(None)";
 
-	return myTextureFile;
+	return myTextures[(int)aType].fileName;
 }
 
-void SpriteComponent::SetTexture(Texture* aTexture, const std::string& aTextureName)
+void MENU::SpriteComponent::SetPosition(const Vector2f& aPosition)
 {
-	myTextureFile = aTextureName;
-	mySharedData.texture = aTexture;
-	myInstance.size = mySharedData.texture->GetTextureSize();
+	myPosition = aPosition;
 }
 
-void SpriteComponent::SetPosition(Vector2f aPosition)
+void MENU::SpriteComponent::SetPivot(const Vector2f& aPivot)
 {
-	myInstance.position = aPosition;
+	myInstance.pivot = aPivot;
+}
+
+void MENU::SpriteComponent::SetSize(const Vector2f& aSize)
+{
+	myInstance.size = aSize;
+}
+
+void MENU::SpriteComponent::SetScaleMultiplier(const Vector2f& aScaleMultiplier)
+{
+	myInstance.scaleMultiplier = aScaleMultiplier;
+}
+
+void MENU::SpriteComponent::SetColor(const Vector4f& aColor, ObjectState aState)
+{
+	myTextures[(int)aState].color = aColor;
+}
+
+void MENU::SpriteComponent::SetClipValue(const ClipValue& aClipValue)
+{
+	myInstance.clip = aClipValue;
+}
+
+void MENU::SpriteComponent::SetRotation(float aRotation)
+{
+	myInstance.rotation = aRotation;
+}
+
+void MENU::SpriteComponent::SetIsHidden(bool aIsHidden)
+{
+	myInstance.isHidden = aIsHidden;
+}
+
+void MENU::SpriteComponent::SetTexture(Texture* aTexture, const std::string& aTextureName, ObjectState aType)
+{
+	myTextures[(int)aType].fileName = aTextureName;
+	myTextures[(int)aType].shared.texture = aTexture;
+
+	if (aType == ObjectState::Default)
+		myInstance.size = myTextures[(int)aType].shared.texture->GetTextureSize();
 }

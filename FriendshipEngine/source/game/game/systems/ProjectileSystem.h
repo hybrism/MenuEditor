@@ -5,11 +5,11 @@
 #include "../component/MeshComponent.h"
 #include "../component/MetaDataComponent.h"
 
-class ProjectileSystem : public System
+class ProjectileSystem : public System<ProjectileSystem>
 {
 public:
 	ProjectileSystem(World* aWorld);
 
 	void Init() override;
-	void Update(const float& dt) override;
+	void Update(const SceneUpdateContext& dt) override;
 };

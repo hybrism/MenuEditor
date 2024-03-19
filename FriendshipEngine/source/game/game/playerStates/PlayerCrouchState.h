@@ -1,16 +1,13 @@
 #pragma once
 #include "PlayerState.h"
 
-
-
 class PlayerCrouchState : public PlayerState
 {
 public:
-	void OnEnter() override;
-	void OnExit() override;
-
-	void Update(const float& dt) override;
-	int GetID() override { return myStateID; };
-
-	int myStateID = 2;
+	PlayerCrouchState(PlayerStateMachine* aStateMachine);
+	void OnEnter(PlayerStateUpdateContext& aContext) override;
+	void OnExit(PlayerStateUpdateContext& aContext) override;
+	void Update(PlayerStateUpdateContext& aContext) override;
+private:
+	bool CanUncrouch(PlayerStateUpdateContext& aContext);
 };

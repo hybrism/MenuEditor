@@ -1,71 +1,123 @@
 #pragma once
-#include <engine/math/Vector.h>
+#include <string>
+#include <vector>
+#include <memory>
+#include <cassert>
 
-class MenuComponent;
-class MenuObject
+#include "IDManager.h"
+#include "MenuUpdateContext.h"
+
+#include "components/ComponentTypeEnum.h"
+#include "components/MenuComponent.h"
+
+namespace MENU
 {
-	friend class ObjectManager;
+	class MenuObject
+	{
+		friend class ObjectManager;
 
-public:
-	const unsigned int myID;
+	public:
+		MenuObject(const unsigned int aID, const Vector2f& aPosition = { 0.f, 0.f });
+		~MenuObject();
 
-	MenuObject(const unsigned int aID);
+		template<class T>
+		T& AddComponent();
 
-	template<class T>
-	T& AddComponent();
+		void RemoveComponent(const ID aID);
 
-	template<class T>
-	T& GetComponent();
+		template<class T>
+		T& GetComponent();
 
-	template<class T>
-	bool HasComponent();
+		template<class T>
+		std::vector<std::shared_ptr<MenuComponent>> GetComponents();
 
-	virtual void Init();
-	virtual void Update();
-	virtual void Render();
+		template<class T>
+		bool HasComponent();
 
-	void SetName(const std::string& aName) { myName = aName; }
-	void SetPosition(const Vector2f& aPosition);
+		void AddComponentOfType(ComponentType aType);
 
-	std::string GetName() const { return myName; }
-	Vector2f GetPosition() const { return myPosition; }
+		virtual void Update(const MenuUpdateContext& aContext);
+		virtual void Render();
 
-private:
-	std::vector<std::shared_ptr<MenuComponent>> myComponents1DVector;
-	std::string myName;
-	Vector2f myPosition;
-};
+		bool IsHovered();
+		bool IsPressed();
+
+		void SetName(const std::string& aName) { myName = aName; }
+		void SetPosition(const Vector2f& aPosition);
+
+		const ID GetID() const { return myID; }
+		const ObjectState GetState() { return myState; }
+		std::string& GetName() { return myName; }
+		Vector2f GetPosition() const { return myPosition; }
+
+	private:
+		MenuObject() = delete;
+
+		std::vector<std::shared_ptr<MenuComponent>> myComponents;
+
+		ObjectState myState;
+
+		const ID myID;
+		ID myComponentIDCounter = 0;
+		std::string myName;
+		Vector2f myPosition;
+	};
+}
 
 template<class T>
-inline T& MenuObject::AddComponent()
+inline T& MENU::MenuObject::AddComponent()
 {
-	std::shared_ptr<T> component = std::make_shared<T>(*this);
-	myComponents1DVector.emplace_back(component);
+	std::shared_ptr<T> component = std::make_shared<T>(*this, myComponentIDCounter++);
+	myComponents.emplace_back(component);
 	return *component;
 }
 
+/// <summary>
+/// Gets reference to first component of type
+/// </summary>
 template<class T>
-inline T& MenuObject::GetComponent()
+inline T& MENU::MenuObject::GetComponent()
 {
-	for (size_t i = 0; i < myComponents1DVector.size(); i++)
+	std::shared_ptr<MenuComponent> result = nullptr;
+
+	for (size_t i = 0; i < myComponents.size(); i++)
 	{
-		if (typeid(*myComponents1DVector[i]) == typeid(T))
+		if (typeid(*myComponents[i]) == typeid(T))
 		{
-			return static_cast<T&>(*myComponents1DVector[i]);
+			result = myComponents[i];
 		}
 	}
 
-	//TODO: Fix this
-	T& fail = static_cast<T&>(*myComponents1DVector[0]);
-	return fail;
+	assert(result != nullptr && "Trying to get component that does not exist!");
+
+	return static_cast<T&>(*result);
+}
+
+/// <summary>
+/// Gets vector of pointers to all components of type
+/// </summary>
+template<class T>
+inline std::vector<std::shared_ptr<MENU::MenuComponent>> MENU::MenuObject::GetComponents()
+{
+	std::vector<std::shared_ptr<MenuComponent>> result;
+
+	for (size_t i = 0; i < myComponents.size(); i++)
+	{
+		if (typeid(*myComponents[i]) == typeid(T))
+		{
+			result.push_back(myComponents[i]);
+		}
+	}
+
+	return result;
 }
 
 template<class T>
-inline bool MenuObject::HasComponent()
+inline bool MENU::MenuObject::HasComponent()
 {
-	for (size_t i = 0; i < myComponents1DVector.size(); i++)
+	for (size_t i = 0; i < myComponents.size(); i++)
 	{
-		if (typeid(*myComponents1DVector[i]) == typeid(T))
+		if (typeid(*myComponents[i]) == typeid(T))
 			return true;
 	}
 

@@ -27,7 +27,7 @@ PixelOutput main(PixelInputType input)
     float3 specularColor = lerp((float3) 0.04f, albedo, Metalness);
     float3 diffuseColor = lerp((float3) 0.00f, albedo, 1 - Metalness);
     
-    float3 cameraPosition = modelToWorld[3].xyz;
+    float3 cameraPosition = GetCameraPosition();
     float3 toEye = normalize(cameraPosition - worldPosition.xyz);
     float3 normal = aNormalTexture.Sample(aDefaultSampler, uv).rgb;
     

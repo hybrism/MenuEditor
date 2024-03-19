@@ -48,12 +48,18 @@ void Game::Init()
 
 	myPostProcess.Init();
 	mySceneManager.Init();
-	myLightManager.Init({0,-1,0}, { 118.f / 256.f, 75.f / 256.f, 35.f / 256.f ,0 });
+	myLightManager.Init({ 0,-1,0 }, { 118.f / 256.f, 75.f / 256.f, 35.f / 256.f ,1 });
+	mySkyBox.Init();
+
+	myContext.lightManager = &GetLightManager();
+	myContext.postProcess = &GetPostProcess();
+	myContext.sceneManager = &GetSceneManager();
 }
 
-void Game::Update(const float& dt)
+void Game::Update(const float& aDT)
 {
-	if (!mySceneManager.Update(dt))
+	myContext.dt = aDT;
+	if (!mySceneManager.Update(myContext))
 		PostQuitMessage(0);
 
 	mySceneManager.LateUpdate();
@@ -68,6 +74,8 @@ void Game::Render()
 		GBuffer& gBuffer = ge->GetGBuffer();
 		DeferredRenderer& deferred = ge->GetDeferredRenderer();
 		ForwardRenderer& forward = ge->GetForwardRenderer();
+		SpriteRenderer& sprite = ge->GetSpriteRenderer();
+		auto prevDrawCalls = ge->GetDrawCalls();
 
 		// Shadows
 		myLightManager.BeginShadowRendering();
@@ -75,23 +83,43 @@ void Game::Render()
 		forward.DoShadowRenderPass();
 		myLightManager.EndShadowRendering();
 
-		deferred.DoGBufferPass();
 
 
-		//Light
-		myPostProcess.FirstFrame();
+		if ((ge->GetDrawCalls() - prevDrawCalls) > 0)
 		{
-			gBuffer.SetAllAsResources(1);
+			deferred.DoGBufferPass();
+			//mySkyBox.Render(); //TO:DO Find a nicer place for the SkyBox to live.  Utkommenterad tills jag vet varf?r vingarna f?rsvinner n?r man titttar p? skyboxen
 
-			myLightManager.LightRender();
-			myLightManager.SetResourcesOnSlot();
 
-			deferred.DoFinalPass();
-			forward.DoRenderPass();
 
-			gBuffer.ClearAllResources(1);
+#ifndef _RELEASE
+			myLightManager.RenderPointLightSpheres();
+#endif
+
+
+			myPostProcess.FirstFrame();
+			{
+				gBuffer.SetAllAsResources(1);
+
+				myLightManager.LightRender();
+				myLightManager.SetResourcesOnSlot();
+
+				deferred.DoFinalPass();
+				forward.DoRenderPass();
+			}
+
+
 			myLightManager.ClearAllResources();
 		}
 		myPostProcess.Render();
+		sprite.Render();
 	}
 }
+
+//void Game::Clear()
+//{
+//	auto* ge = GraphicsEngine::GetInstance();
+//	auto* context = ge->DX().GetContext();
+//	ID3D11ShaderResourceView* nullsrv = nullptr;
+//	context->PSSetShaderResources(13, 1, &nullsrv);
+//}

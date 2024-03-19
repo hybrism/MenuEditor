@@ -4,6 +4,7 @@
 
 enum class npcState
 {
+	dead,
 	walk,
 	count
 };
@@ -14,6 +15,7 @@ struct NpcComponent : public Component<NpcComponent>
 	int ID;
 	int GroupID;
 	float DelayTimer;
+	float movementSpeed;
 	bool IsActive;
 	Vector3f walkToPos;
 	Vector3f StartPos;
@@ -21,5 +23,6 @@ struct NpcComponent : public Component<NpcComponent>
 
 
 
-	npcState myNpcState = npcState::walk;
+	npcState myNpcState = npcState::dead;
 };
+

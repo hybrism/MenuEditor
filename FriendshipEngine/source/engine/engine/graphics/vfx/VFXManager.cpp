@@ -96,15 +96,31 @@ void VFXManager::Render()
 			const VisualEffect& effect = myVfxDatabase->GetEffect(vfx.visualEffectId);
 			const VisualEffectCell& cell = effect.GetCell(i);
 			
-			for (SharedMesh* data : package.meshData)
+			for (SharedMesh* mesh : package.meshData)
 			{
-				MeshInstanceRenderData instanceData;
-				instanceData.renderMode = RenderMode::TRIANGLELIST;
-				instanceData.vsType = VsType::DefaultVFX;
-				instanceData.psType = cell.type;
-				instanceData.transform = Transform(cell.transform.GetMatrix() * matrix);
-				instanceData.data = VfxMeshInstanceData{ vfx.activeMeshesTime[i] };
-				forward.Render(static_cast<Mesh*>(data), instanceData, BlendState::AlphaBlend);
+				//MeshInstanceRenderData instanceData;
+				//instanceData.renderMode = RenderMode::TRIANGLELIST;
+				//instanceData.vsType = VsType::DefaultVFX;
+				//instanceData.psType = cell.type;
+				//instanceData.transform = Transform(cell.transform.GetMatrix() * matrix);
+
+				//VfxMeshInstanceData data{};
+				//data.transform = instanceData.transform;
+				//data.time = vfx.activeMeshesTime[i];
+				VfxMeshInstanceData instanceData;
+				instanceData.transform = Transform(cell.transform.GetMatrix() * matrix);// , vfx.activeMeshesTime[i] };
+				instanceData.time = vfx.activeMeshesTime[i];
+
+				forward.Render(
+					static_cast<Mesh*>(mesh),
+					{
+						instanceData,
+						VsType::DefaultVFX,
+						cell.type,
+						RenderMode::TRIANGLELIST
+					},
+					BlendState::AlphaBlend
+				);
 			}
 		}
 	}

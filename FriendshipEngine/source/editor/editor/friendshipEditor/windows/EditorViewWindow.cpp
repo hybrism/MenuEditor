@@ -17,7 +17,7 @@ void FE::EditorViewWindow::Show(const EditorUpdateContext& aContext)
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
 		ImVec2 region = ImGui::GetContentRegionAvail();
-		Vector2i dimensions = GraphicsEngine::GetInstance()->GetViewportDimensions();
+		Vector2i dimensions = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
 
 		float aspectRatio = (float)dimensions.x / (float)dimensions.y;
 		if (region.x / region.y > aspectRatio)

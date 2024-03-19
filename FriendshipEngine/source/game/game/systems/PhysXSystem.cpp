@@ -31,9 +31,9 @@ void PhysXSystem::Init()
 
 }
 
-void PhysXSystem::Update(const float& dt)
+void PhysXSystem::Update(const SceneUpdateContext& aContext)
 {
-	myPhysXSceneManager->Update(dt);
+	myPhysXSceneManager->Update(aContext.dt);
 
 	for (auto& entity : myEntities)
 	{

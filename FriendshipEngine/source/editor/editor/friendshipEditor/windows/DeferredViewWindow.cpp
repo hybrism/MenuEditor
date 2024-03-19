@@ -51,7 +51,7 @@ void FE::DeferredViewWindow::Show(const EditorUpdateContext& aContext)
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
 			ImGui::Text("DepthBuffer");
-			ImGui::Image(ge->GetDepthBuffer().mySRV.Get(), ImVec2(256, 144));
+			ImGui::Image(ge->GetDepthBuffer().SRV.Get(), ImVec2(256, 144));
 
 
 			ImGui::EndTable();

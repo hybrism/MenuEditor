@@ -1,97 +1,97 @@
 {
     "sceneName": "lvl_assetGym",
     "entities": [
-        38842,
-        38868,
-        38860,
-        38830,
-        38876,
-        38834,
-        38872,
-        38846,
-        38880,
-        38850,
-        -20126,
-        38824,
-        -20102,
-        -20110,
-        -20118,
-        -20142,
-        -20134
+        165446,
+        165472,
+        165464,
+        165434,
+        165480,
+        165438,
+        165476,
+        165450,
+        165484,
+        165454,
+        -108024,
+        165428,
+        -108000,
+        -108008,
+        -108016,
+        -107992,
+        -108032
     ],
     "names": [
         {
-            "entityID": 38842,
+            "entityID": 165446,
             "name": "----Enviorment----"
         },
         {
-            "entityID": 38868,
+            "entityID": 165472,
             "name": "Main Camera"
         },
         {
-            "entityID": 38860,
+            "entityID": 165464,
             "name": "Directional Light"
         },
         {
-            "entityID": 38830,
+            "entityID": 165434,
             "name": "Blockout Walkable"
         },
         {
-            "entityID": 38876,
+            "entityID": 165480,
             "name": "Lighting"
         },
         {
-            "entityID": 38834,
+            "entityID": 165438,
             "name": "Setdress"
         },
         {
-            "entityID": 38872,
+            "entityID": 165476,
             "name": "---Characters---"
         },
         {
-            "entityID": 38846,
+            "entityID": 165450,
             "name": "Player"
         },
         {
-            "entityID": 38880,
+            "entityID": 165484,
             "name": "Enemies"
         },
         {
-            "entityID": 38850,
+            "entityID": 165454,
             "name": "---Scripted Events---"
         },
         {
-            "entityID": -20126,
+            "entityID": -108024,
             "name": "sm_ground_4x4"
         },
         {
-            "entityID": 38824,
+            "entityID": 165428,
             "name": "Directional Light (1)"
         },
         {
-            "entityID": -20102,
+            "entityID": -108000,
             "name": "sm_BuildingDetails_5x7_a"
         },
         {
-            "entityID": -20110,
+            "entityID": -108008,
             "name": "sm_buildingBlock_5x5x7"
         },
         {
-            "entityID": -20118,
+            "entityID": -108016,
             "name": "sm_BuildingDetails_5x7_b"
         },
         {
-            "entityID": -20142,
+            "entityID": -107992,
             "name": "sm_BuildingDetails_10x7_b"
         },
         {
-            "entityID": -20134,
+            "entityID": -108032,
             "name": "sm_BuildingDetails_10x7_a"
         }
     ],
     "transforms": [
         {
-            "entityID": 38842,
+            "entityID": 165446,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -111,7 +111,7 @@
             "parent": 0
         },
         {
-            "entityID": 38868,
+            "entityID": 165472,
             "position": {
                 "x": 0.0,
                 "y": 1.0,
@@ -131,7 +131,7 @@
             "parent": 0
         },
         {
-            "entityID": 38860,
+            "entityID": 165464,
             "position": {
                 "x": 0.0,
                 "y": 3.0,
@@ -151,7 +151,7 @@
             "parent": 0
         },
         {
-            "entityID": 38830,
+            "entityID": 165434,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -171,7 +171,7 @@
             "parent": 0
         },
         {
-            "entityID": 38876,
+            "entityID": 165480,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -191,7 +191,7 @@
             "parent": 0
         },
         {
-            "entityID": 38834,
+            "entityID": 165438,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -211,7 +211,7 @@
             "parent": 0
         },
         {
-            "entityID": 38872,
+            "entityID": 165476,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -231,7 +231,7 @@
             "parent": 0
         },
         {
-            "entityID": 38846,
+            "entityID": 165450,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -251,7 +251,7 @@
             "parent": 0
         },
         {
-            "entityID": 38880,
+            "entityID": 165484,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -271,7 +271,7 @@
             "parent": 0
         },
         {
-            "entityID": 38850,
+            "entityID": 165454,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -291,7 +291,7 @@
             "parent": 0
         },
         {
-            "entityID": -20126,
+            "entityID": -108024,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -311,7 +311,7 @@
             "parent": 0
         },
         {
-            "entityID": 38824,
+            "entityID": 165428,
             "position": {
                 "x": 25.79751205444336,
                 "y": 9.000000953674317,
@@ -331,7 +331,7 @@
             "parent": 0
         },
         {
-            "entityID": -20102,
+            "entityID": -108000,
             "position": {
                 "x": 22.0,
                 "y": 0.0,
@@ -351,7 +351,7 @@
             "parent": 0
         },
         {
-            "entityID": -20110,
+            "entityID": -108008,
             "position": {
                 "x": 17.0,
                 "y": 0.0,
@@ -371,7 +371,7 @@
             "parent": 0
         },
         {
-            "entityID": -20118,
+            "entityID": -108016,
             "position": {
                 "x": 22.0,
                 "y": 0.0,
@@ -391,7 +391,7 @@
             "parent": 0
         },
         {
-            "entityID": -20142,
+            "entityID": -107992,
             "position": {
                 "x": 16.87112808227539,
                 "y": 0.0,
@@ -411,7 +411,7 @@
             "parent": 0
         },
         {
-            "entityID": -20134,
+            "entityID": -108032,
             "position": {
                 "x": 27.05415916442871,
                 "y": 0.0,
@@ -434,27 +434,27 @@
     "boxColliders": [],
     "meshFilters": [
         {
-            "entityID": -20126,
+            "entityID": -108024,
             "meshID": 1734886493
         },
         {
-            "entityID": -20102,
+            "entityID": -108000,
             "meshID": -1916461377
         },
         {
-            "entityID": -20110,
+            "entityID": -108008,
             "meshID": -418910219
         },
         {
-            "entityID": -20118,
+            "entityID": -108016,
             "meshID": -1270741138
         },
         {
-            "entityID": -20142,
+            "entityID": -107992,
             "meshID": 503376106
         },
         {
-            "entityID": -20134,
+            "entityID": -108032,
             "meshID": 503383399
         }
     ],
@@ -462,7 +462,7 @@
     "lightComponents": [],
     "directionalLightComponentData": [
         {
-            "entityID": 38860,
+            "entityID": 165464,
             "color": {
                 "x": 1.0,
                 "y": 0.95686274766922,
@@ -475,7 +475,7 @@
             }
         },
         {
-            "entityID": 38824,
+            "entityID": 165428,
             "color": {
                 "x": 1.0,
                 "y": 1.0,
@@ -490,10 +490,11 @@
     ],
     "cameraComponent": [
         {
-            "entityID": 38868
+            "entityID": 165472
         }
     ],
     "eventColliderComponents": [],
+    "eventComponents": [],
     "animationComponents": [],
     "physXComponents": [],
     "orbComponent": [],

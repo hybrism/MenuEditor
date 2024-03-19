@@ -6,27 +6,26 @@
 // Engine
 #include <engine/Paths.h>
 #include <engine/Engine.h>
-#include <engine/graphics/GraphicsEngine.h>
-#include <engine/graphics/Camera.h>
 #include <engine/utility/StringHelper.h>
 #include <engine/utility/Error.h>
+#include <engine/graphics/Camera.h>
+#include <engine/graphics/GraphicsEngine.h>
 #include <engine/graphics/model/Mesh.h>
 #include <engine/graphics/model/SkeletalMesh.h>
 #include <engine/graphics/model/MeshDrawer.h>
-#include <engine/graphics/DirectionalLightManager.h>
+#include <engine/graphics/Light/LightManager.h>
+#include <engine/graphics/renderer/DeferredRenderer.h>
 
 //Assets
 #include <assets/ModelFactory.h>
 #include <assets/FactoryStructs.h>
 #include <assets/ShaderDatabase.h>
 #include <engine/graphics/Texture.h>
+#include <assets/TextureFactory.h>
 
 //Internal
 #include <shared/postMaster/PostMaster.h>
 
-//BEFORE BUILD MODELVIEWER:
-// [ ] Go to Engine->Application->ApplicationEntryPoint.cpp and change USE_CONSOLE_WINDOW to '0'
-// 
 //AFTER BUILD:
 // [ ] Copy bin + content to new folder, remove uneccesary files (unused .pdb and .exes for example)
 // [ ] Test open .exe to see if it works
@@ -36,7 +35,7 @@ ModelViewer::ModelViewer()
 {
 	myInitialValues[(int)eInitialValues::CameraPosition] = { 0, 250.f, 500.f };
 	myInitialValues[(int)eInitialValues::CameraRotation] = { 0, 180, 0 };
-	myInitialValues[(int)eInitialValues::LightDirection] = { 275.f, 1.f, 0.f };
+	myInitialValues[(int)eInitialValues::LightDirection] = { 40.f, -50.f, 0.f };
 	myInitialValues[(int)eInitialValues::LightColor] = { 1.f, 1.f, 1.f };
 	myInitialValues[(int)eInitialValues::MeshPosition] = { 0, 0, 0 };
 	myInitialValues[(int)eInitialValues::MeshRotation] = { 0, 0, 0 };
@@ -49,28 +48,29 @@ ModelViewer::ModelViewer()
 
 ModelViewer::~ModelViewer() {}
 
-void ModelViewer::Init()
+void ModelViewer::Init(LightManager* aLightManager)
 {
+	myLightManager = aLightManager;
+
 	//SUBSCRIBE TO EVENTS
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::MeshDropped);
 
 	//SET VALUES TO LIGHT AND CAMERA
 	auto graphicsEngine = GraphicsEngine::GetInstance();
-	//DirectionalLightManager* lightManager = graphicsEngine->GetDirectionalLightManager();
-	
+
 	graphicsEngine->GetCamera()->GetTransform().SetPosition(myInitialValues[(int)eInitialValues::CameraPosition]);
 	graphicsEngine->GetCamera()->GetTransform().SetEulerAngles(myInitialValues[(int)eInitialValues::CameraRotation]);
-	//lightManager->SetColor(myInitialValues[(int)eInitialValues::LightColor]);
-	//lightManager->SetDirection(myInitialValues[(int)eInitialValues::LightDirection]);
+	myLightManager->SetDirectionalLightsColor({ myInitialValues[(int)eInitialValues::LightColor].x, myInitialValues[(int)eInitialValues::LightColor].y, myInitialValues[(int)eInitialValues::LightColor].z, 1.f });
+	myLightManager->GetDirectionalLight().myDirectionalLightCamera->GetTransform().SetEulerAngles(myInitialValues[(int)eInitialValues::LightDirection]);
 
 	//LOAD ICONS
 	std::wstring assetPath = StringHelper::s2ws(RELATIVE_MODELVIEWER_ASSET_PATH);
-	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_home.dds", myIcons[(int)eIcon::Home]);
-	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_light.dds", myIcons[(int)eIcon::Light]);
-	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_camera.dds", myIcons[(int)eIcon::Camera]);
-	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_mesh.dds", myIcons[(int)eIcon::Mesh]);
-	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_file.dds", myIcons[(int)eIcon::LoadedMeshes]);
-	myTextureFactory.CreateDDSTexture(assetPath + L"icons/s_goose.dds", myIcons[(int)eIcon::Goose]);
+	TextureFactory::CreateDDSTexture(assetPath + L"icons/s_home.dds", myIcons[(int)eIcon::Home]);
+	TextureFactory::CreateDDSTexture(assetPath + L"icons/s_light.dds", myIcons[(int)eIcon::Light]);
+	TextureFactory::CreateDDSTexture(assetPath + L"icons/s_camera.dds", myIcons[(int)eIcon::Camera]);
+	TextureFactory::CreateDDSTexture(assetPath + L"icons/s_mesh.dds", myIcons[(int)eIcon::Mesh]);
+	TextureFactory::CreateDDSTexture(assetPath + L"icons/s_file.dds", myIcons[(int)eIcon::LoadedMeshes]);
+	TextureFactory::CreateDDSTexture(assetPath + L"icons/s_goose.dds", myIcons[(int)eIcon::Goose]);
 
 	//GET CUBEMAP-PATHS
 	for (const auto& entry : std::filesystem::directory_iterator(RELATIVE_CUBEMAP_ASSET_PATH))
@@ -82,29 +82,39 @@ void ModelViewer::Init()
 		}
 	}
 
-	graphicsEngine->SetCubemap(std::string(RELATIVE_CUBEMAP_ASSET_PATH) + myCubemapPaths[12]);
+	graphicsEngine->SetCubemap(std::string(RELATIVE_CUBEMAP_ASSET_PATH) + myCubemapPaths[10]);
 
 	//INIT FLOOR & GIZMO
 	myMeshes[(int)eMeshType::Floor].mesh = CreateMeshAndGetTextures(RELATIVE_MODELVIEWER_ASSET_PATH + (std::string)"models/sm_floor.fbx");
-	myMeshes[(int)eMeshType::Floor].instance = {};
+	myMeshes[(int)eMeshType::Floor].instance.vsType = VsType::DefaultPBRInstanced;
+	myMeshes[(int)eMeshType::Floor].instance.psType = PsType::GBuffer;
 	myMeshes[(int)eMeshType::Floor].instance.data = StaticMeshInstanceData();
 	myMeshes[(int)eMeshType::Gizmo].mesh = CreateMeshAndGetTextures(RELATIVE_MODELVIEWER_ASSET_PATH + (std::string)"models/sm_gizmo.fbx");
+	myMeshes[(int)eMeshType::Gizmo].instance.vsType = VsType::DefaultPBRInstanced;
+	myMeshes[(int)eMeshType::Gizmo].instance.psType = PsType::GBuffer;
 	myMeshes[(int)eMeshType::Gizmo].instance.data = myMeshes[(int)eMeshType::Floor].instance.data;
+
+	myMeshes[(int)eMeshType::Display].instance.data = StaticMeshInstanceData();
 }
 
 void ModelViewer::Update(float dt)
 {
 	RotateCameraWithMouse(dt);
+	CameraUpdate(dt);
 
-	SettingsWindow();
 	ModelWindow();
 }
+
+
 
 void ModelViewer::Render()
 {
 	GraphicsEngine* ge = GraphicsEngine::GetInstance();
-	MeshDrawer& meshDrawer = ge->GetMeshDrawer();
-	//ge->GetDirectionalLightManager()->UpdateBuffer();
+	RenderState state;
+	state.blendState = BlendState::Disabled;
+	state.depthStencilState = DepthStencilState::ReadWrite;
+	state.rasterizerState = RasterizerState::BackfaceCulling;
+	ge->SetRenderState(state);
 
 	for (size_t i = 0; i < (int)eMeshType::Count; i++)
 	{
@@ -126,10 +136,14 @@ void ModelViewer::Render()
 			}
 			else
 			{
-				meshDrawer.Draw(*myMeshes[i].mesh.meshData[j], myMeshes[i].instance);
+				ge->GetDeferredRenderer().Render(
+					(Mesh*)myMeshes[i].mesh.meshData[j],
+					myMeshes[i].instance);
 			}
 		}
 	}
+
+	SettingsWindow();
 }
 
 void ModelViewer::RecieveMessage(const FE::Message& aMessage)
@@ -142,7 +156,8 @@ void ModelViewer::RecieveMessage(const FE::Message& aMessage)
 		PrintI(filename);
 
 		myMeshes[(int)eMeshType::Display].mesh = CreateMeshAndGetTextures(filename);
-		myMeshes[(int)eMeshType::Display].instance = {};
+		myMeshes[(int)eMeshType::Display].instance.psType = PsType::GBuffer;
+		myMeshes[(int)eMeshType::Display].instance.vsType = VsType::DefaultPBRInstanced;
 		myMeshes[(int)eMeshType::Display].instance.data = StaticMeshInstanceData();
 		myMeshes[(int)eMeshType::Gizmo].instance.data = myMeshes[(int)eMeshType::Display].instance.data;
 
@@ -164,7 +179,7 @@ void ModelViewer::ModelWindow()
 	{
 		ImVec2 region = ImGui::GetContentRegionAvail();
 		ImVec2 screenCursorPos = ImGui::GetCursorScreenPos();
-		Vector2i dimensions = GraphicsEngine::GetInstance()->GetViewportDimensions();
+		Vector2i dimensions = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
 
 		float aspectRatio = (float)dimensions.x / (float)dimensions.y;
 		if (region.x / region.y > aspectRatio)
@@ -217,9 +232,7 @@ void ModelViewer::SettingsWindow()
 		ImGui::SetItemTooltip("View and load previous Meshes");
 
 		if (ImGui::ImageButton("Goose", myIcons[(int)eIcon::Goose].Get(), ImVec2(64, 64)))
-		{
-			//TODO: Play freebird 
-		}
+			ImGui::OpenPopup("LoadedMeshes");
 		ImGui::SetItemTooltip("Secret button, no function here yet :p");
 
 		CameraSettings();
@@ -235,12 +248,9 @@ void ModelViewer::LightingSettings()
 	if (ImGui::BeginPopup("LightSettings"))
 	{
 		auto graphicsEngine = GraphicsEngine::GetInstance();
-		//auto directionalLightManager = graphicsEngine->GetDirectionalLightManager();
-		//Vector3f directionalLightRotation = directionalLightManager->GetDirection();
-		//Vector4f directionalLightColor = directionalLightManager->GetColor();
 
 		ImGui::SeparatorText("Lighting"); ImGui::Spacing();
-		static int item_current_idx = 12;
+		static int item_current_idx = 10;
 		std::string combo_preview_value = myCubemapPaths[item_current_idx];
 		if (ImGui::BeginCombo("Cubemaps", combo_preview_value.c_str()))
 		{
@@ -261,12 +271,16 @@ void ModelViewer::LightingSettings()
 		}
 
 		ImGui::Spacing();
-		//if (ImGui::DragFloat3("Directional Light Direction", &directionalLightRotation.x))
-		//	directionalLightManager->SetDirection(directionalLightRotation);
 
-		//ImGui::Spacing();
-		//if (ImGui::ColorEdit4("Directional Light Color", &directionalLightColor.x))
-		//	directionalLightManager->SetColor(directionalLightColor);
+
+		if (ImGui::DragFloat2("Rotation", &myLightManager->GetDirectionalLight().myEuler.x))
+		{
+			myLightManager->GetDirectionalLight().myDirectionalLightCamera->GetTransform().SetEulerAngles(myLightManager->GetDirectionalLight().myEuler);
+		}
+
+		ImGui::DragFloat("Directional Intensity", &myLightManager->GetDirectionalLight().myIntensity, 0.05f, 0.0f);
+		ImGui::DragFloat("Ambient Intensity", &myLightManager->GetDirectionalLight().myAmbientIntensity, 0.05f, 0.0f);
+
 
 		ImGui::Spacing();
 		if (ImGui::Button("Set Light to Default settings", ImVec2(ImGui::GetContentRegionAvail().x, 18)))
@@ -319,13 +333,14 @@ void ModelViewer::MeshAndTexturesData()
 
 	if (ImGui::BeginPopup("Mesh and Textures"))
 	{
-		Vector3f meshPosition = myMeshes[(int)eMeshType::Display].instance.transform.GetPosition();
+		StaticMeshInstanceData& instanceData = std::get<StaticMeshInstanceData>(myMeshes[(int)eMeshType::Display].instance.data);
+		Vector3f position = instanceData.transform.GetPosition();
 
 		//MESH
 		ImGui::SeparatorText("Mesh"); ImGui::Spacing();
-		if (ImGui::DragFloat3("Mesh position", &meshPosition.x))
+		if (ImGui::DragFloat3("Mesh position", &position.x))
 		{
-			myMeshes[(int)eMeshType::Display].instance.transform.SetPosition(meshPosition);
+			instanceData.transform.SetPosition(position);
 			myMeshes[(int)eMeshType::Gizmo].instance.transform = myMeshes[(int)eMeshType::Display].instance.transform;
 		}
 
@@ -464,19 +479,16 @@ void ModelViewer::SetAllValuesToDefault()
 
 void ModelViewer::SetMeshToDefault()
 {
-	myMeshes[(int)eMeshType::Display].instance.transform.SetPosition(myInitialValues[(int)eInitialValues::MeshPosition]);
-	myMeshes[(int)eMeshType::Display].instance.transform.Rotate(myInitialValues[(int)eInitialValues::MeshRotation]);
+	StaticMeshInstanceData& instanceData = std::get<StaticMeshInstanceData>(myMeshes[(int)eMeshType::Display].instance.data);
+	instanceData.transform.SetPosition({ 0.f, 0.f, 0.f });
 
 	myMeshes[(int)eMeshType::Gizmo].instance.transform = myMeshes[(int)eMeshType::Display].instance.transform;
 }
 
 void ModelViewer::SetLightToDefault()
 {
-	auto graphicsEngine = GraphicsEngine::GetInstance();
-	graphicsEngine;
-	//DirectionalLightManager* lightManager = graphicsEngine->GetDirectionalLightManager();
-	//lightManager->SetColor(myInitialValues[(int)eInitialValues::LightColor]);
-	//lightManager->SetDirection(myInitialValues[(int)eInitialValues::LightDirection]);
+	myLightManager->SetDirectionalLightsColor({ myInitialValues[(int)eInitialValues::LightColor].x, myInitialValues[(int)eInitialValues::LightColor].y, myInitialValues[(int)eInitialValues::LightColor].z, 1.f });
+	myLightManager->GetDirectionalLight().myDirectionalLightCamera->GetTransform().SetEulerAngles(myInitialValues[(int)eInitialValues::LightDirection]);
 }
 
 void ModelViewer::SetCameraToDefault()
@@ -499,7 +511,7 @@ SharedMeshPackage ModelViewer::CreateMeshAndGetTextures(const std::string& aFile
 	{
 		meshes.meshData[i]->SetMaterialName(meshInformation.meshData[i].materialName);
 
-		TextureCollection textures = FindTextures(aFilePath, meshes.meshData[i]->GetMaterialPath());
+		TextureCollection textures = FindTextures(aFilePath, meshes.meshData[i]->GetMaterialName());
 
 		meshes.meshData[i]->SetVertexShader(ShaderDatabase::GetVertexShader(VsType::DefaultPBRInstanced));
 		meshes.meshData[i]->SetPixelShader(ShaderDatabase::GetPixelShader(PsType::MissingTextureLegacy));
@@ -507,7 +519,7 @@ SharedMeshPackage ModelViewer::CreateMeshAndGetTextures(const std::string& aFile
 		if (CouldFindTextures(textures))
 		{
 			meshes.meshData[i]->SetTextures(textures);
-			meshes.meshData[i]->SetPixelShader(ShaderDatabase::GetPixelShader(PsType::DefaultPBR));
+			meshes.meshData[i]->SetPixelShader(ShaderDatabase::GetPixelShader(PsType::GBuffer));
 		}
 		else
 		{
@@ -525,7 +537,7 @@ SharedMeshPackage ModelViewer::CreateMeshAndGetTextures(const std::string& aFile
 TextureCollection ModelViewer::FindTextures(const std::string& aFilePath, const std::string& aModelMaterial)
 {
 	myMissingTexturesData = "";
-	
+
 	std::string filename;
 	std::string path;
 
@@ -551,21 +563,25 @@ TextureCollection ModelViewer::FindTextures(const std::string& aFilePath, const 
 	std::string normal = "t_" + aModelMaterial + "_n.dds";
 
 	TextureCollection textureCollection;
-	textureCollection.albedoTexture.path = albedo;
-	textureCollection.materialTexture.path = material;
-	textureCollection.normalTexture.path = normal;
-	textureCollection.emissiveTexture.path = emissive;
 
-	CreateTextures(path, textureCollection);
+	if (CaseSensitiveComparison(albedo, path))
+	{
+		textureCollection.albedoTexture.path = albedo;
+		textureCollection.materialTexture.path = material;
+		textureCollection.normalTexture.path = normal;
+		textureCollection.emissiveTexture.path = emissive;
+
+		CreateTextures(path, textureCollection);
+	}
 
 	if (CouldFindTextures(textureCollection))
 		return textureCollection;
 
 	myMissingTexturesData += "Textures listed in fbx:\n";
-	myMissingTexturesData += textureCollection.albedoTexture.path + "\n";
-	myMissingTexturesData += textureCollection.materialTexture.path + "\n";
-	myMissingTexturesData += textureCollection.normalTexture.path + "\n";
-	myMissingTexturesData += textureCollection.emissiveTexture.path + "\n\n";
+	myMissingTexturesData += albedo + "\n";
+	myMissingTexturesData += material + "\n";
+	myMissingTexturesData += emissive + "\n";
+	myMissingTexturesData += normal + "\n\n";
 
 	//IF NOT, LOOK FOR TEXTURE BY FILENAME
 	std::string materialName = "";
@@ -589,28 +605,45 @@ TextureCollection ModelViewer::FindTextures(const std::string& aFilePath, const 
 	emissive = "t_" + materialName + "_fx.dds";
 	normal = "t_" + materialName + "_n.dds";
 
-	textureCollection.albedoTexture.path = albedo;
-	textureCollection.materialTexture.path = material;
-	textureCollection.normalTexture.path = normal;
-	textureCollection.emissiveTexture.path = emissive;
+	if (CaseSensitiveComparison(albedo, path))
+	{
+		textureCollection.albedoTexture.path = albedo;
+		textureCollection.materialTexture.path = material;
+		textureCollection.normalTexture.path = normal;
+		textureCollection.emissiveTexture.path = emissive;
 
-	CreateTextures(path, textureCollection);
+		CreateTextures(path, textureCollection);
+	}
 
 	myMissingTexturesData += "Search by Filename:\n";
-	myMissingTexturesData += textureCollection.albedoTexture.path + "\n";
-	myMissingTexturesData += textureCollection.materialTexture.path + "\n";
-	myMissingTexturesData += textureCollection.normalTexture.path + "\n";
-	myMissingTexturesData += textureCollection.emissiveTexture.path + "\n";
+	myMissingTexturesData += albedo + "\n";
+	myMissingTexturesData += material + "\n";
+	myMissingTexturesData += emissive + "\n";
+	myMissingTexturesData += normal + "\n\n";
 
 	return textureCollection;
 }
 
+bool ModelViewer::CaseSensitiveComparison(const std::string& aTextureFile, const std::string& aPath)
+{
+	for (const auto& entry : std::filesystem::directory_iterator(aPath))
+	{
+		if (entry.path().filename().extension() != ".dds")
+			continue;
+
+		if (aTextureFile == entry.path().filename().string())
+			return true;
+	}
+
+	return false;
+}
+
 void ModelViewer::CreateTextures(const std::string& aFilePath, TextureCollection& aTextureCollection)
 {
-	aTextureCollection.albedoTexture.texture = myTextureFactory.CreateTexture(aFilePath + aTextureCollection.albedoTexture.path, false);
-	aTextureCollection.materialTexture.texture = myTextureFactory.CreateTexture(aFilePath + aTextureCollection.materialTexture.path, false);
-	aTextureCollection.normalTexture.texture = myTextureFactory.CreateTexture(aFilePath + aTextureCollection.normalTexture.path, false);
-	aTextureCollection.emissiveTexture.texture = myTextureFactory.CreateTexture(aFilePath + aTextureCollection.emissiveTexture.path, false);
+	aTextureCollection.albedoTexture.texture = TextureFactory::CreateTexture(aFilePath + aTextureCollection.albedoTexture.path, false);
+	aTextureCollection.materialTexture.texture = TextureFactory::CreateTexture(aFilePath + aTextureCollection.materialTexture.path, false);
+	aTextureCollection.normalTexture.texture = TextureFactory::CreateTexture(aFilePath + aTextureCollection.normalTexture.path, false);
+	aTextureCollection.emissiveTexture.texture = TextureFactory::CreateTexture(aFilePath + aTextureCollection.emissiveTexture.path, false);
 }
 
 bool ModelViewer::CouldFindTextures(const TextureCollection& aTextureCollection)
@@ -644,4 +677,38 @@ void ModelViewer::RotateCameraWithMouse(float dt)
 	}
 
 	myPreviousMousePosition = myCurrentMousePosition;
+}
+
+void ModelViewer::CameraUpdate(float dt)
+{
+	auto graphicsEngine = GraphicsEngine::GetInstance();
+	auto camera = graphicsEngine->GetCamera();
+
+	myActiveSpeedMultiplier = ImGui::IsKeyDown(ImGuiKey_LeftShift);
+	float multiplier = 1 + myMoveMultiplier * static_cast<int>(myActiveSpeedMultiplier);
+
+	float movement = myCameraMovementSpeed * multiplier * dt;
+	Vector3f direction = { 0.f, 0.f, 0.f };
+
+	if (ImGui::IsKeyDown(ImGuiKey_W))
+		direction += camera->GetTransform().GetForward();
+
+	if (ImGui::IsKeyDown(ImGuiKey_S))
+		direction -= camera->GetTransform().GetForward();
+
+	if (ImGui::IsKeyDown(ImGuiKey_A))
+		direction -= camera->GetTransform().GetRight();
+
+	if (ImGui::IsKeyDown(ImGuiKey_D))
+		direction += camera->GetTransform().GetRight();
+
+	if (ImGui::IsKeyDown(ImGuiKey_E))
+		direction += camera->GetTransform().GetUp();
+
+	if (ImGui::IsKeyDown(ImGuiKey_Q))
+		direction -= camera->GetTransform().GetUp();
+
+
+	camera->GetTransform().Translate(direction * movement);
+
 }

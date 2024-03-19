@@ -1,55 +1,122 @@
 #include "pch.h"
+
 #include "TextComponent.h"
-#include <engine/text/text.h>
+#include "../MenuObject.h"
+#include <engine/utility/StringHelper.h>
 
-TextComponent::TextComponent(MenuObject& aParent)
-	: MenuComponent(aParent)
+MENU::TextComponent::TextComponent(MenuObject& aParent, unsigned int aID)
+	: MenuComponent(aParent, aID, ComponentType::Text)
 {
-	myText = new Text(L"ProggyClean.ttf", FontSize_30);
-	myText->SetPosition({100, 100});
+	myString = "(None)";
+	myFontName = "ProggyClean.ttf";
+	mySize = FontSize_14;
+	myIsCentered = true;
+
+	myColors.fill({ 1.f, 1.f, 1.f, 1.f });
+	myText.SetPosition(myParent.GetPosition());
+	UpdateText();
 }
 
-void TextComponent::Init()
+void MENU::TextComponent::Update(const MenuUpdateContext& aContext)
 {
+	aContext;
 }
 
-void TextComponent::Update()
+void MENU::TextComponent::Render()
 {
+	myText.SetColor(myColors[(int)myParent.GetState()]);
+
+	myText.Render();
 }
 
-void TextComponent::Render()
+void MENU::TextComponent::UpdatePosition()
 {
-	if (myText)
-		myText->Render();
+	if (myIsCentered)
+		myText.CenterTextOverPosition(myParent.GetPosition() + myPosition);
+	else
+		myText.SetPosition(myParent.GetPosition() + myPosition);
 }
 
-std::string TextComponent::GetText()
+std::string MENU::TextComponent::GetText() const
 {
 	return myString;
 }
 
-const Vector2f TextComponent::GetPosition()
+std::string MENU::TextComponent::GetFontName() const
 {
-	return myText->GetPosition();
+	return myFontName;
 }
 
-const Vector4f TextComponent::GetColor()
+FontSize MENU::TextComponent::GetFontSize() const
 {
-	return myText->GetColor();
+	return mySize;
 }
 
-void TextComponent::SetText(const std::string& aText)
+Vector2f MENU::TextComponent::GetPosition() const
+{
+	return myPosition;
+}
+
+Vector4f MENU::TextComponent::GetColor(ObjectState aState) const
+{
+	return myColors[(int)aState];
+}
+
+bool MENU::TextComponent::GetIsCentered() const
+{
+	return myIsCentered;
+}
+
+void MENU::TextComponent::UpdateText()
+{
+	std::wstring wstr = StringHelper::s2ws(myFontName);
+	const wchar_t* fontFile = wstr.c_str();
+
+	myText = Text(fontFile, mySize);
+
+	myText.SetText(myString);
+	myText.SetColor(myColors[(int)ObjectState::Default]);
+	SetPosition(myPosition);
+}
+
+void MENU::TextComponent::SetFont(const std::string& aFontName)
+{
+	myFontName = aFontName;
+	UpdateText();
+}
+
+void MENU::TextComponent::SetFontSize(FontSize aSize)
+{
+	mySize = aSize;
+	UpdateText();
+}
+
+void MENU::TextComponent::SetText(const std::string& aText)
 {
 	myString = aText;
-	myText->SetText(aText);
+	myText.SetText(aText);
 }
 
-void TextComponent::SetPosition(const Vector2f& aPosition)
+void MENU::TextComponent::SetPosition(const Vector2f& aPosition)
 {
-	myText->SetPosition(aPosition);
+	myPosition = aPosition;
+
+	UpdatePosition();
 }
 
-void TextComponent::SetColor(const Vector4f& aColor)
+void MENU::TextComponent::SetColor(const Vector4f& aColor, ObjectState aState)
 {
-	myText->SetColor(aColor);
+	myColors[(int)aState] = aColor;
+}
+
+void MENU::TextComponent::SetIsCentered(bool aBool)
+{
+	myIsCentered = aBool;
+
+	UpdatePosition();
+}
+
+void MENU::TextComponent::CenterTextOverPosition()
+{
+	myText.CenterTextOverPosition(myParent.GetPosition() + myPosition);
 }

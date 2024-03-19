@@ -1947,9 +1947,9 @@ static void MiniMapUpdate()
 // [SECTION] selection helpers
 
 template<typename T>
-void SelectObject(const ImObjectPool<T>& objectIds, ImVector<int>& selected_indices, const int id)
+void SelectObject(const ImObjectPool<T>& objects, ImVector<int>& selected_indices, const int id)
 {
-    const int idx = ObjectPoolFind(objectIds, id);
+    const int idx = ObjectPoolFind(objects, id);
     IM_ASSERT(idx >= 0);
     IM_ASSERT(selected_indices.find(idx) == selected_indices.end());
     selected_indices.push_back(idx);
@@ -1957,20 +1957,20 @@ void SelectObject(const ImObjectPool<T>& objectIds, ImVector<int>& selected_indi
 
 template<typename T>
 void ClearObjectSelection(
-    const ImObjectPool<T>& objectIds,
+    const ImObjectPool<T>& objects,
     ImVector<int>&         selected_indices,
     const int              id)
 {
-    const int idx = ObjectPoolFind(objectIds, id);
+    const int idx = ObjectPoolFind(objects, id);
     IM_ASSERT(idx >= 0);
     IM_ASSERT(selected_indices.find(idx) != selected_indices.end());
     selected_indices.find_erase_unsorted(idx);
 }
 
 template<typename T>
-bool IsObjectSelected(const ImObjectPool<T>& objectIds, ImVector<int>& selected_indices, const int id)
+bool IsObjectSelected(const ImObjectPool<T>& objects, ImVector<int>& selected_indices, const int id)
 {
-    const int idx = ObjectPoolFind(objectIds, id);
+    const int idx = ObjectPoolFind(objects, id);
     return selected_indices.find(idx) != selected_indices.end();
 }
 

@@ -33,6 +33,12 @@ public:
 	void SetPosition(const Vector3f& aPosition);
 	void SetEulerAngles(const Vector3f& aEulerAngles);
 	void SetScale(const Vector3f& aScale);
+
+	Transform operator*=(const Transform& aTransform)
+	{
+		myMatrix = DirectX::XMMatrixMultiply(myMatrix, aTransform.GetMatrix());
+		return *this;
+	}
 private:
 	DirectX::XMMATRIX myMatrix;
 };

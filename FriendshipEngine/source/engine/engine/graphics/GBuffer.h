@@ -18,7 +18,7 @@ enum class GBufferTexture
 	Normal, // stored as 0.5f + 0.5f*normal
 	VertexNormal,
 	Material,
-	AmbientOcclusionAndCustom, // Ambient occlusion in R, rest is unused
+	Effects, // Ambient occlusion in R, rest is unused
 	Count
 };
 
@@ -35,7 +35,7 @@ public:
 	void SetAsResourceOnSlot(GBufferTexture aTexture, unsigned int aSlot);
 	void SetAllAsResources(const unsigned int& aStartSlot);
 	void ClearAllResources(const unsigned int& aStartSlot);
-#ifdef _DEBUG
+#ifndef _RELEASE
 	void CopyToStaging();
 #endif
 public: // temp
@@ -43,5 +43,5 @@ public: // temp
 	std::array<ComPtr<ID3D11Texture2D>, (int)GBufferTexture::Count> myTextures;
 	std::array<ComPtr<ID3D11RenderTargetView>, (int)GBufferTexture::Count> myRTVs;
 	std::array<ComPtr<ID3D11ShaderResourceView>, (int)GBufferTexture::Count> mySRVs;
-	std::shared_ptr<const D3D11_VIEWPORT> myViewport;
+	D3D11_VIEWPORT myViewport;
 };

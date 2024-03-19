@@ -18,6 +18,7 @@ namespace FE
 		Console,
 		ScriptEditor,
 		VertexPainter,
+		DirectionalLight,
 		Count
 	};
 

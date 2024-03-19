@@ -1,6 +1,6 @@
 #pragma once
 
-class HitboxSystem : public System
+class HitboxSystem : public System<HitboxSystem>
 {
 public:
 	HitboxSystem(World* aWorld);
@@ -11,7 +11,7 @@ public:
 
 
 	// Inherited via System
-	virtual void Update(const float& dt) override;
+	virtual void Update(const SceneUpdateContext& dt) override;
 
 };
 

@@ -25,28 +25,33 @@ void FE::SceneHierarchyWindow::Show(const EditorUpdateContext& aContext)
 
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
-		ImGui::SeparatorText("Scene Hierarcy");
 
-		ImGui::InputTextWithHint("Hierarchy search", "(Case sensitive)", &mySceneHierarchySearchWord);
+		ImGui::SeparatorText("Scene Hierarcy");
+		ImGui::InputTextWithHint("Search", "(Case sensitive)", &mySceneHierarchySearchWord);
 
 		ImGui::Text("[EntityID] ObjectName");
 		ImGui::Text("Hold left ctrl to open more windows");
-		ImGui::Separator();
 
-		for (Entity entity : entities)
+		if (ImGui::BeginChild("Entities"))
 		{
-			auto& data = aContext.world->GetComponent<MetaDataComponent>(entity);
 
-			std::string displayName = "[" + std::to_string(entity) + "] " + data.name;
-
-			if (displayName.find(mySceneHierarchySearchWord) != std::string::npos)
+			for (Entity entity : entities)
 			{
-				if (ImGui::Selectable(displayName.c_str(), mySelectedEntity == entity))
+				auto& data = aContext.world->GetComponent<MetaDataComponent>(entity);
+
+				std::string displayName = "[" + std::to_string(entity) + "] " + data.name;
+
+				if (displayName.find(mySceneHierarchySearchWord) != std::string::npos)
 				{
-					mySelectedEntity = entity;
-					PushInspectorWindow(entity);
+					if (ImGui::Selectable(displayName.c_str(), mySelectedEntity == entity))
+					{
+						mySelectedEntity = entity;
+						PushInspectorWindow(entity);
+					}
 				}
 			}
+
+			ImGui::EndChild();
 		}
 	}
 	ImGui::End();

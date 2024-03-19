@@ -28,8 +28,12 @@ void AudioManager::Init()
 	std::string jumpFilePath = RELATIVE_AUDIO_ASSET_PATH;
 	jumpFilePath += "Jump.wav";
 
+	std::string freeBird = RELATIVE_AUDIO_ASSET_PATH;
+	freeBird += "Freebird.wav";
+
 	LoadSound(jumpFilePath, false, false, false);
-	//PlaySound(freeBirdFilePath, {0,50,0}, 1.f);
+	LoadSound(freeBird, false, false, false);
+	//PlaySound(freeBird, {0,0,0}, 0.6f);
 }
 
 void AudioManager::Destroy()

@@ -7,8 +7,12 @@
 union AnimationDataParameter
 {
 	float f;
-	int i;
 	bool b;
+
+	AnimationDataParameter() : f(0) { }
+	AnimationDataParameter(float aValue) : f(aValue) { }
+	AnimationDataParameter(int aValue) : f(static_cast<float>(aValue)) { }
+	AnimationDataParameter(bool aValue) : b(aValue) { }
 };
 
 typedef AnimationDataParameter AnimationDataParameterContainer[ANIMATION_DATA_PARAMETER_COUNT];
@@ -27,6 +31,8 @@ struct AnimationData
 	float exitTimer = 0.0f;
 	float transitionTimer = 0.0f;
 	float blendFactor = 0.0f;
+	bool isPlaying = true;
+	bool isDone = false;
 
 	bool IsTransitioning() const
 	{

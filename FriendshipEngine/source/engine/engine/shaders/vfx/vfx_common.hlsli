@@ -8,7 +8,9 @@ struct VfxVertexInputType
     float3 normal : NORMAL;
     float3 binormal : BINORMAL;
     float3 tangent : TANGENT;
-    float1 time : TEXCOORD1;
+    uint1 vertexIndex : SV_VertexID;
+    float4x4 instanceTransform : WORLD;
+    float time : TIME;
 };
 
 struct VfxPixelInputType
@@ -16,9 +18,11 @@ struct VfxPixelInputType
     float4 position : SV_POSITION;
     float4 worldPosition : POSITION;
     float4 color : COLOR;
+    float2 uv : TEXCOORD0;
     float3 normal : NORMAL;
     float3 binormal : BINORMAL;
     float3 tangent : TANGENT;
-    float2 uv : TEXCOORD0;
-    float1 time : TEXCOORD1;
+    //float1 time : TEXCOORD1;
+    //float1 time : TIME;
+    float time : TIME;
 };

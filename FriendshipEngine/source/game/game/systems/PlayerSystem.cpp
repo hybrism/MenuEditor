@@ -43,14 +43,13 @@ PlayerSystem::PlayerSystem(World* aWorld, PhysXSceneManager* aPhysXSceneManager)
 
 PlayerSystem::~PlayerSystem()
 {
-	DeletePlayerStates();
 }
 
 #include <iostream>
 #include <assets/AssetDatabase.h>
 void PlayerSystem::Init()
 {
-	CreatePlayerStates();
+	myMouseSensitivyMultiplier = GraphicsEngine::GetInstance()->DX().GetViewportDimensions().x / 1920.0f;
 
 	VisualEffect testEffect{};
 	float tempDuration = 0.65f;
@@ -59,7 +58,7 @@ void PlayerSystem::Init()
 		cell.meshId = AssetDatabase::GetMeshIdFromName("sm_aoe1");
 		cell.startTime = 0;
 		cell.duration = tempDuration;
-		cell.transform = DirectX::XMMatrixIdentity();
+		cell.transform = DirectX::XMMatrixRotationRollPitchYaw(90 * Deg2Rad, 0, 0);
 		cell.transform.SetPosition({ 100, 0, 0 });
 		cell.type = PsType::TestVFX;
 		testEffect.AddCell(cell);
@@ -69,7 +68,7 @@ void PlayerSystem::Init()
 		cell.meshId = AssetDatabase::GetMeshIdFromName("sm_aoe1");
 		cell.startTime = 0.2f;
 		cell.duration = tempDuration;
-		cell.transform = DirectX::XMMatrixIdentity();
+		cell.transform = DirectX::XMMatrixRotationRollPitchYaw(90 * Deg2Rad, 0, 0);
 		cell.transform.SetPosition({ 0, 0, 100 });
 		cell.type = PsType::TestVFX;
 		testEffect.AddCell(cell);
@@ -79,7 +78,7 @@ void PlayerSystem::Init()
 		cell.meshId = AssetDatabase::GetMeshIdFromName("sm_aoe1");
 		cell.startTime = 0.4f;
 		cell.duration = tempDuration;
-		cell.transform = DirectX::XMMatrixIdentity();
+		cell.transform = DirectX::XMMatrixRotationRollPitchYaw(90 * Deg2Rad, 0, 0);
 		cell.transform.SetPosition({ 0, 0, 0 });
 		cell.type = PsType::TestVFX;
 		testEffect.AddCell(cell);
@@ -89,7 +88,7 @@ void PlayerSystem::Init()
 		cell.meshId = AssetDatabase::GetMeshIdFromName("sm_aoe1");
 		cell.startTime = 0.6f;
 		cell.duration = tempDuration;
-		cell.transform = DirectX::XMMatrixIdentity();
+		cell.transform = DirectX::XMMatrixRotationRollPitchYaw(90 * Deg2Rad, 0, 0);
 		cell.transform.SetPosition({ 0, 0, -100 });
 		cell.type = PsType::TestVFX;
 		testEffect.AddCell(cell);
@@ -103,17 +102,28 @@ void PlayerSystem::Init()
 	for (auto entity : myEntities)
 	{
 		PlayerComponent& playerComponent = myWorld->GetComponent<PlayerComponent>(entity);
+		TransformComponent& transformComponent = myWorld->GetComponent<TransformComponent>(entity);
 		//PhysXComponent& physXComponent = myWorld->GetComponent<PhysXComponent>(entity);
 
-		playerComponent.currentPlayerState = myPlayerStateArray[static_cast<int>(ePlayerClassStates::GroundState)];
+		PxExtendedVec3 vec3 = { playerComponent.SpawnPoint.x,playerComponent.SpawnPoint.y,playerComponent.SpawnPoint.z };
+		playerComponent.controller->setFootPosition(vec3);
+
+
+		{
+			myStateMachine.Init();
+			PlayerStateUpdateContext context{ 0, playerComponent, transformComponent, myWorld->GetComponent<AnimationDataComponent>(entity), myPhysXSceneManager };
+			myStateMachine.SetState(ePlayerClassStates::Airborne, context);
+		}
+
+		//playerComponent.currentPlayerState = myPlayerStateArray[static_cast<int>(ePlayerClassStates::GroundState)];
 		//SetPlayerState(playerComponent, ePlayerClassStates::GroundState);
 		playerComponent.callbackWrapper.OnShapeHit = [&](const PxControllerShapeHit& hit)
 			{
-				playerComponent.capsuleCollisionPosition = { (float)hit.worldPos.x, (float)hit.worldPos.y, (float)hit.worldPos.z };
+				playerComponent.collision.capsulePosition = { (float)hit.worldPos.x, (float)hit.worldPos.y, (float)hit.worldPos.z };
 
-				playerComponent.capsuleCollisionNormal = { hit.worldNormal.x, hit.worldNormal.y, hit.worldNormal.z };
+				playerComponent.collision.capsuleNormal = { hit.worldNormal.x, hit.worldNormal.y, hit.worldNormal.z };
 
-				playerComponent.isGrounded = hit.worldPos.y - playerComponent.controller->getFootPosition().y < CHARACTER_RADIUS && Vector3f::Up().Dot(playerComponent.capsuleCollisionNormal) > 0.7f;
+				playerComponent.isGrounded = hit.worldPos.y - playerComponent.controller->getFootPosition().y < CHARACTER_RADIUS && Vector3f::Up().Dot(playerComponent.collision.capsuleNormal) > 0.7f;
 
 			};
 
@@ -132,9 +142,9 @@ void PlayerSystem::Init()
 
 #include <engine/math/helper.h>
 float prevY = 0;
-void PlayerSystem::Update(const float& dt)
+void PlayerSystem::Update(const SceneUpdateContext& aContext)
 {
-#ifdef _DEBUG
+#ifndef _RELEASE
 	if (GraphicsEngine::GetInstance()->GetCamera() != GraphicsEngine::GetInstance()->GetViewCamera())
 	{
 		return;
@@ -146,55 +156,94 @@ void PlayerSystem::Update(const float& dt)
 	{
 		PlayerComponent& p = myWorld->GetComponent<PlayerComponent>(entity);
 		TransformComponent& t = myWorld->GetComponent<TransformComponent>(entity);
+		if (p.isDead)
+			Respawn(entity);
+		
 
+
+#ifndef _RELEASE
+		if (!myWorld->TryGetComponent<AnimationDataComponent>(entity))
+		{
+			PrintW("The Player MUST have a a skeletal mesh to function");
+			return;
+		}
+#endif
+		MeshComponent& mesh = myWorld->GetComponent<MeshComponent>(entity);
+		AnimationDataComponent& animationData = myWorld->GetComponent<AnimationDataComponent>(entity);
+		AnimationController* controller = AssetDatabase::GetAnimationController(mesh.id);
+		//if (InputManager::GetInstance()->IsMouseVisible())
+		//{
+		//	return;
+		//}
+		//p.currentPlayerState->Update(dt);
 		//AudioManager::GetInstance()->SetPlayerListenPosition(t.transform);
 
-		Input(entity, dt);
-		Collision(entity, dt);
-		VaultCollision(entity, dt);
-		CameraMove(entity, dt);
 
-		Slide(entity, dt);
-		Move(entity, dt);
+		if (p.health.playerHealth <= 0)
+		{
+			p.health.playerHealth = p.health.playerMaxHealth;
+			Respawn(entity);
+		}
 
-		TestVfxBlob(dt);
+		Input(entity, aContext.dt);
+		Collision(entity, aContext.dt);
+		VaultCollision(entity, aContext.dt);
+		CameraMove(entity, aContext.dt);
+
+		PlayerStateUpdateContext context{ aContext.dt, p, t, animationData, myPhysXSceneManager, controller };
+		myStateMachine.Update(context);
+		p.currentPlayerState = myStateMachine.GetCurrentState();
+
+
+		//std::string jumpFilePath = RELATIVE_AUDIO_ASSET_PATH;
+		//jumpFilePath += "Jump.wav";
+		//AudioManager::GetInstance()->PlaySound(jumpFilePath, { 0,0,0 }, 0.2f);
+		// TODO: Add sound to the jump
+		
+
+		//p.controller->setFootPosition({ p.vaultLocation.x, p.vaultLocation.y, p.vaultLocation.z });
+		//p.yVelocity = 0;
+
+		TestVfxBlob(aContext.dt);
 
 		{
-		
-			PxFilterData filterData;
+			//p.finalVelocity = { p.xVelocity.x, p.yVelocity, p.xVelocity.y };
 
-		
+			PxFilterData filterData;
 
 			filter.mCCTFilterCallback = nullptr;
 			filter.mFilterCallback = nullptr;
 			filter.mFilterFlags = PxQueryFlag::eSTATIC | PxQueryFlag::eDYNAMIC;
-
-			p.finalVelocity = { p.xVelocity.x, p.yVelocity, p.xVelocity.y };
-
-			if (p.isGrounded && p.xVelocity.LengthSqr() > 0)
-			{
-				//float length = p.xVelocity.Length();
-				Vector3f playerVelocity = Vector3f(p.xVelocity.x, p.yVelocity, p.xVelocity.y);
-				playerVelocity.y = 0;
-				Vector3f moveDirection = playerVelocity.GetNormalized();
-
-				//Vector3f projectedMovement = Vector3f::Cross(Vector3f::Cross(p.groundCollisionNormal, Vector3f::Up()), p.groundCollisionNormal).GetNormalized() * Vector3f::Dot(moveDirection, p.groundCollisionNormal);
-
-				float dist = Vector3f::Dot(playerVelocity, p.groundCollisionNormal);
-				Vector3f projectedPoint = (playerVelocity) - (p.groundCollisionNormal * dist);
-
-				p.finalVelocity = projectedPoint;
-			}
-			/*filterData.word0 =  CollisionLayer::PLAYER_GROUP;
-			filterData.word1 = CollisionLayer::DEFAULT;*/
 			filter.mFilterData = &filterData;
 
 			p.isGrounded = false;
-			p.groundCollisionNormal = { 0, 0, 0 };
-			p.capsuleCollisionPosition = { 0, 0, 0 };
+			p.collision.groundNormal = { 0, 0, 0 };
+			p.collision.capsulePosition = { 0, 0, 0 };
+			p.collision.previousCapsuleNormal = p.collision.capsuleNormal;
+			p.collision.capsuleNormal = { 0, 0, 0 };
 
-			p.controller->move(PxVec3(p.finalVelocity.x, p.finalVelocity.y, p.finalVelocity.z), 0.01f, dt, filter);
+			// THIS IS NEEDED, SINCE ALL METRICS ARE DEVELOPED AROUND 60 FPS IT IS MULTIPLIED BY 60 FOR NOW
+			// ADDITIONALLY, WE NEED TO MULTIPLY BY DT TO GET THE CORRECT VELOCITY
+			p.finalVelocity *= 60.0f;
+			p.finalVelocity *= aContext.dt;
+			p.controller->move(PxVec3(p.finalVelocity.x, p.finalVelocity.y, p.finalVelocity.z), 0.01f, aContext.dt, filter);
 		}
+
+
+		animationData.speed = 1.0f;
+		if (controller->GetCurrentState(animationData).GetAnimationIndex() != 0)
+		{
+			animationData.speed = std::min(p.xVelocity.Length(), PlayerConstants::maxSpeed) / PlayerConstants::maxSpeed;
+		}
+
+
+		MeshComponent& meshComponent = myWorld->GetComponent<MeshComponent>(entity);
+
+		float meshHeight = p.currentCameraHeight != PlayerConstants::cameraHeight ? PlayerConstants::meshCrouchHeight : PlayerConstants::meshHeight;
+		meshComponent.offset.SetPosition({ 0, meshHeight, 0 });
+		controller->SetParameter(static_cast<size_t>(PlayerAnimationParameter::eXSpeed), { p.xVelocity.Length() }, animationData, animationData.parameters);
+		controller->SetParameter(static_cast<size_t>(PlayerAnimationParameter::eYSpeed), { p.yVelocity }, animationData, animationData.parameters);
+		//controller->SetParameter(1, { p.isSliding }, animationData, animationData.parameters);
 
 		auto footPos = p.controller->getFootPosition();
 		t.transform.SetPosition({ (float)footPos.x, (float)footPos.y, (float)footPos.z });
@@ -211,161 +260,33 @@ void PlayerSystem::Input(Entity entity, float)
 	PlayerComponent& p = myWorld->GetComponent<PlayerComponent>(entity);
 	InputManager* im = InputManager::GetInstance();
 
-	p.inputDirection = { 0, 0 };
+	p.input.direction = { 0, 0 };
 	Matrix4x4f rot = Matrix4x4f::CreateRollPitchYawMatrix(0, p.cameraRotation.y, 0);
 	Vector3f right = { rot(1, 1), rot(1, 2), rot(1, 3) };
 	Vector3f forward = { rot(3, 1), rot(3, 2), rot(3, 3) };
 	if (im->IsKeyHeld('W'))
 	{
-		p.inputDirection += { forward.x, forward.z };
+		p.input.direction += { forward.x, forward.z };
 	}
 	if (im->IsKeyHeld('S'))
 	{
-		p.inputDirection += { -forward.x, -forward.z };
+		p.input.direction += { -forward.x, -forward.z };
 	}
 	if (im->IsKeyHeld('A'))
 	{
-		p.inputDirection += { right.x, right.z };
+		p.input.direction += { right.x, right.z };
 	}
 	if (im->IsKeyHeld('D'))
 	{
-		p.inputDirection += { -right.x, -right.z };
+		p.input.direction += { -right.x, -right.z };
 	}
 
-	p.hasPressedJump = im->IsKeyPressed(VK_SPACE);
+	p.input.hasPressedJump = im->IsKeyPressed(VK_SPACE);
+	p.input.isHoldingJump = im->IsKeyHeld(VK_SPACE);
 
-	p.inputDirection.Normalize();
+	p.input.direction.Normalize();
 
-	p.isHoldingCrouch = im->IsKeyHeld(VK_SHIFT);
-}
-
-void PlayerSystem::Move(Entity entity, float dt)
-{
-	PlayerComponent& p = myWorld->GetComponent<PlayerComponent>(entity);
-
-	if (p.isSliding) { return; }
-
-	//InputManager* im = InputManager::GetInstance();
-
-
-	//p.controller->resize
-
-
-	{
-		// Y
-		{
-			p.isWallRunning = false;
-			float gravity = p.gravity * dt;
-			if (p.isGrounded)
-			{
-				SetPlayerState(p, ePlayerClassStates::GroundState);
-				p.yVelocity = -0.02f;
-			}
-			else
-			{
-				if (p.wallNormal.LengthSqr() > 0 && p.yVelocity + gravity <= 0)
-				{
-					gravity *= p.wallRunGravityMultiplier;
-					p.isWallRunning = true;
-				}
-				else if (p.groundCollisionNormal.y < -0.5f && p.yVelocity > 0)
-				{
-					p.yVelocity = 0;
-				}
-				p.yVelocity += gravity;
-			}
-
-
-
-			if (p.hasPressedJump)
-			{
-				if (p.isVaultable)
-				{
-					p.controller->setFootPosition({ p.vaultLocation.x, p.vaultLocation.y, p.vaultLocation.z });
-					p.yVelocity = 0;
-				}
-				else if (p.isGrounded || p.isWallRunning)
-				{
-					SetPlayerState(p, ePlayerClassStates::AirbourneState);
-					p.yVelocity = p.jumpSpeed;
-					//std::string jumpFilePath = RELATIVE_AUDIO_ASSET_PATH;
-					//jumpFilePath += "Jump.wav";
-					//AudioManager::GetInstance()->PlaySound(jumpFilePath, { 0,0,0 }, 0.2f);
-					if (p.isWallRunning)
-					{
-						//float length = p.xVelocity.Length();
-						//SetPlayerState(p, ePlayerClassStates::WallrunState);
-						p.xVelocity += Vector2f(p.wallNormal.x, p.wallNormal.z) * p.wallJumpSpeed;
-						p.isWallRunning = false;
-					}
-				}
-			}
-		}
-
-		bool shouldUseGroundFriction = p.isGrounded || p.isWallRunning;
-		float airMultiplier = (shouldUseGroundFriction ? 1.0f : p.airMobilityMultiplier);
-		// X/Z
-		{
-			float strafeMultiplier = 1.0f;
-			if (!shouldUseGroundFriction && p.xVelocity.LengthSqr() > 0)
-			{
-				strafeMultiplier = 1.0f - p.inputDirection.Dot(p.xVelocity.GetNormalized());
-			}
-			if (!p.isWallRunning)
-			{
-				float crouchingMultiplier = p.isCrouching ? p.crouchSpeedMultiplier : 1.0f;
-				p.xVelocity += p.inputDirection * (p.speed) * strafeMultiplier * airMultiplier * crouchingMultiplier; // Add delta?
-			}
-
-			float friction = shouldUseGroundFriction ? p.friction : p.airFriction;
-			if (p.xVelocity.Length() - friction < 0.01f)
-			{
-				p.xVelocity = { 0, 0 };
-			}
-			else if (!p.isWallRunning)
-			{
-				Vector2f r = p.xVelocity.GetNormalized() * friction;
-				p.xVelocity -= r;
-			}
-			//else
-			//{
-			//	Vector2f r = p.xVelocity.GetNormalized() * friction;
-			//	p.xVelocity -= r;
-			//}
-
-
-			{
-				float length = p.xVelocity.Length();
-				if (p.isGrounded && length > p.maxSpeed)
-				{
-					float delta = length - p.maxSpeed;
-					p.xVelocity -= p.xVelocity.GetNormalized() * delta * 0.3f;
-					//p.xVelocity.Normalize();
-					//p.xVelocity *= p.maxSpeed;
-				}
-			}
-
-			if (p.isWallRunning)
-			{
-				SetPlayerState(p, ePlayerClassStates::WallrunState);
-				float length = p.xVelocity.Length();
-				Vector3f wallDirection = p.wallNormal.Cross(Vector3f::Up()).GetNormalized();
-				Vector3f projectedVector = Vector3f::Project(Vector3f(p.xVelocity.x, 0, p.xVelocity.y), wallDirection);
-				projectedVector.Normalize();
-
-				int sign = FriendMath::Sign(projectedVector.Dot(wallDirection));
-				p.xVelocity = Vector2f(wallDirection.x, wallDirection.z) * length * (float)sign;
-				wallDirection;
-				length;
-			}
-		}
-
-		//physx::PxControllerState state;
-		//p.controller->getState(state);
-		//state.collisionFlags;
-
-		//prevY = (float)p.controller->getPosition().y;
-	}
+	p.input.isHoldingCrouch = im->IsKeyHeld(VK_SHIFT);
 }
 
 void PlayerSystem::CameraMove(Entity entity, float dt)
@@ -379,8 +300,8 @@ void PlayerSystem::CameraMove(Entity entity, float dt)
 	InputManager* im = InputManager::GetInstance();
 	Vector2f mouseMovement = im->GetCurrentMousePositionVector2f();
 
-	float rotation_rate_x = p.cameraSensitivity.x * dt;
-	float rotation_rate_y = p.cameraSensitivity.y * dt;
+	float rotation_rate_x = p.cameraSensitivity.x * dt * myMouseSensitivyMultiplier;
+	float rotation_rate_y = p.cameraSensitivity.y * dt * myMouseSensitivyMultiplier;
 
 	camera_yaw += mouseMovement.x * rotation_rate_x;
 	camera_pitch += mouseMovement.y * rotation_rate_y;
@@ -414,10 +335,11 @@ void PlayerSystem::Collision(Entity entity, float)
 		)
 			)
 		{
-			p.groundCollisionNormal = { hit.block.normal.x, hit.block.normal.y, hit.block.normal.z };
-			p.isGrounded = p.groundCollisionNormal.y > 0.5f;
+			p.collision.groundNormal = { hit.block.normal.x, hit.block.normal.y, hit.block.normal.z };
+			p.isGrounded = p.collision.groundNormal.y > 0.5f;
 		}
 	}
+
 
 
 	// Wall collision
@@ -427,33 +349,34 @@ void PlayerSystem::Collision(Entity entity, float)
 		auto footPos = p.controller->getFootPosition();
 		physx::PxTransform shapePose(physx::PxVec3((float)footPos.x, (float)footPos.y + 25.0f, (float)footPos.z));    // [in] initial shape pose (at distance=0)
 
-		Vector3f normal = { 0, 0, 0 };
-
-		if (p.capsuleCollisionNormal.LengthSqr() > 0 && abs(p.capsuleCollisionNormal.Dot(Vector3f::Up())) < 0.1f)
+		p.collision.wallNormal = { 0, 0, 0 };
+		if (p.collision.capsuleNormal.LengthSqr() == 0 && p.xVelocity.Length() > PlayerConstants::minWallRunSpeed)
 		{
-			normal = p.capsuleCollisionNormal;
-		}
-		else if (p.wallNormal.LengthSqr() > 0)
-		{
-			normal = p.wallNormal;
-		}
+			//Vector3f dir = p.collision.previousCapsuleNormal * -1.0f;
+			Vector3f dir = p.finalVelocity;
+			dir.y = 0.0f;
+			dir.Normalize();
+			//if (p.collision.previousCapsuleNormal.LengthSqr() == 0)
+			//{
+			//	dir = p.finalVelocity;
+			//	dir.y = 0.0f;
+			//	dir.Normalize();
+			//}
 
-		p.wallNormal = { 0, 0, 0 };
 
-		if (normal.LengthSqr())
-		{
-			auto pos = p.controller->getPosition();
+			// is wallrunning = false
+			auto ppp = p.controller->getPosition();
 			if (myPhysXSceneManager->GetScene()->raycast(
-				physx::PxVec3((float)pos.x, (float)pos.y, (float)pos.z),
-				physx::PxVec3(-normal.x, -normal.y, -normal.z),
-				p.wallRunRaycastLength,
+				{ (float)ppp.x, (float)ppp.y, (float)ppp.z },
+				{ dir.x, dir.y, dir.z },
+				PlayerConstants::wallRunDetectionRaycastLength,
 				hit,
 				physx::PxHitFlag::eDEFAULT,
 				physx::PxQueryFilterData(PxQueryFlag::eANY_HIT | physx::PxQueryFlag::eSTATIC)
 			)
 				)
 			{
-				p.wallNormal = { hit.block.normal.x,  hit.block.normal.y,  hit.block.normal.z };
+				p.collision.wallNormal = { hit.block.normal.x,  hit.block.normal.y,  hit.block.normal.z };
 			}
 		}
 	}
@@ -470,20 +393,20 @@ void PlayerSystem::VaultCollision(Entity entity, float)
 		physx::PxRaycastBuffer hit = {};
 
 		auto footPos = p.controller->getFootPosition();
-		physx::PxTransform shapePose(physx::PxVec3((float)footPos.x, (float)footPos.y + p.cameraHeight, (float)footPos.z));    // [in] initial shape pose (at distance=0)
+		physx::PxTransform shapePose(physx::PxVec3((float)footPos.x, (float)footPos.y + PlayerConstants::cameraHeight, (float)footPos.z));    // [in] initial shape pose (at distance=0)
 
 		Matrix3x3f rotationMatrix = Matrix3x3f::CreateRotationAroundY(p.cameraRotation.y * Deg2Rad);
 		Vector3f rot = Vector3f::Forward() * rotationMatrix;
 		rot.Normalize();
 		physx::PxVec3 dir = { rot.x, rot.y, rot.z };
 		auto wallDetectionOrigin = shapePose.p + dir * CHARACTER_RADIUS;
-		auto vaultCastOrigin = wallDetectionOrigin + dir * p.vaultRange - dir;
+		auto vaultCastOrigin = wallDetectionOrigin + dir * PlayerConstants::vaultRange - dir;
 
 
 		if (myPhysXSceneManager->GetScene()->raycast(
 			wallDetectionOrigin,
 			dir,
-			p.vaultRange,
+			PlayerConstants::vaultRange,
 			hit,
 			physx::PxHitFlag::eDEFAULT,
 			physx::PxQueryFilterData(PxQueryFlag::eANY_HIT | physx::PxQueryFlag::eSTATIC)
@@ -498,7 +421,7 @@ void PlayerSystem::VaultCollision(Entity entity, float)
 		if (myPhysXSceneManager->GetScene()->raycast(
 			vaultCastOrigin,
 			physx::PxVec3(0, -1, 0),
-			p.cameraHeight - STEP_OFFSET - 1.0f,
+			PlayerConstants::cameraHeight - STEP_OFFSET - 1.0f,
 			vaultHit,
 			physx::PxHitFlag::eDEFAULT,
 			physx::PxQueryFilterData(PxQueryFlag::eANY_HIT | physx::PxQueryFlag::eSTATIC)
@@ -511,122 +434,13 @@ void PlayerSystem::VaultCollision(Entity entity, float)
 	}
 }
 
-void PlayerSystem::Slide(Entity entity, float dt)
+void PlayerSystem::Respawn(Entity entity)
 {
 	PlayerComponent& p = myWorld->GetComponent<PlayerComponent>(entity);
-
-	bool canUncrouch = true;
-	if (p.isCrouching || p.isSliding)
-	{
-		physx::PxOverlapBuffer hit = {};
-		auto footPos = p.controller->getFootPosition();
-		physx::PxTransform shapePose(physx::PxVec3((float)footPos.x, (float)footPos.y + CHARACTER_HEIGHT_PRE_ADJUSTMENT, (float)footPos.z));
-
-		if (p.groundCollisionNormal.LengthSqr() > 0)
-		{
-			if (myPhysXSceneManager->GetScene()->overlap(
-				physx::PxSphereGeometry(CHARACTER_RADIUS - 1 + HEAD_BONK_OFFSET),
-				shapePose,
-				hit,
-				physx::PxQueryFilterData(PxQueryFlag::eANY_HIT | physx::PxQueryFlag::eSTATIC)
-			))
-			{
-				canUncrouch = false;
-			}
-		}
-	}
-
-	if (p.hasPressedJump && canUncrouch)
-	{
-		p.isSliding = false;
-		p.isCrouching = false;
-		p.slideTimer = 0;
-		p.controller->resize(CHARACTER_HEIGHT);
-		return;
-	}
-
-	if (p.isSliding || p.isCrouching)
-	{
-		//p.controller->resize(0.0f);
-	}
-	else if (canUncrouch)
-	{
-		p.controller->resize(CHARACTER_HEIGHT);
-	}
-
-	if ((!p.isHoldingCrouch || !p.isGrounded || p.isWallRunning) && canUncrouch)
-	{
-		p.slideTimer = 0;
-		p.isCrouching = false;
-		p.isSliding = false;
-
-		if (false) // TODO: Check if there is a wall above of the player
-		{
-			p.isCrouching = false;
-			return;
-		}
-
-		return;
-	}
-
-	if (p.isCrouching)
-	{
-		p.slideTimer = 0;
-		p.isSliding = false;
-		return;
-	}
-
-	p.isSliding = p.xVelocity.Length() >= p.slideSpeedThreshold;
-	if (!p.isSliding)
-	{
-		p.isCrouching = true;
-		p.slideTimer = 0;
-		return;
-	}
-
-	if (p.slideTimer <= 0)
-	{
-		p.xVelocity *= p.slideSpeed;
-	}
-
-	p.slideTimer += dt;
-
-	if (p.slideTimer >= p.slideTimeUnitlFriction)
-	{
-		p.xVelocity *= p.slideFriction;
-	}
+	PxExtendedVec3 vec3 = { p.SpawnPoint.x,p.SpawnPoint.y,p.SpawnPoint.z };
+	p.controller->setFootPosition(vec3);
+	p.isDead = false;
 }
-
-void PlayerSystem::SetPlayerState(PlayerComponent& aPlayerComponent, const ePlayerClassStates& aPlayerState)
-{
-	if (myPlayerStateArray[static_cast<int>(aPlayerState)] == aPlayerComponent.currentPlayerState)
-		return;
-
-	aPlayerComponent.currentPlayerState->OnExit();
-	aPlayerComponent.currentPlayerState = myPlayerStateArray[static_cast<int>(aPlayerState)];
-	aPlayerComponent.currentPlayerState->OnEnter();
-}
-
-void PlayerSystem::CreatePlayerStates()
-{
-	myPlayerStateArray[static_cast<int>(ePlayerClassStates::GroundState)] = new PlayerGroundState();
-	myPlayerStateArray[static_cast<int>(ePlayerClassStates::AirbourneState)] = new PlayerAirbourneState();
-	myPlayerStateArray[static_cast<int>(ePlayerClassStates::CrouchState)] = new PlayerCrouchState();
-	myPlayerStateArray[static_cast<int>(ePlayerClassStates::SlideState)] = new PlayerSlideState();
-	myPlayerStateArray[static_cast<int>(ePlayerClassStates::WallrunState)] = new PlayerWallrunState();
-	myPlayerStateArray[static_cast<int>(ePlayerClassStates::VaultState)] = new PlayerVaultState();
-
-}
-
-void PlayerSystem::DeletePlayerStates()
-{
-	for (int i = 0; i < static_cast<int>(ePlayerClassStates::Count); i++)
-	{
-		delete myPlayerStateArray[i];
-		myPlayerStateArray[i] = nullptr;
-	}
-}
-
 
 void PlayerSystem::TestVfxBlob(const float& dt)
 {

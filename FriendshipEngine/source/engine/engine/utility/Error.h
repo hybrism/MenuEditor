@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include "../math/Vector.h"
 #include "../math/Transform.h"
 
@@ -7,6 +6,8 @@
 #define RED 4
 #define YELLOW 6
 #define PURPLE 5
+
+// TODO: Add #ifndef _RELEASE variants for all Print functions
 
 #define WELCOME_TO_FRIENDSHIPENGINE Error::PrintIntro();
 #define Print(msg) Error::DebugPrintString(msg);
