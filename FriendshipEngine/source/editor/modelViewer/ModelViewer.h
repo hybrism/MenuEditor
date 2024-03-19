@@ -67,6 +67,7 @@ public:
 	void Init(LightManager* aLightManager);
 	void Update(float dt);
 	void Render();
+	void RenderImGui();
 
 private:
 

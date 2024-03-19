@@ -116,7 +116,7 @@ void LightManager::Init(const Vector3f& aDirection, const Vector4f& aColor, cons
 
 
 #if _MODELVIEWER
-			myDirectionalLight->myShadowMapDepthBuffer = DepthBuffer::Create({ 6000, 6000 });//g->GetViewportDimensions()
+			myDirectionalLight->myShadowMapDepthBuffer = DepthBuffer::Create({ 8000, 8000 });//g->GetViewportDimensions()
 #else
 			myDirectionalLight->myShadowMapDepthBuffer = DepthBuffer::Create({ 1000, 1000 }); // Hello, sänkte resolution så vi har 60fps i editor mode. Var 4096, 4096.
 #endif

@@ -3,11 +3,8 @@
 #include <d3d11.h>
 #include <filesystem>
 #include <fstream>
-#include <string>
-#include <vector>
-#include <memory>
 
-//ImGui
+//External
 #include <imgui/imgui.h>
 #include <imgui_internal.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -16,30 +13,25 @@
 //Engine
 #include <engine/Paths.h>
 #include <engine/utility/Error.h>
-#include <engine/utility/StringHelper.h>
-#include <engine/utility/InputManager.h>
-#include <engine/graphics/Texture.h>
 #include <assets/TextureFactory.h>
 #include <engine/graphics/GraphicsEngine.h>
 
 //Internal
 #include <shared/postMaster/PostMaster.h>
-#include "UpdateContext.h"
-#include "MenuEditorCommon.h"
-
 #include "windows/AssetsWindow.h"
 #include "windows/ConsoleWindow.h"
 #include "windows/InspectorWindow.h"
 #include "windows/ObjectHierarchyWindow.h"
 #include "windows/MenuViewWindow.h"
 
+//Game
 #include <game/gui/MenuObject.h>
 #include <game/gui/components/SpriteComponent.h>
 #include <game/gui/components/Collider2DComponent.h>
 #include <game/gui/components/TextComponent.h>
 
 MENU::MenuEditor::MenuEditor()
-	: myFirstFrameSetup(false)
+	: myFirstFrameSetup(true)
 	, myShouldShowDebugData(false)
 	, myShouldShowEditorColliders(false)
 	, myShouldShowMenuColldiers(true)
@@ -48,10 +40,7 @@ MENU::MenuEditor::MenuEditor()
 	, myUpGizmoID(INVALID_ID)
 	, myRightGizmoID(INVALID_ID)
 {
-	for (size_t i = 0; i < (int)ePopup::Count; i++)
-	{
-		myPopups[i] = false;
-	}
+	myPopups.fill(false);
 }
 
 MENU::MenuEditor::~MenuEditor()
@@ -74,9 +63,9 @@ void MENU::MenuEditor::Init()
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::NewMenuLoaded);
 
 	////CREATE EDITOR WINDOWS
-	myWindows[(int)MENU::WindowID::Assets] = std::make_shared<AssetsWindow>("Assets", true, ImGuiWindowFlags_None);
-	myWindows[(int)MENU::WindowID::MenuView] = std::make_shared<MenuViewWindow>("MenuView", true, ImGuiWindowFlags_None);
-	myWindows[(int)MENU::WindowID::Console] = std::make_shared<ConsoleWindow>("Console", true, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::WindowID::Assets] = std::make_shared<AssetsWindow>("Assets", false, ImGuiWindowFlags_None);
+	myWindows[(int)MENU::WindowID::MenuView] = std::make_shared<MenuViewWindow>("MenuView", false, ImGuiWindowFlags_NoBackground);
+	myWindows[(int)MENU::WindowID::Console] = std::make_shared<ConsoleWindow>("Console", false, ImGuiWindowFlags_None);
 	myWindows[(int)MENU::WindowID::Inspector] = std::make_shared<InspectorWindow>("Inspector", true, ImGuiWindowFlags_None);
 	myWindows[(int)MENU::WindowID::MenuObjectHierarchy] = std::make_shared<MenuObjectHierarchy>("MenuObjects", true, ImGuiWindowFlags_None);
 
@@ -136,7 +125,6 @@ void MENU::MenuEditor::Update(float)
 		if (!myWindows[i]->myData.isOpen)
 			continue;
 
-		//ImGui::SetNextWindowBgAlpha(0.7f);
 		myWindows[i]->Show(editorUpdateContext);
 	}
 
@@ -278,7 +266,7 @@ void MENU::MenuEditor::Dockspace()
 	ImGui::Begin("MenuEditorDockspace", NULL, hostWindowFlags);
 	ImGui::PopStyleVar(3);
 
-	ImGuiID dockspaceID = ImGui::GetID(myWindows[(int)MENU::WindowID::Assets]->myData.handle.c_str());
+	ImGuiID dockspaceID = viewport->ID;
 	ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
 	MenuBar();
@@ -294,43 +282,29 @@ void MENU::MenuEditor::Dockspace()
 		//		SETUP:
 		//							80%		
 		//		|-------------------|----|
-		//		|					|____|	70%	
+		//		|					|	 |		
+		//		|					|	 |
+		//		|					|----|	50%
 		//		|					|	 |
 		//		|					|	 |
 		//		|___________________|____|
-		//		|						 |	15% (height)
-		//		|________________________|
 
-		constexpr float ratioHorizontalSplit = 0.15f;
 		constexpr float ratioTopWindowSplit = 0.80f;
-		constexpr float ratioBottomWindowSplit = 0.50f;
-		constexpr float ratioTopRightWindowSplit = 0.70f;
-
-		//Horizontal split
-		ImGuiID topAreaID = 0;
-		ImGuiID bottomAreaID = 0;
-		ImGui::DockBuilderSplitNode(dockspaceID, ImGuiDir_Down, ratioHorizontalSplit, &bottomAreaID, &topAreaID);
+		constexpr float ratioTopRightWindowSplit = 0.50f;
 
 		//Split Top area into 2
-		ImGuiID topLeftAreaID = 0;
-		ImGuiID topRightAreaID = 0;
-		ImGui::DockBuilderSplitNode(topAreaID, ImGuiDir_Left, ratioTopWindowSplit, &topLeftAreaID, &topRightAreaID);
+		ImGuiID leftAreaID = 0;
+		ImGuiID rightAreaID = 0;
+		ImGui::DockBuilderSplitNode(dockspaceID, ImGuiDir_Left, ratioTopWindowSplit, &leftAreaID, &rightAreaID);
 
-		//Split Bottom area into 2
-		ImGuiID bottomLeftAreaID = 0;
-		ImGuiID bottomRightAreaID = 0;
-		ImGui::DockBuilderSplitNode(bottomAreaID, ImGuiDir_Left, ratioBottomWindowSplit, &bottomLeftAreaID, &bottomRightAreaID);
+		//Split top right area horisontally
+		ImGuiID rightTopAreaID = 0;
+		ImGuiID rightBottomAreaID = 0;
+		ImGui::DockBuilderSplitNode(rightAreaID, ImGuiDir_Down, ratioTopRightWindowSplit, &rightBottomAreaID, &rightTopAreaID);
 
-		//Split top right area horiszontally
-		ImGuiID topRightTopAreaID = 0;
-		ImGuiID topRightBottomAreaID = 0;
-		ImGui::DockBuilderSplitNode(topRightAreaID, ImGuiDir_Down, ratioTopRightWindowSplit, &topRightBottomAreaID, &topRightTopAreaID);
-
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::MenuView]->myData.handle.c_str(), topLeftAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::MenuObjectHierarchy]->myData.handle.c_str(), topRightTopAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::Inspector]->myData.handle.c_str(), topRightBottomAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::Assets]->myData.handle.c_str(), bottomLeftAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::Console]->myData.handle.c_str(), bottomRightAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::MenuView]->myData.handle.c_str(), leftAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::MenuObjectHierarchy]->myData.handle.c_str(), rightTopAreaID);
+		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::Inspector]->myData.handle.c_str(), rightBottomAreaID);
 
 		ImGui::DockBuilderFinish(dockspaceID);
 
@@ -485,6 +459,16 @@ void MENU::MenuEditor::RecieveMessage(const FE::Message& aMessage)
 	case FE::eMessageType::DdsDropped:
 	{
 		std::string filename = std::any_cast<std::string>(aMessage.myMessage);
+
+		for (size_t i = 0; i < myAssets.textures.size(); i++)
+		{
+			if (myAssets.textureIdToName[i] == filename)
+			{
+				PrintI("Asset: " + filename + " already exists!");
+				return;
+			}
+		}
+
 		myAssets.textures.push_back(TextureFactory::CreateTexture(RELATIVE_SPRITE_ASSET_PATH + filename, false));
 		myAssets.textureIdToName.push_back(filename);
 		myAssets.textureNameToId[filename] = (UINT)myAssets.textures.size() - 1;
@@ -493,6 +477,16 @@ void MENU::MenuEditor::RecieveMessage(const FE::Message& aMessage)
 	case FE::eMessageType::TtfDropped:
 	{
 		std::string filename = std::any_cast<std::string>(aMessage.myMessage);
+	
+		for (size_t i = 0; i < myAssets.fontFiles.size(); i++)
+		{
+			if (myAssets.fontFiles[i] == filename)
+			{
+				PrintI("Asset: " + filename + " already exists!");
+				return;
+			}
+		}
+		
 		myAssets.fontFiles.push_back(filename);
 		break;
 	}

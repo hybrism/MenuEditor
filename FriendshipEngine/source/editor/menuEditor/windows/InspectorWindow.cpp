@@ -34,8 +34,8 @@ void MENU::InspectorWindow::Show(const MenuEditorUpdateContext& aContext)
 	if (!myData.isOpen)
 		return;
 
-	ImGui::SetNextWindowSize(ImVec2(350.f, 550.f), ImGuiCond_Appearing);
-	ImGui::SetNextWindowPos(ImVec2(1560.f, 400.f), ImGuiCond_Appearing);
+	//ImGui::SetNextWindowSize(ImVec2(350.f, 550.f), ImGuiCond_Appearing);
+	//ImGui::SetNextWindowPos(ImVec2(1560.f, 400.f), ImGuiCond_Appearing);
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
 		if (mySelectedObjectID == UINT_MAX) //Early out

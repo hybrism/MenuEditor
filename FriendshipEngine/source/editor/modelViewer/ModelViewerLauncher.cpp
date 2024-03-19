@@ -204,6 +204,8 @@ void ModelViewerLauncher::Render()
 		context->PSSetShaderResources(0, 1, &nullSRV);
 	}
 
+	myModelViewer.RenderImGui();
+
 	ImGuiHandler::Render();
 }
 

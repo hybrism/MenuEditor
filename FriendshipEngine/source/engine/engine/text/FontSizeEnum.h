@@ -33,6 +33,5 @@ static const char* FontSizeDisplayNames[] =
 	"30",
 	"36",
 	"48",
-	"60",
-	"72"
+	"60"
 };

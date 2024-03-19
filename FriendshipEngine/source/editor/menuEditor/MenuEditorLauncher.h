@@ -21,12 +21,12 @@ private:
 	Engine* myEngine = nullptr;
 
 	MENU::MenuEditor myMenuEditor;
+
 };
 
 namespace MENU
 {
-	bool IsFbx(const std::wstring& aPath);
-	bool IsDds(const std::wstring& aPath);
-	bool IsTtf(const std::wstring& aPath);
+	void HandleDroppedFile(WPARAM wParam);
+	bool IsOfType(const std::wstring& aFileType, const std::wstring& aPath);
 	std::string ExtractFileName(const std::wstring& aPath);
 }

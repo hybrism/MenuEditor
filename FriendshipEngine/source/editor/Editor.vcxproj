@@ -112,7 +112,6 @@
     <ClInclude Include="editor\friendshipEditor\windows\VertexPainterWindow.h" />
     <ClInclude Include="editor\friendshipEditor\windows\Window.h" />
     <ClInclude Include="editor\friendshipEditor\windows\WindowFactory.h" />
-    <ClInclude Include="editor\menuEditor\MenuEditor.h" />
     <ClInclude Include="editor\scriptEditor\ScriptEditor.h" />
     <ClInclude Include="editor\scriptEditor\ScriptEditorNodeColors.h" />
     <ClInclude Include="editor\scriptEditor\ScriptEditorSelection.h" />
@@ -141,7 +140,6 @@
     <ClCompile Include="editor\friendshipEditor\windows\ScriptEditorWindow.cpp" />
     <ClCompile Include="editor\friendshipEditor\windows\VertexPainterWindow.cpp" />
     <ClCompile Include="editor\friendshipEditor\windows\WindowFactory.cpp" />
-    <ClCompile Include="editor\menuEditor\MenuEditor.cpp" />
     <ClCompile Include="editor\scriptEditor\ScriptEditor.cpp" />
     <ClCompile Include="editor\scriptEditor\commands\CreateLinkCommand.cpp" />
     <ClCompile Include="editor\scriptEditor\commands\CreateNodeCommand.cpp" />

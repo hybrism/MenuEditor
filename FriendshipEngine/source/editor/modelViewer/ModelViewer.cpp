@@ -105,8 +105,6 @@ void ModelViewer::Update(float dt)
 	ModelWindow();
 }
 
-
-
 void ModelViewer::Render()
 {
 	GraphicsEngine* ge = GraphicsEngine::GetInstance();
@@ -143,6 +141,11 @@ void ModelViewer::Render()
 		}
 	}
 
+	//SettingsWindow();
+}
+
+void ModelViewer::RenderImGui()
+{
 	SettingsWindow();
 }
 
@@ -177,29 +180,29 @@ void ModelViewer::ModelWindow()
 	ImGui::DockSpaceOverViewport(nullptr, ImGuiDockNodeFlags_PassthruCentralNode);
 	if (ImGui::Begin("ModelViewer", 0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar))
 	{
-		ImVec2 region = ImGui::GetContentRegionAvail();
-		ImVec2 screenCursorPos = ImGui::GetCursorScreenPos();
-		Vector2i dimensions = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
+		//ImVec2 region = ImGui::GetContentRegionAvail();
+		//ImVec2 screenCursorPos = ImGui::GetCursorScreenPos();
+		//Vector2i dimensions = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
 
-		float aspectRatio = (float)dimensions.x / (float)dimensions.y;
-		if (region.x / region.y > aspectRatio)
-		{
-			region.x = region.y * aspectRatio;
-		}
-		else
-		{
-			region.y = region.x / aspectRatio;
-		}
+		//float aspectRatio = (float)dimensions.x / (float)dimensions.y;
+		//if (region.x / region.y > aspectRatio)
+		//{
+		//	region.x = region.y * aspectRatio;
+		//}
+		//else
+		//{
+		//	region.y = region.x / aspectRatio;
+		//}
 
-		ImVec2 vMin = ImGui::GetWindowContentRegionMin();
-		ImVec2 vMax = ImVec2(vMin.x + region.x, vMin.y + region.y);
-		ImVec2 wPos = ImGui::GetWindowPos();
+		//ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+		//ImVec2 vMax = ImVec2(vMin.x + region.x, vMin.y + region.y);
+		//ImVec2 wPos = ImGui::GetWindowPos();
 
-		ImVec2 vMinWin = wPos + vMin;
-		ImVec2 vMaxWin = wPos + vMax;
+		//ImVec2 vMinWin = wPos + vMin;
+		//ImVec2 vMaxWin = wPos + vMax;
 
-		ImDrawList* tDrawList = ImGui::GetWindowDrawList();
-		tDrawList->AddImage(GraphicsEngine::GetInstance()->GetBackBufferSRV().Get(), vMinWin, vMaxWin);
+		//ImDrawList* tDrawList = ImGui::GetWindowDrawList();
+		//tDrawList->AddImage(GraphicsEngine::GetInstance()->GetBackBufferSRV().Get(), vMinWin, vMaxWin);
 
 		HandleWarningPopups();
 	}
@@ -231,9 +234,9 @@ void ModelViewer::SettingsWindow()
 			ImGui::OpenPopup("LoadedMeshes");
 		ImGui::SetItemTooltip("View and load previous Meshes");
 
-		if (ImGui::ImageButton("Goose", myIcons[(int)eIcon::Goose].Get(), ImVec2(64, 64)))
-			ImGui::OpenPopup("LoadedMeshes");
-		ImGui::SetItemTooltip("Secret button, no function here yet :p");
+		//if (ImGui::ImageButton("Goose", myIcons[(int)eIcon::Goose].Get(), ImVec2(64, 64)))
+		//	ImGui::OpenPopup("LoadedMeshes");
+		//ImGui::SetItemTooltip("Secret button, no function here yet :p");
 
 		CameraSettings();
 		LightingSettings();

@@ -1,16 +1,11 @@
 #pragma once
-
-#include <game/gui/IDManager.h>
+#include <array>
+#include <shared/postMaster/Observer.h>
 #include <game/gui/MenuHandler.h>
 
 #include "MenuEditorCommon.h"
 #include "windows/Window.h"
 
-#include <string>
-#include <array>
-#include <map>
-#include <engine/math/Vector.h>
-#include <shared/postMaster/Observer.h>
 
 class Game;
 
@@ -46,7 +41,6 @@ namespace MENU
 		Assets myAssets;
 
 		ID mySelectedObjectID;
-
 		ID myEditorIDStartIndex;
 		ID myUpGizmoID;
 		ID myRightGizmoID;

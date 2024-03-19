@@ -46,58 +46,7 @@ LRESULT CALLBACK WndProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In
 	{
 	case WM_DROPFILES:
 	{
-		HDROP hDropInfo = (HDROP)wParam;
-
-		UINT num_paths = DragQueryFileW(hDropInfo, 0xFFFFFFFF, 0, 512);
-
-		wchar_t* filePath = nullptr;
-		UINT max_filePath_len = 0;
-
-		for (UINT i = 0; i < num_paths; ++i)
-		{
-			UINT filename_len = DragQueryFileW(hDropInfo, i, nullptr, 512) + 1;
-
-			if (filename_len > max_filePath_len)
-			{
-				max_filePath_len = filename_len;
-				wchar_t* tmp = (wchar_t*)realloc(filePath, max_filePath_len * sizeof(*filePath));
-
-				if (tmp != nullptr)
-				{
-					filePath = tmp;
-				}
-			}
-
-			DragQueryFileW(hDropInfo, i, filePath, filename_len);
-		}
-
-		if (filePath > 0 && MENU::IsFbx(filePath))
-		{
-			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::MeshDropped, StringHelper::ws2s(filePath) });
-		}
-
-		if (filePath > 0 && MENU::IsDds(filePath))
-		{
-			std::string filenameOnly = MENU::ExtractFileName(filePath);
-			std::wstring copyTo = StringHelper::s2ws(RELATIVE_SPRITE_ASSET_PATH + filenameOnly);
-
-			CopyFile(filePath, copyTo.c_str(), true);
-
-			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::DdsDropped, filenameOnly });
-		}
-
-		if (filePath > 0 && MENU::IsTtf(filePath))
-		{
-			std::string filenameOnly = MENU::ExtractFileName(filePath);
-			std::wstring copyTo = StringHelper::s2ws(RELATIVE_FONT_ASSET_PATH + filenameOnly);
-
-			CopyFile(filePath, copyTo.c_str(), true);
-
-			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::TtfDropped, filenameOnly });
-		}
-
-		free(filePath);
-		DragFinish(hDropInfo);
+		MENU::HandleDroppedFile(wParam);
 		break;
 	}
 	default:
@@ -156,9 +105,9 @@ void MenuEditorLauncher::Update(const float& dt)
 
 void MenuEditorLauncher::Render()
 {
+	GraphicsEngine::GetInstance()->SetRawBackBufferAsRenderTarget();
 	myMenuEditor.Render();
 
-	GraphicsEngine::GetInstance()->SetRawBackBufferAsRenderTarget();
 	ImGuiHandler::Render();
 }
 
@@ -168,25 +117,71 @@ void MenuEditorLauncher::EndFrame()
 	myEngine->EndFrame();
 }
 
+void MENU::HandleDroppedFile(WPARAM wParam)
+{
+	HDROP hDropInfo = (HDROP)wParam;
+
+	UINT num_paths = DragQueryFileW(hDropInfo, 0xFFFFFFFF, 0, 512);
+
+	wchar_t* filePath = nullptr;
+	UINT max_filePath_len = 0;
+
+	for (UINT i = 0; i < num_paths; ++i)
+	{
+		UINT filename_len = DragQueryFileW(hDropInfo, i, nullptr, 512) + 1;
+
+		if (filename_len > max_filePath_len)
+		{
+			max_filePath_len = filename_len;
+			wchar_t* tmp = (wchar_t*)realloc(filePath, max_filePath_len * sizeof(*filePath));
+
+			if (tmp != nullptr)
+			{
+				filePath = tmp;
+			}
+		}
+
+		DragQueryFileW(hDropInfo, i, filePath, filename_len);
+	}
+
+	if (filePath == 0)
+		return;
+
+	if (MENU::IsOfType(L"fbx", filePath))
+	{
+		FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::MeshDropped, StringHelper::ws2s(filePath) });
+	}
+	else if (MENU::IsOfType(L"dds", filePath))
+	{
+		std::string filenameOnly = MENU::ExtractFileName(filePath);
+		std::wstring copyTo = StringHelper::s2ws(RELATIVE_SPRITE_ASSET_PATH + filenameOnly);
+
+		CopyFile(filePath, copyTo.c_str(), true);
+
+		FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::DdsDropped, filenameOnly });
+	}
+	else if (MENU::IsOfType(L"ttf", filePath))
+	{
+		std::string filenameOnly = MENU::ExtractFileName(filePath);
+		std::wstring copyTo = StringHelper::s2ws(RELATIVE_FONT_ASSET_PATH + filenameOnly);
+
+		CopyFile(filePath, copyTo.c_str(), true);
+
+		FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::TtfDropped, filenameOnly });
+	}
+
+	free(filePath);
+	DragFinish(hDropInfo);
+}
 
 bool MenuEditorLauncher::BeginFrame()
 {
 	return myEngine->BeginFrame();
 }
 
-bool MENU::IsFbx(const std::wstring& aPath)
+bool MENU::IsOfType(const std::wstring& aFileType, const std::wstring& aPath)
 {
-	return (aPath.substr(aPath.find_last_of(L".") + 1) == L"fbx");
-}
-
-bool MENU::IsDds(const std::wstring& aPath)
-{
-	return (aPath.substr(aPath.find_last_of(L".") + 1) == L"dds");
-}
-
-bool MENU::IsTtf(const std::wstring& aPath)
-{
-	return (aPath.substr(aPath.find_last_of(L".") + 1) == L"ttf");
+	return (aPath.substr(aPath.find_last_of(L".") + 1) == aFileType);
 }
 
 std::string MENU::ExtractFileName(const std::wstring& aPath)
