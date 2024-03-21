@@ -31,7 +31,7 @@
 #include <game/gui/components/TextComponent.h>
 
 MENU::MenuEditor::MenuEditor()
-	: myFirstFrameSetup(true)
+	: myFirstFrameSetup(false)
 	, myShouldShowDebugData(false)
 	, myShouldShowEditorColliders(false)
 	, myShouldShowMenuColldiers(true)
@@ -39,9 +39,7 @@ MENU::MenuEditor::MenuEditor()
 	, myEditorIDStartIndex(400)
 	, myUpGizmoID(INVALID_ID)
 	, myRightGizmoID(INVALID_ID)
-{
-	myPopups.fill(false);
-}
+{}
 
 MENU::MenuEditor::~MenuEditor()
 {}
@@ -275,38 +273,38 @@ void MENU::MenuEditor::Dockspace()
 
 	if (!myFirstFrameSetup)
 	{
-		ImGui::DockBuilderRemoveNode(dockspaceID);
-		ImGui::DockBuilderAddNode(dockspaceID, ImGuiDockNodeFlags_DockSpace | ImGuiDockNodeFlags_PassthruCentralNode);
-		ImGui::DockBuilderSetNodeSize(dockspaceID, viewport->Size);
-
 		//		SETUP:
 		//							80%		
 		//		|-------------------|----|
 		//		|					|	 |		
 		//		|					|	 |
-		//		|					|----|	50%
+		//		|					|----|	60%
 		//		|					|	 |
 		//		|					|	 |
 		//		|___________________|____|
 
-		constexpr float ratioTopWindowSplit = 0.80f;
-		constexpr float ratioTopRightWindowSplit = 0.50f;
+		constexpr float ratioWindowSplit = 0.80f;
+		constexpr float ratioTopRightWindowSplit = 0.60f;
+		constexpr float menuBarHeight = 18.f;
 
-		//Split Top area into 2
-		ImGuiID leftAreaID = 0;
-		ImGuiID rightAreaID = 0;
-		ImGui::DockBuilderSplitNode(dockspaceID, ImGuiDir_Left, ratioTopWindowSplit, &leftAreaID, &rightAreaID);
+		ImVec2 wSize = ImVec2(viewport->WorkSize.x * (1 - ratioWindowSplit), viewport->WorkSize.y - menuBarHeight);
+		ImVec2 wMin = ImVec2(viewport->WorkSize.x * ratioWindowSplit, viewport->WorkPos.y + menuBarHeight);
+		ImVec2 wMax = ImVec2(viewport->WorkSize);
 
-		//Split top right area horisontally
-		ImGuiID rightTopAreaID = 0;
-		ImGuiID rightBottomAreaID = 0;
-		ImGui::DockBuilderSplitNode(rightAreaID, ImGuiDir_Down, ratioTopRightWindowSplit, &rightBottomAreaID, &rightTopAreaID);
 
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::MenuView]->myData.handle.c_str(), leftAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::MenuObjectHierarchy]->myData.handle.c_str(), rightTopAreaID);
-		ImGui::DockBuilderDockWindow(myWindows[(int)MENU::WindowID::Inspector]->myData.handle.c_str(), rightBottomAreaID);
+		MENU::WindowData& hierarchyWindow = myWindows[(int)MENU::WindowID::MenuObjectHierarchy]->myData;
+		MENU::WindowData& inspectorWindow = myWindows[(int)MENU::WindowID::Inspector]->myData;
 
-		ImGui::DockBuilderFinish(dockspaceID);
+		ImGui::SetNextWindowPos(wMin);
+		ImGui::SetNextWindowSize(ImVec2(wSize.x, wSize.y * (1 - ratioTopRightWindowSplit)));
+		ImGui::Begin(hierarchyWindow.handle.c_str(), &hierarchyWindow.isOpen, hierarchyWindow.flags);
+		ImVec2 nextWindowStartPos = ImVec2(wMin.x, wMin.y + ImGui::GetWindowHeight());
+		ImGui::End();
+
+		ImGui::SetNextWindowPos(nextWindowStartPos);
+		ImGui::SetNextWindowSize(ImVec2(wSize.x, wSize.y * ratioTopRightWindowSplit));
+		ImGui::Begin(inspectorWindow.handle.c_str(), &inspectorWindow.isOpen, inspectorWindow.flags);
+		ImGui::End();
 
 		myFirstFrameSetup = true;
 	}
@@ -317,6 +315,9 @@ void MENU::MenuEditor::MenuBar()
 {
 	if (ImGui::BeginMainMenuBar())
 	{
+		myContentRegionMin = ImGui::GetWindowContentRegionMin();
+		myContentRegionMin.y += ImGui::GetWindowHeight();
+
 		if (ImGui::BeginMenu("File"))
 		{
 			if (ImGui::BeginMenu("Open"))
@@ -411,7 +412,14 @@ void MENU::MenuEditor::Popups()
 	{
 		newMenuName = "(Untitled)";
 		ImGui::OpenPopup("Create New");
-		myPopups[(int)ePopup::CreateNew] = false;
+		myPopups.reset();
+	}
+
+	if (myPopups[(int)ePopup::SaveFileAs])
+	{
+		newMenuName = myMenuHandler.GetName() + " Copy";
+		ImGui::OpenPopup("Save As");
+		myPopups.reset();
 	}
 
 	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -425,7 +433,6 @@ void MENU::MenuEditor::Popups()
 		if (ImGui::Button("Create", ImVec2(120, 0)))
 		{
 			ImGui::CloseCurrentPopup();
-			myPopups[(int)ePopup::CreateNew] = false;
 
 			size_t n = newMenuName.find(".json");
 			if (n == std::string::npos)
@@ -445,7 +452,35 @@ void MENU::MenuEditor::Popups()
 		if (ImGui::Button("Cancel", ImVec2(120, 0)))
 		{
 			ImGui::CloseCurrentPopup();
-			myPopups[(int)ePopup::CreateNew] = false;
+		}
+
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::BeginPopupModal("Save As", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Enter Menu name: ");
+		ImGui::InputText("##", &newMenuName, ImGuiInputTextFlags_AutoSelectAll);
+
+		if (ImGui::Button("Save", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+
+			size_t n = newMenuName.find(".json");
+			if (n == std::string::npos)
+				newMenuName += ".json";
+
+			std::string path = RELATIVE_IMPORT_DATA_PATH + MENU::MENU_PATH + newMenuName;
+			nlohmann::json menu;
+			std::ofstream dataFile(path);
+			dataFile << menu;
+			dataFile.close();
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
 		}
 
 		ImGui::EndPopup();

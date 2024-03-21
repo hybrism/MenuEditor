@@ -210,6 +210,16 @@ std::vector<MENU::MenuState>& MENU::MenuHandler::GetAllStates()
 	return myStates;
 }
 
+std::string MENU::MenuHandler::GetName() const
+{
+	return myName;
+}
+
+std::string MENU::MenuHandler::GetFileName() const
+{
+	return std::string(myName + ".json");
+}
+
 void MENU::MenuHandler::RemoveObjectAtID(ID aID)
 {
 	for (size_t i = 0; i < myStates.size(); i++)
@@ -269,11 +279,10 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 	while (!myStateStack.empty())
 		myStateStack.pop();
 
-	myFileName = aMenuFile;
 	myName = aMenuFile.substr(0, aMenuFile.find_last_of('.'));
 
 	std::string MENU_PATH = "menus/";
-	std::string path = RELATIVE_IMPORT_DATA_PATH + MENU_PATH + myFileName;
+	std::string path = RELATIVE_IMPORT_DATA_PATH + MENU_PATH + aMenuFile;
 	std::ifstream dataFile(path);
 	if (dataFile.fail())
 	{
@@ -354,7 +363,7 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 		for (size_t stateIndex = 0; stateIndex < colors.size(); stateIndex++)
 		{
 			text.SetColor(JsonToColorVec(colors[stateIndex]["color"]), (ObjectState)stateIndex);
-		} 
+		}
 
 		text.SetIsCentered(textComponents[i]["isCentered"]);
 
@@ -514,7 +523,7 @@ void MENU::MenuHandler::SaveToJson()
 				textEntry["font"] = text.GetFontName();
 				textEntry["fontSize"] = (int)text.GetFontSize();
 				textEntry["isCentered"] = text.GetIsCentered();
-				
+
 				for (size_t stateIndex = 0; stateIndex < (int)ObjectState::Count; stateIndex++)
 				{
 					nlohmann::json colorEntry;
@@ -561,7 +570,7 @@ void MENU::MenuHandler::SaveToJson()
 	menuFile["commandComponents"] = commandComponents;
 
 	std::string MENU_PATH = "menus/";
-	std::string path = RELATIVE_IMPORT_DATA_PATH + MENU_PATH + myFileName;
+	std::string path = RELATIVE_IMPORT_DATA_PATH + MENU_PATH + myName + ".json";
 	std::ofstream dataFile(path);
 	if (dataFile.fail())
 	{

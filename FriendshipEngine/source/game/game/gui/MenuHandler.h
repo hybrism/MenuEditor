@@ -38,6 +38,8 @@ namespace MENU
 
 		MenuState& GetCurrentState();
 		std::vector<MenuState>& GetAllStates();
+		std::string GetName() const;
+		std::string GetFileName() const;
 
 		MenuObject& GetObjectFromID(ID aID);
 		MenuObject& GetObjectFromIndex(ID aIndex);
@@ -66,7 +68,6 @@ namespace MENU
 		SceneManager* mySceneManager;
 
 		std::string myName;
-		std::string myFileName;
 
 		std::stack<MenuState*> myStateStack;
 		std::vector<MenuState> myStates;

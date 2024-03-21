@@ -19,10 +19,10 @@
     <ClInclude Include="windows\InspectorWindow.h">
       <Filter>windows</Filter>
     </ClInclude>
-    <ClInclude Include="windows\ObjectHierarchyWindow.h">
+    <ClInclude Include="windows\MenuViewWindow.h">
       <Filter>windows</Filter>
     </ClInclude>
-    <ClInclude Include="windows\MenuViewWindow.h">
+    <ClInclude Include="windows\ObjectHierarchyWindow.h">
       <Filter>windows</Filter>
     </ClInclude>
     <ClInclude Include="windows\Window.h">
@@ -41,10 +41,10 @@
     <ClCompile Include="windows\InspectorWindow.cpp">
       <Filter>windows</Filter>
     </ClCompile>
-    <ClCompile Include="windows\ObjectHierarchyWindow.cpp">
+    <ClCompile Include="windows\MenuViewWindow.cpp">
       <Filter>windows</Filter>
     </ClCompile>
-    <ClCompile Include="windows\MenuViewWindow.cpp">
+    <ClCompile Include="windows\ObjectHierarchyWindow.cpp">
       <Filter>windows</Filter>
     </ClCompile>
   </ItemGroup>

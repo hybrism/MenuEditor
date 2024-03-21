@@ -262,22 +262,22 @@
     <ClInclude Include="text\FontSizeEnum.h">
       <Filter>text</Filter>
     </ClInclude>
-    <ClInclude Include="text\Fontfile.h">
-      <Filter>text</Filter>
-    </ClInclude>
-    <ClInclude Include="text\Parser.h">
-      <Filter>text</Filter>
-    </ClInclude>
-    <ClInclude Include="text\Text.h">
-      <Filter>text</Filter>
-    </ClInclude>
-    <ClInclude Include="text\TextFile.h">
-      <Filter>text</Filter>
-    </ClInclude>
     <ClInclude Include="text\TextService.h">
       <Filter>text</Filter>
     </ClInclude>
-    <ClInclude Include="text\Token.h">
+    <ClInclude Include="text\fontfile.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="text\parser.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="text\text.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="text\textfile.h">
+      <Filter>text</Filter>
+    </ClInclude>
+    <ClInclude Include="text\token.h">
       <Filter>text</Filter>
     </ClInclude>
     <ClInclude Include="utility\Error.h">
@@ -398,22 +398,22 @@
     <ClCompile Include="shaders\VertexShader.cpp">
       <Filter>shaders</Filter>
     </ClCompile>
-    <ClCompile Include="text\Fontfile.cpp">
-      <Filter>text</Filter>
-    </ClCompile>
-    <ClCompile Include="text\Parser.cpp">
-      <Filter>text</Filter>
-    </ClCompile>
-    <ClCompile Include="text\Text.cpp">
-      <Filter>text</Filter>
-    </ClCompile>
-    <ClCompile Include="text\TextFile.cpp">
-      <Filter>text</Filter>
-    </ClCompile>
     <ClCompile Include="text\TextService.cpp">
       <Filter>text</Filter>
     </ClCompile>
-    <ClCompile Include="text\Token.cpp">
+    <ClCompile Include="text\fontfile.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
+    <ClCompile Include="text\parser.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
+    <ClCompile Include="text\text.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
+    <ClCompile Include="text\textfile.cpp">
+      <Filter>text</Filter>
+    </ClCompile>
+    <ClCompile Include="text\token.cpp">
       <Filter>text</Filter>
     </ClCompile>
     <ClCompile Include="utility\Error.cpp">

@@ -1,5 +1,4 @@
 #include "AssetsWindow.h"
-//#include "../gui/IDManager.h"
 
 #include <d3d11.h>
 #include <engine/graphics/Texture.h>
@@ -45,17 +44,6 @@ void MENU::AssetsWindow::Show(const MenuEditorUpdateContext& aContext)
 
 					ImGui::MenuItem(fontFile.c_str());
 				}
-				ImGui::TreePop();
-			}
-
-			if (ImGui::TreeNode("IDs"))
-			{
-				//auto ids = IDManager::GetInstance()->GetIDs();
-				//for (size_t i = 0; i < ids.size(); i++)
-				//{
-				//	std::string status = ids[i] ? "Free" : "-";
-				//	ImGui::Text("ID: %i %s", i, status.c_str());
-				//}
 				ImGui::TreePop();
 			}
 

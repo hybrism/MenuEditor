@@ -32,8 +32,6 @@ void MENU::MenuObjectHierarchy::Show(const MenuEditorUpdateContext& aContext)
 	if (!myData.isOpen)
 		return;
 
-	//ImGui::SetNextWindowSize(ImVec2(350.f, 350.f), ImGuiCond_Appearing);
-	//ImGui::SetNextWindowPos(ImVec2(1560.f, 45.f), ImGuiCond_Appearing);
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
 		ImGui::SeparatorText("MenuStates");

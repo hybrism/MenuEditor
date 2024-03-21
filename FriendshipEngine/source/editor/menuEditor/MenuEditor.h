@@ -6,7 +6,6 @@
 #include "MenuEditorCommon.h"
 #include "windows/Window.h"
 
-
 class Game;
 
 namespace MENU 
@@ -51,7 +50,9 @@ namespace MENU
 
 		//IMGUI
 		std::array<std::shared_ptr<MENU::WindowBase>, (int)MENU::WindowID::Count> myWindows;
-		std::array<bool, (int)ePopup::Count> myPopups;
+		std::bitset<(int)ePopup::Count> myPopups;
+		
+		ImVec2 myContentRegionMin;
 
 		bool myShouldShowDebugData;
 		bool myShouldShowEditorColliders;

@@ -84,7 +84,7 @@ void MenuEditorLauncher::Init(HINSTANCE hInstance, WNDPROC wndProc)
 	HWND windowHandle = myEngine->GetWindowHandle();
 	DragAcceptFiles(windowHandle, TRUE);
 
-	GraphicsEngine::GetInstance()->SetClearColor(0.f, 0.f, 0.f);
+	GraphicsEngine::GetInstance()->SetClearColor(0.3f, 0.3f, 0.3f);
 
 	ImGuiHandler::Init();
 

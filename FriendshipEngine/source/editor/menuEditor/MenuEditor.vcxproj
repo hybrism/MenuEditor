@@ -153,8 +153,8 @@
     <ClInclude Include="windows\AssetsWindow.h" />
     <ClInclude Include="windows\ConsoleWindow.h" />
     <ClInclude Include="windows\InspectorWindow.h" />
-    <ClInclude Include="windows\ObjectHierarchyWindow.h" />
     <ClInclude Include="windows\MenuViewWindow.h" />
+    <ClInclude Include="windows\ObjectHierarchyWindow.h" />
     <ClInclude Include="windows\Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -163,8 +163,8 @@
     <ClCompile Include="windows\AssetsWindow.cpp" />
     <ClCompile Include="windows\ConsoleWindow.cpp" />
     <ClCompile Include="windows\InspectorWindow.cpp" />
-    <ClCompile Include="windows\ObjectHierarchyWindow.cpp" />
     <ClCompile Include="windows\MenuViewWindow.cpp" />
+    <ClCompile Include="windows\ObjectHierarchyWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\external\External.vcxproj">
