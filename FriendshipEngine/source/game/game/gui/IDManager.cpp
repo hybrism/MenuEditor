@@ -7,7 +7,7 @@ MENU::ID MENU::IDManager::GetFreeID()
 {
 	for (ID id = 0; id < myIDs.size(); id++)
 	{
-		if (myIDs[id])
+		if (!myIDs[id])
 			return UseID(id);
 	}
 

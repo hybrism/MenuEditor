@@ -170,6 +170,46 @@ void MENU::InspectorWindow::EditSpriteComponent(const MenuEditorUpdateContext& a
 
 		EditSpriteTextures(aContext, sprite);
 
+		const char* tagPreviewValue = Tags[(int)sprite.GetTag()];
+		if (ImGui::BeginCombo("Tag", tagPreviewValue))
+		{
+			for (int i = 0; i < IM_ARRAYSIZE(Tags); i++)
+			{
+				const bool isSelected = ((int)sprite.GetInteractionType() == i);
+				if (ImGui::Selectable(Tags[i], isSelected))
+				{
+					sprite.SetTag((Tag)i);
+				}
+
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+
+		if (sprite.GetTag() == Tag::Interactable)
+		{
+			const char* interactionPreviewValue = InteractionTypes[(int)sprite.GetInteractionType()];
+			if (ImGui::BeginCombo("Interaction type", interactionPreviewValue))
+			{
+				for (int i = 0; i < IM_ARRAYSIZE(InteractionTypes); i++)
+				{
+					const bool isSelected = ((int)sprite.GetInteractionType() == i);
+					if (ImGui::Selectable(InteractionTypes[i], isSelected))
+					{
+						sprite.SetInteractionType((InteractionType)i);
+					}
+
+					if (isSelected)
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
+			}
+		}
+
+
 		if (ImGui::TreeNode("More"))
 		{
 			if (ImGui::DragFloat2("Position", &position.x))

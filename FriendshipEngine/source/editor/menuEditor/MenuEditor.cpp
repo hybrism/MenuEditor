@@ -37,8 +37,7 @@ MENU::MenuEditor::MenuEditor()
 	, myShouldShowMenuColldiers(true)
 	, mySelectedObjectID(INVALID_ID)
 	, myEditorIDStartIndex(400)
-	, myUpGizmoID(INVALID_ID)
-	, myRightGizmoID(INVALID_ID)
+	, myGizmoID(INVALID_ID)
 {}
 
 MENU::MenuEditor::~MenuEditor()
@@ -133,6 +132,8 @@ void MENU::MenuEditor::Update(float)
 	menuContext.mousePressed = ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
 
 	myMenuHandler.Update(menuContext);
+
+	menuContext.mousePressed = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
 	myEditorObjectManager.Update(menuContext);
 
 	GizmoUpdate();
@@ -165,17 +166,16 @@ void MENU::MenuEditor::GizmoUpdate()
 		{
 			mySelectedObjectID = myMenuHandler.GetObjectFromID(myEditorIDToMenuIDMap[mo.GetID()]).GetID();
 			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::PushEntityToInspector, mySelectedObjectID });
+			break;
 		}
 	}
 
 	if (mySelectedObjectID != UINT_MAX)
 	{
-		MenuObject& gizmoUp = myEditorObjectManager.GetObjectFromID(myUpGizmoID);
-		MenuObject& gizmoRight = myEditorObjectManager.GetObjectFromID(myRightGizmoID);
+		MenuObject& gizmo = myEditorObjectManager.GetObjectFromID(myGizmoID);
 		MenuObject& selectedObject = myMenuHandler.myObjectManager.GetObjectFromID(mySelectedObjectID);
 
-		gizmoUp.SetPosition(selectedObject.GetPosition());
-		gizmoRight.SetPosition(selectedObject.GetPosition());
+		gizmo.SetPosition(selectedObject.GetPosition());
 	}
 }
 
@@ -184,7 +184,6 @@ void MENU::MenuEditor::GenerateEditorColliders()
 	myEditorObjectManager.ClearAll();
 	myEditorIDToMenuIDMap.clear();
 	myMenuIDToEditorIDMap.clear();
-
 
 	if (myMenuHandler.GetAllStates().empty())
 		return;
@@ -208,9 +207,9 @@ void MENU::MenuEditor::GenerateEditorColliders()
 	//CREATE GIZMO
 	{
 		MenuObject& mo = myEditorObjectManager.CreateNew(editorID++, myRenderCenter);
-		myUpGizmoID = mo.GetID();
+		myGizmoID = mo.GetID();
 		SpriteComponent& sprite = mo.AddComponent<SpriteComponent>();
-		int textureID = myAssets.textureNameToId["s_gizmo_up.dds"];
+		int textureID = myAssets.textureNameToId["s_gizmo.dds"];
 		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], ObjectState::Default);
 		sprite.SetColor({ 1.f, 1.f, 1.f, 0.3f }, ObjectState::Default);
 		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], ObjectState::Hovered);
@@ -219,28 +218,7 @@ void MENU::MenuEditor::GenerateEditorColliders()
 		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, ObjectState::Pressed);
 
 		Collider2DComponent& collider = mo.AddComponent<Collider2DComponent>();
-		collider.SetSize({ 16.f, 32.f });
-		collider.SetPosition({ 0.f, 22.f });
-		collider.SetShouldRenderColliders(myShouldShowEditorColliders);
-	}
-
-	{
-		MenuObject& mo = myEditorObjectManager.CreateNew(editorID++, myRenderCenter);
-		myRightGizmoID = mo.GetID();
-
-		SpriteComponent& sprite = mo.AddComponent<SpriteComponent>();
-		int textureID = myAssets.textureNameToId["s_gizmo_right.dds"];
-
-		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], ObjectState::Default);
-		sprite.SetColor({ 1.f, 1.f, 1.f, 0.3f }, ObjectState::Default);
-		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], ObjectState::Hovered);
-		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, ObjectState::Hovered);
-		sprite.SetTexture(myAssets.textures[textureID], myAssets.textureIdToName[textureID], ObjectState::Pressed);
-		sprite.SetColor({ 1.f, 1.f, 1.f, 1.f }, ObjectState::Pressed);
-
-		Collider2DComponent& collider = mo.AddComponent<Collider2DComponent>();
-		collider.SetSize({ 32.f, 16.f });
-		collider.SetPosition({ 22.f, 0.f });
+		collider.SetSize(sprite.GetTextureSize());
 		collider.SetShouldRenderColliders(myShouldShowEditorColliders);
 	}
 }
@@ -466,15 +444,13 @@ void MENU::MenuEditor::Popups()
 		{
 			ImGui::CloseCurrentPopup();
 
+			myMenuHandler.SetName(newMenuName.substr(0, newMenuName.find_last_of('.')));
+
 			size_t n = newMenuName.find(".json");
 			if (n == std::string::npos)
 				newMenuName += ".json";
 
-			std::string path = RELATIVE_IMPORT_DATA_PATH + MENU::MENU_PATH + newMenuName;
-			nlohmann::json menu;
-			std::ofstream dataFile(path);
-			dataFile << menu;
-			dataFile.close();
+			myMenuHandler.SaveToJson();
 		}
 
 		ImGui::SameLine();

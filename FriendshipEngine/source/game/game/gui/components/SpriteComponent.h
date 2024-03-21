@@ -9,6 +9,22 @@ class Texture;
 
 namespace MENU
 {
+	enum class Tag
+	{
+		Static,
+		Interactable,
+		Count
+	};
+
+	enum class InteractionType
+	{
+		None,
+		Drag,
+		Clip,
+		Hide,
+		Count
+	};
+
 	class MenuObject;
 	class SpriteComponent : public MenuComponent
 	{
@@ -17,6 +33,14 @@ namespace MENU
 			SpriteSharedData shared;
 			Vector4f color = { 1.f, 1.f, 1.f,1.f };
 			std::string fileName;
+		};
+
+		//TODO: Maybe use some kind of design pattern to fix this in a smart way
+		struct MovementValues
+		{
+			float value;
+			float min = 0;
+			float max = 0;
 		};
 
 	public:
@@ -34,6 +58,10 @@ namespace MENU
 		float& GetRotation() { return myInstance.rotation; }
 		bool& GetIsHidden() { return myInstance.isHidden; }
 
+		//TODO: Add a InteractableComponent instead
+		Tag GetTag() const { return myTag; }
+		InteractionType GetInteractionType() const { return myInteractionType; }
+
 		Texture* GetTexture(ObjectState aType = ObjectState::Default) const;
 		Vector4f& GetColor(ObjectState aType = ObjectState::Default);
 
@@ -48,6 +76,10 @@ namespace MENU
 		void SetRotation(float aRotation);
 		void SetIsHidden(bool aIsHidden);
 
+		//TODO: Add a InteractableComponent instead
+		void SetTag(Tag aTag);
+		void SetInteractionType(InteractionType aInteractiontype);
+
 		void SetTexture(Texture* aTexture, const std::string& aTextureName, ObjectState aState = ObjectState::Default);
 		void SetColor(const Vector4f& aColor, ObjectState aState = ObjectState::Default);
 
@@ -56,8 +88,8 @@ namespace MENU
 
 		std::array<TextureData, (int)ObjectState::Count> myTextures;
 
-		std::string myTextureFile;
-
+		Tag myTag;
+		InteractionType myInteractionType;
 	};
 
 }

@@ -22,7 +22,6 @@ namespace MENU
 
 		MenuObject& CreateNew(ID aID = INVALID_ID, const Vector2f& aPosition = { 0.f, 0.f });
 		MenuObject& GetObjectFromID(ID aID);
-		MenuObject& GetObjectFromIndex(unsigned int aIndex);
 		
 		void RemoveObjectAtID(ID aID);
 

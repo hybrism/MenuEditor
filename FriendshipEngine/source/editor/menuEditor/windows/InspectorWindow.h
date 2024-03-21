@@ -5,6 +5,20 @@
 
 namespace MENU
 {
+	static const char* Tags[] =
+	{
+		"Static",
+		"Interactable"
+	};
+
+	static const char* InteractionTypes[] =
+	{
+		"None",
+		"Drag",
+		"Clip",
+		"Hide"
+	};
+
 	class MenuObject;
 	class SpriteComponent;
 	class InspectorWindow : public WindowBase, public FE::Observer

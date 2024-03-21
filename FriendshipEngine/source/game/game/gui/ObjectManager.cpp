@@ -59,19 +59,12 @@ MENU::MenuObject& MENU::ObjectManager::GetObjectFromID(ID aID)
 	return *myObjects.front();
 }
 
-MENU::MenuObject& MENU::ObjectManager::GetObjectFromIndex(unsigned int aIndex)
-{
-	assert(aIndex <= myLastObjectIndex && "Index is out of range!");
-
-	return *myObjects[aIndex];
-}
-
 void MENU::ObjectManager::RemoveObjectAtID(ID aID)
 {
 	for (unsigned int i = 0; i < myObjects.size(); i++)
 	{
-		unsigned int ID = myObjects[i]->GetID();
-		if (ID == aID)
+		ID id = myObjects[i]->GetID();
+		if (id == aID)
 		{
 			RemoveObjectAtIndex(i);
 			return;

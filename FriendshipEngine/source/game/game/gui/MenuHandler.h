@@ -41,6 +41,8 @@ namespace MENU
 		std::string GetName() const;
 		std::string GetFileName() const;
 
+		void SetName(const std::string& aName);
+
 		MenuObject& GetObjectFromID(ID aID);
 		MenuObject& GetObjectFromIndex(ID aIndex);
 

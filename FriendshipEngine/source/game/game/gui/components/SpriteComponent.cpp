@@ -8,6 +8,8 @@
 
 MENU::SpriteComponent::SpriteComponent(MenuObject& aParent, unsigned int aID)
 	: MenuComponent(aParent, aID, ComponentType::Sprite)
+	, myTag(Tag::Static)
+	, myInteractionType(InteractionType::None)
 {}
 
 void MENU::SpriteComponent::Update(const MenuUpdateContext& aContext)
@@ -24,7 +26,6 @@ void MENU::SpriteComponent::Render()
 
 	myInstance.color = myTextures[(int)myParent.GetState()].color;
 
-	//TODO: Don't do this for all components
 	GraphicsEngine::GetInstance()->GetSpriteRenderer().DrawSprite(myTextures[(int)myParent.GetState()].shared, myInstance);
 }
 
@@ -92,6 +93,16 @@ void MENU::SpriteComponent::SetRotation(float aRotation)
 void MENU::SpriteComponent::SetIsHidden(bool aIsHidden)
 {
 	myInstance.isHidden = aIsHidden;
+}
+
+void MENU::SpriteComponent::SetTag(Tag aTag)
+{
+	myTag = aTag;
+}
+
+void MENU::SpriteComponent::SetInteractionType(InteractionType aInteractiontype)
+{
+	myInteractionType = aInteractiontype;
 }
 
 void MENU::SpriteComponent::SetTexture(Texture* aTexture, const std::string& aTextureName, ObjectState aType)

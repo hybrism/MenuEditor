@@ -220,6 +220,11 @@ std::string MENU::MenuHandler::GetFileName() const
 	return std::string(myName + ".json");
 }
 
+void MENU::MenuHandler::SetName(const std::string& aName)
+{
+	myName = aName;
+}
+
 void MENU::MenuHandler::RemoveObjectAtID(ID aID)
 {
 	for (size_t i = 0; i < myStates.size(); i++)

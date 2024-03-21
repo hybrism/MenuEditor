@@ -213,6 +213,22 @@ void MENU::MenuObjectHierarchy::AddObjectButton(const MenuEditorUpdateContext& a
 			obj.AddComponent<SpriteComponent>();
 			obj.AddComponent<Collider2DComponent>();
 			obj.AddComponent<TextComponent>();
+			obj.AddComponent<CommandComponent>();
+
+			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::UpdateMenuEditorColliders, this });
+			ImGui::CloseCurrentPopup();
+		}
+
+		if (ImGui::Selectable("Add Slider"))
+		{
+			MenuObject& obj = aContext.menuHandler->CreateNewObject(myViewportCenter);
+
+			obj.AddComponent<SpriteComponent>();
+			obj.AddComponent<SpriteComponent>();
+			obj.AddComponent<SpriteComponent>();
+			obj.AddComponent<Collider2DComponent>();
+			obj.AddComponent<TextComponent>();
+			obj.AddComponent<CommandComponent>();
 
 			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::UpdateMenuEditorColliders, this });
 			ImGui::CloseCurrentPopup();

@@ -41,8 +41,7 @@ namespace MENU
 
 		ID mySelectedObjectID;
 		ID myEditorIDStartIndex;
-		ID myUpGizmoID;
-		ID myRightGizmoID;
+		ID myGizmoID;
 
 		Vector2f myGizmoPosition;
 		Vector2f myRenderSize;
@@ -64,9 +63,7 @@ namespace MENU
 		void Popups();
 		//!IMGUI
 	
-		//POSTMASTER
 		void RecieveMessage(const FE::Message& aMessage) override;
-		//!POSTMASTER
 	};
 
 }
