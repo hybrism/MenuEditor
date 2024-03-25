@@ -23,6 +23,7 @@ namespace MENU
 		Collider2D,
 		Text,
 		Command,
+		Interactable,
 		Count
 	};
 
@@ -32,6 +33,7 @@ namespace MENU
 		"ColliderComponent",
 		"TextComponent",
 		"CommandComponent",
+		"InteractableComponent",
 		"None"
 	};
 };

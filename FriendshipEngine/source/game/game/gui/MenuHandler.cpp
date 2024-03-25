@@ -18,6 +18,7 @@
 #include "components/TextComponent.h"
 #include "components/Collider2DComponent.h"
 #include "components/CommandComponent.h"
+#include "components/InteractableComponent.h"
 
 MENU::MenuHandler::MenuHandler()
 	: mySceneManager(nullptr)
@@ -51,19 +52,22 @@ void MENU::MenuHandler::Update(const MenuUpdateContext& aContext)
 		if (!currentObj.IsPressed())
 			continue;
 
+		if (!aContext.mouseReleased)
+			continue;
+
 		auto& command = currentObj.GetComponent<CommandComponent>();
 		switch (command.GetCommandType())
 		{
 		case eCommandType::PopMenu:
 		{
 			PopState();
-			return;
+			break;
 		}
 		case eCommandType::PushMenu:
 		{
 			ID menuID = std::get<ID>(command.GetCommandData().data);
 			PushState(menuID);
-			return;
+			break;
 		}
 		case eCommandType::LoadLevel:
 		{
@@ -72,18 +76,18 @@ void MENU::MenuHandler::Update(const MenuUpdateContext& aContext)
 			if (!mySceneManager)
 			{
 				PrintI("Load Level: " + levelName);
-				continue;
+				break;
 			}
 
 			mySceneManager->LoadScene({ eSceneType::Game, levelName });
-			return;
+			break;
 		}
 		case eCommandType::ResumeGame:
 		{
 			if (!mySceneManager)
 			{
 				PrintI("Pause/Unpause");
-				continue;
+				break;
 			}
 
 			mySceneManager->SetIsPaused(false);
@@ -94,7 +98,7 @@ void MENU::MenuHandler::Update(const MenuUpdateContext& aContext)
 			if (!mySceneManager)
 			{
 				PrintI("Back to MainMenu");
-				continue;
+				break;
 			}
 
 			while (mySceneManager->GetCurrentScene()->GetType() != eSceneType::MainMenu)
@@ -107,7 +111,7 @@ void MENU::MenuHandler::Update(const MenuUpdateContext& aContext)
 			if (!mySceneManager)
 			{
 				PrintI("Exit Game!");
-				continue;
+				break;
 			}
 
 			mySceneManager->PopScene();
@@ -116,6 +120,7 @@ void MENU::MenuHandler::Update(const MenuUpdateContext& aContext)
 		default:
 			break;
 		}
+
 	}
 }
 
@@ -324,6 +329,9 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 		ID ownerID = spriteComponents[i]["ownerID"];
 		SpriteComponent& sprite = myObjectManager.GetObjectFromID(ownerID).AddComponent<SpriteComponent>();
 
+		if (spriteComponents[i].contains("name"))
+			sprite.myName = spriteComponents[i]["name"];
+
 		//TODO: AssetDatabase for sprites?
 		nlohmann::json textures = spriteComponents[i]["textures"];
 		for (size_t stateIndex = 0; stateIndex < textures.size(); stateIndex++)
@@ -359,6 +367,10 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 		ID ownerID = textComponents[i]["ownerID"];
 
 		TextComponent& text = myObjectManager.GetObjectFromID(ownerID).AddComponent<TextComponent>();
+
+		if (textComponents[i].contains("name"))
+			text.myName = textComponents[i]["name"];
+
 		text.SetFont(textComponents[i]["font"]);
 		text.SetFontSize((FontSize)textComponents[i]["fontSize"]);
 		text.SetText(textComponents[i]["textString"]);
@@ -480,6 +492,7 @@ void MENU::MenuHandler::SaveToJson()
 	nlohmann::json textComponents;
 	nlohmann::json colliderComponents;
 	nlohmann::json commandComponents;
+	nlohmann::json interactableComponents;
 
 	for (size_t i = 0; i < myObjectManager.myObjects.size(); i++)
 	{
@@ -491,6 +504,9 @@ void MENU::MenuHandler::SaveToJson()
 				SpriteComponent& sprite = static_cast<SpriteComponent&>(*sprites[componentIndex]);
 				nlohmann::json spriteEntry;
 				spriteEntry["ownerID"] = sprite.GetParent().GetID();
+
+				if (!sprite.myName.empty())
+					spriteEntry["name"] = sprite.myName;
 
 				for (size_t stateIndex = 0; stateIndex < (int)ObjectState::Count; stateIndex++)
 				{
@@ -523,6 +539,10 @@ void MENU::MenuHandler::SaveToJson()
 				TextComponent& text = static_cast<TextComponent&>(*texts[componentIndex]);
 				nlohmann::json textEntry;
 				textEntry["ownerID"] = text.GetParent().GetID();
+
+				if (!text.myName.empty())
+					textEntry["name"] = text.myName;
+
 				textEntry["textString"] = text.GetText();
 				textEntry["position"] = ScreenPositionToJson(text.GetPosition());
 				textEntry["font"] = text.GetFontName();
@@ -535,7 +555,6 @@ void MENU::MenuHandler::SaveToJson()
 					colorEntry["color"] = ColorVecToJson(text.GetColor((ObjectState)stateIndex));
 					textEntry["colors"].push_back(colorEntry);
 				}
-
 
 				textComponents.push_back(textEntry);
 			}
@@ -567,12 +586,56 @@ void MENU::MenuHandler::SaveToJson()
 
 			commandComponents.push_back(commandEntry);
 		}
+
+		if (myObjectManager.myObjects[i]->HasComponent<InteractableComponent>())
+		{
+			InteractableComponent interactable = myObjectManager.myObjects[i]->GetComponent<InteractableComponent>();
+			nlohmann::json interactableEntry;
+			interactableEntry["ownerID"] = interactable.GetParent().GetID();
+
+			nlohmann::json interactions;
+			for (size_t interactionIndex = 0; interactionIndex < interactable.myInteractions.size(); interactionIndex++)
+			{
+				nlohmann::json interactionEntry;
+				interactionEntry["interactionType"] = (int)interactable.myInteractions[interactionIndex]->myType;
+
+				switch (interactable.myInteractions[interactionIndex]->myType)
+				{
+				case MENU::InteractionType::Drag:
+				{
+					std::shared_ptr<DragInteraction> drag = std::static_pointer_cast<DragInteraction>(interactable.myInteractions[interactionIndex]);
+					interactionEntry["min"] = drag->myMin;
+					interactionEntry["max"] = drag->myMax;
+					break;
+				}
+				case MENU::InteractionType::Clip:
+				{
+					//TODO: Is this necessary?
+					break;
+				}
+				case MENU::InteractionType::Hide:
+				{
+					//TODO: Is this necessary?
+					break;
+				}
+				default:
+					continue;
+				}
+
+				interactions.push_back(interactionEntry);
+			}
+
+			interactableEntry["interactions"] = interactions;
+
+			interactableComponents.push_back(interactableEntry);
+		}
 	}
 
 	menuFile["spriteComponents"] = spriteComponents;
 	menuFile["textComponents"] = textComponents;
 	menuFile["colliderComponents"] = colliderComponents;
 	menuFile["commandComponents"] = commandComponents;
+	menuFile["interactableComponents"] = interactableComponents;
 
 	std::string MENU_PATH = "menus/";
 	std::string path = RELATIVE_IMPORT_DATA_PATH + MENU_PATH + myName + ".json";

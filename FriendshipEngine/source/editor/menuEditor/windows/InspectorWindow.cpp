@@ -9,10 +9,11 @@
 #include <game/gui/MenuObject.h>
 #include <game/gui/MenuHandler.h>
 #include <game/gui/ObjectManager.h>
-#include <game/gui/components/SpriteComponent.h>
 #include <game/gui/components/TextComponent.h>
-#include <game/gui/components/Collider2DComponent.h>
+#include <game/gui/components/SpriteComponent.h>
 #include <game/gui/components/CommandComponent.h>
+#include <game/gui/components/Collider2DComponent.h>
+#include <game/gui/components/InteractableComponent.h>
 
 #include <shared/postMaster/PostMaster.h>
 
@@ -70,6 +71,9 @@ void MENU::InspectorWindow::Show(const MenuEditorUpdateContext& aContext)
 
 		if (selectedObject.HasComponent<CommandComponent>())
 			EditCommandComponent(aContext, selectedObject);
+
+		if (selectedObject.HasComponent<InteractableComponent>())
+			EditInteractableComponent(aContext, selectedObject);
 
 		ImGui::PopID();
 	}
@@ -159,6 +163,8 @@ void MENU::InspectorWindow::EditSpriteComponent(const MenuEditorUpdateContext& a
 		Vector2f position = sprite.GetPosition();
 		ImGui::PushID(componentIndex);
 		ImGui::SeparatorText("Sprite");
+		ImGui::SameLine();
+		ImGui::InputText("Name", &sprite.myName, ImGuiInputTextFlags_AutoSelectAll);
 
 		if (aContext.showDebugData)
 		{
@@ -169,46 +175,6 @@ void MENU::InspectorWindow::EditSpriteComponent(const MenuEditorUpdateContext& a
 		}
 
 		EditSpriteTextures(aContext, sprite);
-
-		const char* tagPreviewValue = Tags[(int)sprite.GetTag()];
-		if (ImGui::BeginCombo("Tag", tagPreviewValue))
-		{
-			for (int i = 0; i < IM_ARRAYSIZE(Tags); i++)
-			{
-				const bool isSelected = ((int)sprite.GetInteractionType() == i);
-				if (ImGui::Selectable(Tags[i], isSelected))
-				{
-					sprite.SetTag((Tag)i);
-				}
-
-				if (isSelected)
-					ImGui::SetItemDefaultFocus();
-			}
-
-			ImGui::EndCombo();
-		}
-
-		if (sprite.GetTag() == Tag::Interactable)
-		{
-			const char* interactionPreviewValue = InteractionTypes[(int)sprite.GetInteractionType()];
-			if (ImGui::BeginCombo("Interaction type", interactionPreviewValue))
-			{
-				for (int i = 0; i < IM_ARRAYSIZE(InteractionTypes); i++)
-				{
-					const bool isSelected = ((int)sprite.GetInteractionType() == i);
-					if (ImGui::Selectable(InteractionTypes[i], isSelected))
-					{
-						sprite.SetInteractionType((InteractionType)i);
-					}
-
-					if (isSelected)
-						ImGui::SetItemDefaultFocus();
-				}
-
-				ImGui::EndCombo();
-			}
-		}
-
 
 		if (ImGui::TreeNode("More"))
 		{
@@ -281,6 +247,8 @@ void MENU::InspectorWindow::EditTextComponent(const MenuEditorUpdateContext& aCo
 
 		ImGui::PushID(componentIndex);
 		ImGui::SeparatorText("Text");
+		ImGui::SameLine();
+		ImGui::InputText("Name", &text.myName, ImGuiInputTextFlags_AutoSelectAll);
 
 		if (aContext.showDebugData)
 		{
@@ -502,6 +470,137 @@ void MENU::InspectorWindow::EditCommandComponent(const MenuEditorUpdateContext& 
 	{
 		if (ImGui::Button("RemoveComponent", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
 			aObject.RemoveComponent(command.GetID());
+
+		ImGui::TreePop();
+	}
+
+	ImGui::Spacing();
+	ImGui::PopID();
+}
+
+void MENU::InspectorWindow::EditInteractableComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject)
+{
+	InteractableComponent& interactable = aObject.GetComponent<InteractableComponent>();
+	ImGui::PushID("Interactable");
+	ImGui::SeparatorText("Interactable");
+
+	if (aContext.showDebugData)
+	{
+		ImGui::Text("ComponentID: %i", interactable.GetID());
+		ImGui::Text("ParentID: %i", interactable.GetParent().GetID());
+	}
+
+	ImGui::Button("Add Interaction", ImVec2(ImGui::GetContentRegionAvail().x, 24));
+	if (ImGui::BeginPopupContextItem(0, ImGuiPopupFlags_MouseButtonLeft))
+	{
+		static std::shared_ptr<MenuComponent> selectedComponent;
+		static InteractionType selectedType = InteractionType::None;
+
+		const char* componentPreviewValue = selectedComponent ? selectedComponent->myName.c_str() : "(None)";
+		if (ImGui::BeginCombo("Component", componentPreviewValue))
+		{
+			ImGui::SeparatorText("Sprites");
+			auto spriteComponents = aObject.GetComponents<SpriteComponent>();
+			for (size_t i = 0; i < spriteComponents.size(); i++)
+			{
+				std::string previewValue = std::to_string(spriteComponents[i]->GetID()) + " " + spriteComponents[i]->myName;
+				const bool isSelected = (selectedComponent == spriteComponents[i]);
+				if (ImGui::Selectable(previewValue.c_str(), isSelected))
+				{
+					selectedComponent = spriteComponents[i];
+				}
+
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::SeparatorText("Texts");
+			auto textComponents = aObject.GetComponents<TextComponent>();
+			for (size_t i = 0; i < textComponents.size(); i++)
+			{
+				std::string previewValue = std::to_string(textComponents[i]->GetID()) + " " + textComponents[i]->myName;
+				const bool isSelected = (selectedComponent == textComponents[i]);
+				if (ImGui::Selectable(previewValue.c_str(), isSelected))
+				{
+					selectedComponent = textComponents[i];
+				}
+
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+
+		const char* interactionPreviewValue = InteractionTypes[(int)selectedType];
+		if (ImGui::BeginCombo("Interaction type", interactionPreviewValue))
+		{
+			for (int j = 0; j < IM_ARRAYSIZE(InteractionTypes); j++)
+			{
+				const bool isSelected = ((int)selectedType == j);
+				if (ImGui::Selectable(InteractionTypes[j], isSelected))
+				{
+					selectedType = (InteractionType)j;
+				}
+
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+
+		if (ImGui::Button("Add", ImVec2(120, 0)))
+		{
+			interactable.AddInteraction(selectedComponent, selectedType);
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+
+	for (size_t i = 0; i < interactable.myInteractions.size(); i++)
+	{
+		std::shared_ptr<Interaction> interaction = interactable.myInteractions[i];
+		ImGui::Text("Component: %i %s", (int)interaction->myParent->GetID(), interaction->myParent->myName.c_str());
+
+		ImGui::Text("Interaction: %s", InteractionTypes[(int)interaction->myType]);
+
+		switch (interaction->myType)
+		{
+		case MENU::InteractionType::Drag:
+		{
+			std::shared_ptr<DragInteraction> drag = std::static_pointer_cast<DragInteraction>(interaction);
+			ImGui::DragFloat("Min", &drag->myMin, 1.f, 0.f, 0.f, "%.0f");
+			ImGui::DragFloat("Max", &drag->myMax, 1.f, 0.f, 0.f, "%.0f");
+			ImGui::DragFloat("Value", &drag->myValue, 0.01f, 0.f, 1.f, "%.2f");
+
+				break;
+		}
+		case MENU::InteractionType::Clip:
+		{
+
+			break;
+		}
+		case MENU::InteractionType::Hide:
+		{
+
+			break;
+		}
+		default:
+			break;
+		}
+	}
+
+	if (ImGui::TreeNode("More"))
+	{
+		if (ImGui::Button("RemoveComponent", ImVec2(ImGui::GetContentRegionAvail().x, 24)))
+			aObject.RemoveComponent(interactable.GetID());
 
 		ImGui::TreePop();
 	}

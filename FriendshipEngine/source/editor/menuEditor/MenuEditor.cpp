@@ -107,7 +107,7 @@ void MENU::MenuEditor::Init()
 	GenerateEditorColliders();
 }
 
-void MENU::MenuEditor::Update(float)
+void MENU::MenuEditor::Update(float aDt)
 {
 	Dockspace();
 	Popups();
@@ -127,13 +127,17 @@ void MENU::MenuEditor::Update(float)
 
 	MenuUpdateContext menuContext;
 	ImVec2 mousePos = ImGui::GetMousePos();
+	ImVec2 mouseDelta = ImGui::GetMouseDragDelta();
+	menuContext.dt = aDt;
 	menuContext.mousePosition = { mousePos.x, mousePos.y };
+	menuContext.mouseDelta = { mouseDelta.x, mouseDelta.y };
 	menuContext.renderSize = myRenderSize;
-	menuContext.mousePressed = ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
+	menuContext.mousePressed = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+	menuContext.mouseReleased = ImGui::IsMouseReleased(ImGuiMouseButton_Left);
 
 	myMenuHandler.Update(menuContext);
 
-	menuContext.mousePressed = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
+	menuContext.mousePressed = ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
 	myEditorObjectManager.Update(menuContext);
 
 	GizmoUpdate();

@@ -19,10 +19,7 @@ MENU::Collider2DComponent::Collider2DComponent(MenuObject& aParent, unsigned int
 
 void MENU::Collider2DComponent::Update(const MenuUpdateContext& aContext)
 {
-	CheckCollision(
-		{ aContext.mousePosition.x, aContext.renderSize.y - aContext.mousePosition.y },
-		aContext.mousePressed
-	);
+	CheckCollision(aContext);
 }
 
 void MENU::Collider2DComponent::Render()
@@ -52,16 +49,16 @@ void MENU::Collider2DComponent::RenderColliders()
 	debug.DrawLine({ min.x, max.y }, { min.x, min.y });
 }
 
-bool MENU::Collider2DComponent::CheckCollision(const Vector2f& aPosition, bool aIsPressed)
+bool MENU::Collider2DComponent::CheckCollision(const MenuUpdateContext& aContext)
 {
-	bool min = aPosition.x > myMin.x && aPosition.y > myMin.y;
-	bool max = aPosition.x < myMax.x && aPosition.y < myMax.y;
+	bool min = aContext.mousePosition.x > myMin.x && aContext.renderSize.y - aContext.mousePosition.y > myMin.y;
+	bool max = aContext.mousePosition.x < myMax.x && aContext.renderSize.y - aContext.mousePosition.y < myMax.y;
 
 	myIsPressed = false;
 	myIsHovered = min && max;
 
 	if (myIsHovered)
-		myIsPressed = aIsPressed;
+		myIsPressed = aContext.mousePressed;
 
 	return myIsHovered;
 }

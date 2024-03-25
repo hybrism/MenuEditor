@@ -11,6 +11,7 @@ MENU::TextComponent::TextComponent(MenuObject& aParent, unsigned int aID)
 	myFontName = "ProggyClean.ttf";
 	mySize = FontSize_14;
 	myIsCentered = true;
+	myIsHidden = false;
 
 	myColors.fill({ 1.f, 1.f, 1.f, 1.f });
 	myText.SetPosition(myParent.GetPosition());
@@ -24,6 +25,9 @@ void MENU::TextComponent::Update(const MenuUpdateContext& aContext)
 
 void MENU::TextComponent::Render()
 {
+	if (myIsHidden)
+		return;
+
 	myText.SetColor(myColors[(int)myParent.GetState()]);
 
 	myText.Render();
@@ -65,6 +69,11 @@ Vector4f MENU::TextComponent::GetColor(ObjectState aState) const
 bool MENU::TextComponent::GetIsCentered() const
 {
 	return myIsCentered;
+}
+
+bool MENU::TextComponent::GetIsHidden() const
+{
+	return myIsHidden;
 }
 
 void MENU::TextComponent::UpdateText()
@@ -109,11 +118,16 @@ void MENU::TextComponent::SetColor(const Vector4f& aColor, ObjectState aState)
 	myColors[(int)aState] = aColor;
 }
 
-void MENU::TextComponent::SetIsCentered(bool aBool)
+void MENU::TextComponent::SetIsCentered(bool aIsCentered)
 {
-	myIsCentered = aBool;
+	myIsCentered = aIsCentered;
 
 	UpdatePosition();
+}
+
+void MENU::TextComponent::SetIsHidden(bool aIsHidden)
+{
+	myIsHidden = aIsHidden;
 }
 
 void MENU::TextComponent::CenterTextOverPosition()

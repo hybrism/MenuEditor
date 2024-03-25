@@ -15,21 +15,21 @@ struct fontChar
 		tMax_ = static_cast<float>(y+height)/static_cast<float>(texHeight);
 	}
 
-	uint id_;
-	uint x_;
-	uint y_;
-	uint width_;
-	uint height_;
-	float xoffset_;
-	float yoffset_;
-	float xadvance_;
-	uint page_;
-	uint chnl_;
+	uint id_ = 0;
+	uint x_ = 0;
+	uint y_ = 0;
+	uint width_ = 0;
+	uint height_ = 0;
+	float xoffset_ = 0.f;
+	float yoffset_ = 0.f;
+	float xadvance_ = 0.f;
+	uint page_ = 0;
+	uint chnl_ = 0;
 
-	float sMin_;
-	float sMax_;
-	float tMin_;
-	float tMax_;
+	float sMin_ = 0.f;
+	float sMax_ = 0.f;
+	float tMin_ = 0.f;
+	float tMax_ = 0.f;
 };
 
 char *load_asset(const char* aTexturePath, int &aSize);

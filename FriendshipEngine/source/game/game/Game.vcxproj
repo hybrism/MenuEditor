@@ -180,6 +180,7 @@
     <ClInclude Include="component\ScriptableEventComponent.h" />
     <ClInclude Include="component\TransformComponent.h" />
     <ClInclude Include="factory\ProjectileFactory.h" />
+    <ClInclude Include="gui\components\InteractableComponent.h" />
     <ClInclude Include="gui\IDManager.h" />
     <ClInclude Include="gui\MenuHandler.h" />
     <ClInclude Include="gui\MenuObject.h" />
@@ -248,6 +249,7 @@
     <ClCompile Include="audio\FMODImplementation.cpp" />
     <ClCompile Include="collision\Bitmask.cpp" />
     <ClCompile Include="factory\ProjectileFactory.cpp" />
+    <ClCompile Include="gui\components\InteractableComponent.cpp" />
     <ClCompile Include="gui\IDManager.cpp" />
     <ClCompile Include="gui\MenuHandler.cpp" />
     <ClCompile Include="gui\MenuObject.cpp" />

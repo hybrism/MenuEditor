@@ -8,8 +8,7 @@
 
 MENU::SpriteComponent::SpriteComponent(MenuObject& aParent, unsigned int aID)
 	: MenuComponent(aParent, aID, ComponentType::Sprite)
-	, myTag(Tag::Static)
-	, myInteractionType(InteractionType::None)
+
 {}
 
 void MENU::SpriteComponent::Update(const MenuUpdateContext& aContext)
@@ -95,15 +94,7 @@ void MENU::SpriteComponent::SetIsHidden(bool aIsHidden)
 	myInstance.isHidden = aIsHidden;
 }
 
-void MENU::SpriteComponent::SetTag(Tag aTag)
-{
-	myTag = aTag;
-}
 
-void MENU::SpriteComponent::SetInteractionType(InteractionType aInteractiontype)
-{
-	myInteractionType = aInteractiontype;
-}
 
 void MENU::SpriteComponent::SetTexture(Texture* aTexture, const std::string& aTextureName, ObjectState aType)
 {

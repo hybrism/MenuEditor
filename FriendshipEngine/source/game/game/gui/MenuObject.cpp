@@ -7,14 +7,15 @@
 #include "components/SpriteComponent.h"
 #include "components/TextComponent.h"
 #include "components/CommandComponent.h"
+#include "components/InteractableComponent.h"
+
 
 MENU::MenuObject::MenuObject(const unsigned int aID, const Vector2f& aPosition)
 	: myID(aID)
 	, myName("(Untitled)")
 	, myPosition(aPosition)
 	, myState(ObjectState::Default)
-{
-}
+{}
 
 MENU::MenuObject::~MenuObject()
 {}
@@ -46,6 +47,9 @@ void MENU::MenuObject::AddComponentOfType(ComponentType aType)
 		break;
 	case MENU::ComponentType::Command:
 		AddComponent<CommandComponent>();
+		break;
+	case MENU::ComponentType::Interactable:
+		AddComponent<InteractableComponent>();
 		break;
 	default:
 		break;

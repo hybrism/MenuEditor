@@ -26,17 +26,6 @@ void MENU::ObjectManager::Render()
 	}
 }
 
-void MENU::ObjectManager::CheckCollision(const Vector2f& aPosition, bool aIsPressed)
-{
-	for (size_t i = 0; i < myObjects.size(); i++)
-	{
-		if (!myObjects[i]->HasComponent<Collider2DComponent>())
-			return;
-
-		myObjects[i]->GetComponent<Collider2DComponent>().CheckCollision(aPosition, aIsPressed);
-	}
-}
-
 MENU::MenuObject& MENU::ObjectManager::CreateNew(ID aID, const Vector2f& aPosition)
 {
 	assert(aID != INVALID_ID && "ID is not valid!");

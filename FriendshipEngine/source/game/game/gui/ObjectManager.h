@@ -18,8 +18,6 @@ namespace MENU
 		void Update(const MenuUpdateContext& aContext);
 		void Render();
 
-		void CheckCollision(const Vector2f& aPosition, bool aIsPressed = false);
-
 		MenuObject& CreateNew(ID aID = INVALID_ID, const Vector2f& aPosition = { 0.f, 0.f });
 		MenuObject& GetObjectFromID(ID aID);
 		

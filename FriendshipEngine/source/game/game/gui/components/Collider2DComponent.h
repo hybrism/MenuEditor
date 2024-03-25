@@ -15,7 +15,7 @@ namespace MENU
 
 		void UpdatePosition();
 
-		bool CheckCollision(const Vector2f& aPosition, bool aIsPressed);
+		bool CheckCollision(const MenuUpdateContext& aContext);
 		bool IsHovered() { return myIsHovered; }
 		bool IsPressed() { return myIsPressed; }
 

@@ -29,6 +29,7 @@ namespace MENU
 			, myType(aType)
 			, myPosition({ 0.f,0.f })
 			, myID(aID)
+			, myName("")
 		{}
 
 		virtual ~MenuComponent() {}
@@ -37,5 +38,8 @@ namespace MENU
 		const ComponentType myType;
 		const unsigned int myID;
 		Vector2f myPosition;
+
+	public:
+		std::string myName;
 	};
 }

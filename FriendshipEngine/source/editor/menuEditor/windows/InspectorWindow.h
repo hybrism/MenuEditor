@@ -5,20 +5,6 @@
 
 namespace MENU
 {
-	static const char* Tags[] =
-	{
-		"Static",
-		"Interactable"
-	};
-
-	static const char* InteractionTypes[] =
-	{
-		"None",
-		"Drag",
-		"Clip",
-		"Hide"
-	};
-
 	class MenuObject;
 	class SpriteComponent;
 	class InspectorWindow : public WindowBase, public FE::Observer
@@ -43,6 +29,6 @@ namespace MENU
 		void EditTextComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject);
 		void EditCollider2DComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject);
 		void EditCommandComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject);
-
+		void EditInteractableComponent(const MenuEditorUpdateContext& aContext, MenuObject& aObject);
 	};
 }
