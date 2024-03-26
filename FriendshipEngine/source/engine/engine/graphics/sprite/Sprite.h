@@ -19,10 +19,10 @@ struct TextureRect
 
 struct ClipValue
 {
-	float left;
-	float right;
-	float down;
-	float upper;
+	float left = 0.f;
+	float right = 0.f;
+	float down = 0.f;
+	float upper = 0.f;
 };
 
 struct SpriteInstanceData

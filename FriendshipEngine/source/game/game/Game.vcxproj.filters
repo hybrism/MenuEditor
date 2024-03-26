@@ -148,6 +148,9 @@
     <ClInclude Include="gui\components\ComponentTypeEnum.h">
       <Filter>gui\components</Filter>
     </ClInclude>
+    <ClInclude Include="gui\components\InteractableComponent.h">
+      <Filter>gui\components</Filter>
+    </ClInclude>
     <ClInclude Include="gui\components\MenuComponent.h">
       <Filter>gui\components</Filter>
     </ClInclude>
@@ -302,9 +305,6 @@
     <ClInclude Include="utility\StateMachine.h">
       <Filter>utility</Filter>
     </ClInclude>
-    <ClInclude Include="gui\components\InteractableComponent.h">
-      <Filter>gui\components</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
@@ -339,6 +339,9 @@
       <Filter>gui\components</Filter>
     </ClCompile>
     <ClCompile Include="gui\components\CommandComponent.cpp">
+      <Filter>gui\components</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\components\InteractableComponent.cpp">
       <Filter>gui\components</Filter>
     </ClCompile>
     <ClCompile Include="gui\components\SpriteComponent.cpp">
@@ -473,9 +476,6 @@
     </ClCompile>
     <ClCompile Include="utility\StateMachine.cpp">
       <Filter>utility</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\components\InteractableComponent.cpp">
-      <Filter>gui\components</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

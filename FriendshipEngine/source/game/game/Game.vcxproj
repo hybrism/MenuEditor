@@ -180,7 +180,6 @@
     <ClInclude Include="component\ScriptableEventComponent.h" />
     <ClInclude Include="component\TransformComponent.h" />
     <ClInclude Include="factory\ProjectileFactory.h" />
-    <ClInclude Include="gui\components\InteractableComponent.h" />
     <ClInclude Include="gui\IDManager.h" />
     <ClInclude Include="gui\MenuHandler.h" />
     <ClInclude Include="gui\MenuObject.h" />
@@ -189,6 +188,7 @@
     <ClInclude Include="gui\components\Collider2DComponent.h" />
     <ClInclude Include="gui\components\CommandComponent.h" />
     <ClInclude Include="gui\components\ComponentTypeEnum.h" />
+    <ClInclude Include="gui\components\InteractableComponent.h" />
     <ClInclude Include="gui\components\MenuComponent.h" />
     <ClInclude Include="gui\components\SpriteComponent.h" />
     <ClInclude Include="gui\components\TextComponent.h" />
@@ -249,13 +249,13 @@
     <ClCompile Include="audio\FMODImplementation.cpp" />
     <ClCompile Include="collision\Bitmask.cpp" />
     <ClCompile Include="factory\ProjectileFactory.cpp" />
-    <ClCompile Include="gui\components\InteractableComponent.cpp" />
     <ClCompile Include="gui\IDManager.cpp" />
     <ClCompile Include="gui\MenuHandler.cpp" />
     <ClCompile Include="gui\MenuObject.cpp" />
     <ClCompile Include="gui\ObjectManager.cpp" />
     <ClCompile Include="gui\components\Collider2DComponent.cpp" />
     <ClCompile Include="gui\components\CommandComponent.cpp" />
+    <ClCompile Include="gui\components\InteractableComponent.cpp" />
     <ClCompile Include="gui\components\SpriteComponent.cpp" />
     <ClCompile Include="gui\components\TextComponent.cpp" />
     <ClCompile Include="pch.cpp">

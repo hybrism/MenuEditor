@@ -60,23 +60,34 @@ MENU::DragInteraction::DragInteraction(std::shared_ptr<MenuComponent> aParent)
 
 void MENU::DragInteraction::OnPressed(const MenuUpdateContext& aContext)
 {
-	if (aContext.mouseDelta.x == 0.f)
-		return;
-
 	if (myParent->GetType() == ComponentType::Sprite)
 	{
 		std::shared_ptr<SpriteComponent> sprite = std::static_pointer_cast<SpriteComponent>(myParent);
 
-		Vector2f screenPosition = sprite->GetPosition() + sprite->GetParent().GetPosition();
+		float desiredPosition = aContext.mousePosition.x;
+		float screenPosition = sprite->GetPosition().x + sprite->GetParent().GetPosition().x;
+
+		float movement = aContext.mouseDelta.x;
+		if (movement < 0)
+		{
+			//LEFT
+			if (desiredPosition < screenPosition)
+				movement = 0.f;
+
+		}
+		else if (movement > 0)
+		{
+			//RIGHT
+			if (desiredPosition > screenPosition)
+				movement = 0.f;
+		}
+
+		//COMPARABLE VALUES!
 		
-		float direction = aContext.mouseDelta.x > 0 ? 0.1f : -0.1f;
 
-		myValue += direction;
-		myValue = std::clamp(myValue, 0.f, 1.f);
-
-		Vector2f newPosition;
-
-		newPosition.x = FriendMath::Lerp(myMin, myMax, myValue);
+		Vector2f newPosition = sprite->GetPosition();
+		newPosition.x += movement;
+		newPosition.x = std::clamp(newPosition.x, myMin, myMax);
 
 		sprite->SetPosition(newPosition);
 	}
@@ -129,12 +140,9 @@ void MENU::ClipInteraction::OnPressed(const MenuUpdateContext& aContext)
 	{
 		std::shared_ptr<SpriteComponent> sprite = std::static_pointer_cast<SpriteComponent>(myParent);
 
-		float direction = (aContext.mouseDelta.x / 100.f) * -1.f;
-		myValue += direction;
-		myValue = std::clamp(myValue, 0.f, 1.f);
+		myValue = std::clamp((aContext.mouseDelta.x / 100.f) * -1.f, 0.f, 1.f);
 
 		ClipValue clip;
-
 		clip.right = myValue;
 
 		sprite->SetClipValue(clip);

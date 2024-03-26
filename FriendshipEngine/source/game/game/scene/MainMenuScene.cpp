@@ -34,7 +34,7 @@ bool MainMenuScene::Update(const SceneUpdateContext& aContext)
 	MENU::MenuUpdateContext context;
 	context.renderSize = renderSize;
 	context.mousePosition = { (float)mousePos.x, (float)mousePos.y };
-	context.mousePressed = input->IsLeftMouseButtonDown();
+	context.mouseDown = input->IsLeftMouseButtonDown();
 	myMenuHandler.Update(context);
 
 	return !input->IsKeyPressed(VK_ESCAPE);

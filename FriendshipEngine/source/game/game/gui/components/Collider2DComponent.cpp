@@ -51,14 +51,14 @@ void MENU::Collider2DComponent::RenderColliders()
 
 bool MENU::Collider2DComponent::CheckCollision(const MenuUpdateContext& aContext)
 {
-	bool min = aContext.mousePosition.x > myMin.x && aContext.renderSize.y - aContext.mousePosition.y > myMin.y;
-	bool max = aContext.mousePosition.x < myMax.x && aContext.renderSize.y - aContext.mousePosition.y < myMax.y;
+	bool min = aContext.mousePosition.x > myMin.x && aContext.mousePosition.y > myMin.y;
+	bool max = aContext.mousePosition.x < myMax.x && aContext.mousePosition.y < myMax.y;
 
 	myIsPressed = false;
 	myIsHovered = min && max;
 
 	if (myIsHovered)
-		myIsPressed = aContext.mousePressed;
+		myIsPressed = aContext.mouseDown;
 
 	return myIsHovered;
 }

@@ -413,6 +413,34 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 		}
 	}
 
+	if (menuFile.contains("interactableComponents"))
+	{
+		nlohmann::json interactableComponents = menuFile["interactableComponents"];
+		for (size_t i = 0; i < interactableComponents.size(); i++)
+		{
+			ID ownerID = interactableComponents[i]["ownerID"];
+			InteractableComponent& interactable = myObjectManager.GetObjectFromID(ownerID).AddComponent<InteractableComponent>();
+
+			for (size_t j = 0; j < interactableComponents[i]["interactions"].size(); j++)
+			{
+				InteractionType type = (InteractionType)interactableComponents[i]["interactions"][j]["interactionType"];
+				ID parentComponentId = interactableComponents[i]["interactions"][j]["parentComponent"];
+				
+				MenuObject& parent = myObjectManager.GetObjectFromID(ownerID);
+				
+				auto sprites = parent.GetComponents<SpriteComponent>();
+				
+				for (size_t k = 0; k < sprites.size(); k++)
+				{
+					if (sprites[k]->GetID() == parentComponentId)
+						interactable.AddInteraction(sprites[k], type);
+				}
+			}
+
+
+		}
+	} 
+
 	if (myStates.empty())
 	{
 		MenuState newState;
@@ -597,7 +625,9 @@ void MENU::MenuHandler::SaveToJson()
 			for (size_t interactionIndex = 0; interactionIndex < interactable.myInteractions.size(); interactionIndex++)
 			{
 				nlohmann::json interactionEntry;
+
 				interactionEntry["interactionType"] = (int)interactable.myInteractions[interactionIndex]->myType;
+				interactionEntry["parentComponent"] = (int)interactable.myInteractions[interactionIndex]->myParent->GetID();
 
 				switch (interactable.myInteractions[interactionIndex]->myType)
 				{

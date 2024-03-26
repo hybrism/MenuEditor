@@ -9,7 +9,7 @@ namespace MENU
 		Vector2f mousePosition;
 		Vector2f mouseDelta;
 		Vector2f renderSize;
-		bool mousePressed = false;
+		bool mouseDown = false;
 		bool mouseReleased = false;
 	};
 }

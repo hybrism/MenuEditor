@@ -56,6 +56,7 @@ namespace MENU
 
 		InteractionType myType;
 		std::shared_ptr<MenuComponent> myParent;
+		float myValue;
 	};
 
 	class DragInteraction : public Interaction
@@ -67,7 +68,6 @@ namespace MENU
 
 		float myMin;
 		float myMax;
-		float myValue;
 	};
 
 	class HideInteraction : public Interaction
@@ -87,6 +87,5 @@ namespace MENU
 
 		virtual void OnPressed(const MenuUpdateContext& aContext) override;
 
-		float myValue;
 	};
 }

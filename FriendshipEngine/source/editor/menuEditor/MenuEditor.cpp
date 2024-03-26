@@ -102,7 +102,7 @@ void MENU::MenuEditor::Init()
 		}
 	}
 
-	myMenuHandler.Init("mainMenu.json", nullptr);
+	myMenuHandler.Init("sliderTest.json", nullptr);
 
 	GenerateEditorColliders();
 }
@@ -129,15 +129,15 @@ void MENU::MenuEditor::Update(float aDt)
 	ImVec2 mousePos = ImGui::GetMousePos();
 	ImVec2 mouseDelta = ImGui::GetMouseDragDelta();
 	menuContext.dt = aDt;
-	menuContext.mousePosition = { mousePos.x, mousePos.y };
+	menuContext.mousePosition = { mousePos.x, myRenderSize.y - mousePos.y };
 	menuContext.mouseDelta = { mouseDelta.x, mouseDelta.y };
 	menuContext.renderSize = myRenderSize;
-	menuContext.mousePressed = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+	menuContext.mouseDown = ImGui::IsMouseDown(ImGuiMouseButton_Left);
 	menuContext.mouseReleased = ImGui::IsMouseReleased(ImGuiMouseButton_Left);
 
 	myMenuHandler.Update(menuContext);
 
-	menuContext.mousePressed = ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
+	menuContext.mouseDown = ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
 	myEditorObjectManager.Update(menuContext);
 
 	GizmoUpdate();
