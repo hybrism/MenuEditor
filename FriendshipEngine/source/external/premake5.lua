@@ -11,7 +11,7 @@ project "External"
 	location (dirs.external)
 		
 	language "C++"
-	cppdialect "C++17"
+	cppdialect "C++20"
 	kind "StaticLib"
 
 	debugdir "%{dirs.bin}%{cfg.buildcfg}"

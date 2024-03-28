@@ -38,7 +38,7 @@ private:
 		std::vector<MeshData>& outMeshData
 	);
 
-	static void ModelFactory::SetDataFromFBXElement(
+	static void SetDataFromFBXElement(
 		fbxsdk::FbxLayerElementTemplate<fbxsdk::FbxVector4>* anElement,
 		int aFbxContolPointIdx,
 		int aPolygonIdx,

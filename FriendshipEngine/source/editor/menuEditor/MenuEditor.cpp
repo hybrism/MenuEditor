@@ -13,9 +13,10 @@
 //Engine
 #include <engine/Paths.h>
 #include <engine/utility/Error.h>
+#include <assets/AssetDatabase.h>
 #include <assets/TextureFactory.h>
 #include <engine/graphics/GraphicsEngine.h>
-
+//
 //Internal
 #include <shared/postMaster/PostMaster.h>
 #include "windows/AssetsWindow.h"
@@ -46,6 +47,7 @@ MENU::MenuEditor::~MenuEditor()
 void MENU::MenuEditor::Init()
 {
 	auto ge = GraphicsEngine::GetInstance();
+	AssetDatabase::CreateInstance();
 
 	//TODO:  ViewPort != RenderSize, add get RenderSize to graphicsengine 23.f is the height of menubar?
 	Vector2i viewport = ge->DX().GetViewportDimensions();
@@ -73,7 +75,8 @@ void MENU::MenuEditor::Init()
 		auto ext = entry.path().extension();
 		if (ext == ".dds")
 		{
-			myAssets.textures.push_back(TextureFactory::CreateTexture(RELATIVE_SPRITE_ASSET_PATH + entry.path().filename().string(), false));
+			std::string fileName = entry.path().filename().string();
+			myAssets.textures.push_back(AssetDatabase::GetTextureDatabase().GetOrLoadSpriteTexture(fileName));
 			myAssets.textureIdToName.push_back(entry.path().filename().string());
 			myAssets.textureNameToId[entry.path().filename().string()] = (UINT)myAssets.textures.size() - 1;
 		}
@@ -102,7 +105,7 @@ void MENU::MenuEditor::Init()
 		}
 	}
 
-	myMenuHandler.Init("sliderTest.json", nullptr);
+	myMenuHandler.Init("sliderTest.json");
 
 	GenerateEditorColliders();
 }
@@ -129,6 +132,7 @@ void MENU::MenuEditor::Update(float aDt)
 	ImVec2 mousePos = ImGui::GetMousePos();
 	ImVec2 mouseDelta = ImGui::GetMouseDragDelta();
 	menuContext.dt = aDt;
+	menuContext.menuHandler = &myMenuHandler;
 	menuContext.mousePosition = { mousePos.x, myRenderSize.y - mousePos.y };
 	menuContext.mouseDelta = { mouseDelta.x, mouseDelta.y };
 	menuContext.renderSize = myRenderSize;
@@ -272,7 +276,6 @@ void MENU::MenuEditor::Dockspace()
 		ImVec2 wSize = ImVec2(viewport->WorkSize.x * (1 - ratioWindowSplit), viewport->WorkSize.y - menuBarHeight);
 		ImVec2 wMin = ImVec2(viewport->WorkSize.x * ratioWindowSplit, viewport->WorkPos.y + menuBarHeight);
 		ImVec2 wMax = ImVec2(viewport->WorkSize);
-
 
 		MENU::WindowData& hierarchyWindow = myWindows[(int)MENU::WindowID::MenuObjectHierarchy]->myData;
 		MENU::WindowData& inspectorWindow = myWindows[(int)MENU::WindowID::Inspector]->myData;
@@ -426,7 +429,7 @@ void MENU::MenuEditor::Popups()
 			dataFile << menu;
 			dataFile.close();
 
-			myMenuHandler.Init(newMenuName, nullptr);
+			myMenuHandler.Init(newMenuName);
 			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::NewMenuLoaded, newMenuName });
 		}
 
@@ -484,7 +487,7 @@ void MENU::MenuEditor::RecieveMessage(const FE::Message& aMessage)
 			}
 		}
 
-		myAssets.textures.push_back(TextureFactory::CreateTexture(RELATIVE_SPRITE_ASSET_PATH + filename, false));
+		myAssets.textures.push_back(AssetDatabase::GetTextureDatabase().GetOrLoadSpriteTexture(filename));
 		myAssets.textureIdToName.push_back(filename);
 		myAssets.textureNameToId[filename] = (UINT)myAssets.textures.size() - 1;
 		break;
@@ -526,3 +529,5 @@ void MENU::MenuEditor::RecieveMessage(const FE::Message& aMessage)
 		break;
 	}
 }
+
+

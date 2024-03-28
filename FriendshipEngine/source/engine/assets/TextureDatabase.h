@@ -49,6 +49,8 @@ public:
 		return myVertexTextures.at(aId);
 	}
 
+	Texture* GetOrLoadSpriteTexture(const std::string& aTextureName);
+
 	size_t GetTextureIndex(const std::string& aMaterialName)
 	{
 		assert(myMaterialNameToTextureIndex.find(aMaterialName) != myMaterialNameToTextureIndex.end() && "Material name does not exist");
@@ -70,9 +72,14 @@ public:
 
 	void ReadTextures(const nlohmann::json& jsonObject);
 	void LoadVertexTextures(const std::string& aSceneName);
+
 private:
 	std::vector<TextureCollection> myTextures; // TODO: Change vertex color texture save locations to a separate vector that updates once for each scene
 	std::vector<VertexTextureCollection> myVertexTextures; // TODO: Change vertex color texture save locations to a separate vector that updates once for each scene
+	std::vector<TextureData> mySpriteTextures;
+
 	std::unordered_map<std::string, size_t> myMaterialNameToTextureIndex;
 	std::unordered_map<std::string, size_t> myMeshNameToVertexTextureIndex;
+
+	std::unordered_map<std::string, size_t> myTextureNameToSpriteTextureIndex;
 };

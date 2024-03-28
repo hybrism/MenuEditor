@@ -25,7 +25,7 @@ void MENU::InteractableComponent::Update(const MenuUpdateContext& aContext)
 	}
 }
 
-void MENU::InteractableComponent::AddInteraction(std::shared_ptr<MenuComponent> aComponent, InteractionType aType)
+std::shared_ptr<MENU::Interaction> MENU::InteractableComponent::AddInteraction(std::shared_ptr<MenuComponent> aComponent, InteractionType aType)
 {
 	switch (aType)
 	{
@@ -42,6 +42,7 @@ void MENU::InteractableComponent::AddInteraction(std::shared_ptr<MenuComponent> 
 		break;
 	}
 
+	return myInteractions[myInteractions.size() - 1];
 }
 
 void MENU::InteractableComponent::RemoveInteraction()
@@ -64,26 +65,26 @@ void MENU::DragInteraction::OnPressed(const MenuUpdateContext& aContext)
 	{
 		std::shared_ptr<SpriteComponent> sprite = std::static_pointer_cast<SpriteComponent>(myParent);
 
+		//COMPARABLE VALUES!
 		float desiredPosition = aContext.mousePosition.x;
 		float screenPosition = sprite->GetPosition().x + sprite->GetParent().GetPosition().x;
 
 		float movement = aContext.mouseDelta.x;
-		if (movement < 0)
+		if (movement > 0)
 		{
 			//LEFT
 			if (desiredPosition < screenPosition)
 				movement = 0.f;
 
 		}
-		else if (movement > 0)
+		else if (movement < 0)
 		{
 			//RIGHT
 			if (desiredPosition > screenPosition)
 				movement = 0.f;
 		}
 
-		//COMPARABLE VALUES!
-		
+
 
 		Vector2f newPosition = sprite->GetPosition();
 		newPosition.x += movement;
@@ -133,9 +134,6 @@ MENU::ClipInteraction::ClipInteraction(std::shared_ptr<MenuComponent> aParent)
 
 void MENU::ClipInteraction::OnPressed(const MenuUpdateContext& aContext)
 {
-	if (aContext.mouseDelta.x == 0.f)
-		return;
-
 	if (myParent->GetType() == ComponentType::Sprite)
 	{
 		std::shared_ptr<SpriteComponent> sprite = std::static_pointer_cast<SpriteComponent>(myParent);

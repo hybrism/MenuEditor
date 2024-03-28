@@ -29,7 +29,14 @@ TextureDatabase::~TextureDatabase()
 		delete collection.normalTexture.texture;
 		delete collection.emissiveTexture.texture;
 	}
+
+	for (auto& spriteTexture : mySpriteTextures)
+	{
+		delete spriteTexture.texture;
+	}
+
 	myTextures.clear();
+	mySpriteTextures.clear();
 }
 
 void TextureDatabase::ReadTextures(const nlohmann::json& jsonObject)
@@ -168,6 +175,18 @@ void TextureDatabase::UpdateVertexPaintedTextures(const std::string& aSceneName)
 			data[index].materials.push_back(v.materials);
 		}
 	}
+
 	BinaryVertexPaintingFileFactory::WriteCollectionToFile(data, folderPath);
 }
 #endif
+
+Texture* TextureDatabase::GetOrLoadSpriteTexture(const std::string& aTextureName)
+{
+	if (!myTextureNameToSpriteTextureIndex.contains(aTextureName))
+	{
+		mySpriteTextures.push_back({ aTextureName, TextureFactory::CreateTexture(RELATIVE_SPRITE_ASSET_PATH + aTextureName, false) });
+		myTextureNameToSpriteTextureIndex[aTextureName] = mySpriteTextures.size() - 1;
+	}
+
+	return mySpriteTextures[myTextureNameToSpriteTextureIndex[aTextureName]].texture;
+}

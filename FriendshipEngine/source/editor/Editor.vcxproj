@@ -62,11 +62,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LauncherDebug|x64'">
     <NMakeOutput>$(OutDir)Editor_LauncherDebug</NMakeOutput>
-    <AdditionalOptions>/std:c++17 %(AdditionalOptions)</AdditionalOptions>
+    <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <NMakeOutput>$(OutDir)Editor_Release</NMakeOutput>
-    <AdditionalOptions>/std:c++17 %(AdditionalOptions)</AdditionalOptions>
+    <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
     <ClCompile>
@@ -81,7 +81,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>

@@ -1,10 +1,16 @@
 #pragma once
 #include <engine/math/Vector.h>
 
+class SceneManager;
+
 namespace MENU
 {
+	class MenuHandler;
+
 	struct MenuUpdateContext
 	{
+		SceneManager* sceneManager = nullptr;
+		MenuHandler* menuHandler = nullptr;
 		float dt;
 		Vector2f mousePosition;
 		Vector2f mouseDelta;

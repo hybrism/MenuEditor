@@ -427,6 +427,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="shaders\common\2d_debug_line.hlsl">
+      <Filter>shaders\common</Filter>
+    </FxCompile>
     <FxCompile Include="shaders\common\debug_line_PS.hlsl">
       <Filter>shaders\common</Filter>
     </FxCompile>
@@ -500,9 +503,6 @@
       <Filter>shaders\sprite</Filter>
     </FxCompile>
     <FxCompile Include="shaders\sprite\sprite_PS.hlsl">
-      <Filter>shaders\sprite</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\sprite\sprite_VS.hlsl">
       <Filter>shaders\sprite</Filter>
     </FxCompile>
     <FxCompile Include="shaders\vfx\test_vfx_PS.hlsl">

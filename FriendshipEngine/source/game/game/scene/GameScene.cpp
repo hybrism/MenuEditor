@@ -66,7 +66,7 @@ GameScene::GameScene(SceneManager* aSceneManager)
 void GameScene::Init(PhysXSceneManager& aPhysXManager)
 {
 	myWorld->Init();
-	myMenuHandler.Init("pauseMenu.json", mySceneManager);
+	myMenuHandler.Init("pauseMenu.json");
 	InitComponents();
 	InitSystems(aPhysXManager);
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <variant>
 #include <string>
+#include <functional>
 
 #include "../IDManager.h"
 #include "MenuComponent.h"
@@ -43,7 +44,7 @@ namespace MENU
 	public:
 		CommandComponent(MenuObject& aParent, unsigned int aID);
 
-		void Update(const MenuUpdateContext& aContext) override;
+		void Execute(CommandData aData, const MenuUpdateContext& aContext);
 
 		void SetCommandType(eCommandType aType);
 		void SetCommandData(CommandData aData);
@@ -54,5 +55,7 @@ namespace MENU
 	private:
 		eCommandType myCommandType;
 		CommandData myCommandData;
+
+		std::function<void(CommandData, const MenuUpdateContext&)> myCommand;
 	};
 }

@@ -85,7 +85,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
@@ -111,7 +111,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
@@ -140,7 +140,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
@@ -187,6 +187,7 @@
     <ClInclude Include="gui\ObjectManager.h" />
     <ClInclude Include="gui\components\Collider2DComponent.h" />
     <ClInclude Include="gui\components\CommandComponent.h" />
+    <ClInclude Include="gui\components\CommandFunctions.h" />
     <ClInclude Include="gui\components\ComponentTypeEnum.h" />
     <ClInclude Include="gui\components\InteractableComponent.h" />
     <ClInclude Include="gui\components\MenuComponent.h" />
@@ -255,6 +256,7 @@
     <ClCompile Include="gui\ObjectManager.cpp" />
     <ClCompile Include="gui\components\Collider2DComponent.cpp" />
     <ClCompile Include="gui\components\CommandComponent.cpp" />
+    <ClCompile Include="gui\components\CommandFunctions.cpp" />
     <ClCompile Include="gui\components\InteractableComponent.cpp" />
     <ClCompile Include="gui\components\SpriteComponent.cpp" />
     <ClCompile Include="gui\components\TextComponent.cpp" />

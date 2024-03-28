@@ -266,10 +266,12 @@ bool AudioManager::IsEventPlaying(const std::string& strEventName) const
 		return false;
 
 	FMOD_STUDIO_PLAYBACK_STATE* state = NULL;
-	if (tFoundIt->second->getPlaybackState(state) == FMOD_STUDIO_PLAYBACK_PLAYING)
+	tFoundIt->second->getPlaybackState(state);
+	if (*state == FMOD_STUDIO_PLAYBACK_PLAYING)
 	{
 		return true;
 	}
+
 	return false;
 }
 

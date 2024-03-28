@@ -18,7 +18,7 @@ MainMenuScene::MainMenuScene(SceneManager* aSceneManager)
 void MainMenuScene::Init(PhysXSceneManager&)
 {
 	myWorld->Init();
-	myMenuHandler.Init("mainMenu.json", mySceneManager);
+	myMenuHandler.Init("mainMenu.json");
 }
 
 bool MainMenuScene::Update(const SceneUpdateContext& aContext)
@@ -32,6 +32,8 @@ bool MainMenuScene::Update(const SceneUpdateContext& aContext)
 	Vector2i mousePos = input->GetTentativeMousePosition();
 
 	MENU::MenuUpdateContext context;
+	context.sceneManager = mySceneManager;
+	context.menuHandler = &myMenuHandler;
 	context.renderSize = renderSize;
 	context.mousePosition = { (float)mousePos.x, (float)mousePos.y };
 	context.mouseDown = input->IsLeftMouseButtonDown();

@@ -7,8 +7,6 @@
 #include "ObjectManager.h"
 #include "MenuUpdateContext.h"
 
-class SceneManager;
-
 namespace MENU
 {
 	struct MenuState
@@ -26,8 +24,9 @@ namespace MENU
 		MenuHandler();
 		~MenuHandler();
 
-		void Init(const std::string& aMenuFile, SceneManager* aSceneManager = nullptr);
+		void Init(const std::string& aMenuFile);
 		void Update(const MenuUpdateContext& aContext);
+		void HandleCommand(MenuObject& aObject, const MenuUpdateContext& aContext);
 		void Render();
 		
 		void AddNewState(const std::string& aName);
@@ -56,18 +55,17 @@ namespace MENU
 		void LoadFromJson(const std::string& aMenuFile);
 		Vector4f JsonToColorVec(nlohmann::json aJson);
 		Vector2f JsonToVec2(nlohmann::json aJson);
-		Vector2f JsonToScreenPosition(nlohmann::json aJson);
+		Vector2f JsonToScreen(nlohmann::json aJson);
 
 		//TODO: These are not needed in game
 		void SaveToJson();
 		nlohmann::json ColorVecToJson(const Vector4f& aVec);
 		nlohmann::json Vec2ToJson(const Vector2f& aVec);
-		nlohmann::json ScreenPositionToJson(const Vector2f& aPosition);
+		nlohmann::json ScreenToJson(const Vector2f& aPosition);
 
 	private:
 		ObjectManager myObjectManager;
 		IDManager myIDManager;
-		SceneManager* mySceneManager;
 
 		std::string myName;
 

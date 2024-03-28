@@ -33,7 +33,7 @@ namespace MENU
 
 		virtual void Update(const MenuUpdateContext& aContext) override;
 
-		void AddInteraction(std::shared_ptr<MenuComponent> aComponent, InteractionType aType = InteractionType::None);
+		std::shared_ptr<Interaction> AddInteraction(std::shared_ptr<MenuComponent> aComponent, InteractionType aType = InteractionType::None);
 		void RemoveInteraction();
 
 		std::vector<std::shared_ptr<Interaction>> myInteractions;

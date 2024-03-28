@@ -11,7 +11,7 @@ public:
 
 
 
-	static int AudioManager::ErrorCheck(FMOD_RESULT result)
+	static int ErrorCheck(FMOD_RESULT result)
 	{
 		if (result != FMOD_OK)
 		{

@@ -4,7 +4,7 @@ project "ModelViewer"
 	
 	kind "WindowedApp"
 	language "C++"
-	cppdialect "C++17"
+	cppdialect "C++20"
 
 	debugdir "%{dirs.bin}%{cfg.buildcfg}"
 	targetdir ("%{dirs.bin}%{cfg.buildcfg}")

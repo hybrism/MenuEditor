@@ -145,6 +145,9 @@
     <ClInclude Include="gui\components\CommandComponent.h">
       <Filter>gui\components</Filter>
     </ClInclude>
+    <ClInclude Include="gui\components\CommandFunctions.h">
+      <Filter>gui\components</Filter>
+    </ClInclude>
     <ClInclude Include="gui\components\ComponentTypeEnum.h">
       <Filter>gui\components</Filter>
     </ClInclude>
@@ -339,6 +342,9 @@
       <Filter>gui\components</Filter>
     </ClCompile>
     <ClCompile Include="gui\components\CommandComponent.cpp">
+      <Filter>gui\components</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\components\CommandFunctions.cpp">
       <Filter>gui\components</Filter>
     </ClCompile>
     <ClCompile Include="gui\components\InteractableComponent.cpp">
