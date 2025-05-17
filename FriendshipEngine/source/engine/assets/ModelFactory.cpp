@@ -42,7 +42,6 @@ SharedMeshPackage ModelFactory::LoadMesh(const std::string& aFilePath, AssetData
 		assert(meshPackage.meshData.size() > 0 && "No mesh data found in FBX file");
 
 		BinaryMeshFactory::WriteMeshToFile(meshPackage, RELATIVE_CUSTOM_MESH_DATA_PATH);
-		BinaryMeshFactory::WriteMeshToFile(meshPackage, RELATIVE_CUSTOM_MESH_DATA_RELEASE_PATH);
 		package = BinaryMeshFactory::LoadMeshFromFile(aFilePath, RELATIVE_CUSTOM_MESH_DATA_PATH, aAssetDatabase);
 	}
 #endif
@@ -62,7 +61,6 @@ void ModelFactory::SetMaterial(const std::string& aMaterialName, SharedMesh* aSh
 		return;
 	}
 	textureCollection = AssetDatabase::GetTextures(AssetDatabase::GetTextureIndex(aMaterialName));
-
 
 	aSharedMesh->SetTextures(textureCollection);
 }

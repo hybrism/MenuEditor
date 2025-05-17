@@ -19,7 +19,7 @@ public:
 	~OrbSystem() override;
 
 	void Init() override;
-	void Update(const SceneUpdateContext& dt) override;
+	void Update(SceneUpdateContext& dt) override;
 	void Render() override;
 
 	void LoadInOrbData(std::string aFile,OrbComponent& aOrb);
@@ -32,7 +32,6 @@ private:
 	void PlayerTakeDamage(PlayerComponent& aPlayer, OrbComponent& aOrb);
 	void LerpVignette(const float& aDT, const float& aScaling);
 	void SetVignetteRegular();
-	void SetVignetteWholeScreen();
 	float myCreationTimer = 0.f;
 	float myChaseTimer = 0.f;
 	float myChaseSpeedThreshold = 0.5f;

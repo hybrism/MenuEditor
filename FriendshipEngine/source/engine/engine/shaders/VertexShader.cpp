@@ -104,7 +104,7 @@ bool VertexShader::PrepareRender(
 {
 	if (!myShader)
 	{
-		PrintE("[PixelShader.cpp] PrepareRender failed!");
+		PrintE("[VertexShader.cpp] PrepareRender failed!");
 		return false;
 	}
 

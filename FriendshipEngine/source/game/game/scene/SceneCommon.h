@@ -1,15 +1,29 @@
 #pragma once
+
 class SceneManager;
 class LightManager;
 class PostProcess;
+class VFXManager;
+class ParticleSystemManager;
 class Game;
+class GameTimer;
+
+namespace MENU
+{
+	class MenuHandler;
+}
 
 struct SceneUpdateContext
 {
 	float dt;
+	double totalTime;
 	PostProcess* postProcess;
 	LightManager* lightManager;
 	SceneManager* sceneManager;
+	VFXManager* vfxManager;
+	ParticleSystemManager* particleSystemManager;
+	GameTimer* gameTimer;
+	MENU::MenuHandler* menuHandler;
 };
 
 enum class eSceneType
@@ -21,14 +35,11 @@ enum class eSceneType
 
 enum class eLevel
 {
-	None,
+	Lvl0 = 0,
+	Lvl1 = 1,
+	Lvl2 = 2,
+	Lvl3 = 3,
 	FeatureGym,
-	Lvl0_Tutorial,
-	Lvl1,
-	Lvl2,
-	Lvl3_FamilyHeirloom,
-	AssetGym,
-
-	AxelFeatureGym,
+	None,
 	Count
 };

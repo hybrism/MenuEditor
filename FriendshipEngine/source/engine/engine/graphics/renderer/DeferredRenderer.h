@@ -9,6 +9,13 @@
 
 class Mesh;
 class SkeletalMesh;
+class SharedMesh;
+
+struct StaticData
+{
+	std::vector<MeshInstanceRenderData> data = {};
+	size_t size = 0;
+};
 
 // TODO: Support render without depth
 class DeferredRenderer : public Renderer
@@ -22,11 +29,13 @@ public:
 
 	// TODO: add support to disable shadows on one instance
 	void DoShadowRenderPass();
+	void PrepareGBuffer();
 	void DoGBufferPass();
 	void DoFinalPass();
 private:
 	void Clear();
-	void PrepareGBuffer();
+
+	void AddToRenderContainer(SharedMesh* aMesh, MeshInstanceRenderData aInstanceData, void* aContainer);
 
 	// TODO: add support to render different shaders for each instance
 	void RenderMeshes(bool aUsePixelShader);
@@ -37,8 +46,8 @@ private:
 	// så borde vi byta till att använda en array som är lika stor som antalet meshes i systemet
 
 	// TODO: optimize this since push_back is EXTREMLY slow D:
-	std::unordered_map<Mesh*, std::vector<MeshInstanceRenderData>> myStaticMeshes;
-	std::unordered_map<SkeletalMesh*, std::vector<MeshInstanceRenderData>> mySkeletalMeshes;
-	std::unordered_map<SkeletalMesh*, std::vector<MeshInstanceRenderData>> myDisregardDepthMeshes;
+	std::unordered_map<SharedMesh*, StaticData> myStaticMeshes;
+	std::unordered_map<SharedMesh*, StaticData> mySkeletalMeshes;
+	std::unordered_map<SharedMesh*, StaticData> myDisregardDepthMeshes;
 	MeshDrawer& myMeshDrawer;
 };

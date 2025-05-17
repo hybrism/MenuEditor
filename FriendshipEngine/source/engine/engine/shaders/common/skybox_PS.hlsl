@@ -3,7 +3,7 @@
 TextureCube SkyBox : register(t13);
 
 
-PixelOutput main(DeferredPixelInputType input)
+PixelOutput main(PixelInputType input)
 {
     PixelOutput result;
     

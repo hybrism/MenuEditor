@@ -8,6 +8,8 @@
 #include "../component/OrbComponent.h"
 #include "../component/PlayerComponent.h"
 #include "../component/TransformComponent.h"
+#include "../component/MeshComponent.h"
+
 #include "engine\debug\DebugLine.h"
 #include "engine\math\helper.h"
 
@@ -33,8 +35,10 @@ void OrbSystem::Init()
 	for (Entity entity : myEntities)
 	{
 		OrbComponent& orbComponent = myWorld->GetComponent<OrbComponent>(entity);
-		TransformComponent& transform = myWorld->GetComponent<TransformComponent>(entity);
-		transform.transform.SetScale(Vector3f{ 0.1f,0.1f,0.1f });
+		//MeshComponent& mesh = myWorld->GetComponent<MeshComponent>(entity);
+		//mesh.shouldRender = false;
+		//TransformComponent& transform = myWorld->GetComponent<TransformComponent>(entity);
+		//transform.transform.SetScale(Vector3f{ 0.1f,0.1f,0.1f });
 		LoadInOrbData(ORB_DATA, orbComponent);
 	}
 
@@ -42,27 +46,36 @@ void OrbSystem::Init()
 	myNewVignetteStrength = 0.f;
 }
 
-void OrbSystem::Update(const SceneUpdateContext& aContext)
+void OrbSystem::Update(SceneUpdateContext& aContext)
 {
 	myPostProcess = aContext.postProcess;
-	LerpVignette(aContext.dt, 1.0f);
+	LerpVignette(aContext.dt, 5.0f);
 
 	for (Entity entity : myEntities)
 	{
 		auto playerID = myWorld->GetPlayerEntityID();
 		auto& playerComp = myWorld->GetComponent<PlayerComponent>(playerID);
-		myPlayerPos = Vector3f{(float)playerComp.controller->getPosition().x,
-							   (float)playerComp.controller->getPosition().y,
-							   (float)playerComp.controller->getPosition().z };
-
 		TransformComponent& transformComponent = myWorld->GetComponent<TransformComponent>(entity);
 		OrbComponent& orbComponent = myWorld->GetComponent<OrbComponent>(entity);
 
 		if (playerComp.health.playerHealth > 0)
 		{
+			PlayerRegainHealth(playerComp, orbComponent, aContext.dt);
+
+		}
+
+		if (!playerComp.isChased)
+			return;
+		
+		myPlayerPos = Vector3f{(float)playerComp.controller->getPosition().x,
+							   (float)playerComp.controller->getPosition().y,
+							   (float)playerComp.controller->getPosition().z };
+
+
+		if (playerComp.health.playerHealth > 0)
+		{
 			CreateFollowPath(playerComp, aContext.dt);
 			FollowPath(playerComp,transformComponent, orbComponent, aContext.dt);
-			PlayerRegainHealth(playerComp,orbComponent, aContext.dt);
 		}
 
 		orbComponent.OrbPos = transformComponent.transform.GetPosition();
@@ -94,7 +107,6 @@ void OrbSystem::LoadInOrbData(std::string aFile, OrbComponent& aOrb)
 {
 
 	nlohmann::json jsonData = JsonUtility::OpenJson(aFile);
-
 	nlohmann::json orbSettingsData = jsonData["OrbSettings"];
 
 	for (int i = 0; i < orbSettingsData.size(); i++)
@@ -227,10 +239,6 @@ void OrbSystem::LerpVignette(const float& aDT, const float& aScaling)
 void OrbSystem::SetVignetteRegular()
 {
 	myVigData.vignetteInner = 0.3f;
-	myVigData.vignetteOuter = 1.6f;
+	myVigData.vignetteOuter = 1.9f;
 	myVigData.vignetteCurvature = 0.5f;
-}
-
-void OrbSystem::SetVignetteWholeScreen()
-{
 }

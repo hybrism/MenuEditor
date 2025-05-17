@@ -164,6 +164,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CoreTypes.h" />
     <ClInclude Include="Defines.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Paths.h" />
@@ -190,6 +191,7 @@
     <ClInclude Include="graphics\Light\SkyBox.h" />
     <ClInclude Include="graphics\PostProcess.h" />
     <ClInclude Include="graphics\PrimitiveMeshes\CubePrimitive.h" />
+    <ClInclude Include="graphics\PrimitiveMeshes\QuadPrimitive.h" />
     <ClInclude Include="graphics\PrimitiveMeshes\SpherePrimitive.h" />
     <ClInclude Include="graphics\RenderDefines.h" />
     <ClInclude Include="graphics\RenderTarget.h" />
@@ -204,13 +206,16 @@
     <ClInclude Include="graphics\renderer\DebugRenderer.h" />
     <ClInclude Include="graphics\renderer\DeferredRenderer.h" />
     <ClInclude Include="graphics\renderer\ForwardRenderer.h" />
+    <ClInclude Include="graphics\renderer\FrustumCulling.h" />
     <ClInclude Include="graphics\renderer\Renderer.h" />
     <ClInclude Include="graphics\renderer\SpriteRenderer.h" />
     <ClInclude Include="graphics\sprite\Sprite.h" />
     <ClInclude Include="graphics\sprite\SpriteDrawer.h" />
+    <ClInclude Include="graphics\vfx\ParticleSystemManager.h" />
     <ClInclude Include="graphics\vfx\VFXDatabase.h" />
     <ClInclude Include="graphics\vfx\VFXManager.h" />
     <ClInclude Include="graphics\vfx\VisualEffect.h" />
+    <ClInclude Include="graphics\vfx\VisualEffectFactory.h" />
     <ClInclude Include="math\AABB3D.h" />
     <ClInclude Include="math\Intersection.h" />
     <ClInclude Include="math\Line.h" />
@@ -263,6 +268,7 @@
     <ClCompile Include="graphics\Light\SkyBox.cpp" />
     <ClCompile Include="graphics\PostProcess.cpp" />
     <ClCompile Include="graphics\PrimitiveMeshes\CubePrimitive.cpp" />
+    <ClCompile Include="graphics\PrimitiveMeshes\QuadPrimitive.cpp" />
     <ClCompile Include="graphics\PrimitiveMeshes\SpherePrimitive.cpp" />
     <ClCompile Include="graphics\RenderTarget.cpp" />
     <ClCompile Include="graphics\StagingTexture.cpp" />
@@ -274,10 +280,13 @@
     <ClCompile Include="graphics\renderer\DebugRenderer.cpp" />
     <ClCompile Include="graphics\renderer\DeferredRenderer.cpp" />
     <ClCompile Include="graphics\renderer\ForwardRenderer.cpp" />
+    <ClCompile Include="graphics\renderer\FrustumCulling.cpp" />
     <ClCompile Include="graphics\renderer\SpriteRenderer.cpp" />
     <ClCompile Include="graphics\sprite\SpriteDrawer.cpp" />
+    <ClCompile Include="graphics\vfx\ParticleSystemManager.cpp" />
     <ClCompile Include="graphics\vfx\VFXDatabase.cpp" />
     <ClCompile Include="graphics\vfx\VFXManager.cpp" />
+    <ClCompile Include="graphics\vfx\VisualEffectFactory.cpp" />
     <ClCompile Include="math\Transform.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -296,117 +305,145 @@
     <ClCompile Include="utility\StringHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\common\2d_debug_line.hlsl">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\2d_debug_line.cso</ObjectFileOutput>
+    <FxCompile Include="shaders\common\2d_debug_line_VS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\2d_debug_line_VS.cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\common\3d_debug_line_VS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\3d_debug_line_VS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\common\debug_line_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\debug_line_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\debug_line_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\common\debug_point_ligth_sphere_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\debug_point_ligth_sphere_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\debug_point_ligth_sphere_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\common\missing_texture_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\missing_texture_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\missing_texture_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\common\missing_texture_deferred_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\missing_texture_deferred_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\missing_texture_deferred_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\common\skybox_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\skybox_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\skybox_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\fullscreen\fullscreen_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\fullscreen_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\fullscreen_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\fullscreen\fullscreen_VS.hlsl">
       <ShaderType>Vertex</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\fullscreen_VS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\fullscreen_VS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\fullscreen\post_process_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\post_process_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\post_process_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\fullscreen\post_process_VS.hlsl">
       <ShaderType>Vertex</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\post_process_VS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\post_process_VS.cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\fullscreen\post_process_speedlines_PS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\post_process_speedlines_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\fullscreen\post_process_tone_map_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\post_process_tone_map_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\post_process_tone_map_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\fullscreen\post_process_vignette_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\post_process_vignette_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\post_process_vignette_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\pbr\pbr_bounding_lights_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_bounding_lights_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\pbr_bounding_lights_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\pbr\pbr_default_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_default_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\pbr_default_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\pbr\pbr_default_VS.hlsl">
       <ShaderType>Vertex</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_default_VS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\pbr_default_VS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\pbr\pbr_default_instanced_VS.hlsl">
       <ShaderType>Vertex</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_default_instanced_VS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\pbr_default_instanced_VS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\pbr\pbr_deferred_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_deferred_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\pbr_deferred_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\pbr\pbr_directional_light_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_directional_light_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\pbr_directional_light_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\pbr\pbr_g_buffer_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_g_buffer_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\pbr_g_buffer_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\pbr\pbr_silhouette_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_silhouette_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\pbr_silhouette_PS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\pbr\pbr_skinned_VS.hlsl">
       <ShaderType>Vertex</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_skinned_VS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\pbr_skinned_VS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\pbr\pbr_skinned_instanced_VS.hlsl">
       <ShaderType>Vertex</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_skinned_instanced_VS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\pbr_skinned_instanced_VS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\pbr\pbr_vertex_painted_instanced_VS.hlsl">
       <ShaderType>Vertex</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\pbr_vertex_painted_instanced_VS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\pbr_vertex_painted_instanced_VS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\sprite\instanced_3D_sprite_VS.hlsl">
       <ShaderType>Vertex</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\instanced_3D_sprite_VS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\instanced_3D_sprite_VS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\sprite\instanced_sprite_VS.hlsl">
       <ShaderType>Vertex</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\instanced_sprite_VS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\instanced_sprite_VS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\sprite\sprite_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\sprite_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\sprite_PS.cso</ObjectFileOutput>
     </FxCompile>
-    <FxCompile Include="shaders\vfx\test_vfx_PS.hlsl">
+    <FxCompile Include="shaders\sprite\sprite_VS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\sprite_VS.cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\vfx\aoe1_PS.hlsl">
       <ShaderType>Pixel</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\test_vfx_PS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\aoe1_PS.cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\vfx\aoe2_PS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\aoe2_PS.cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\vfx\aoe3_PS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\aoe3_PS.cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\vfx\particle_PS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\particle_PS.cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="shaders\vfx\particle_VS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\particle_VS.cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="shaders\vfx\vfx_default_VS.hlsl">
       <ShaderType>Vertex</ShaderType>
-      <ObjectFileOutput>C:\Users\tove.laursen\GIT\MenuEditor\FriendshipEngine\bin\shaders\vfx_default_VS.cso</ObjectFileOutput>
+      <ObjectFileOutput>C:\Users\tovel\Documents\MenuEditor\FriendshipEngine\content\shaders\vfx_default_VS.cso</ObjectFileOutput>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

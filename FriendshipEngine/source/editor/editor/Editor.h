@@ -1,11 +1,11 @@
 #pragma once
-
 #include "friendshipEditor/EditorUpdateContext.h"
-#include <engine/debug/DebugCamera.h>
+#include "FreeCameraHandler.h"
 
 class Game;
 class EditorManager;
 class StateStack;
+class GraphicsEngine;
 
 class Editor
 {
@@ -17,11 +17,10 @@ public:
 	void Render();
 
 
-	void SwitchToDebugCamera(float dt);
 private:
 	Game* myGame = nullptr;
 	StateStack* myStateStack = nullptr;
 	EditorManager* myEditorManager = nullptr;
 
-	DebugCamera myDebugCamera;
+	FreeCameraHandler myFreeCamHandler;
 };

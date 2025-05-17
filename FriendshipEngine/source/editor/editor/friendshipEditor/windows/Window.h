@@ -40,6 +40,7 @@ namespace FE
 		}
 
 		WindowData myData = {};
+		virtual void OnOpen(const EditorUpdateContext&) { __noop; }
 		virtual void Show(const EditorUpdateContext& aContext) = 0;
 	};
 };

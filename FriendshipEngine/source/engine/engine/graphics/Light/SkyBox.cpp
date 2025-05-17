@@ -47,13 +47,15 @@ void SkyBox::Update()
 {
 }
 
+#include <assets/ShaderDatabase.h>
 void SkyBox::Render()
 {
-	StaticMeshInstanceData instanceData{};
-	auto cam = GraphicsEngine::GetInstance()->GetCamera();
+	auto* ge = GraphicsEngine::GetInstance();
+	auto cam = ge->GetCamera();
 	Vector3f pos = cam->GetTransform().GetPosition();
-	instanceData.transform.SetPosition(pos);
-	instanceData.transform.SetScale({ 20000.f , 20000.f, 20000.f });
+	Transform transform;
+	transform.SetPosition(pos);
+	transform.SetScale({ 20000.f , 20000.f, 20000.f });
 	//MeshInstanceRenderData instanceData;
 	//instanceData.renderMode = RenderMode::TRIANGLELIST;
 	//instanceData.vsType = VsType::DefaultPBRInstanced;
@@ -63,14 +65,27 @@ void SkyBox::Render()
 	auto context = GraphicsEngine::GetInstance()->DX().GetContext();
 	context->PSSetShaderResources(13, 1, myCubemap.GetAddressOf());
 
-	GraphicsEngine::GetInstance()->GetForwardRenderer().Render(
-		static_cast<Mesh*>(mySkyBoxMesh),
-		{
-			instanceData,
-			VsType::DefaultPBRInstanced,
-			PsType::SkyBox,
-			RenderMode::TRIANGLELIST,
-			{}
-		}
+	ge->SetDepthStencilState(DepthStencilState::Disabled);
+	ge->SetBlendState(BlendState::Disabled);
+	ge->SetRasterizerState(RasterizerState::NoFaceCulling);
+	mySkyBoxMesh->Render(
+		transform.GetMatrix(),
+		ShaderDatabase::GetVertexShader(VsType::DefaultPBR),
+		ShaderDatabase::GetPixelShader(PsType::SkyBox),
+		RenderMode::TRIANGLELIST
 	);
+	ge->SetDepthStencilState(DepthStencilState::ReadWrite);
+	ge->SetRasterizerState(RasterizerState::BackfaceCulling);
+
+
+	//GraphicsEngine::GetInstance()->GetForwardRenderer().Render(
+	//	static_cast<Mesh*>(mySkyBoxMesh),
+	//	{
+	//		instanceData,
+	//		VsType::DefaultPBRInstanced,
+	//		PsType::SkyBox,
+	//		RenderMode::TRIANGLELIST,
+	//		{}
+	//	}
+	//);
 }

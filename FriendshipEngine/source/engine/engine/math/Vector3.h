@@ -112,6 +112,11 @@ public:
 		);
 	};
 
+	static Vector3<T> Zero()
+	{
+		return Vector3<T>(0, 0, 0);
+	}
+
 	static Vector3<T> Up()
 	{
 		return Vector3<T>(0, 1, 0);

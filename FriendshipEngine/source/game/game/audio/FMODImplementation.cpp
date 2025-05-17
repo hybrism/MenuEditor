@@ -4,18 +4,14 @@
 
 FMODImplementation::FMODImplementation()
 {
+	// TODO TA BORT CREATE HÄR UWU
 	myStudioSystem = nullptr;
-	
+	AudioManager::GetInstance()->Create();
 	AudioManager::GetInstance()->ErrorCheck(FMOD::Studio::System::create(&myStudioSystem));
 	AudioManager::GetInstance()->ErrorCheck(myStudioSystem->initialize(MAX_AMOUNT_CHANNELS, FMOD_STUDIO_INIT_LIVEUPDATE, FMOD_INIT_PROFILE_ENABLE, nullptr));
 	
 	myCoreSystem = nullptr;
 	AudioManager::GetInstance()->ErrorCheck(myStudioSystem->getCoreSystem(&myCoreSystem));
-
-
-
-
-
 }
 
 FMODImplementation::~FMODImplementation()
@@ -34,10 +30,7 @@ void FMODImplementation::Update()
 		if (!isPlaying)
 			channelsToDelete.push_back(currentChannel);
 	}
-	myBanks;
-	myEvents;
-	mySounds;
-	myChannels;
+	
 	for (FMODImplementation::ChannelMap::iterator& it : channelsToDelete)
 	{
 		channelsToDelete.erase(channelsToDelete.begin());

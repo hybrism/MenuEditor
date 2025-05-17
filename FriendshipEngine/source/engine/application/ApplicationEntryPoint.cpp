@@ -35,7 +35,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR,
 	auto app = CreateApplication();
 	app->Init(hInstance, WndProc);
 	app->Run();
-
+	
 	delete app;
 
 	return (int)msg.wParam;

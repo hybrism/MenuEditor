@@ -66,10 +66,16 @@ public:
 
 	bool IsLeftMouseButtonDown() const { return myCurrentMouseState.leftButton; }
 	bool IsLeftMouseButtonPressed() const { return myCurrentMouseState.leftButton && !myPreviousMouseState.leftButton; }
+	bool IsLeftMouseButtonReleased() const { return !myCurrentMouseState.leftButton && myPreviousMouseState.leftButton; }
+
+
 	bool IsRightMouseButtonDown() const { return myCurrentMouseState.rightButton; }
 	bool IsRightMouseButtonPressed() const { return myCurrentMouseState.rightButton && !myPreviousMouseState.rightButton; }
+	bool IsRightMouseButtonReleased() const { return !myCurrentMouseState.rightButton && myPreviousMouseState.rightButton; }
+
 	bool IsMiddleMouseButtonDown() const { return myCurrentMouseState.middleButton; }
 	bool IsMiddleMouseButtonPressed() const { return myCurrentMouseState.middleButton && !myPreviousMouseState.middleButton; }
+	bool IsMiddleMouseButtonReleased() const { return !myCurrentMouseState.middleButton && myPreviousMouseState.middleButton; }
 
 	std::unique_ptr<DirectX::Mouse>& GetMouse() {
 		return myMouse;

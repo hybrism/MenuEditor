@@ -8,5 +8,6 @@ enum class eEvent
   LoadLevel_3 = 3,
   Checkpoint = 4,
   WinGame = 5,
+  LvlSelect = 6,
   Count
 };

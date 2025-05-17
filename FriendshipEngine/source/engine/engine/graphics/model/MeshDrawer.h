@@ -53,5 +53,5 @@ private:
 	void Map(void*& aMappableData);
 
 	const DxBuffer* myCurrentInstanceBuffer;
-	DxBuffer myInstanceBuffer;
+	DxBuffer myInstanceBuffer[(int)InstanceDataType::Count];
 };

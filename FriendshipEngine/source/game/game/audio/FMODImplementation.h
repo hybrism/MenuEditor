@@ -19,10 +19,10 @@ public:
 
     int myNextChannelId = 0;
 
-    typedef std::map<std::string, FMOD::Sound*> SoundMap;
-    typedef std::map<int, FMOD::Channel*> ChannelMap;
-    typedef std::map<std::string, FMOD::Studio::EventInstance*> EventMap;
-    typedef std::map<std::string, FMOD::Studio::Bank*> BankMap;
+    typedef std::map<std::string, FMOD::Sound*>                 SoundMap;
+    typedef std::map<int, FMOD::Channel*>                       ChannelMap;
+    typedef std::map<const FMOD_GUID*, FMOD::Studio::EventInstance*> EventMap;
+    typedef std::map<std::string, FMOD::Studio::Bank*>          BankMap;
 
     BankMap myBanks;
     EventMap myEvents;

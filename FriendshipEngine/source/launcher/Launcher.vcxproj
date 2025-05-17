@@ -93,6 +93,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>..\..\dependencies\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>-IGNORE:4099 -IGNORE:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='LauncherDebug|x64'">
@@ -117,6 +118,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>..\..\dependencies\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>-IGNORE:4099 -IGNORE:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,6 +148,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>..\..\dependencies\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>-IGNORE:4099 -IGNORE:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

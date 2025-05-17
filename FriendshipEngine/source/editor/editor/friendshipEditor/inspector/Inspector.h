@@ -2,6 +2,7 @@
 #include "../windows/Window.h"
 #include <engine/math/Vector.h>
 #include <ecs/entity/Entity.h>
+#include <memory>
 
 class World;
 class Texture;
@@ -32,7 +33,7 @@ namespace FE
 		void DisplayOrbData(World* aWorld);
 
 		Vector3f myObjectRotation;
-		Texture* myTextureToDisplay;
+		std::shared_ptr<Texture> myTextureToDisplay;
 		Entity mySelectedEntity;
 		int myWindowID;
 		bool myTextureWindowOpen;

@@ -9,14 +9,16 @@
 
 #include <nlohmann\json_fwd.hpp>
 #include <engine\graphics\Light\LightStructs.h>
+#include <engine/graphics/animation/AnimationController.h>
+#include <engine/graphics/animation/Skeleton.h>
 
 class SharedMesh;
-class AnimationController;
 
 enum class PrimitiveMeshID
 {
-	Sphere = 0,
-	Cube
+	Cube = 0,
+	Quad,
+	Sphere,
 };
 
 class AssetDatabase
@@ -69,12 +71,6 @@ public:
 		size_t index = myInstance->myMeshNameToMeshId.at(aMeshName);
 		return myInstance->myMeshes.at(index);
 	}
-
-	// WARNING: may cause memory leaks if not handled properly
-	static void ModifyTextures(const size_t& aId, const TextureCollection& aTextureCollection)
-	{
-		myInstance->myTextureDatabase.ModifyTextures(aId, aTextureCollection);
-	}
 #endif
 
 	static void UpdateMeshTexture(const size_t& aTextureId, const size_t& aMeshId, const size_t& aMeshDataIndex);
@@ -102,20 +98,30 @@ public:
 		return myInstance->myTextureDatabase.GetTextures(aId);
 	}
 
-	static std::vector<Animation*> GetAnimations(const size_t& aMeshId) 
+	static std::vector<Animation*> GetAnimations(const Skeleton* aSkeleton) 
 	{
-		return myInstance->myAnimations.at(aMeshId);
+		return myInstance->myAnimations.at(aSkeleton->name);
 	}
 
-	static Animation* GetAnimation(const size_t& aMeshId, const size_t& aAnimationIndex)
+	static Animation* GetAnimation(const Skeleton* aSkeleton, const size_t& aAnimationIndex)
 	{
-		assert(myInstance->myAnimations.at(aMeshId).size() > aAnimationIndex && "Animation does not exist");
-		return GetAnimations(aMeshId)[aAnimationIndex];
+		assert(myInstance->myAnimations.at(aSkeleton->name).size() > aAnimationIndex && "Animation does not exist");
+		return GetAnimations(aSkeleton)[aAnimationIndex];
 	}
 
-	static Animation* GetAnimation(const size_t& aMeshId, const std::string& aAnimationName)
+	static Animation* GetAnimation(const Skeleton* aSkeleton, const std::string& aAnimationName)
 	{
-		return myInstance->GetAnimation(aMeshId, myInstance->myAnimationNameToIndex.at(aAnimationName));
+		return myInstance->GetAnimation(aSkeleton, myInstance->myAnimationNameToIndex.at(aAnimationName));
+	}
+
+	static Skeleton* GetSkeleton(const size_t& aMeshId)
+	{
+		return myInstance->myMeshes[aMeshId].skeleton;
+	}
+
+	static Skeleton* GetSkeleton(const std::string& aMeshName)
+	{
+		return myInstance->myMeshes[GetMeshIdFromName(aMeshName)].skeleton;
 	}
 
 	static size_t GetAnimationIndex(const std::string& aAnimationName)
@@ -134,9 +140,9 @@ public:
 		return myInstance->myTextureDatabase.DoesTextureExist(aMaterialName);
 	}
 
-	static bool DoesAnimationControllerExist(const size_t& aMeshId)
+	static bool DoesAnimationControllerExist(const Skeleton* aSkeleton)
 	{
-		return myInstance->myAnimationControllers.find(aMeshId) != myInstance->myAnimationControllers.end();
+		return myInstance->mySkeletonToAnimationControllerId.find(aSkeleton->name) != myInstance->mySkeletonToAnimationControllerId.end();
 	}
 
 	static std::string GetNameFromPath(std::string aPath)
@@ -162,16 +168,23 @@ public:
 		return aPath;
 	}
 
-	static AnimationController* GetAnimationController(const size_t& aMeshId)
+	static AnimationController& GetAnimationController(const Skeleton* aSkeleton)
 	{
-		assert(DoesAnimationControllerExist(aMeshId) && "Animation controller does not exist");
-		return myInstance->myAnimationControllers.at(aMeshId);
+		assert(DoesAnimationControllerExist(aSkeleton) && "Animation controller does not exist");
+		return GetAnimationController(myInstance->mySkeletonToAnimationControllerId.at(aSkeleton->name));
 	}
 
-	static void CreateAnimationController(const size_t& aMeshId);
+	static AnimationController& GetAnimationController(const size_t& aId)
+	{
+		assert(myInstance->myAnimationControllers.size() > aId && "ID does not exist");
+		return myInstance->myAnimationControllers[aId];
+	}
+
+	static int CreateAnimationController(const Skeleton* aSkeleton);
+	static int CreateAnimationController();
 
 	// TODO: GET RID OF THESE AFTER WE HAVE MOVED FROM UNITY
-	static std::unordered_map<size_t, std::vector<Animation*>> GetAnimationMap() { return myInstance->myAnimations; }
+	static std::unordered_map<std::string, std::vector<Animation*>> GetAnimationMap() { return myInstance->myAnimations; }
 
 	static volatile bool HasLoadedAssets() { return myInstance->myHasLoadedAssets; }
 
@@ -182,11 +195,14 @@ public:
 	//LIGHTS
 	static void StoreDirectionalLight(DirectionalLight aDirectionalLight);
 	static void StorePointLight(PointLight aPointLight);
+	static void ClearPointLight() 
+	{ 
+		myInstance->myStoredPointLightInformation.clear(); 
+	}
 	static DirectionalLight& GetDirectionalLight();
-	static std::vector<PointLight>& GetPointLight();
+	static std::vector<PointLight> GetPointLight();
 
 	static TextureDatabase& GetTextureDatabase() { return myInstance->myTextureDatabase; }
-
 private:
 	AssetDatabase();
 
@@ -201,14 +217,14 @@ private:
 
 	std::unordered_map<std::string, size_t> myMeshNameToMeshId;
 	std::unordered_map<size_t, size_t> myUnityMeshIdToMeshId;
-	std::unordered_map<size_t, AnimationController*> myAnimationControllers;
+	std::unordered_map<std::string, int> mySkeletonToAnimationControllerId; // USE THIS MAP UNTIL WE HAVE MOVED FROM UNITY
 	std::unordered_map<std::string, size_t> myAnimationNameToIndex; // this only exists for convinience atm since we use unity to export animations
-	std::unordered_map<size_t, std::vector<Animation*>> myAnimations;
+	std::unordered_map<std::string, std::vector<Animation*>> myAnimations;
 	std::vector<SharedMeshPackage> myMeshes; // when moving from unity, change this to a vector
 	std::vector<std::string> myMeshPaths;
+	std::vector<AnimationController> myAnimationControllers;
 
 	//LIGHT
-	std::vector<int> test;
 	std::vector<PointLight> myStoredPointLightInformation;
 
 	const std::string myMissingPathText = "";

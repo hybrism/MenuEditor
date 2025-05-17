@@ -23,6 +23,6 @@ struct NpcComponent : public Component<NpcComponent>
 
 
 
-	npcState myNpcState = npcState::dead;
+	npcState myNpcState = npcState::walk;
 };
 

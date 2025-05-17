@@ -27,6 +27,7 @@ DeferredPixelInputType main(AnimatedVertexInputType input)
     output.position = vertexClipPos;
     output.worldPosition = vertexObjectPos;
     output.entityData = uint2(0, 0);
+    output.color = float4(0, 0, 0, 0);
     
 	return output;
 }

@@ -32,7 +32,6 @@ public:
 private:
 	Pose InternalUpdateAndGetPose(
 		const float& aDeltaTime,
-		size_t aMeshId,
 		size_t aTimeIndex,
 		const SharedMeshPackage& aMeshPackage,
 		AnimationData& aData,

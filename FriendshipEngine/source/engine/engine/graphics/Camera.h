@@ -17,6 +17,8 @@ public:
 		const float& aNearPlane,
 		const float& aFarPlane
 	);
+
+	void SetFOV(const float& aFOV);
 	void SetOrtographicProjection(
 		const float& aLeft,
 		const float& aRight,
@@ -33,9 +35,19 @@ public:
 
 	const float& GetNearPlane() const { return myNearPlane; }
 	const float& GetFarPlane() const { return myFarPlane; }
+	const float& GetHFov() const { return myHFoV; }
+	const float& GetVFov() const { return myVFoV; }
+	const float& GetHFar() const { return myHFar; }
+	const float& GetVFar() const { return myWFar; }
+	const float& GetHNear() const { return myHNear; }
+	const float& GetVNear() const { return myWNear; }
+	const float& GetFOW() const { return myFOV; }
+	bool& GetHeadBobBool();
+	void SetHeadBobBool(bool aBool);
 	const Vector2<float> GetNearPlaneDimensions() const { return { myWNear, myHNear }; }
 	const Vector2<float> GetFarPlaneDimensions() const { return { myWFar, myHFar }; }
 	Transform& GetTransform() { return myTransform; }
+
 private:
 	const float PI = 3.14159265f;
 	DirectX::XMMATRIX myProjection;
@@ -50,6 +62,8 @@ private:
 	float myWNear;
 	float myVFoV;
 	float myHFoV;
+	float myFOV;
+	bool myHeadBobBool = true;
 
 	GraphicsEngine* myGraphicsEngine;
 };

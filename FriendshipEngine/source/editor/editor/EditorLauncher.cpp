@@ -54,10 +54,11 @@ bool EditorLauncher::BeginFrame()
 void EditorLauncher::Init(HINSTANCE hInstance, WNDPROC wndProc)
 {
 	myGameApplication->Init(hInstance, wndProc);
+
 	myEditor->Init(myGameApplication->GetGame());
 }
 
-void EditorLauncher::Update(const float& dt)
+void EditorLauncher::Update(const float& dt,const double& aTotalTime)
 {
 	myEditor->Update(dt);
 
@@ -65,7 +66,7 @@ void EditorLauncher::Update(const float& dt)
 	// same todo can be found in GraphicsEngine.h
 	GraphicsEngine::GetInstance()->ResetDrawCalls();
 
-	myGameApplication->Update(dt);
+	myGameApplication->Update(dt, aTotalTime);
 }
 
 void EditorLauncher::Render()

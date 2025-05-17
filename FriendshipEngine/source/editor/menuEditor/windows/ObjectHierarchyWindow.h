@@ -23,5 +23,8 @@ namespace MENU
 		void PushMenuObjectToInspector(unsigned int aID);
 		void AddStateButton(const MenuEditorUpdateContext& aContext);
 		void AddObjectButton(const MenuEditorUpdateContext& aContext);
+
+		void DuplicateState(const MenuEditorUpdateContext& aContext, unsigned int aStateIdToCopy);
+		void DuplicateObject(const MenuEditorUpdateContext& aContext, unsigned int aObjectIDToCopy);
 	};
 }

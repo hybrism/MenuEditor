@@ -20,19 +20,13 @@ namespace MENU
 			std::string fileName;
 		};
 
-		//TODO: Maybe use some kind of design pattern to fix this in a smart way
-		struct MovementValues
-		{
-			float value;
-			float min = 0;
-			float max = 0;
-		};
-
 	public:
 		SpriteComponent(MenuObject& aParent, unsigned int aID);
 
 		virtual void Update(const MenuUpdateContext& aContext) override;
 		virtual void Render() override;
+
+		void OnResize(const Vector2f& aScale) override;
 
 		SpriteInstanceData GetInstanceData() const { return myInstance; }
 		Vector2f GetPosition() const { return myPosition; }
@@ -43,7 +37,7 @@ namespace MENU
 		float& GetRotation() { return myInstance.rotation; }
 		bool& GetIsHidden() { return myInstance.isHidden; }
 
-		Texture* GetTexture(ObjectState aType = ObjectState::Default) const;
+		std::shared_ptr<Texture> GetTexture(ObjectState aType = ObjectState::Default) const;
 		Vector4f& GetColor(ObjectState aType = ObjectState::Default);
 
 		Vector2f GetTextureSize(ObjectState aType = ObjectState::Default) const;
@@ -57,12 +51,13 @@ namespace MENU
 		void SetRotation(float aRotation);
 		void SetIsHidden(bool aIsHidden);
 
-
-		void SetTexture(Texture* aTexture, const std::string& aTextureName, ObjectState aState = ObjectState::Default);
+		void SetTexture(std::shared_ptr<Texture> aTexture, const std::string& aTextureName, ObjectState aState = ObjectState::Default);
 		void SetColor(const Vector4f& aColor, ObjectState aState = ObjectState::Default);
 
 	private:
 		SpriteInstanceData myInstance;
+		Vector2f myInitialPosition;
+		Vector2f myInitialSize;
 
 		std::array<TextureData, (int)ObjectState::Count> myTextures;
 

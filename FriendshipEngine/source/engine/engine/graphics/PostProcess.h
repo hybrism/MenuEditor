@@ -47,9 +47,7 @@ public:
 		myBufferData.vignetteCurvature = aVignetteData.vignetteCurvature;
 	}
 	void SetVignetteStrength(float aStrength) { myBufferData.vignetteStrength = aStrength; }
-#ifdef _EDITOR
 	PostProcessBufferData& GetBufferData() { return myBufferData; }
-#endif
 private:
 	void ClearShaderResources();
 

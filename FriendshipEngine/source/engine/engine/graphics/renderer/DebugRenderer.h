@@ -8,12 +8,10 @@ namespace DirectX
 	namespace DX11
 	{
 		struct VertexPositionColor;
-		class BasicEffect;
-		class CommonStates;
 	}
 }
 
-class DebugRenderer : public Renderer
+namespace DEBUG
 {
 	struct Line
 	{
@@ -22,6 +20,17 @@ class DebugRenderer : public Renderer
 		DirectX::XMFLOAT4 color;
 	};
 
+	struct Quad
+	{
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT3 normal;
+		DirectX::XMFLOAT2 scale;
+		DirectX::XMFLOAT4 color;
+	};
+}
+
+class DebugRenderer : public Renderer
+{
 public:
 	DebugRenderer();
 	~DebugRenderer();
@@ -29,21 +38,16 @@ public:
 	void Init();
 
 	void Render();
+	void Clear();
 
 	void DrawLine(const Vector3f& aFrom, const Vector3f& aTo, const Vector3f& aColor = { 1.f, 1.f, 1.f });
 	void DrawLine(const Vector2f& aFrom, const Vector2f& aTo, const Vector3f& aColor = { 1.f, 1.f, 1.f });
-
+	void DrawQuad(const Vector3f& aPosition, const Vector3f& aNormal, const Vector2f& aScale, const Vector3f& aColor = { 1.f, 1.f, 1.f });
 private:
-	std::vector<Line> my3DLines;
-	std::vector<Line> my2DLines;
+	std::vector<DEBUG::Line> my3DLines;
+	std::vector<DEBUG::Quad> my3DQuads;
+	std::vector<DEBUG::Line> my2DLines;
 
 	Vector2f myRenderSize;
-	const Vector3f WHITE = { 1.f, 1.f, 1.f };
-
 	std::unique_ptr<DirectX::DX11::PrimitiveBatch<DirectX::DX11::VertexPositionColor>> myPrimitiveBatch;
-	std::unique_ptr<DirectX::DX11::BasicEffect> myBasicEffect;
-	std::unique_ptr<DirectX::DX11::CommonStates> myStates;
-
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> myInputLayout;
-
 };

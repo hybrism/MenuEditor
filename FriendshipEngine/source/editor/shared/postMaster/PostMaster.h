@@ -34,6 +34,7 @@ namespace FE
 	public:
 		PostMaster(PostMaster& aOther) = delete;
 		void operator=(const PostMaster& aOther) = delete;
+		~PostMaster();
 
 		static PostMaster* GetInstance();
 

@@ -7,7 +7,7 @@
 #include <engine/graphics/Texture.h>
 #include <engine/utility/Error.h>
 
-Texture* TextureFactory::CreateTexture(const std::string& aTexturePath, const bool& aUseRelative, bool aShouldPrintError)
+std::shared_ptr<Texture> TextureFactory::CreateTexture(const std::string& aTexturePath, const bool& aUseRelative, bool aShouldPrintError)
 {
 	aShouldPrintError;
 
@@ -19,7 +19,7 @@ Texture* TextureFactory::CreateTexture(const std::string& aTexturePath, const bo
 
 	if (StringHelper::GetFileExtension(path) == "png")
 	{
-		Texture* texture = nullptr;
+		std::shared_ptr<Texture> texture = nullptr;
 		if (!CreatePNGTexture(path, texture))
 		{
 #ifndef _RELEASE
@@ -41,7 +41,7 @@ Texture* TextureFactory::CreateTexture(const std::string& aTexturePath, const bo
 
 		D3D11_TEXTURE2D_DESC desc;
 		pTextureInterface->GetDesc(&desc);
-		return new Texture(shaderResourceView, desc.Width, desc.Height);
+		return std::make_shared<Texture>(shaderResourceView, desc.Width, desc.Height);
 	}
 
 #ifndef _RELEASE
@@ -56,7 +56,70 @@ Texture* TextureFactory::CreateTexture(const std::string& aTexturePath, const bo
 	return nullptr;
 }
 
-bool TextureFactory::CreatePNGTexture(const std::string& aPath, Texture*& outTexture)
+#ifdef _EDITOR
+#include <d3d11.h>
+#include <directxtex/DirectXTex.h>
+
+std::shared_ptr<Texture> TextureFactory::CreateDDSTextureWithCPUAccess(const std::string& aTexturePath, std::shared_ptr<StagingTexture>& outStagingTexture)
+{
+	std::wstring path = StringHelper::s2ws(aTexturePath);
+
+	ComPtr<ID3D11Resource> textureResource;
+	ComPtr<ID3D11ShaderResourceView> shaderResourceView;
+
+	HRESULT result = DirectX::CreateDDSTextureFromFileEx(
+		GraphicsEngine::GetInstance()->DX().GetDevice().Get(),
+		path.c_str(),
+		UINT_MAX,
+		D3D11_USAGE_DYNAMIC,
+		D3D11_BIND_SHADER_RESOURCE,
+		D3D11_CPU_ACCESS_WRITE,
+		0,
+		DirectX::DDS_LOADER_IGNORE_SRGB,
+		textureResource.GetAddressOf(),
+		shaderResourceView.GetAddressOf()
+	);
+
+	if (FAILED(result))
+	{
+		PrintE("[TextureFactory.cpp] Failed to load texture: " + aTexturePath);
+		return nullptr;
+	}
+
+
+	ComPtr<ID3D11Texture2D> texture;
+	textureResource->QueryInterface(__uuidof(ID3D11Texture2D), &texture);
+
+	D3D11_TEXTURE2D_DESC desc;
+	texture->GetDesc(&desc);
+
+	outStagingTexture = std::make_shared<StagingTexture>();
+	{
+		outStagingTexture->CreateStagingTexture(nullptr, texture, shaderResourceView);
+	}
+
+	return std::make_shared<Texture>(shaderResourceView, desc.Width, desc.Height, texture);
+}
+
+void TextureFactory::UpdateTextureWithCPUAccess(std::shared_ptr<Texture> aTexture, const unsigned char* aData)
+{
+	auto* ge = GraphicsEngine::GetInstance();
+
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = ge->DX().GetContext()->Map(aTexture->myTexture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(hr))
+	{
+		PrintE("[TextureFactory.cpp] Failed to map texture: ");
+		return;
+	}
+
+	memcpy(mappedResource.pData, aData, aTexture->myWidth * aTexture->myHeight * 4);
+
+	ge->DX().GetContext()->Unmap(aTexture->myTexture.Get(), 0);
+}
+#endif
+
+bool TextureFactory::CreatePNGTexture(const std::string& aPath, std::shared_ptr<Texture>& outTexture)
 {
 	bool useSrgb = true; // temp?
 	int width, height, channels;
@@ -116,7 +179,7 @@ bool TextureFactory::CreatePNGTexture(const std::string& aPath, Texture*& outTex
 	GraphicsEngine::GetInstance()->DX().GetContext()->GenerateMips(myShaderResourceView.Get());
 	myTexture->Release();
 
-	outTexture = new Texture(myShaderResourceView, width, height, rgbaPixels, myTexture);
+	outTexture = std::make_unique<Texture>(myShaderResourceView, width, height, rgbaPixels, myTexture);
 
 	return true;
 }

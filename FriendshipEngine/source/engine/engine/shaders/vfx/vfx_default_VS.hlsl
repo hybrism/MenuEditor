@@ -23,5 +23,7 @@ VfxPixelInputType main(VfxVertexInputType input)
     output.time = 0.0f;
     output.color = float4(0, 0, 0, 1);
     
+    output.depth = vertexClipPos.z / vertexClipPos.w;
+    
     return output;
 }

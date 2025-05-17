@@ -14,6 +14,7 @@
 #include <game/gui/components/Collider2DComponent.h>
 #include <game/gui/components/TextComponent.h>
 #include <game/gui/components/CommandComponent.h>
+#include <game/gui/components/InteractableComponent.h>
 
 MENU::MenuObjectHierarchy::MenuObjectHierarchy(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
 	: WindowBase(aHandle, aOpen, aFlags)
@@ -76,10 +77,16 @@ void MENU::MenuObjectHierarchy::Show(const MenuEditorUpdateContext& aContext)
 
 				ImGui::InputText("Name", &aContext.menuHandler->GetCurrentState().name, ImGuiInputTextFlags_AutoSelectAll);
 
+				if (ImGui::Selectable("Duplicate"))
+				{
+					DuplicateState(aContext, myRightClickedStateID);
+
+					ImGui::CloseCurrentPopup();
+				}
+
 				if (ImGui::Selectable("Remove"))
 				{
 					aContext.menuHandler->RemoveState(myRightClickedStateID);
-
 
 					ImGui::CloseCurrentPopup();
 				}
@@ -124,12 +131,15 @@ void MENU::MenuObjectHierarchy::Show(const MenuEditorUpdateContext& aContext)
 				}
 			}
 
-
-
 			if (ImGui::BeginPopup("Menu Object Edit"))
 			{
 				if (aContext.showDebugData)
 					ImGui::Text("Item pressed: %i", myRightClickedObjectID);
+
+				if (ImGui::Selectable("Duplicate"))
+				{
+					DuplicateObject(aContext, myRightClickedObjectID);
+				}
 
 				if (ImGui::Selectable("Move Up"))
 				{
@@ -179,7 +189,8 @@ void MENU::MenuObjectHierarchy::AddStateButton(const MenuEditorUpdateContext& aC
 
 		if (ImGui::Button("Add", ImVec2(120, 0)))
 		{
-			aContext.menuHandler->AddNewState(myNewStateName);
+			MenuState& newState = aContext.menuHandler->AddNewState(myNewStateName);
+			aContext.menuHandler->PushState(newState.id);
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::SameLine();
@@ -240,5 +251,87 @@ void MENU::MenuObjectHierarchy::AddObjectButton(const MenuEditorUpdateContext& a
 		}
 
 		ImGui::EndPopup();
+	}
+}
+
+void MENU::MenuObjectHierarchy::DuplicateState(const MenuEditorUpdateContext& aContext, unsigned int aStateIdToCopy)
+{
+	MenuState& stateToCopy = aContext.menuHandler->GetStateFromID((ID)aStateIdToCopy);
+	auto objectIdsToCopy = stateToCopy.objectIds;
+
+	MenuState& newState = aContext.menuHandler->AddNewState(stateToCopy.name + " Copy");
+	aContext.menuHandler->PushState(newState.id);
+
+	for (size_t i = 0; i < objectIdsToCopy.size(); i++)
+	{
+		DuplicateObject(aContext, objectIdsToCopy[i]);
+	}
+
+}
+
+void MENU::MenuObjectHierarchy::DuplicateObject(const MenuEditorUpdateContext& aContext, unsigned int aObjectIDToCopy)
+{
+	MenuObject& toCopy = aContext.menuHandler->GetObjectFromID(aObjectIDToCopy);
+	MenuObject& newObject = aContext.menuHandler->CreateNewObject();
+
+	newObject.SetPosition(toCopy.GetPosition());
+	newObject.SetName(toCopy.GetName());
+
+	if (toCopy.HasComponent<SpriteComponent>())
+	{
+		auto spritesToCopy = toCopy.GetComponents<SpriteComponent>();
+		for (size_t i = 0; i < spritesToCopy.size(); i++)
+		{
+			SpriteComponent& oldSprite = static_cast<SpriteComponent&>(*spritesToCopy[i]);
+			auto& newSprite = newObject.AddComponent<SpriteComponent>();
+			newSprite.SetTexture(oldSprite.GetTexture(ObjectState::Default), oldSprite.GetTexturePath(ObjectState::Default), ObjectState::Default);
+			newSprite.SetTexture(oldSprite.GetTexture(ObjectState::Hovered), oldSprite.GetTexturePath(ObjectState::Hovered), ObjectState::Hovered);
+			newSprite.SetTexture(oldSprite.GetTexture(ObjectState::Pressed), oldSprite.GetTexturePath(ObjectState::Pressed), ObjectState::Pressed);
+			newSprite.SetColor(oldSprite.GetColor(ObjectState::Default), ObjectState::Default);
+			newSprite.SetColor(oldSprite.GetColor(ObjectState::Hovered), ObjectState::Hovered);
+			newSprite.SetColor(oldSprite.GetColor(ObjectState::Pressed), ObjectState::Pressed);
+			newSprite.SetClipValue(oldSprite.GetClipValue());
+			newSprite.SetPosition(oldSprite.GetPosition());
+			newSprite.SetIsHidden(oldSprite.GetIsHidden());
+			newSprite.SetPivot(oldSprite.GetPivot());
+			newSprite.SetRotation(oldSprite.GetRotation());
+			newSprite.SetScaleMultiplier(oldSprite.GetScaleMultiplier());
+			newSprite.SetSize(oldSprite.GetSize());
+		}
+	}
+
+	if (toCopy.HasComponent<TextComponent>())
+	{
+		auto textsToCopy = toCopy.GetComponents<TextComponent>();
+		for (size_t i = 0; i < textsToCopy.size(); i++)
+		{
+			TextComponent& oldText = static_cast<TextComponent&>(*textsToCopy[i]);
+			auto& newText = newObject.AddComponent<TextComponent>();
+			newText.SetColor(oldText.GetColor(ObjectState::Default), ObjectState::Default);
+			newText.SetColor(oldText.GetColor(ObjectState::Hovered), ObjectState::Hovered);
+			newText.SetColor(oldText.GetColor(ObjectState::Pressed), ObjectState::Pressed);
+			newText.SetText(oldText.GetText());
+			newText.SetIsHidden(oldText.GetIsHidden());
+			newText.SetFont(oldText.GetFontName());
+			newText.SetFontSize(oldText.GetFontSize());
+			newText.SetIsCentered(oldText.GetIsCentered());
+			newText.SetPosition(oldText.GetPosition());
+		}
+	}
+
+	if (toCopy.HasComponent<Collider2DComponent>())
+	{
+		auto colliderToCopy = toCopy.GetComponent<Collider2DComponent>();
+		auto& newCollider = newObject.AddComponent<Collider2DComponent>();
+		newCollider.SetPosition(colliderToCopy.GetPosition());
+		newCollider.SetSize(colliderToCopy.GetSize());
+	}
+
+	if (toCopy.HasComponent<CommandComponent>())
+	{
+		auto commandToCopy = toCopy.GetComponent<CommandComponent>();
+		auto& newCommand = newObject.AddComponent<CommandComponent>();
+		newCommand.SetCommandType(commandToCopy.GetCommandType());
+		newCommand.SetCommandData(commandToCopy.GetCommandData());
 	}
 }

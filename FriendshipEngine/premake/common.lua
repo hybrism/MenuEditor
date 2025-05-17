@@ -31,7 +31,7 @@ dirs["modelViewer"]		= os.realpath(dirs.editor .. "modelViewer/")
 dirs["menuEditor"]		= os.realpath(dirs.editor .. "menuEditor/")
 dirs["shared"]		= os.realpath(dirs.editor .. "shared/")
 
-dirs["shaders"]	=  os.realpath(dirs.bin .. "shaders/")
+dirs["shaders"]	=  os.realpath(dirs.content .. "shaders/")
 
 --dirs.shaders["relative"] = "../bin/shaders/"
 

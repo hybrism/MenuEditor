@@ -32,8 +32,6 @@ void EditorManager::Init(Game* aGame)
 
 	LoadImportFiles();
 
-	//myMenuEditor.Init(myGame);
-
 	for (size_t i = 0; i < (int)FE::ID::Count; i++)
 	{
 		myWindows[(FE::ID)i] = FE::WindowFactory::Create((FE::ID)i);
@@ -44,7 +42,7 @@ void EditorManager::Init(Game* aGame)
 
 void EditorManager::Update(EditorUpdateContext aContext)
 {
-	Dockspace();
+	Dockspace(aContext);
 
 	aContext.editorManager = this;
 
@@ -57,7 +55,7 @@ void EditorManager::Update(EditorUpdateContext aContext)
 	}
 }
 
-void EditorManager::Dockspace()
+void EditorManager::Dockspace(EditorUpdateContext aContext)
 {
 	const auto& viewport = ImGui::GetMainViewport();
 
@@ -77,14 +75,14 @@ void EditorManager::Dockspace()
 	ImGuiID dockspaceID = ImGui::GetID("Dockspace");
 	ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
-	MenuBar();
+	MenuBar(aContext);
 
 	ImGui::End();
 
 	if (!myFirstFrameSetup)
 	{
 		ImGui::DockBuilderRemoveNode(dockspaceID);
-		ImGui::DockBuilderAddNode(dockspaceID, ImGuiDockNodeFlags_DockSpace | ImGuiDockNodeFlags_PassthruCentralNode);
+		ImGui::DockBuilderAddNode(dockspaceID, (int)ImGuiDockNodeFlags_DockSpace | (int)ImGuiDockNodeFlags_PassthruCentralNode);
 		ImGui::DockBuilderSetNodeSize(dockspaceID, viewport->Size);
 
 		//		SETUP:
@@ -138,7 +136,7 @@ void EditorManager::Dockspace()
 	}
 }
 
-void EditorManager::MenuBar()
+void EditorManager::MenuBar(EditorUpdateContext aContext)
 {
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -149,6 +147,11 @@ void EditorManager::MenuBar()
 				PostQuitMessage(0);
 			}
 
+			if (ImGui::MenuItem("Fullscreen"))
+			{
+				GraphicsEngine::GetInstance()->SetFullscreen(true, &aContext.game->GetLightManager(), &aContext.game->GetPostProcess());
+			}
+
 			ImGui::EndMenu();
 		}
 
@@ -156,7 +159,10 @@ void EditorManager::MenuBar()
 		{
 			for (int windowIndex = 0; windowIndex < (int)FE::ID::Count; windowIndex++)
 			{
-				ImGui::MenuItem(myWindows[(FE::ID)windowIndex]->myData.handle.c_str(), NULL, &myWindows[(FE::ID)windowIndex]->myData.isOpen);
+				if (ImGui::MenuItem(myWindows[(FE::ID)windowIndex]->myData.handle.c_str(), NULL, &myWindows[(FE::ID)windowIndex]->myData.isOpen))
+				{
+					myWindows[(FE::ID)windowIndex]->OnOpen(aContext);
+				}
 			}
 			ImGui::EndMenu();
 		}
@@ -172,7 +178,8 @@ void EditorManager::MenuBar()
 				}
 			}
 
-			if (ImGui::MenuItem("[Update files...]"))
+			ImGui::Separator();
+			if (ImGui::MenuItem("Update files..."))
 				LoadImportFiles();
 
 			ImGui::EndMenu();
@@ -187,14 +194,14 @@ void EditorManager::LoadImportFiles()
 
 	for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(RELATIVE_IMPORT_PATH))
 	{
+		if (entry.path().filename() == "Resources.json")
+			continue;
+
+		if (entry.path().filename() == "data")
+			continue;
+
 		std::string file = entry.path().filename().string();
-		if ((file != "Resources.json") && (file != "Resources.friend"))
-		{
-			if (entry.path().filename().extension() == ".json")
-			{
-				myJsonFileNames.emplace_back(file);
-			}
-		}
+		myJsonFileNames.emplace_back(file);
 	}
 }
 

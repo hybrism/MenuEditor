@@ -22,19 +22,18 @@ public:
 	void SetPosition(const Vector3f& aPosition);
 	void SetColor(const Vector4f& aColor);
 
-	Vector3f GetStartPosition() { return myStartPosition; }
-	Vector3f GetEndPosition() { return myEndPosition; }
+	//Vector3f GetStartPosition() { return myStartPosition; }
+	//Vector3f GetEndPosition() { return myEndPosition; }
 
 private:
-	void UpdateVertices();
+	//Transform myTransform = {};
+	//std::vector<Vertex> myVertices = {};
 
-	Transform myTransform = {};
-	std::vector<Vertex> myVertices = {};
+	//Vector3f myStartPosition;
+	//Vector3f myEndPosition;
+	//Vector4f myColor;
 
-	Vector3f myStartPosition;
-	Vector3f myEndPosition;
-	Vector4f myColor;
+	//Mesh myMesh;
 
-	Mesh myMesh;
-
+	bool myPrintError = false;
 };

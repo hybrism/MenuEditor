@@ -6,9 +6,10 @@ class MainMenuScene : public Scene
 {
 public:
 	MainMenuScene(SceneManager* aSceneManager);
+	~MainMenuScene() override = default;
 
 	void Init(PhysXSceneManager& aPhysXManager) override;
-	bool Update(const SceneUpdateContext& aContext) override;
+	bool Update(SceneUpdateContext& aContext) override;
 	void Render() override;
 
 	void OnEnter() override;

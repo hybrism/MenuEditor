@@ -13,4 +13,8 @@ private:
 
 	bool IsOnWallNextFrame(PlayerStateUpdateContext& aContext);
 
+	bool IsKnifeInPieSlice(float aAngle, float aLowerBound, float aUpperBound);
+
+	void AdjustWallrunCameraOnEnter(PlayerStateUpdateContext& aContext, PlayerComponent& p, TransformComponent& t);
+	void LimitWallrunCamera(PlayerComponent& p, TransformComponent& t, const float& aSign);
 };

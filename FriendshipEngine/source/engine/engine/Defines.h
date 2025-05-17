@@ -4,8 +4,8 @@
 #ifndef _RELEASE
 
 // --- Engine settings ---
-#define WINDOWED_FULLSCREEN 1
-#define SHOW_CONSOLE_WINDOW 0
+#define WINDOWED_FULLSCREEN 0
+#define SHOW_CONSOLE_WINDOW 1
 #define START_WITH_MAINMENU 1
 
 #define _MODELVIEWER 0

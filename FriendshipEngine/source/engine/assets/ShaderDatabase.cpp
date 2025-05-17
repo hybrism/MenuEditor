@@ -102,7 +102,7 @@ void ShaderDatabase::LoadPBRShaders()
 		{ "WORLD",		1, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	16,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
 		{ "WORLD",		2, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	32,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
 		{ "WORLD",		3, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	48,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
-		{ "ENTITY",		0, DXGI_FORMAT_R32G32_UINT,			1,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_INSTANCE_DATA,	1 },
+		{ "ENTITY",		0, DXGI_FORMAT_R32G32_SINT,			1,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_INSTANCE_DATA,	1 },
 		};
 
 		current.Init("pbr_default_instanced", type, layout, sizeof(layout));
@@ -124,7 +124,7 @@ void ShaderDatabase::LoadPBRShaders()
 		{ "WORLD",		1, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	16,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
 		{ "WORLD",		2, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	32,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
 		{ "WORLD",		3, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	48,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
-		{ "ENTITY",		0, DXGI_FORMAT_R32G32_UINT,			1,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_INSTANCE_DATA,	1 },
+		{ "ENTITY",		0, DXGI_FORMAT_R32G32_SINT,			1,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_INSTANCE_DATA,	1 },
 		};
 
 		current.Init("pbr_vertex_painted_instanced", type, layout, sizeof(layout));
@@ -179,6 +179,7 @@ void ShaderDatabase::LoadFullscreenShaders()
 
 		myPixelShaders[static_cast<size_t>(PsType::Vignette)].Init("post_process_vignette", PsType::Vignette);
 		myPixelShaders[static_cast<size_t>(PsType::ToneMap)].Init("post_process_tone_map", PsType::ToneMap);
+		myPixelShaders[static_cast<size_t>(PsType::Speedlines)].Init("post_process_speedlines", PsType::Speedlines);
 	}
 #pragma endregion //!PS
 }
@@ -239,7 +240,36 @@ void ShaderDatabase::LoadSpriteShaders()
 void ShaderDatabase::LoadCommonShaders()
 {
 #pragma region VS
+	VsType type = VsType::Count;
 
+	// 3d_debug_line_VS
+	{
+		type = VsType::DebugLine3D;
+		auto& current = myVertexShaders[static_cast<size_t>(type)];
+
+		D3D11_INPUT_ELEMENT_DESC layout[] =
+		{
+		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
+		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 }
+		};
+
+		current.Init("3d_debug_line", type, layout, sizeof(layout));
+	}
+
+	// 2d_debug_line_VS
+	{
+		type = VsType::DebugLine2D;
+		auto& current = myVertexShaders[static_cast<size_t>(type)];
+
+		D3D11_INPUT_ELEMENT_DESC layout[] =
+		{
+		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
+		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 }
+		};
+
+		current.Init("2d_debug_line", type, layout, sizeof(layout));
+	}
+	
 #pragma endregion //!VS
 #pragma region PS
 	myPixelShaders[static_cast<size_t>(PsType::MissingTextureLegacy)].Init("missing_texture", PsType::MissingTextureLegacy);
@@ -251,52 +281,9 @@ void ShaderDatabase::LoadVFXShaders()
 {
 #pragma region VS
 	VsType type = VsType::Count;
-	// Default PBR Vertex Shader
+	// Default VFX
 	{
-		//type = VsType::DefaultVFX;
-		//auto& current = myVertexShaders[static_cast<size_t>(type)];
-		//D3D11_INPUT_ELEMENT_DESC layout[] =
-		//{
-		//{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "BINORMAL",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "TANGENT",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	0,								D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "TEXCOORD",	1, DXGI_FORMAT_R32_FLOAT,			0,	8,								D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//};
-
-		//current.Init("vfx_default", type, layout, sizeof(layout));
-
-
 		type = VsType::DefaultVFX;
-		//auto& current = myVertexShaders[static_cast<size_t>(type)];
-		//D3D11_INPUT_ELEMENT_DESC layout[] =
-		//{
-		//{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "BINORMAL",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "TANGENT",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "WORLD",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	0,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
-		//{ "WORLD",		1, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	16,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
-		//{ "WORLD",		2, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	32,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
-		//{ "WORLD",		3, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	48,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
-		//{ "ENTITY",		0, DXGI_FORMAT_R32G32_UINT,			1,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_INSTANCE_DATA,	1 },
-		//};
-		//{
-		//{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "BINORMAL",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "TANGENT",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
-		//{ "WORLD",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	0,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
-		//{ "WORLD",		1, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	16,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
-		//{ "WORLD",		2, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	32,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
-		//{ "WORLD",		3, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	48,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
-		//};
 
 		auto& current = myVertexShaders[static_cast<size_t>(type)];
 		D3D11_INPUT_ELEMENT_DESC layout[] =
@@ -316,8 +303,35 @@ void ShaderDatabase::LoadVFXShaders()
 
 		current.Init("vfx_default", type, layout, sizeof(layout));
 	}
+
+	// Particle
+	{
+		type = VsType::Particle;
+
+		auto& current = myVertexShaders[static_cast<size_t>(type)];
+		D3D11_INPUT_ELEMENT_DESC layout[] =
+		{
+		{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
+		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
+		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
+		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
+		{ "BINORMAL",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
+		{ "TANGENT",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
+		{ "WORLD",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	0,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
+		{ "WORLD",		1, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	16,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
+		{ "WORLD",		2, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	32,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
+		{ "WORLD",		3, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	48,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
+		{ "COLOR",		1, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_INSTANCE_DATA,	1 },
+		{ "TIME",		0, DXGI_FORMAT_R32_FLOAT,			1,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_INSTANCE_DATA,	1 },
+		};
+
+		current.Init("particle", type, layout, sizeof(layout));
+	}
 #pragma endregion //!VS
 #pragma region PS
-	myPixelShaders[static_cast<size_t>(PsType::TestVFX)].Init("test_vfx", PsType::TestVFX);
+	myPixelShaders[static_cast<size_t>(PsType::Aoe1)].Init("aoe1", PsType::Aoe1);
+	myPixelShaders[static_cast<size_t>(PsType::Aoe2)].Init("aoe2", PsType::Aoe2);
+	myPixelShaders[static_cast<size_t>(PsType::Aoe3)].Init("aoe3", PsType::Aoe3);
+	myPixelShaders[static_cast<size_t>(PsType::Particle)].Init("particle", PsType::Particle);
 #pragma endregion //!PS
 }

@@ -11,8 +11,12 @@
 #include "../scripting/ScriptRuntimeInstance.h"
 #include "../scripting/ScriptUpdateContext.h"
 
+#include <engine/utility/InputManager.h>
+#include <engine/utility/StringHelper.h>
+
 #include "../gui/MenuUpdateContext.h"
 #include "SceneManager.h"
+
 
 #pragma region Systems and Components Includes
 //Systems
@@ -44,6 +48,7 @@
 #include "../component/AnimationDataComponent.h"
 #include "../component/MetaDataComponent.h"
 #include "../component/DeathZoneComponent.h"
+#include "../component/SphereColliderComponent.h"
 
 #include "../component/EventComponent.h"
 #include "../component/ScriptableEventComponent.h"
@@ -54,29 +59,46 @@
 #include "../component/PhysXComponent.h"
 #include "../component/OrbComponent.h"
 
+#include "audio/NewAudioManager.h"
+
 #pragma endregion
 
 GameScene::GameScene(SceneManager* aSceneManager)
 	: Scene(aSceneManager)
 {
 	myType = eSceneType::Game;
+
 	myWorld = new World();
+}
+
+GameScene::~GameScene()
+{
+	delete myWorld;
+	myWorld = nullptr;
 }
 
 void GameScene::Init(PhysXSceneManager& aPhysXManager)
 {
 	myWorld->Init();
 	myMenuHandler.Init("pauseMenu.json");
+
+	myGameTimer.Init();
 	InitComponents();
 	InitSystems(aPhysXManager);
 }
 
-bool GameScene::Update(const SceneUpdateContext& aContext)
+bool GameScene::Update(SceneUpdateContext& aContext)
 {
 	assert(mySceneManager && "SceneManager is nullptr!");
 
 	auto* im = InputManager::GetInstance();
 
+	aContext.menuHandler = &myMenuHandler;
+	aContext.gameTimer = &myGameTimer;
+
+	
+	myGameTimer.Update(aContext);
+	
 	if (!mySceneManager->GetIsPaused())
 	{
 		myWorld->Update(aContext);
@@ -89,16 +111,23 @@ bool GameScene::Update(const SceneUpdateContext& aContext)
 	else
 	{
 #ifndef _EDITOR
-		auto renderSize = GraphicsEngine::GetInstance()->GetViewportDimensions();
+		auto renderSize = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
 		Vector2i mousePos = im->GetTentativeMousePosition();
 
 		MENU::MenuUpdateContext context;
+		context.sceneManager = mySceneManager;
+		context.menuHandler = &myMenuHandler;
+		context.postProcess = aContext.postProcess;
+		context.lightManager = aContext.lightManager;
 		context.renderSize = renderSize;
-		context.mousePosition = { (float)mousePos.x, (float)mousePos.y };
-		context.mousePressed = im->IsLeftMouseButtonDown();
+		context.mousePosition = { (float)mousePos.x, renderSize.y - (float)mousePos.y };
+		context.mouseDown = im->IsLeftMouseButtonDown();
+		context.mouseReleased = im->IsLeftMouseButtonReleased();
+
 		myMenuHandler.Update(context);
 #endif // !_EDITOR
 	}
+
 
 
 #ifdef _DEBUG
@@ -109,11 +138,17 @@ bool GameScene::Update(const SceneUpdateContext& aContext)
 #endif // _DEBUG
 
 #ifndef _EDITOR
-	if (im->IsKeyPressed(VK_ESCAPE))
+	if (im->IsKeyPressed(VK_ESCAPE) && !mySceneManager->GetIsPaused())
 	{
 		mySceneManager->TogglePaused();
 	}
 #endif // !_EDITOR
+
+
+	if(Engine::GetInstance()->GetWindowHandle() != GetForegroundWindow() && !mySceneManager->GetIsPaused()) // Checks if current window is in focus!
+	{
+		mySceneManager->TogglePaused();
+	}
 
 	return true;
 }
@@ -121,6 +156,11 @@ bool GameScene::Update(const SceneUpdateContext& aContext)
 void GameScene::Render()
 {
 	myWorld->Render();
+
+	if (myType == eSceneType::Game)
+	{
+		myGameTimer.Render();
+	}
 
 #ifndef _EDITOR
 	if (mySceneManager->GetIsPaused())
@@ -131,6 +171,9 @@ void GameScene::Render()
 void GameScene::OnEnter()
 {
 	mySceneManager->SetIsPaused(false);
+	myGameTimer.ResetTimer();
+
+	NewAudioManager::GetInstance()->PlayLoadedSong();
 }
 
 void GameScene::InitComponents()
@@ -140,7 +183,6 @@ void GameScene::InitComponents()
 	myWorld->RegisterComponent<PlayerComponent>(1);
 	myWorld->RegisterComponent<ColliderComponent>();
 	myWorld->RegisterComponent<CollisionDataComponent>();
-	myWorld->RegisterComponent<MeshComponent>();
 	myWorld->RegisterComponent<EnemyComponent>(32);
 	myWorld->RegisterComponent<HitboxComponent>(64);
 	myWorld->RegisterComponent<CameraComponent>(8);
@@ -148,11 +190,11 @@ void GameScene::InitComponents()
 	myWorld->RegisterComponent<PhysXComponent>(128);
 	myWorld->RegisterComponent<OrbComponent>(1);
 	myWorld->RegisterComponent<DeathZoneComponent>();
-
 	myWorld->RegisterComponent<ProjectileComponent>(32);
 	myWorld->RegisterComponent<NpcComponent>(32);
 	myWorld->RegisterComponent<EventComponent>(64);
 	myWorld->RegisterComponent<ScriptableEventComponent>(64);
+	myWorld->RegisterComponent<SphereColliderComponent>();
 
 #ifndef _RELEASE
 	myWorld->RegisterComponent<MetaDataComponent>();
@@ -162,14 +204,6 @@ void GameScene::InitComponents()
 void GameScene::InitSystems(PhysXSceneManager& aPhysXManager)
 {
 	//TODO: Move all of these to respective constructor
-
-	// RenderingSystem
-	{
-		ComponentSignature renderingSystemSignature;
-		renderingSystemSignature.set(myWorld->GetComponentSignatureID<TransformComponent>());
-		renderingSystemSignature.set(myWorld->GetComponentSignatureID<MeshComponent>());
-		myWorld->RegisterSystem<RenderingSystem>(renderingSystemSignature);
-	}
 
 	myWorld->RegisterSystem<PlayerSystem, PhysXSceneManager*>(&aPhysXManager);
 	myWorld->RegisterSystem<CameraSystem>();
@@ -198,11 +232,6 @@ void GameScene::InitSystems(PhysXSceneManager& aPhysXManager)
 		animationSystemSignature.set(myWorld->GetComponentSignatureID<MeshComponent>());
 		myWorld->RegisterSystem<AnimatorSystem>(animationSystemSignature);
 	}
-
-	////ScriptableEventSystem
-	//{
-	//	myWorld->RegisterSystem<ScriptableEventSystem>();
-	//}
 
 	//PhysXSystem
 	{
@@ -233,11 +262,13 @@ void GameScene::InitSystems(PhysXSceneManager& aPhysXManager)
 		npcSystemSignature.set(myWorld->GetComponentSignatureID<AnimationDataComponent>());
 		myWorld->RegisterSystem<NpcSystem>(npcSystemSignature);
 	}
-	//DEAHTZONE
+	//DEATHZONE
 	{
 		myWorld->RegisterSystem<DeathZoneSystem, PhysXSceneManager*>(&aPhysXManager);
-
 	}
+
+	// This system MUST be the last system to be registered due to rendering order
+	myWorld->RegisterSystem<RenderingSystem>();
 }
 
 void GameScene::InitScripts(const std::string& aLevelName)

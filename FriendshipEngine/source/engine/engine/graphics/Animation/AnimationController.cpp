@@ -3,10 +3,10 @@
 #include "Animation.h"
 #include <assets/AssetDatabase.h>
 
-AnimationController::AnimationController(AssetDatabase* aAssetDatabase, const size_t& aMeshId)
+AnimationController::AnimationController(AssetDatabase* aAssetDatabase, int aId)
 {
 	myAssetDatabase = aAssetDatabase;
-	myMeshId = aMeshId;
+	myId = aId;
 }
 
 AnimationController::~AnimationController()
@@ -43,12 +43,7 @@ void AnimationController::Update(const float& aDeltaTime, Animation& aAnimation,
 	}
 
 	if (aData.transitionTimer < transition->duration) { return; }
-	//{
-	//	Animation* animation = myAssetDatabase->GetAnimation(myMeshId, myCurrentAnimationIndex);
-	//	bool hasTimeExceededFixedDuration = myAnimationData->time < animation->Duration * transition.duration;
-	//	if (transition.fixedDuration && hasTimeExceededFixedDuration) { return; }
-	//	else if (myTransitionTimer < transition.duration) { return; }
-	//}
+
 	aData.currentStateIndex = aData.nextStateIndex;
 	aData.transitionTimer = 0.0f;
 	aData.exitTimer = 0.0f;
@@ -56,8 +51,6 @@ void AnimationController::Update(const float& aDeltaTime, Animation& aAnimation,
 	aData.blendFactor = 0.0f;
 	aData.time[0] = aData.time[1];
 	aData.time[1] = 0.0f;
-
-	//myStates[myCurrentAnimation].Update(aDeltaTime);
 }
 
 size_t AnimationController::AddState(const int& aAnimationIndex)
@@ -93,6 +86,11 @@ void AnimationController::SetState(const unsigned int& aStateIndex, AnimationDat
 	aData.previousStateIndex = aData.currentStateIndex;
 	aData.currentStateIndex = aStateIndex;
 	aData.nextStateIndex = aData.currentStateIndex;
+	aData.transitionIndex = -1;
+	aData.blendFactor = 0.0f;
+	aData.isDone = false;
+	aData.time[0] = 0.0f;
+	aData.time[1] = 0.0f;
 }
 
 int AnimationController::GetCurrentAnimationIndex(AnimationData& aData)

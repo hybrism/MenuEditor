@@ -21,12 +21,13 @@ public:
 		myNextComponentId = 0;
 	}
 
-	void Reset(EntitySignatureManager* aManager)
+	void Reset()
 	{
 		for (auto& c : myComponentContainers)
 		{
-			c->Reset(aManager);
+			c->Reset();
 		}
+		myEntitySignatureCollection.Reset();
 	}
 
 	template<typename T>
@@ -39,36 +40,36 @@ public:
 	}
 
 	template<typename T>
-	T& AddComponent(const Entity& aEntity, EntitySignatureManager* aManager)
+	T& AddComponent(const Entity& aEntity)
 	{
-		return GetComponentContainer<T>()->AddComponent(aEntity, aManager);
+		return GetComponentContainer<T>()->AddComponent(aEntity, myEntitySignatureCollection);
 	}
 
 	template<typename T>
-	void RemoveComponent(const Entity& aEntity, EntitySignatureManager* aManager)
+	void RemoveComponent(const Entity& aEntity)
 	{
-		GetComponentContainer<T>()->RemoveComponent(aEntity, aManager);
+		GetComponentContainer<T>()->RemoveComponent(aEntity, myEntitySignatureCollection);
 	}
 
 	template<typename T>
-	T& GetComponent(const Entity& aEntity, EntitySignatureManager* aManager) const
+	T& GetComponent(const Entity& aEntity) const
 	{
-		assert(aManager->GetComponentSignature(aEntity).test(T::componentId) && "Entity does not exist in ComponentContainer");
-		return GetComponentContainer<T>()->GetComponent(aManager->GetSignatureIndex(aEntity, T::componentId));
+		//assert(myEntitySignatureCollection.GetComponentSignature(aEntity).test(T::componentId) && "Entity does not exist in ComponentContainer");
+		return GetComponentContainer<T>()->GetComponent(myEntitySignatureCollection.GetSignatureIndex(aEntity, T::componentId));
 	}
 
 	template<typename T>
-	T* TryGetComponent(const Entity& aEntity, EntitySignatureManager* aManager) const
+	T* TryGetComponent(const Entity& aEntity) const
 	{
-		if (!aManager->GetComponentSignature(aEntity).test(T::componentId)) { return nullptr; }
-		return &GetComponent<T>(aEntity, aManager);
+		if (!myEntitySignatureCollection.GetComponentSignature(aEntity).test(T::componentId)) { return nullptr; }
+		return &GetComponent<T>(aEntity);
 	}
 
-	void OnEntityDestroyed(const Entity& aEntity, EntitySignatureManager* aManager)
+	void OnEntityDestroyed(const Entity& aEntity)
 	{
 		for (auto& c : myComponentContainers)
 		{
-			c->OnEntityDestroyed(aEntity, aManager);
+			c->OnEntityDestroyed(aEntity, myEntitySignatureCollection);
 		}
 	}
 
@@ -79,12 +80,24 @@ public:
 	}
 
 	template<typename T>
-	bool HasComponent(const Entity& aEntity, EntitySignatureManager* aManager) const
+	bool HasComponent(const Entity& aEntity) const
 	{
-		return aManager->GetComponentSignature(aEntity)[GetComponentSignatureID<T>()];
+		return myEntitySignatureCollection.GetComponentSignature(aEntity)[GetComponentSignatureID<T>()];
+	}
+
+	template<typename T>
+	void UpdateComponentSignature(const Entity& aEntity, bool aValue)
+	{
+		myEntitySignatureCollection.UpdateComponentSignature(aEntity, GetComponentSignatureID<T>(), aValue);
+	}
+
+	const ComponentSignature& GetEntitySignature(const Entity& aEntity) const
+	{
+		return myEntitySignatureCollection.GetComponentSignature(aEntity);
 	}
 private:
 	std::vector<IComponentContainer*> myComponentContainers;
+	EntitySignatureCollection myEntitySignatureCollection;
 	cid_t myNextComponentId = 0;
 
 	template<typename T>
@@ -94,7 +107,7 @@ private:
 
 		assert(cid < myNextComponentId && "Component not registered before use.");
 
-		return static_cast<ComponentContainer<T>*>(myComponentContainers.at(cid));
+		return (ComponentContainer<T>*)myComponentContainers[cid];
 	}
 };
 

@@ -7,8 +7,6 @@ PixelOutput main(SpritePixelInputType input)
     PixelOutput result;
     float4 diffuse = aMainTexture.Sample(aDefaultSampler, input.uv) * input.color;
 	
-    if (diffuse.a < 0.1f)
-        discard;
     
 	//IF we want to use lighting on sprites, check TGE! They have some cool stuff :)
     
@@ -20,8 +18,11 @@ PixelOutput main(SpritePixelInputType input)
     step(clip.x, input.uv.x) *
     step(input.uv.x, 1 - clip.y) *
     step(input.uv.y, 1 - clip.z) *
-    step(clip.w, input.uv.y) * diffuse.a;
-    
+    step(clip.w, input.uv.y) *
+    diffuse.a;
+        
+    diffuse.a = step(0.01f, diffuse.a) * diffuse.a;
+       
     result.color.rgb = diffuse.rgb;
     result.color.a = diffuse.a;
     	

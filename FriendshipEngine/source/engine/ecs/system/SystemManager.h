@@ -50,7 +50,7 @@ public:
 		}
 	}
 
-	void Update(const SceneUpdateContext& aContext)
+	void Update(SceneUpdateContext& aContext)
 	{
 #if SHOULD_PRINT_SYSTEM_EXECUTION_ORDER
 		Print("\n--------------------------------------------------------\n");

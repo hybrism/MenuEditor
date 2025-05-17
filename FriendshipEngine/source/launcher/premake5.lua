@@ -23,6 +23,8 @@ project "Launcher"
         "**.hlsli",
 	}
 
+	linkoptions { "-IGNORE:4099", "-IGNORE:4006" }
+
 	--verify_or_create_settings("Game")
 	
 	filter "configurations:Editor"

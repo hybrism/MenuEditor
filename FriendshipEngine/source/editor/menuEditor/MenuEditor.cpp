@@ -105,7 +105,7 @@ void MENU::MenuEditor::Init()
 		}
 	}
 
-	myMenuHandler.Init("sliderTest.json");
+	myMenuHandler.Init("mainMenu.json");
 
 	GenerateEditorColliders();
 }
@@ -136,8 +136,8 @@ void MENU::MenuEditor::Update(float aDt)
 	menuContext.mousePosition = { mousePos.x, myRenderSize.y - mousePos.y };
 	menuContext.mouseDelta = { mouseDelta.x, mouseDelta.y };
 	menuContext.renderSize = myRenderSize;
-	menuContext.mouseDown = ImGui::IsMouseDown(ImGuiMouseButton_Left);
 	menuContext.mouseReleased = ImGui::IsMouseReleased(ImGuiMouseButton_Left);
+	menuContext.mouseDown = ImGui::IsMouseDown(ImGuiMouseButton_Left);
 
 	myMenuHandler.Update(menuContext);
 

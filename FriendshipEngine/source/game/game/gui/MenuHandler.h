@@ -28,15 +28,20 @@ namespace MENU
 		void Update(const MenuUpdateContext& aContext);
 		void HandleCommand(MenuObject& aObject, const MenuUpdateContext& aContext);
 		void Render();
-		
-		void AddNewState(const std::string& aName);
+		void OnResize(const Vector2i& aNewRenderSize);
+
+		MENU::MenuState& AddNewState(const std::string& aName);
+
 		void RemoveState(ID aID);
 		void PushState(ID aID);
+		void PushState(const std::string& aStateName);
 		void PopState();
 		void PopToBaseState();
 
 		MenuState& GetCurrentState();
+		MenuState& GetStateFromID(ID aID);
 		std::vector<MenuState>& GetAllStates();
+
 		std::string GetName() const;
 		std::string GetFileName() const;
 
@@ -44,6 +49,7 @@ namespace MENU
 
 		MenuObject& GetObjectFromID(ID aID);
 		MenuObject& GetObjectFromIndex(ID aIndex);
+		MenuObject& GetObjectFromName(const std::string& aName);
 
 		void RemoveObjectAtID(ID aID);
 		void MoveUpObjectAtID(ID aID);
@@ -51,7 +57,6 @@ namespace MENU
 
 		MenuObject& CreateNewObject(const Vector2f& aPosition = { 0.f, 0.f });
 
-		//TODO: Move these to a "MenuLoader"
 		void LoadFromJson(const std::string& aMenuFile);
 		Vector4f JsonToColorVec(nlohmann::json aJson);
 		Vector2f JsonToVec2(nlohmann::json aJson);
@@ -71,7 +76,5 @@ namespace MENU
 
 		std::stack<MenuState*> myStateStack;
 		std::vector<MenuState> myStates;
-
-		Vector2f myRenderSize;
 	};
 }

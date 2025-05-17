@@ -4,10 +4,7 @@
 #include <engine/utility/Error.h>
 #include <engine/graphics/GraphicsEngine.h>
 
-#include <directxtk/Effects.h>
 #include <directxtk/VertexTypes.h>
-#include <directxtk/CommonStates.h>
-
 
 DebugRenderer::DebugRenderer()
 {}
@@ -27,76 +24,131 @@ void DebugRenderer::Init()
 	myRenderSize = { (float)size.x, (float)size.y };
 
 	myPrimitiveBatch = std::make_unique<DX11::PrimitiveBatch<DX11::VertexPositionColor>>(context);
-	myBasicEffect = std::make_unique<DX11::BasicEffect>(device.Get());
-	myStates = std::make_unique<DX11::CommonStates>(device.Get());
-
-	myBasicEffect->SetProjection(DirectX::XMMatrixOrthographicOffCenterRH(0,
-		myRenderSize.x, myRenderSize.y, 0, 0, 1));
-
-	myBasicEffect->SetVertexColorEnabled(true);
-
-	void const* shaderByteCode;
-	size_t byteCodeLength;
-
-	myBasicEffect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-
-	HRESULT result = device->CreateInputLayout(
-		DirectX::VertexPositionColor::InputElements,
-		DirectX::VertexPositionColor::InputElementCount,
-		shaderByteCode,
-		byteCodeLength,
-		myInputLayout.ReleaseAndGetAddressOf()
-	);
-
-	if (FAILED(result))
-		PrintW("[DebugRenderer.cpp] Failed to create DebugRenderer!");
 }
+
+#include <engine/graphics/Camera.h>
+#include <assets/ShaderDatabase.h>
+#include <engine/shaders/VertexShader.h>
+#include <engine/shaders/PixelShader.h>
 
 void DebugRenderer::Render()
 {
 	using namespace DirectX;
 	auto ge = GraphicsEngine::GetInstance();
-	auto context = ge->DX().GetContext();
 
+	RenderState renderState;
+	renderState.blendState = BlendState::Disabled;
+	renderState.depthStencilState = DepthStencilState::ReadWrite;
+	renderState.rasterizerState = RasterizerState::WireframeNoCulling;
+
+	ge->SetRenderState(renderState);
+
+	ShaderDatabase::GetPixelShader(PsType::DebugLine)->PrepareRender();
+
+	// 3D
+	ShaderDatabase::GetVertexShader(VsType::DebugLine3D)->PrepareRender();
 	myPrimitiveBatch->Begin();
-
-	//TODO Fix Depth and Rendertarget for 3dLines!
-	for (const Line& line : my3DLines)
 	{
-		XMFLOAT3 from = { line.from.x, line.from.y, line.from.z };
-		XMFLOAT3 to = { line.to.x, line.to.y, line.to.z };
-		XMFLOAT4 color = { line.color.x, line.color.y, line.color.z, 1.f };
 
-		myPrimitiveBatch->DrawLine(
-			DX11::VertexPositionColor({ from, color }),
-			DX11::VertexPositionColor({ to, color })
-		);
+		//TODO Fix Depth and Rendertarget for 3dLines!
+		for (const DEBUG::Line& line : my3DLines)
+		{
+			XMFLOAT3 from = { line.from.x, line.from.y, line.from.z };
+			XMFLOAT3 to = { line.to.x, line.to.y, line.to.z };
+			XMFLOAT4 color = { line.color.x, line.color.y, line.color.z, 1.f };
+
+			myPrimitiveBatch->DrawLine(
+				DX11::VertexPositionColor({ from, color }),
+				DX11::VertexPositionColor({ to, color })
+			);
+		}
+
 	}
+	myPrimitiveBatch->End();
 
-	context->OMSetBlendState(myStates->Opaque(), nullptr, 0xFFFFFFFF);
-	context->OMSetDepthStencilState(myStates->DepthNone(), 0);
-	context->RSSetState(myStates->CullNone());
-
-	myBasicEffect->Apply(context);
-
-	context->IASetInputLayout(myInputLayout.Get());
-
-	for (const Line& line : my2DLines)
+	// 3D Quads
+	myPrimitiveBatch->Begin();
 	{
-		XMFLOAT3 from = { line.from.x, line.from.y, line.from.z };
-		XMFLOAT3 to = { line.to.x, line.to.y, line.to.z };
-		XMFLOAT4 color = { line.color.x, line.color.y, line.color.z, 1.f };
+		//TODO Fix Depth and Rendertarget for 3dLines!
+		for (const DEBUG::Quad& quad : my3DQuads)
+		{
+			XMFLOAT3 position = quad.position;
+			DirectX::XMVECTOR normal = { quad.normal.x, quad.normal.y, quad.normal.z };
+			XMFLOAT2 scale = quad.scale;
+			XMFLOAT4 color = quad.color;
 
-		myPrimitiveBatch->DrawLine(
-			DX11::VertexPositionColor({ from, color }),
-			DX11::VertexPositionColor({ to, color })
-		);
+			XMFLOAT3 q0 = XMFLOAT3(-scale.x / 2.0f, -scale.y / 2.0f, 0.0f);
+			XMFLOAT3 q1 = XMFLOAT3(scale.x / 2.0f, -scale.y / 2.0f, 0.0f);
+			XMFLOAT3 q2 = XMFLOAT3(scale.x / 2.0f, scale.y / 2.0f, 0.0f);
+			XMFLOAT3 q3 = XMFLOAT3(-scale.x / 2.0f, scale.y / 2.0f, 0.0f);
+
+			{
+				XMVECTOR upVector = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+				XMMATRIX viewMatrix = XMMatrixLookAtLH(XMVectorZero(), -normal, upVector);
+				XMMATRIX rotationMatrix = XMMatrixInverse(nullptr, viewMatrix);
+
+
+				XMVECTOR vertex = XMLoadFloat3(&q0);
+				vertex = XMVector3TransformCoord(vertex, rotationMatrix);
+				XMStoreFloat3(&q0, vertex);
+
+				vertex = XMLoadFloat3(&q1);
+				vertex = XMVector3TransformCoord(vertex, rotationMatrix);
+				XMStoreFloat3(&q1, vertex);
+
+				vertex = XMLoadFloat3(&q2);
+				vertex = XMVector3TransformCoord(vertex, rotationMatrix);
+				XMStoreFloat3(&q2, vertex);
+
+				vertex = XMLoadFloat3(&q3);
+				vertex = XMVector3TransformCoord(vertex, rotationMatrix);
+				XMStoreFloat3(&q3, vertex);
+			}
+
+			myPrimitiveBatch->DrawQuad(
+				DX11::VertexPositionColor({ q0.x + position.x, q0.y + position.y, q0.z + position.z }, color),
+				DX11::VertexPositionColor({ q1.x + position.x, q1.y + position.y, q1.z + position.z }, color),
+				DX11::VertexPositionColor({ q2.x + position.x, q2.y + position.y, q2.z + position.z }, color),
+				DX11::VertexPositionColor({ q3.x + position.x, q3.y + position.y, q3.z + position.z }, color)
+			);
+		}
 	}
+	myPrimitiveBatch->End();
 
+	// 2D
+	ShaderDatabase::GetVertexShader(VsType::DebugLine2D)->PrepareRender();
+	myPrimitiveBatch->Begin();
+	{
+
+		renderState.depthStencilState = DepthStencilState::Disabled;
+
+		ge->SetRenderState(renderState);
+
+		for (const DEBUG::Line& line : my2DLines)
+		{
+			XMFLOAT3 from = { line.from.x, line.from.y, line.from.z };
+			XMFLOAT3 to = { line.to.x, line.to.y, line.to.z };
+			XMFLOAT4 color = { line.color.x, line.color.y, line.color.z, 1.f };
+
+			myPrimitiveBatch->DrawLine(
+				DX11::VertexPositionColor({ from, color }),
+				DX11::VertexPositionColor({ to, color })
+			);
+		}
+
+	}
 	myPrimitiveBatch->End();
 
 	//TODO: Perhaps move this to a PrepareRender? 
 	my3DLines.clear();
+	my3DQuads.clear();
+	my2DLines.clear();
+}
+
+void DebugRenderer::Clear()
+{
+	my3DLines.clear();
+	my3DQuads.clear();
 	my2DLines.clear();
 }
 
@@ -106,7 +158,7 @@ void DebugRenderer::DrawLine(const Vector3f& aFrom, const Vector3f& aTo, const V
 	DirectX::XMFLOAT3 to = { aTo.x, aTo.y, aTo.z };
 	DirectX::XMFLOAT4 color = { aColor.x, aColor.y, aColor.z, 1.f };
 
-	my3DLines.push_back(Line({ from, to, color }));
+	my3DLines.push_back(DEBUG::Line({ from, to, color }));
 }
 
 void DebugRenderer::DrawLine(const Vector2f& aFrom, const Vector2f& aTo, const Vector3f& aColor)
@@ -115,5 +167,15 @@ void DebugRenderer::DrawLine(const Vector2f& aFrom, const Vector2f& aTo, const V
 	DirectX::XMFLOAT3 to = { aTo.x, aTo.y, 0.f };
 	DirectX::XMFLOAT4 color = { aColor.x, aColor.y, aColor.z, 1.f };
 
-	my2DLines.push_back(Line({ from, to, color }));
+	my2DLines.push_back(DEBUG::Line({ from, to, color }));
+}
+
+void DebugRenderer::DrawQuad(const Vector3f& aPosition, const Vector3f& aNormal, const Vector2f& aScale, const Vector3f& aColor)
+{
+	DirectX::XMFLOAT3 position = { aPosition.x, aPosition.y, aPosition.z };
+	DirectX::XMFLOAT3 normal = { aNormal.x, aNormal.y, aNormal.z };
+	DirectX::XMFLOAT2 scale = { aScale.x, aScale.y };
+	DirectX::XMFLOAT4 color = { aColor.x, aColor.y, aColor.z, 1.f };
+
+	my3DQuads.push_back(DEBUG::Quad({ position, normal, scale, color }));
 }

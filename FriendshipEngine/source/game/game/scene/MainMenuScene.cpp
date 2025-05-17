@@ -7,6 +7,7 @@
 #include <engine/graphics/GraphicsEngine.h>
 
 #include "../gui/MenuUpdateContext.h"
+#include "../audio/NewAudioManager.h"
 
 MainMenuScene::MainMenuScene(SceneManager* aSceneManager)
 	: Scene(aSceneManager)
@@ -21,10 +22,8 @@ void MainMenuScene::Init(PhysXSceneManager&)
 	myMenuHandler.Init("mainMenu.json");
 }
 
-bool MainMenuScene::Update(const SceneUpdateContext& aContext)
+bool MainMenuScene::Update(SceneUpdateContext& aContext)
 {
-	aContext;
-
 	assert(mySceneManager && "SceneManager is nullptr!");
 
 	auto input = InputManager::GetInstance();
@@ -34,9 +33,13 @@ bool MainMenuScene::Update(const SceneUpdateContext& aContext)
 	MENU::MenuUpdateContext context;
 	context.sceneManager = mySceneManager;
 	context.menuHandler = &myMenuHandler;
+	context.postProcess = aContext.postProcess;
+	context.lightManager = aContext.lightManager;
 	context.renderSize = renderSize;
-	context.mousePosition = { (float)mousePos.x, (float)mousePos.y };
+	context.mousePosition = { (float)mousePos.x, renderSize.y - (float)mousePos.y };
 	context.mouseDown = input->IsLeftMouseButtonDown();
+	context.mouseReleased = input->IsLeftMouseButtonReleased();
+
 	myMenuHandler.Update(context);
 
 	return !input->IsKeyPressed(VK_ESCAPE);
@@ -58,6 +61,8 @@ void MainMenuScene::OnEnter()
 {
 	mySceneManager->SetIsPaused(true);
 	myMenuHandler.PopToBaseState();
+	NewAudioManager::GetInstance()->StopMusic();
+	NewAudioManager::GetInstance()->PlayMusic(eSounds::MenuMusic, 0.2f);
 }
 
 void MainMenuScene::InitComponents() { __noop; }

@@ -1,7 +1,6 @@
 #pragma once
 #include "IComponentContainer.h"
-#include "../entity/Entity.h"
-#include "../entity/EntitySignatureManager.h"
+#include "../entity/EntitySignatureContainer.h"
 
 #include <cassert>
 #include <set>
@@ -30,31 +29,33 @@ public:
 		mySize = 0;
 	}
 
-	void Reset(EntitySignatureManager* aManager) override
+	void Reset() override
 	{
+		T copy{};
 		while (mySize > 0)
 		{
-			RemoveComponentInternal(myComponentToEntityMap[mySize - 1], aManager);
+			memcpy(&myComponents[mySize - 1], &copy, sizeof(T));  // resets the component
+			--mySize;
 		}
 	}
 
-	T& AddComponent(const Entity& aEntity, EntitySignatureManager* aManager)
+	T& AddComponent(const Entity& aEntity, EntitySignatureCollection& aCollection)
 	{
 		assert(mySize < myMaxSize && "ComponentContainer is full");
-		assert(!aManager->GetComponentSignature(aEntity).test(T::componentId) && "Entity contains the component you are trying to add");
+		assert(!aCollection.GetComponentSignature(aEntity).test(T::componentId) && "Entity contains the component you are trying to add");
 
-		aManager->SetSignatureIndex(aEntity, T::componentId, static_cast<int>(mySize));
-		aManager->UpdateComponentSignature(aEntity, T::componentId, true);
+		aCollection.SetSignatureIndex(aEntity, T::componentId, static_cast<int>(mySize));
+		aCollection.UpdateComponentSignature(aEntity, T::componentId, true);
 		myComponentToEntityMap[mySize] = aEntity;
 		++mySize;
 
 		return myComponents[mySize - 1];
 	}
 
-	void RemoveComponent(const Entity& aEntity, EntitySignatureManager* aManager)
+	void RemoveComponent(const Entity& aEntity, EntitySignatureCollection& aCollection)
 	{
-		assert(aManager->GetComponentSignature(aEntity).test(T::componentId) && "Entity does not exist in ComponentContainer");
-		RemoveComponentInternal(aEntity, aManager);
+		assert(aCollection.GetComponentSignature(aEntity).test(T::componentId) && "Entity does not exist in ComponentContainer");
+		RemoveComponentInternal(aEntity, aCollection);
 	}
 
 	T& GetComponent(int aIndex) const
@@ -63,12 +64,12 @@ public:
 		return myComponents[aIndex];
 	}
 
-	void OnEntityDestroyed(const Entity& aEntity, EntitySignatureManager* aManager) override
+	void OnEntityDestroyed(const Entity& aEntity, EntitySignatureCollection& aCollection) override
 	{
 		// if the entity is not in the container, do nothing
-		if (!aManager->GetComponentSignature(aEntity).test(T::componentId)) { return; }
+		if (!aCollection.GetComponentSignature(aEntity).test(T::componentId)) { return; }
 
-		RemoveComponent(aEntity, aManager);
+		RemoveComponent(aEntity, aCollection);
 	}
 
 	const size_t& GetMaxSize() const { return myMaxSize; }
@@ -86,20 +87,30 @@ public:
 //	}
 //#endif
 private:
-	void RemoveComponentInternal(const Entity& aEntity, EntitySignatureManager* aManager)
+	void RemoveComponentInternal(const Entity& aEntity, EntitySignatureCollection& aCollection)
 	{
 		assert(mySize > 0 && "ComponentContainer is empty");
 
 		size_t lastElementIndex = mySize - 1;
-		int indexOfRemovedEntity = aManager->GetSignatureIndex(aEntity, T::componentId);
-		eid_t lastEntity = myComponentToEntityMap[lastElementIndex];
+		int entityToRemoveIndex = aCollection.GetSignatureIndex(aEntity, T::componentId);
 
-		memcpy(&myComponents[indexOfRemovedEntity], &myComponents[lastElementIndex], sizeof(myComponents[indexOfRemovedEntity]));
+		if (entityToRemoveIndex == lastElementIndex)
+		{
+			T copy{};
+			memcpy(&myComponents[lastElementIndex], &copy, sizeof(T));  // resets the component
+			aCollection.UpdateComponentSignature(aEntity, T::componentId, false);
+			--mySize;
+			return;
+		}
+
+		eid_t lastEntity = myComponentToEntityMap[lastElementIndex];
+		memcpy(&myComponents[entityToRemoveIndex], &myComponents[lastElementIndex], sizeof(myComponents[entityToRemoveIndex]));
 		T copy{};
 		memcpy(&myComponents[lastElementIndex], &copy, sizeof(T));  // resets the component
+		myComponentToEntityMap[entityToRemoveIndex] = lastEntity;
 
-		aManager->SetSignatureIndex(lastEntity, T::componentId, indexOfRemovedEntity);
-		aManager->UpdateComponentSignature(aEntity, T::componentId, false);
+		aCollection.SetSignatureIndex(lastEntity, T::componentId, entityToRemoveIndex);
+		aCollection.UpdateComponentSignature(aEntity, T::componentId, false);
 		--mySize;
 	}
 
@@ -108,9 +119,5 @@ private:
 	T* myComponents;
 	eid_t* myComponentToEntityMap;
 	// TODO: optimize initialization of components if they contain too lot of data?
-	
-#ifndef _RELEASE
-	std::vector<EntityData*> myEntities;
-#endif
 };
 

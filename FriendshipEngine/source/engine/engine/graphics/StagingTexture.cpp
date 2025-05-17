@@ -7,9 +7,9 @@ void StagingTexture::CopyToStaging() const
 {
 	auto* context = GraphicsEngine::GetInstance()->DX().GetContext();
 #ifdef _EDITOR
-	context->CopyResource(myStagingTexture, myTexture);
+	context->CopyResource(myStagingTexture, myTexture.Get());
 #endif
-	context->CopyResource(myIntermediateTexture, myTexture);
+	context->CopyResource(myIntermediateTexture.Get(), myTexture.Get());
 }
 
 #ifdef _EDITOR
@@ -49,7 +49,7 @@ void StagingTexture::CreateStagingTexture(D3D11_SHADER_RESOURCE_VIEW_DESC* aSRVD
 		stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 		stagingDesc.Usage = D3D11_USAGE_STAGING;
 
-		result = device->CreateTexture2D(&stagingDesc, nullptr, &myStagingTexture);
+		result = device->CreateTexture2D(&stagingDesc, nullptr, myIntermediateTexture.GetAddressOf());
 		assert(SUCCEEDED(result));
 	}
 #endif
@@ -60,13 +60,24 @@ void StagingTexture::CreateStagingTexture(D3D11_SHADER_RESOURCE_VIEW_DESC* aSRVD
 
 		stagingDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
-		result = device->CreateTexture2D(&stagingDesc, nullptr, &myIntermediateTexture);
+		result = device->CreateTexture2D(&stagingDesc, nullptr, myIntermediateTexture.GetAddressOf());
 		assert(SUCCEEDED(result));
 	}
 
 	ID3D11ShaderResourceView* tempSRV;
-	result = device->CreateShaderResourceView(myIntermediateTexture, aSRVDesc, &tempSRV);
+	result = device->CreateShaderResourceView(myIntermediateTexture.Get(), aSRVDesc, &tempSRV);
 	assert(SUCCEEDED(result));
 	myIntermediateSRV = tempSRV;
 	tempSRV->Release();
+}
+
+void StagingTexture::CreateStagingTexture(
+	D3D11_SHADER_RESOURCE_VIEW_DESC* aSRVDesc,
+	ComPtr<ID3D11Texture2D>& aTexture,
+	ComPtr<ID3D11ShaderResourceView>& aSRV
+)
+{
+	SRV = aSRV;
+	myTexture = aTexture;
+	CreateStagingTexture(aSRVDesc);
 }

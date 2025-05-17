@@ -32,7 +32,8 @@ struct Vertex;
 struct RenderTarget;
 class Camera;
 class GBuffer;
-class DirectionalLightManager;
+class LightManager;
+class PostProcess;
 
 class GraphicsEngine
 {
@@ -85,18 +86,43 @@ public:
 	void BeginFrame();
 	void EndFrame();
 
-	ComPtr<ID3D11RenderTargetView>& GetBackBuffer();
-	ComPtr<ID3D11ShaderResourceView>& GetBackBufferSRV();
+	ComPtr<ID3D11RenderTargetView>& GetBackBuffer() { return myBackBufferRenderTarget.RTV; }
+	ComPtr<ID3D11ShaderResourceView>& GetBackBufferSRV() { return myBackBufferRenderTarget.SRV; }
 	RenderTarget& GetBackBufferRenderTarget();
 	DepthBuffer& GetDepthBuffer() { return myDxData.GetDepthBuffer(); }
-	bool SetResolution(Vector2i aResolution);
+
+	Vector2i& GetInternalResolution() { return myInternalResolution; }
+
+	void SetFullscreen(
+		bool aIsFullscreen,
+		LightManager* aLightManager,
+		PostProcess* aPostProcess
+	);
+
+	void SetResolution(
+		const Vector2i& aResolution,
+		LightManager* aLightManager,
+		PostProcess* aPostProcess
+	);
+
+	void SetResolution(
+		const Vector2i& aResolution,
+		bool aIsFullscreen,
+		LightManager* aLightManager,
+		PostProcess* aPostProcess
+	);
+	void SetInternalResolution(const Vector2i& aResolution);
+	bool SetWindowDimensions(const Vector2i& aResolution);
 
 	Camera* GetCamera() { return myCurrentCamera; }
 	Camera* GetViewCamera() { return myViewCamera; }
 	Camera const* GetCamera() const { return myCurrentCamera; }
 	void ChangeCurrentCamera(Camera* aCamera);
 	void ResetToViewCamera();
+
+	//Used to stop CameraSystem from updating the player while in free camera mode
 	void SetUseOfFreeCamera(const bool& aBool);
+	bool IsFreeCameraInUse() const { return myIsUsingFreeCamera; }
 
 	MeshDrawer& GetMeshDrawer() { return myRenderers.meshDrawer; }
 
@@ -123,7 +149,6 @@ public:
 	unsigned int GetDrawCalls() const { return myDrawCalls; }
 
 	unsigned int GetRenderMode() const { return myRenderMode; }
-	DirectionalLightManager* GetDirectionalLightManager() { return myDirectionalLightManager; }
 
 	void SetRawBackBufferAsRenderTarget();
 	void SetRawBackBufferAsRenderTarget(DepthBuffer* aDepth);
@@ -150,7 +175,11 @@ public:
 	}
 	Vector3f GetClearColor() const { return { myClearColor.x, myClearColor.y, myClearColor.z }; }
 
-	bool IsViewCameraInUse() const { return myIsUsingViewCamera; }
+	float GetDepthFadeK() const { return myDepthFadeK; }
+	void SetDepthFadeK(const float& aDepthFadeK) { myDepthFadeK = aDepthFadeK; }
+#ifdef _EDITOR
+	float& GetDepthFadeKRef() { return myDepthFadeK; }
+#endif
 private:
 	GraphicsEngine();
 
@@ -161,6 +190,7 @@ private:
 	bool CreateRasterizerStates();
 	bool CreateSamplerStates();
 	void UpdateFrameBuffer();
+	void SetInternalFullscreen(bool aIsFullscreen);
 	
 
 	ComPtr<ID3D11Buffer> myFrameBuffer;
@@ -174,6 +204,10 @@ private:
 	GERenderers myRenderers;
 	GERenderStateCollection myRenderStates;
 
+	Vector2i myBackBufferDimensions;
+	Vector2i myInternalResolution;
+	Vector2i myTargetResolution;
+	
 	RenderTarget myBackBufferRenderTarget;
 
 	Camera* myViewCamera;
@@ -181,14 +215,14 @@ private:
 	
 	DxData myDxData;
 
-	DirectionalLightManager* myDirectionalLightManager;
-
 	Vector4f myClearColor;
 
 	unsigned int myDrawCalls = 0;
 	unsigned int myNumMips = 0;
-	static GraphicsEngine* myInstance;
 	RenderState myRenderState;
 	unsigned int myRenderMode = 0;
-	bool myIsUsingViewCamera = false;
+	float myDepthFadeK = 1400;
+	bool myIsUsingFreeCamera = false;
+
+	static GraphicsEngine* myInstance;
 };

@@ -89,13 +89,14 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>DirectXTex.lib;DirectXTex_Spectre.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\dependencies\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="editor\Editor.h" />
     <ClInclude Include="editor\EditorLauncher.h" />
+    <ClInclude Include="editor\FreeCameraHandler.h" />
     <ClInclude Include="editor\editorUtilitiy\EditorUtility.h" />
     <ClInclude Include="editor\friendshipEditor\EditorManager.h" />
     <ClInclude Include="editor\friendshipEditor\EditorUpdateContext.h" />
@@ -126,6 +127,7 @@
   <ItemGroup>
     <ClCompile Include="editor\Editor.cpp" />
     <ClCompile Include="editor\EditorLauncher.cpp" />
+    <ClCompile Include="editor\FreeCameraHandler.cpp" />
     <ClCompile Include="editor\editorUtilitiy\EditorUtility.cpp" />
     <ClCompile Include="editor\friendshipEditor\EditorManager.cpp" />
     <ClCompile Include="editor\friendshipEditor\inspector\Inspector.cpp" />

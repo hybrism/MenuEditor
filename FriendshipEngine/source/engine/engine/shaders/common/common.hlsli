@@ -65,7 +65,7 @@ struct AnimatedVertexInputType : VertexInputType
 struct VertexInstancedInputType : VertexInputType
 {
     float4x4 instanceTransform : WORLD;
-    uint2 entityData : ENTITY; // x = entityId, y = render order
+    int2 entityData : ENTITY; // x = entityId, y = render order
 };
 
 struct AnimatedVertexInstancedInputType : AnimatedVertexInputType
@@ -135,9 +135,11 @@ struct PostProcessData
     float vignetteCurvature;
     
     float3 blackPoint;
-    float3 vignetteColor;
+    float speedLineRadiusAddition;
     
-    float2 trash;
+    float3 vignetteColor;
+
+    float trash;
 };
 
 // TODO: separate resolution and viewport
@@ -148,7 +150,9 @@ cbuffer FrameBuffer : register(b0)
     float4x4 modelToWorld; //WorldToCamera, ModelMatrix, ViewModel, ViewMatrix
     float NearPlane;
     float FarPlane;
-    float2 unused0;
+    
+    float depthFadeK;
+    float1 unused0;
 }
 
 cbuffer ObjectBuffer : register(b1)
@@ -186,10 +190,9 @@ cbuffer LightBufferData : register(b4)
     } myPointLights[32];
 
     int amountOfPointLights;
-    
-     int useShadows;
-    
-    float unused[2];
+    int useShadows;
+    float shadowBias;
+    float shadowOffsetScale;
 };
 
 cbuffer PointLightSphereColorBufferData : register(b5)
@@ -264,6 +267,45 @@ float4x4 inverse(float4x4 m)
     return ret;
 }
 
+float3x3 inverse(float3x3 mat)
+{
+    float a11 = mat[0][0];
+    float a12 = mat[0][1];
+    float a13 = mat[0][2];
+    
+    float a21 = mat[1][0];
+    float a22 = mat[1][1];
+    float a23 = mat[1][2];
+    
+    float a31 = mat[2][0];
+    float a32 = mat[2][1];
+    float a33 = mat[2][2];
+    
+    float det = a11 * a22 * a33 + a12 * a23 * a31 + a13 * a21 * a32 -
+                a13 * a22 * a31 - a11 * a23 * a32 - a12 * a21 * a33;
+    
+    // If the determinant is zero, matrix is not invertible
+    if (det == 0)
+        return float3x3(0, 0, 0, 0, 0, 0, 0, 0, 0); // Or handle this case as needed
+    
+    float invDet = 1.0f / det;
+    
+    float b11 = (a22 * a33 - a23 * a32) * invDet;
+    float b12 = (a13 * a32 - a12 * a33) * invDet;
+    float b13 = (a12 * a23 - a13 * a22) * invDet;
+    
+    float b21 = (a23 * a31 - a21 * a33) * invDet;
+    float b22 = (a11 * a33 - a13 * a31) * invDet;
+    float b23 = (a13 * a21 - a11 * a23) * invDet;
+    
+    float b31 = (a21 * a32 - a22 * a31) * invDet;
+    float b32 = (a12 * a31 - a11 * a32) * invDet;
+    float b33 = (a11 * a22 - a12 * a21) * invDet;
+    
+    return float3x3(b11, b12, b13, b21, b22, b23, b31, b32, b33);
+}
+
+
 float3 UnpackNormal(float3 normalTexture)
 {
     return normalize(2.0f * normalTexture - 1.0f);
@@ -272,10 +314,17 @@ float3 UnpackNormal(float3 normalTexture)
 float3 GetCameraPosition()
 {
     float4x4 mat = inverse(modelToWorld);
-    return float3(mat[0].w, mat[1].w, mat[2].w);
+    return float3(mat[0][3], mat[1][3], mat[2][3]);
 }
 
 SamplerState aDefaultSampler : register(s0);
 SamplerState aClampingSampler : register(s1);
+SamplerState aShadowSampler : register(s2);
+SamplerComparisonState depthSamplerState
+{
+    Filter = COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
 
 

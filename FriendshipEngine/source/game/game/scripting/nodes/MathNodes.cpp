@@ -129,7 +129,7 @@ public:
 		currentPosition.z = FriendMath::Lerp(state->startPosition.z, state->endPosition.z, fractionOfJourney);
 
 
-		if (Vector3f::Distance(state->endPosition, transformComponent.transform.GetPosition()) < 10.f)
+		if (Vector3f::Distance(state->endPosition, transformComponent.transform.GetPosition()) < 1.f)
 		{
 			aContext.TriggerOutputPin(myOutputFlowPin);
 			transformComponent.transform.SetPosition(state->endPosition);
@@ -241,6 +241,7 @@ public:
 		if (!state->isValueSet)
 		{
 			state->startRotation = currentRotation;
+			state->finalRotation = finalRotation;
 			state->timer = 0;
 			state->isValueSet = true;
 		}
@@ -249,17 +250,17 @@ public:
 
 		float ratio = state->timer / duration;
 
-		currentRotation.x = FriendMath::Lerp(state->startRotation.x, finalRotation.x, ratio);
-		currentRotation.y = FriendMath::Lerp(state->startRotation.y, finalRotation.y, ratio);
-		currentRotation.z = FriendMath::Lerp(state->startRotation.z, finalRotation.z, ratio);
+		//if (state->timer > duration)
+		//	ratio = 1.f;
 
-		//TODO SCRIPTING: Rotation never stops :( 
-		if (currentRotation.x >= finalRotation.z &&
-			abs(currentRotation.y) >= finalRotation.x &&
-			currentRotation.z >= finalRotation.y)
+		currentRotation.x = FriendMath::Lerp(state->startRotation.x, state->finalRotation.x, ratio);
+		currentRotation.y = FriendMath::Lerp(state->startRotation.y, state->finalRotation.y, ratio);
+		currentRotation.z = FriendMath::Lerp(state->startRotation.z, state->finalRotation.z, ratio);
+
+		if (Vector3f::Distance(currentRotation, state->finalRotation) < 0.5f)
 		{
 			aContext.TriggerOutputPin(myOutputFlowPin);
-			transformComponent.transform.SetEulerAngles(finalRotation);
+			transformComponent.transform.SetEulerAngles(state->finalRotation);
 			return ScriptNodeResult::Finished;
 		}
 

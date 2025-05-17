@@ -14,7 +14,7 @@ class ISystem
 public:
 	friend class SystemManager;
 	virtual void Init() { __noop; }
-	virtual void Update(const SceneUpdateContext&) { __noop; }
+	virtual void Update(SceneUpdateContext&) { __noop; }
 	virtual void Render() { __noop; }
 	virtual void Reset() { __noop; }
 protected:

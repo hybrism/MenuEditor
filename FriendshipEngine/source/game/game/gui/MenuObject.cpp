@@ -14,6 +14,7 @@ MENU::MenuObject::MenuObject(const unsigned int aID, const Vector2f& aPosition)
 	: myID(aID)
 	, myName("(Untitled)")
 	, myPosition(aPosition)
+	, myInitialPosition(aPosition)
 	, myState(ObjectState::Default)
 {}
 
@@ -82,6 +83,27 @@ void MENU::MenuObject::Render()
 	}
 }
 
+void MENU::MenuObject::OnResize(const Vector2i& aNewRenderSize)
+{
+	Vector2f scaleRatio = {
+		(float)aNewRenderSize.x / (float)myTargetRenderSize.x,
+		(float)aNewRenderSize.y / (float)myTargetRenderSize.y
+	};
+
+	Vector2f positionRatio = {
+		myInitialPosition.x * scaleRatio.x,
+		myInitialPosition.y * scaleRatio.y
+	};
+
+	//myPosition = { positionRatio.x * aNewRenderSize.x, positionRatio.y * aNewRenderSize.y };
+	myPosition = positionRatio;
+
+	for (size_t i = 0; i < myComponents.size(); i++)
+	{
+		myComponents[i]->OnResize(scaleRatio);
+	}
+}
+
 bool MENU::MenuObject::IsHovered()
 {
 	if (!HasComponent<Collider2DComponent>())
@@ -98,9 +120,14 @@ bool MENU::MenuObject::IsPressed()
 	return GetComponent<Collider2DComponent>().IsPressed();
 }
 
-void MENU::MenuObject::SetPosition(const Vector2f& aPosition)
+void MENU::MenuObject::SetPosition(const Vector2f& aPosition, bool aIsInitialPosition)
 {
 	myPosition = aPosition;
+	if (aIsInitialPosition)
+	{
+		myInitialPosition = aPosition;
+		myTargetRenderSize = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
+	}
 
 	for (size_t i = 0; i < myComponents.size(); i++)
 	{

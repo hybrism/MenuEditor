@@ -65,44 +65,47 @@ void LightManager::Init(const Vector3f& aDirection, const Vector4f& aColor, cons
 
 #if !_MODELVIEWER
 	myPointLights = AssetDatabase::GetPointLight();
-
+	//AssetDatabase::ClearPointLight();
 
 	aDirection;
 	aColor;
 
+	//myPointLights.clear();
+
 
 	{   //   Directional Light
 		//If intensity is less than 0, then there is no Directional Light.
-		if (AssetDatabase::GetDirectionalLight().myIntensity < 0)
+		if (AssetDatabase::GetDirectionalLight().myIntensity > 0)
 		{
-			std::cout << "[ERROR] [LightManager.cpp] There was no Directional Light to import, creating a hardcoded one ;) \n";
-			myDirectionalLight = new DirectionalLight({1,1,0}, {aColor.x, aColor.y, aColor.z}, 1);
-			myDirectionalLight->myTransform.SetEulerAngles({45,45,45});
-		}
-		else
-		{
-
+			if (myDirectionalLight) {
+				delete myDirectionalLight->myDirectionalLightCamera;
+			}
+			delete myDirectionalLight;
 			myDirectionalLight = new DirectionalLight(AssetDatabase::GetDirectionalLight().myDirection, AssetDatabase::GetDirectionalLight().myColor, AssetDatabase::GetDirectionalLight().myIntensity);
 			myDirectionalLight->myTransform = AssetDatabase::GetDirectionalLight().myTransform;
 		}
+		else
+		{
+			if (myDirectionalLight) {
+				delete myDirectionalLight->myDirectionalLightCamera;
+			}
+			delete myDirectionalLight;
+			std::cout << "[ERROR] [LightManager.cpp] There was no Directional Light to import, creating a hardcoded one ;) \n";
+			myDirectionalLight = new DirectionalLight({ 1,1,0 }, { aColor.x, aColor.y, aColor.z }, 1);
+			myDirectionalLight->myTransform.SetEulerAngles({ 45,45,45 });
+
+		}
 #else
 		{
+			if (myDirectionalLight) {
+				delete myDirectionalLight->myDirectionalLightCamera;
+		}
+			delete myDirectionalLight;
 			myDirectionalLight = new DirectionalLight(aDirection, { aColor.x, aColor.y, aColor.z }, aColor.w);
 #endif
 
-			float pitch = asinf(myDirectionalLight->myTransform.GetMatrix().r[2].m128_f32[1]);
-
-			float huan = -myDirectionalLight->myTransform.GetMatrix().r[2].m128_f32[1];
-			//float tfwoh = myDirectionalLight->myTransform.GetMatrix().r[2].m128_f32[2];
-			float tfwoh = sqrt(myDirectionalLight->myTransform.GetMatrix().r[2].m128_f32[2] * myDirectionalLight->myTransform.GetMatrix().r[2].m128_f32[2] + myDirectionalLight->myTransform.GetMatrix().r[2].m128_f32[3] * myDirectionalLight->myTransform.GetMatrix().r[2].m128_f32[3]);
-
-			float yaw = atan2f(huan, tfwoh);
-
-			pitch = pitch * (180 / 3.1415f) * -1.f;
-			yaw = yaw * (180 / 3.1415f);
+		
 			Vector3<float> dirren;
-
-			//myDirectionalLight->myEuler = Vector3<float>{ pitch,yaw,0 };
 			dirren.x = myDirectionalLight->myTransform.GetMatrix().r[2].m128_f32[0];
 			dirren.y = myDirectionalLight->myTransform.GetMatrix().r[2].m128_f32[1];
 			dirren.z = myDirectionalLight->myTransform.GetMatrix().r[2].m128_f32[2];
@@ -111,24 +114,26 @@ void LightManager::Init(const Vector3f& aDirection, const Vector4f& aColor, cons
 			myDirectionalLight->myDirectionalLightCamera->SetProjectionMatrix(60.2f, (float)ge->DX().GetWindowDimensions().x, (float)ge->DX().GetWindowDimensions().y, 100.f, 100000.f);
 			myDirectionalLight->myDirectionalLightCamera->SetOrtographicProjection(-10000, 10000, -10000, 10000, -25000.f, 25000.f);
 			myDirectionalLight->myDirectionalLightCamera->GetTransform().SetPosition(aPosition);
-			myDirectionalLight->myDirectionalLightCamera->GetTransform().SetEulerAngles({ pitch,yaw,0 });
-			//myDirectionalLight->myDirectionalLightCamera->GetTransform().SetEulerAngles({pitch,90,0});
+			myDirectionalLight->myDirectionalLightCamera->GetTransform().SetEulerAngles(myDirectionalLight->myTransform.GetEulerRotation());
 
 
 #if _MODELVIEWER
-			myDirectionalLight->myShadowMapDepthBuffer = DepthBuffer::Create({ 8000, 8000 });//g->GetViewportDimensions()
+			myDirectionalLight->myShadowMapDepthBuffer = DepthBuffer::Create({ 6000, 6000 });//g->GetViewportDimensions()
 #else
-			myDirectionalLight->myShadowMapDepthBuffer = DepthBuffer::Create({ 1000, 1000 }); // Hello, sänkte resolution så vi har 60fps i editor mode. Var 4096, 4096.
+			myDirectionalLight->myShadowMapDepthBuffer = DepthBuffer::Create({ 4096, 4096 }); // Hello, sänkte resolution så vi har 60fps i editor mode. Var 4096, 4096.
 #endif
 
 #ifdef _LAUNCHER
 			myDirectionalLight->myShadowMapDepthBuffer = DepthBuffer::Create({ 8000, 8000 });//g->GetViewportDimensions()
 #endif // 
 
+#ifdef _RELEASE
+			myDirectionalLight->myShadowMapDepthBuffer = DepthBuffer::Create({ 12000, 12000 });//g->GetViewportDimensions()
+#endif // 
 
 
 			myDirectionalLightRenderTarget = RenderTarget::Create(ge->DX().GetViewportDimensions(), DXGI_FORMAT::DXGI_FORMAT_R32_FLOAT);
-		}
+	}
 
 #if !_MODELVIEWER
 
@@ -157,7 +162,6 @@ void LightManager::Init(const Vector3f& aDirection, const Vector4f& aColor, cons
 			}
 		}
 
-
 		SetLightsOnBuffer();
 }
 
@@ -173,31 +177,31 @@ void LightManager::SetLightsOnBuffer()
 	{
 		std::cout << ("[ERROR] [LightManager.cpp] Could not LightBuffer \n");
 	}
-	LightBufferData* data = (LightBufferData*)mappedBuffer.pData;
 
-
-	if (myPointLights.size() > 0)
 	{
-		PointLight* dataPointlight = myPointLights.data();
-		memcpy(data->myPointLights, dataPointlight, MAX_POINTLIGHTS * sizeof(PointLight));
-		data->amountOfPointLights = (int)myPointLights.size();
+		if (myPointLights.size() > 0)
+		{
+			PointLight* dataPointlight = myPointLights.data();
+			memcpy(myLightData.myPointLights, dataPointlight, MAX_POINTLIGHTS * sizeof(PointLight));
+			myLightData.amountOfPointLights = (int)myPointLights.size();
+		}
+
+		myLightData.directionalLightsDirection.x = myDirectionalLight->myDirectionalLightCamera->GetTransform().GetMatrix().r[2].m128_f32[0];
+		myLightData.directionalLightsDirection.y = myDirectionalLight->myDirectionalLightCamera->GetTransform().GetMatrix().r[2].m128_f32[1];
+		myLightData.directionalLightsDirection.z = myDirectionalLight->myDirectionalLightCamera->GetTransform().GetMatrix().r[2].m128_f32[2];
+		myLightData.directionalLightsIntensity = myDirectionalLight->myIntensity;
+
+		DirectX::XMMATRIX camMat = myDirectionalLight->myDirectionalLightCamera->GetModelMatrix();
+		DirectX::XMMATRIX camProjMat = myDirectionalLight->myDirectionalLightCamera->GetProjectionMatrix();
+		myLightData.dLightShadowSpaceToWorldSpace = (camMat * camProjMat);
+
+		myLightData.ambientLightIntensity = myDirectionalLight->myAmbientIntensity;
+		myLightData.directionalLightsColor = myDirectionalLight->myColor;
 	}
 
 
-	data->directionalLightsDirection.x = myDirectionalLight->myDirectionalLightCamera->GetTransform().GetMatrix().r[2].m128_f32[0];
-	data->directionalLightsDirection.y = myDirectionalLight->myDirectionalLightCamera->GetTransform().GetMatrix().r[2].m128_f32[1];
-	data->directionalLightsDirection.z = myDirectionalLight->myDirectionalLightCamera->GetTransform().GetMatrix().r[2].m128_f32[2];
-	data->directionalLightsIntensity = myDirectionalLight->myIntensity;
-
-	DirectX::XMMATRIX camMat = myDirectionalLight->myDirectionalLightCamera->GetModelMatrix();
-	DirectX::XMMATRIX camProjMat = myDirectionalLight->myDirectionalLightCamera->GetProjectionMatrix();
-	data->dLightShadowSpaceToWorldSpace = (camMat * camProjMat);
-
-	data->ambientLightIntensity = myDirectionalLight->myAmbientIntensity;
-	data->directionalLightsColor = myDirectionalLight->myColor;
-	data->useShadows = (int)myDoNotUseShadows;
-
-
+	LightBufferData* data = (LightBufferData*)mappedBuffer.pData;
+	memcpy(data, &myLightData, sizeof(LightBufferData));
 	context->Unmap(myLightBuffer.Get(), 0);
 
 	context->VSSetConstantBuffers((int)BufferSlots::Light, 1, myLightBuffer.GetAddressOf());
@@ -208,22 +212,22 @@ void LightManager::SetLightsOnBuffer()
 //PointLight
 void LightManager::RenderPointLightSpheres()
 {
-	Transform transform;
+	//Transform transform;
 
-	for (int i = 0; i < myPointLights.size(); i++)
-	{
-		transform.SetPosition(myPointLights[i].myPos);
-		transform.SetScale({ 2.f ,2.f , 2.f });
-		MeshInstanceRenderData instanceData;
-		instanceData.renderMode = RenderMode::TRIANGLELIST;
-		instanceData.vsType = VsType::DefaultPBR;
-		instanceData.psType = PsType::DebugLightSphere;
-		instanceData.transform = transform;
-		instanceData.data = StaticMeshInstanceData{ transform };
+	//for (int i = 0; i < myPointLights.size(); i++)
+	//{
+	//	transform.SetPosition(myPointLights[i].myPos);
+	//	transform.SetScale({ 2.f ,2.f , 2.f });
+	//	MeshInstanceRenderData instanceData;
+	//	instanceData.renderMode = RenderMode::TRIANGLELIST;
+	//	instanceData.vsType = VsType::DefaultPBR;
+	//	instanceData.psType = PsType::DebugLightSphere;
+	//	instanceData.transform = transform;
+	//	instanceData.data = MeshDrawerInstanceData(transform, StaticMeshInstanceData());
 
 
-		GraphicsEngine::GetInstance()->GetForwardRenderer().Render(static_cast<Mesh*>(myLightSphereMesh), instanceData);
-	}
+	//	GraphicsEngine::GetInstance()->GetForwardRenderer().Render(static_cast<Mesh*>(myLightSphereMesh), instanceData);
+	//}
 }
 
 void LightManager::RenderPointLightsBounds()
@@ -237,7 +241,7 @@ void LightManager::RenderPointLightsBounds()
 	myPointLightsRenderTarget.SetAsTarget(&ge->GetDepthBuffer());
 	ge->SetRasterizerState(RasterizerState::FrontfaceCulling);
 	ge->SetDepthStencilState(DepthStencilState::ReadOnlyGreater);
-
+	ge->SetBlendState(BlendState::Disabled);
 
 	//Kötta
 	Transform transform;
@@ -246,7 +250,7 @@ void LightManager::RenderPointLightsBounds()
 		transform.SetScale({ myPointLights[i].myRange / 10.f ,myPointLights[i].myRange / 10.f ,myPointLights[i].myRange / 10.f });
 		transform.SetPosition(myPointLights[i].myPos);
 
-		myLightSphereMesh->Render(transform.GetMatrix(), ShaderDatabase::GetVertexShader(VsType::DefaultPBR), myBoundingPixelShader);
+		myLightSphereMesh->Render(transform.GetMatrix(), ShaderDatabase::GetVertexShader(VsType::DefaultPBR), ShaderDatabase::GetPixelShader(PsType::LightBounds), RenderMode::TRIANGLELIST);
 	}
 
 
@@ -272,6 +276,9 @@ void LightManager::RenderDirectionalLight()
 
 	context->GSSetShader(nullptr, nullptr, 0);
 
+	ge->GetDepthBuffer().CopyToStaging();
+	context->PSSetShaderResources((int)PixelShaderTextureSlot::DepthBuffer, 1, ge->GetDepthBuffer().myIntermediateSRV.GetAddressOf());
+
 	ge->SetDepthStencilState(DepthStencilState::Disabled);
 	ShaderDatabase::GetVertexShader(VsType::Fullscreen)->PrepareRender();
 	ShaderDatabase::GetPixelShader(PsType::DirectionalLight)->PrepareRender();
@@ -280,6 +287,9 @@ void LightManager::RenderDirectionalLight()
 	myDirectionalLightRenderTarget.Clear(color);
 	myDirectionalLightRenderTarget.SetAsTarget();
 	context->Draw(3, 0);
+
+	ID3D11ShaderResourceView* nullsrv = nullptr;
+	context->PSSetShaderResources((int)PixelShaderTextureSlot::DepthBuffer, 1, &nullsrv);
 }
 
 //Directional Light

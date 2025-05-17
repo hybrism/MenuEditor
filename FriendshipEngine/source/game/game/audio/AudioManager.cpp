@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "AudioManager.h"
+
 AudioManager* AudioManager::myInstance = nullptr;
 
 
@@ -21,9 +22,13 @@ void AudioManager::Init()
 	masterFilePath += "Master.bank";	
 	std::string musicFilePath = RELATIVE_FMOD_ASSET_PATH;
 	musicFilePath += "Music.bank";
+
+	std::string masterFilePath1 = RELATIVE_FMOD_ASSET_PATH;
+	musicFilePath += "Music.assets.bank";
 	//LoadBank("D:/Spelprojekt/SP7/FriendshipEngine/content/audio/Desktop/Master.bank", FMOD_STUDIO_LOAD_BANK_NORMAL);
 	LoadBank(masterFilePath, FMOD_STUDIO_LOAD_BANK_NORMAL);
-	LoadBank(musicFilePath, FMOD_STUDIO_LOAD_BANK_NORMAL);
+	//LoadBank(musicFilePath, FMOD_STUDIO_LOAD_BANK_NORMAL);
+	//LoadBank(masterFilePath1, FMOD_STUDIO_LOAD_BANK_NORMAL);
 
 	std::string jumpFilePath = RELATIVE_AUDIO_ASSET_PATH;
 	jumpFilePath += "Jump.wav";
@@ -32,8 +37,10 @@ void AudioManager::Init()
 	freeBird += "Freebird.wav";
 
 	LoadSound(jumpFilePath, false, false, false);
-	LoadSound(freeBird, false, false, false);
+	//LoadSound(freeBird, false, false, false);
 	//PlaySound(freeBird, {0,0,0}, 0.6f);
+
+
 }
 
 void AudioManager::Destroy()
@@ -66,26 +73,28 @@ void AudioManager::LoadBank(const std::string& strBankName, FMOD_STUDIO_LOAD_BAN
 		return;
 	FMOD::Studio::Bank* bank;
 	ErrorCheck(myFMOD->myStudioSystem->loadBankFile(strBankName.c_str(), flags, &bank));
-	if (bank)
+	if (bank) 
 	{
 		myFMOD->myBanks[strBankName] = bank;
 	}
 }
 
-void AudioManager::LoadEvent(const std::string& strEventName)
+void AudioManager::LoadEvent(const FMOD_GUID& aID)
 {
-	auto tFoundit = myFMOD->myEvents.find(strEventName);
+	auto tFoundit = myFMOD->myEvents.find(&aID);
 	if (tFoundit != myFMOD->myEvents.end())
 		return;
 	FMOD::Studio::EventDescription* eventDescription = NULL;
-	ErrorCheck(myFMOD->myStudioSystem->getEvent(strEventName.c_str(), &eventDescription));
+
+
+	ErrorCheck(myFMOD->myStudioSystem->getEventByID(&aID, &eventDescription));
 	if (eventDescription)
 	{
 		FMOD::Studio::EventInstance* pEventInstance = NULL;
 		ErrorCheck(eventDescription->createInstance(&pEventInstance));
 		if (pEventInstance)
 		{
-			myFMOD->myEvents[strEventName] = pEventInstance;
+			myFMOD->myEvents[&aID] = pEventInstance;
 		}
 	}
 }
@@ -163,22 +172,22 @@ int AudioManager::PlaySound(const std::string& strSoundName, const Vector3f& aPo
 	return channelID;
 }
 
-void AudioManager::PlayEvent(const std::string& strEventName)
+void AudioManager::PlayEvent(const FMOD_GUID& eID)
 {
-	auto tFoundit = myFMOD->myEvents.find(strEventName);
+	auto tFoundit = myFMOD->myEvents.find(&eID);
 	if (tFoundit == myFMOD->myEvents.end())
 	{
-		LoadEvent(strEventName);
-		tFoundit = myFMOD->myEvents.find(strEventName);
+		LoadEvent(eID);
+		tFoundit = myFMOD->myEvents.find(&eID);
 		if (tFoundit == myFMOD->myEvents.end())
 			return;
 	}
 	tFoundit->second->start();
 }
 
-void AudioManager::StopEvent(const std::string& strEventName, bool stopImmediate)
+void AudioManager::StopEvent(const FMOD_GUID& eID, bool stopImmediate)
 {
-	auto tFoundIt = myFMOD->myEvents.find(strEventName);
+	auto tFoundIt = myFMOD->myEvents.find(&eID);
 	if (tFoundIt == myFMOD->myEvents.end())
 		return;
 
@@ -196,17 +205,17 @@ void AudioManager::StopChannel(int aChannelID)
 	ErrorCheck(tFoundIt->second->stop());
 }
 
-void AudioManager::GetEventParameter(const std::string& /*strEventName*/, const std::string& /*strParameterName*/, float* /*parameter*/)
+void AudioManager::GetEventParameter(const FMOD_GUID& /*eID*/, const std::string& /*strParameterName*/, float* /*parameter*/)
 {
-	//auto tFoundIt = myFMOD->myEvents.find(strEventName);
-	//if (tFoundIt == myFMOD->myEvents.end())
-	//	return;
+	/*auto tFoundIt = myFMOD->myEvents.find(&eID);
+	if (tFoundIt == myFMOD->myEvents.end())
+		return;
 
-	//FMOD::Studio::EventInstance* pParameter = NULL;
-	//AudioManager::ErrorCheck(tFoundIt->second->getParameterByName(strParameterName.c_str(), &pParameter));
-	//AudioManager::ErrorCheck(pParameter->getParameterValue(parameter));
+	FMOD::Studio::EventInstance* pParameter = NULL;
+	AudioManager::ErrorCheck(tFoundIt->second->getParameterByName(strParameterName.c_str(), &pParameter));
+	AudioManager::ErrorCheck(pParameter->getParameterValue(parameter));*/
 }
-void AudioManager::SetEventParameter(const std::string& /*strEventName*/, const std::string& /*strParameterName*/, float /*fValue*/)
+void AudioManager::SetEventParameter(const FMOD_GUID& /*eID*/, const std::string& /*strParameterName*/, float /*fValue*/)
 {
 	//auto tFoundIt = sgpImplementation->mEvents.find(strEventName);
 	//if (tFoundIt == sgpImplementation->mEvents.end())
@@ -227,9 +236,6 @@ void AudioManager::StopAllChannels()
 			ErrorCheck(currentChannel->second->stop());
 	}
 }
-
-
-
 
 void AudioManager::SetChannel3dPosition(int aChannelID, const Vector3f& aPosition)
 {
@@ -259,19 +265,18 @@ bool AudioManager::IsChannelPlaying(int aChannelID) const
 	return isPlaying;
 }
 
-bool AudioManager::IsEventPlaying(const std::string& strEventName) const
+bool AudioManager::IsEventPlaying(const FMOD_GUID& eID) const
 {
-	auto tFoundIt = myFMOD->myEvents.find(strEventName);
+	auto tFoundIt = myFMOD->myEvents.find(&eID);
 	if (tFoundIt == myFMOD->myEvents.end())
 		return false;
 
-	FMOD_STUDIO_PLAYBACK_STATE* state = NULL;
-	tFoundIt->second->getPlaybackState(state);
-	if (*state == FMOD_STUDIO_PLAYBACK_PLAYING)
+	FMOD_STUDIO_PLAYBACK_STATE state;
+
+	if (tFoundIt->second->getPlaybackState(&state) == (FMOD_RESULT)FMOD_STUDIO_PLAYBACK_PLAYING)
 	{
 		return true;
 	}
-
 	return false;
 }
 

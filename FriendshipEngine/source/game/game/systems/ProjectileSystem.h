@@ -11,5 +11,5 @@ public:
 	ProjectileSystem(World* aWorld);
 
 	void Init() override;
-	void Update(const SceneUpdateContext& dt) override;
+	void Update(SceneUpdateContext& dt) override;
 };

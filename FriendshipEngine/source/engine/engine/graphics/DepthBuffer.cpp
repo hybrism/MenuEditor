@@ -23,7 +23,7 @@ DepthBuffer DepthBuffer::Create(const Vector2i& aSize)
 	desc.CPUAccessFlags = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT;
 
-	result = device->CreateTexture2D(&desc, nullptr, &depthBufferResult.myTexture);
+	result = device->CreateTexture2D(&desc, nullptr, depthBufferResult.myTexture.GetAddressOf());
 	assert(SUCCEEDED(result));
 
 	ID3D11DepthStencilView* DSV;
@@ -32,7 +32,7 @@ DepthBuffer DepthBuffer::Create(const Vector2i& aSize)
 	dsvDesc.Flags = 0;
 	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
 	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	result = device->CreateDepthStencilView(depthBufferResult.myTexture, &dsvDesc, &DSV);
+	result = device->CreateDepthStencilView(depthBufferResult.myTexture.Get(), &dsvDesc, &DSV);
 	assert(SUCCEEDED(result));
 
 	depthBufferResult.myDepth = DSV;
@@ -44,7 +44,7 @@ DepthBuffer DepthBuffer::Create(const Vector2i& aSize)
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = UINT_MAX;
-	result = device->CreateShaderResourceView(depthBufferResult.myTexture, &srvDesc, &SRV);
+	result = device->CreateShaderResourceView(depthBufferResult.myTexture.Get(), &srvDesc, &SRV);
 	assert(SUCCEEDED(result));
 	depthBufferResult.SRV = SRV;
 	SRV->Release();

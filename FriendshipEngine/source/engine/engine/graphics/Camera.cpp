@@ -20,7 +20,7 @@ Camera::Camera()
 void Camera::SetProjectionMatrix(const float& aFov, const float& aWidth, const float& aHeight, const float& aNearPlane, const float& aFarPlane)
 {
 	myProjection = {};
-
+	myFOV = aFov;
 	myHFoV = aFov * PI / 180.f;
 	myVFoV = 2 * std::atan(std::tan(myHFoV / 2) * (aHeight / aWidth));
 	// Aspect ratio and scaling
@@ -40,6 +40,28 @@ void Camera::SetProjectionMatrix(const float& aFov, const float& aWidth, const f
 	myHFar = 2 * tan(myHFoV / 2.f) * aFarPlane;
 	myWFar = myHFar * myHFoV / myVFoV;
 	myHNear = 2 * tan(myHFoV / 2.f) * aNearPlane;
+	myWNear = myHNear * myHFoV / myVFoV;
+}
+
+void Camera::SetFOV(const float& aFOV)
+{
+	myProjection = {};
+	myFOV = aFOV;
+	myHFoV = aFOV * PI / 180.f;
+	myVFoV = 2 * std::atan(std::tan(myHFoV / 2) * (myHeight / myWidth));
+	// Aspect ratio and scaling
+	myProjection.r[0].m128_f32[0] = 1.f / tan(myHFoV / 2.f);
+	myProjection.r[1].m128_f32[1] = 1.f / tan(myVFoV / 2.f);
+
+	// Near-far plane
+	myProjection.r[2].m128_f32[2] = myFarPlane / (myFarPlane - myNearPlane);
+	myProjection.r[2].m128_f32[3] = 1.f / (myFarPlane / (myFarPlane - myNearPlane));
+	myProjection.r[3].m128_f32[2] = -(myFarPlane / (myFarPlane - myNearPlane)) * myNearPlane;
+
+	myProjection.r[3].m128_f32[3] = 0.f;
+	myHFar = 2 * tan(myHFoV / 2.f) * myFarPlane;
+	myWFar = myHFar * myHFoV / myVFoV;
+	myHNear = 2 * tan(myHFoV / 2.f) * myNearPlane;
 	myWNear = myHNear * myHFoV / myVFoV;
 }
 
@@ -96,4 +118,14 @@ const Vector2<float> Camera::ProjectionToPixel(const Vector3<float>& aVec) const
 	auto copy = PointToPostProjection(aVec);
 	
 	return Vector2<float>(copy.x * size.x / 2.f + size.x / 2.f, copy.y * size.y / 2.f + size.y / 2.f);
+}
+
+bool& Camera::GetHeadBobBool()
+{
+	return myHeadBobBool;
+}
+
+void Camera::SetHeadBobBool(bool aBool)
+{
+	myHeadBobBool = aBool;
 }

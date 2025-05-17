@@ -17,7 +17,9 @@ struct FrameBufferData
 	DirectX::XMMATRIX modelToWorld;
 	float nearPlane;
 	float farPlane;
-	float unused[2];
+	float depthFadeK;
+	float unused;
+	//float unused[2];
 };
 
 struct ObjectBufferData
@@ -53,7 +55,8 @@ struct LightBufferData
 
 	int amountOfPointLights;
 	int useShadows = 0; //   1 = NO   :  0 = YES      Math reasons.. ask Oscar Ruselius Karl Onsomkit Ekarnan
-	float unused[2];
+	float shadowBias = 0.000250f;
+	float shadowOffsetScale = 0.001f;
 };
 
 struct PointLightSphereColorData
@@ -80,8 +83,8 @@ struct PostProcessBufferData
 	float vignetteCurvature = 0.5f;
 
 	Vector3f blackPoint = { 0.f , 0.f, 0.f };
-	float trash3 = 0.0f;
+	float speedLineRadiusAddition = 20;
 
-	Vector3f vignetteColor = { 1.f, 0.f, 0.f };
+	Vector3f vignetteColor = { 0.639f, 0.169f, 0.133f };
 	float trash = 0.0f;
 };

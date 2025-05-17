@@ -23,7 +23,7 @@ bool Mesh::Initialize(
 {
 	myVertexSize = sizeof(Vertex);
 
-#ifndef _RELEASE
+#ifdef _EDITOR
 	myVertices = new Vertex[aVertexCount];
 	memcpy(myVertices, aVerts, myVertexSize * aVertexCount);
 	myVertexCount = static_cast<unsigned int>(aVertexCount);

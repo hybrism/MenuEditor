@@ -57,7 +57,7 @@ public:
 	unsigned int myFontHeightWidth;
 	std::vector<int> myAtlas;
 	std::wstring myName;
-	std::unique_ptr<Texture> myTexture;
+	std::shared_ptr<Texture> myTexture;
 	ComPtr<ID3D11ShaderResourceView> myAtlasView;
 };
 
@@ -461,8 +461,9 @@ Font TextService::GetOrLoad(std::wstring aFontFile, unsigned char aBorderSize, i
 	{
 		return { nullptr };
 	}
-		
-	std::string fullPath = RELATIVE_FONT_ASSET_PATH + StringHelper::ws2s(aFontFile);
+	
+	std::string fontFile = StringHelper::ws2s(aFontFile);
+	std::string fullPath = RELATIVE_FONT_ASSET_PATH + fontFile;
 
 	short fontWidth = (short)aSize;
 	const int atlasSize = 1024;
@@ -475,24 +476,47 @@ Font TextService::GetOrLoad(std::wstring aFontFile, unsigned char aBorderSize, i
 
 	std::shared_ptr<InternalTextAndFontData> fontData = nullptr;
 
-	std::wstringstream key;
-	key << StringHelper::s2ws(fullPath) << "-" << fontWidth << "-" << aBorderSize;
+	//std::wstringstream key;
+	//key << StringHelper::s2ws(fullPath) << "-" << fontWidth << "-" << aBorderSize;
 
-	auto it = myFontData.find(key.str());
-	if (it != myFontData.end())
+	//auto it = myFontData.find(key.str());
+	//if (it != myFontData.end())
+	//{
+	//	fontData = it->second.lock();
+	//	if (fontData)
+	//		return { fontData };
+	//}
+
+	unsigned long long key = FontNameToKey(fontFile);
+
+	if (myFontData.find(key) == myFontData.end())
 	{
-		fontData = it->second.lock();
-		if (fontData)
-			return { fontData };
+		myFontData[key] = {};
+	}
+
+
+	int typeKey = 0;
+	{
+		FontType& type = (FontType&)typeKey;
+		type.size = static_cast<short>(aSize);
+		type.borderSize = aBorderSize;
+	}
+	
+	if (myFontData[key].find(typeKey) != myFontData[key].end())
+	{
+		return { myFontData[key][typeKey] };
 	}
 
 	fontData = std::make_shared<InternalTextAndFontData>();
-	myFontData[key.str()] = fontData;
+	//myFontData[key.str()] = fontData;
+	myFontData[key][typeKey] = fontData;
 
 	fontData->myAtlas.resize(atlasSize * atlasSize);
 	ZeroMemory(fontData->myAtlas.data(), (atlasSize * atlasSize) * sizeof(int));
 	fontData->myFontHeightWidth = fontWidth;
-	fontData->myName = key.str();
+
+	fontData->myName = StringHelper::s2ws(fullPath + "-" + std::to_string(fontWidth) + "-" + std::to_string(aBorderSize));
+	//fontData->myName = key.str();
 
 	FT_Face face;
 	std::string aAsciiFontPath = fullPath;
@@ -657,6 +681,15 @@ float TextService::GetSentenceHeight(Text& aText)
 	return maxY;
 }
 
+unsigned long long TextService::FontNameToKey(const std::string& aKey) const
+{
+	std::string substr = aKey.substr(0, 8);
+	const char* cstr = substr.c_str();
+	unsigned long long result = 0;
+	memcpy(&result, cstr, substr.size());
+	return result;
+}
+
 bool TextService::Draw(Text& aText, SpriteShader* aCustomShader)
 {
 	aCustomShader;
@@ -712,7 +745,7 @@ bool TextService::Draw(Text& aText, SpriteShader* aCustomShader)
 	//	spriteSharedData.mySamplerAddressMode = SamplerAddressMode::Clamp;
 	//}
 
-	spriteSharedData.texture = fontData->myTexture.get();
+	spriteSharedData.texture = fontData->myTexture;
 	//spriteSharedData.myCustomShader = aCustomShader;
 
 	{

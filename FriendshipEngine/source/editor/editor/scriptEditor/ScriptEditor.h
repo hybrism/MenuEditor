@@ -31,19 +31,19 @@ public:
 	void Update(const EditorUpdateContext& aContext);
 
 private:
+	std::map<std::string_view, std::vector<std::string_view>> myLevelToScriptsMap;
+
 	std::map<std::string_view, EditorScriptData> myScripts;
-
-	std::map<std::string_view, std::vector<std::string_view>> myLevels;
-
 	std::map<std::string_view, EditorScriptData> myOpenScripts;
 
-	std::string_view myActiveScript;
-	std::string myActiveLevel;
+	std::string_view myCurrentScript;
+	std::string_view myCurrentLevel;
 
 	std::shared_ptr<MoveNodesCommand> myInProgressMove;
 
-	std::string SCRIPT_FILEPATH;
-	std::string LEVEL_FILEPATH;
+	std::string SCRIPT_PATH_EXTENSION = "/scripts/";
+
+	std::string GetScriptPath();
 
 	//IMGUI, separated into functions for easier navigation & handling
 	void SelectScript();

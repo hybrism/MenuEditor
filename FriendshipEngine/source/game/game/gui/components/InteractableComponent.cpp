@@ -8,6 +8,7 @@
 
 #include "SpriteComponent.h"
 #include "TextComponent.h"
+#include "CommandComponent.h"
 
 MENU::InteractableComponent::InteractableComponent(MenuObject& aParent, unsigned int aID)
 	: MenuComponent(aParent, aID, ComponentType::Sprite)
@@ -84,8 +85,6 @@ void MENU::DragInteraction::OnPressed(const MenuUpdateContext& aContext)
 				movement = 0.f;
 		}
 
-
-
 		Vector2f newPosition = sprite->GetPosition();
 		newPosition.x += movement;
 		newPosition.x = std::clamp(newPosition.x, myMin, myMax);
@@ -100,6 +99,24 @@ MENU::HideInteraction::HideInteraction(std::shared_ptr<MenuComponent> aParent)
 {
 	myType = InteractionType::Hide;
 	myIsHidden = false;
+
+	if (aParent->GetParent().HasComponent<CommandComponent>())
+	{
+		CommandComponent& command = aParent->GetParent().GetComponent<CommandComponent>();
+
+		//Reads value from bool to hide/unhide checkmark
+		if (std::holds_alternative<bool*>(command.GetCommandData().data))
+		{
+			bool* data = std::get<bool*>(command.GetCommandData().data);
+			myIsHidden = !*data;
+		}
+	}
+	
+	if (myParent->GetType() == ComponentType::Sprite)
+	{
+		std::shared_ptr<SpriteComponent> sprite = std::static_pointer_cast<SpriteComponent>(myParent);
+		sprite->SetIsHidden(myIsHidden);
+	}
 }
 
 void MENU::HideInteraction::OnPressed(const MenuUpdateContext& aContext)
@@ -113,6 +130,7 @@ void MENU::HideInteraction::OnPressed(const MenuUpdateContext& aContext)
 
 		myIsHidden = !sprite->GetIsHidden();
 		sprite->SetIsHidden(myIsHidden);
+		return;
 	}
 
 	if (myParent->GetType() == ComponentType::Text)
@@ -121,6 +139,7 @@ void MENU::HideInteraction::OnPressed(const MenuUpdateContext& aContext)
 
 		myIsHidden = !text->GetIsHidden();
 		text->SetIsHidden(myIsHidden);
+		return;
 	}
 }
 

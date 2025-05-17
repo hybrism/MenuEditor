@@ -3,8 +3,6 @@
 #pragma warning( push )
 #pragma warning( disable : 4201 ) // Nonstandard nameless struct/union.
 #include <engine/math/Vector.h>
-#include <engine/math/Math.h>
-
 #ifndef _RETAIL
 #include <iostream>
 #endif // !_RETAIL
@@ -408,13 +406,13 @@ inline Vector3<T> Quaternion<T>::GetEulerAnglesRadiansd() const
 	float test = X * Y + Z * W;
 	if (test > 0.499) { // singularity at north pole
 		yaw = 2 * atan2(X, W);
-		roll = PI * T(0.5);
+		roll = PIHalf;
 		pitch = 0;
 		return Vector3<T>{ pitch, yaw, roll };
 	}
 	if (test < -0.499) { // singularity at south pole
 		yaw = -2 * atan2(X, W);
-		roll = -PI * T(0.5);
+		roll = -PIHalf;
 		pitch = 0;
 		return Vector3<T>{ pitch, yaw, roll };
 	}

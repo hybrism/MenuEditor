@@ -1,5 +1,10 @@
 #pragma once
-#include <string>
+#include <engine/graphics/Texture.h>
+#include <memory>
+
+#ifdef _EDITOR
+#include <engine/graphics/StagingTexture.h>
+#endif
 
 struct Animation;
 class AnimationPlayer;
@@ -14,7 +19,10 @@ struct AssetMetaData
 struct TextureData
 {
 	std::string path = "";
-	Texture* texture = nullptr;
+	std::shared_ptr<Texture> texture = nullptr;
+#ifdef _EDITOR
+	std::shared_ptr<StagingTexture> stagingTexture = nullptr;
+#endif
 };
 
 struct TextureCollection
@@ -24,9 +32,57 @@ struct TextureCollection
 	TextureData materialTexture{};
 	TextureData emissiveTexture{};
 	int vertexPaintIndex = -1;
+
+	//TextureCollection() = default;
+
+	//TextureCollection(TextureCollection&& aOther) noexcept
+	//{
+	//	albedoTexture = std::move(aOther.albedoTexture);
+	//	normalTexture = std::move(aOther.normalTexture);
+	//	materialTexture = std::move(aOther.materialTexture);
+	//	emissiveTexture = std::move(aOther.emissiveTexture);
+	//	vertexPaintIndex = aOther.vertexPaintIndex;
+	//}
+
+	//TextureCollection& operator=(TextureCollection&& aOther) noexcept
+	//{
+	//	albedoTexture = std::move(aOther.albedoTexture);
+	//	normalTexture = std::move(aOther.normalTexture);
+	//	materialTexture = std::move(aOther.materialTexture);
+	//	emissiveTexture = std::move(aOther.emissiveTexture);
+	//	vertexPaintIndex = aOther.vertexPaintIndex;
+	//	return *this;
+	//}
+
+	//TextureCollection& operator=(const TextureCollection&& aOther) noexcept
+	//{
+	//	albedoTexture.path = aOther.albedoTexture.path;
+	//	if (aOther.albedoTexture.texture != nullptr)
+	//	{
+	//		albedoTexture.texture = std::make_unique<Texture>(*aOther.albedoTexture.texture);
+	//	}
+
+	//	normalTexture.path = aOther.normalTexture.path;
+	//	if (aOther.normalTexture.texture != nullptr)
+	//	{
+	//		normalTexture.texture = std::make_unique<Texture>(*aOther.normalTexture.texture);
+	//	}
+
+	//	materialTexture.path = aOther.materialTexture.path;
+	//	if (aOther.materialTexture.texture != nullptr)
+	//	{
+	//		materialTexture.texture = std::make_unique<Texture>(*aOther.materialTexture.texture);
+	//	}
+
+	//	emissiveTexture.path = aOther.emissiveTexture.path;
+	//	if (aOther.emissiveTexture.texture != nullptr)
+	//	{
+	//		emissiveTexture.texture = std::make_unique<Texture>(*aOther.emissiveTexture.texture);
+	//	}
+	//}
 };
 
-struct MaterialName
+struct VertexMaterial
 {
 	std::string name = "";
 	int id = -1;
@@ -35,10 +91,10 @@ struct MaterialName
 struct VertexMaterialCollection
 {
 	TextureData vertex{};
-	MaterialName r{};
-	MaterialName g{};
-	MaterialName b{};
-	MaterialName a{};
+	VertexMaterial r{};
+	VertexMaterial g{};
+	VertexMaterial b{};
+	VertexMaterial a{};
 };
 
 struct VertexTextureCollection

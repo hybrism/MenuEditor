@@ -104,7 +104,7 @@ void MENU::InspectorWindow::AddComponentButton(MenuObject& aObject)
 	ImGui::Button("Add Component", ImVec2(ImGui::GetContentRegionAvail().x, 24));
 	if (ImGui::BeginPopupContextItem(0, ImGuiPopupFlags_MouseButtonLeft))
 	{
-		ImGui::Text("Chose component: ");
+		ImGui::Text("Choose component: ");
 
 		const char* comboPreviewValue = ComponentNames[mySelectedComponentIndex];
 		if (ImGui::BeginCombo("Select Component", comboPreviewValue))
@@ -213,7 +213,7 @@ void MENU::InspectorWindow::EditSpriteComponent(const MenuEditorUpdateContext& a
 
 void MENU::InspectorWindow::EditSpriteTextures(const MenuEditorUpdateContext& aContext, SpriteComponent& aSprite)
 {
-	Texture* currentItem = aSprite.GetTexture();
+	std::shared_ptr<Texture> currentItem = aSprite.GetTexture();
 	for (size_t textureStateIndex = 0; textureStateIndex < (int)ObjectState::Count; textureStateIndex++)
 	{
 		if (ImGui::BeginCombo(ObjectStates[textureStateIndex], aSprite.GetTexturePath((ObjectState)textureStateIndex).c_str()))
@@ -387,6 +387,9 @@ void MENU::InspectorWindow::EditCommandComponent(const MenuEditorUpdateContext& 
 	}
 
 	static std::string commandInputString = "(None)";
+	static float commandInputFloat = 0.f;
+	static int commandInputInt = 0;
+
 	eCommandType currentType = command.GetCommandType();
 	if (ImGui::BeginCombo("Commands", CommandNames[(int)currentType]))
 	{
@@ -398,6 +401,7 @@ void MENU::InspectorWindow::EditCommandComponent(const MenuEditorUpdateContext& 
 			{
 				command.SetCommandType((eCommandType)i);
 				commandInputString = "(None)";
+				commandInputFloat = 0.f;
 			}
 
 			if (isSelected)
@@ -460,6 +464,34 @@ void MENU::InspectorWindow::EditCommandComponent(const MenuEditorUpdateContext& 
 	}
 	case eCommandType::QuitGame:
 	{
+		break;
+	}
+	case eCommandType::Resolution:
+	{
+		if (std::holds_alternative<int>(command.GetCommandData().data))
+			commandInputInt = std::get<int>(command.GetCommandData().data);
+
+		ImGui::DragInt("Incrrease -/+", &commandInputInt, 1, -1, 1);
+		command.SetCommandData({ commandInputInt });
+
+		break;
+	}
+	case eCommandType::SfxVolume:
+	{
+		if (std::holds_alternative<float>(command.GetCommandData().data))
+			commandInputFloat = std::get<float>(command.GetCommandData().data);
+
+		ImGui::DragFloat("Volume -/+", &commandInputFloat, 0.01f, -1.f, 1.f, "%.2f");
+		command.SetCommandData({ commandInputFloat });
+		break;
+	}
+	case eCommandType::MusicVolume:
+	{
+		if (std::holds_alternative<float>(command.GetCommandData().data))
+			commandInputFloat = std::get<float>(command.GetCommandData().data);
+
+		ImGui::DragFloat("Volume -/+", &commandInputFloat, 0.01f, -1.f, 1.f, "%.2f");
+		command.SetCommandData({ commandInputFloat });
 		break;
 	}
 	default:

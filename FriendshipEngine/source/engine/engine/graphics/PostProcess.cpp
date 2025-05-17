@@ -28,7 +28,7 @@ void PostProcess::Init()
 	myRenderTargets[0] = RenderTarget::Create(size, DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_FLOAT);
 	myRenderTargets[1] = RenderTarget::Create(size, DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_FLOAT);
 
-	static int divider = 2;
+	int divider = 2;
 	// Create several rendertargets with different viewtargets for blur.
 	for (int i = 1; i < 5; i++)
 	{
@@ -165,12 +165,21 @@ void PostProcess::Render()
 	context->Draw(3, 0);
 
 
+	ShaderDatabase::GetPixelShader(PsType::Speedlines)->PrepareRender();
+	{
+		myRenderTargets[0].SetAsTarget(nullptr);
+
+		context->PSSetShaderResources(11, 1, myRenderTargets[1].SRV.GetAddressOf());
+	}
+	context->Draw(3, 0);
+
+
 	ShaderDatabase::GetPixelShader(PsType::ToneMap)->PrepareRender();
 	{
 		ge->SetBlendState(BlendState::AlphaBlend);
 		ge->SetBackBufferAsActiveTarget();
 		ge->GetBackBufferRenderTarget().Clear(ge->GetClearColor());
-		context->PSSetShaderResources(11, 1, myRenderTargets[1].SRV.GetAddressOf());
+		context->PSSetShaderResources(11, 1, myRenderTargets[0].SRV.GetAddressOf());
 	}
 	context->Draw(3, 0);
 

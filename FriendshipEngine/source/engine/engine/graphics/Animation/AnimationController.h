@@ -18,7 +18,7 @@ struct Animation;
 class AnimationController
 {
 public:
-	AnimationController(AssetDatabase* aAssetDatabase, const size_t& aMeshId);
+	AnimationController(AssetDatabase* aAssetDatabase, int aId);
 	~AnimationController();
 
 	void Update(const float& aDeltaTime, Animation& aAnimation, AnimationData& aData);
@@ -50,6 +50,8 @@ public:
 	bool HasAnimationStates() const { return myAnimationStates.size() > 0; }
 	int GetCurrentAnimationIndex(AnimationData& aData);
 	unsigned int GetDefaultStateIndex() const { return myDefaultStateIndex; }
+
+	int GetId() const { return myId; }
 private:
 	void RunTransitionCheck(AnimationData& aData, AnimationDataParameterContainer& aParameter);
 	bool IsAnimationConditionMet(const size_t& aParameterIndex, const AnimationCondition& aCondition, AnimationDataParameterContainer& aParameter) const;
@@ -57,8 +59,8 @@ private:
 	std::vector<AnimationState> myAnimationStates;
 	std::unordered_map<std::string, size_t> myParameterNameToIndexMap;
 
-	size_t myMeshId = 0;
 	unsigned int myDefaultStateIndex = 0;
+	int myId = 0;
 	AssetDatabase* myAssetDatabase = nullptr;
 };
 

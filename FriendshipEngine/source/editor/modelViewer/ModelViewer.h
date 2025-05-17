@@ -67,10 +67,8 @@ public:
 	void Init(LightManager* aLightManager);
 	void Update(float dt);
 	void Render();
-	void RenderImGui();
 
 private:
-
 	std::array<ModelViewerMesh, (int)eMeshType::Count> myMeshes;
 	std::array<bool, (int)eWindowType::Count> myPopups;
 	std::array<ComPtr<ID3D11ShaderResourceView>, (int)eIcon::Count> myIcons;
@@ -87,8 +85,8 @@ private:
 	bool CouldFindTextures(const TextureCollection& aTextureCollection);
 
 	//TODO MODELVIEWER: REMOVE THIS WHEN DEBUG CAMERA IS STABLE
+	void CameraMovement(float dt);
 	void RotateCameraWithMouse(float dt);
-	void CameraUpdate(float dt);
 	ImVec2 myPreviousMousePosition;
 	ImVec2 myCurrentMousePosition;
 	float myCameraMovementSpeed = 300.f;

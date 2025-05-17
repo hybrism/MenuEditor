@@ -43,81 +43,60 @@
 #endif
 
 ScriptEditor::ScriptEditor()
-{
-}
+{}
 
 ScriptEditor::~ScriptEditor()
-{
-}
+{}
 
 void ScriptEditor::Init()
 {
 	FE::PostMaster::GetInstance()->Subscribe(this, FE::eMessageType::NewLevelLoaded);
 
-	SCRIPT_FILEPATH = RELATIVE_IMPORT_DATA_PATH + (std::string)"scripts/";
-	LEVEL_FILEPATH = RELATIVE_IMPORT_PATH;
-
-	//Iterate through levels
-	std::filesystem::create_directory(LEVEL_FILEPATH);
-	for (const auto& entry : std::filesystem::directory_iterator(LEVEL_FILEPATH))
+	//GET ALL FILE NAMES IN FOLDER: import/ & ADD TO myLevels
+	for (const auto& entry : std::filesystem::directory_iterator(RELATIVE_IMPORT_PATH))
 	{
-		if (entry.path().extension() != ".json")
-			continue;
-
 		if (entry.path().filename() == "Resources.json")
 			continue;
 
-		ScriptStringId level = ScriptStringRegistry::RegisterOrGetStringId(entry.path().filename().string());
-		myLevels[ScriptStringRegistry::GetStringFromStringId(level)];
+		if (entry.path().filename() == "data")
+			continue;
+
+		ScriptStringId levelId = ScriptStringRegistry::RegisterOrGetStringId(entry.path().filename().string());
+		myLevelToScriptsMap[ScriptStringRegistry::GetStringFromStringId(levelId)];
 	}
 
-	//Get scripts related to levels
-	nlohmann::json scripts = JsonUtility::OpenJson(SCRIPT_FILEPATH + "Scripts.json");
-	for (const auto& pair : myLevels)
+	//ITERATE THROUGH ALL LEVELS AND ADD EDITABLE SCRIPTS TO EDITOR
+	for (const auto& pair : myLevelToScriptsMap)
 	{
-		nlohmann::json jsonLevels = scripts["levels"];
+		std::string_view levelName = pair.first;
 
-		for (size_t i = 0; i < jsonLevels.size(); i++)
+		std::string DIRECTORY = std::string(levelName) + "/scripts/";
+
+		if (!std::filesystem::exists(RELATIVE_IMPORT_PATH + DIRECTORY))
+			continue;
+
+		for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(RELATIVE_IMPORT_PATH + DIRECTORY))
 		{
-			std::string_view levelName = jsonLevels[i]["name"];
-			if (levelName == pair.first)
+			std::string scriptName = entry.path().filename().string();
+
+			ScriptStringId scriptId = ScriptStringRegistry::RegisterOrGetStringId(scriptName);
+			std::string_view scriptStringView = ScriptStringRegistry::GetStringFromStringId(scriptId);
+
+			myLevelToScriptsMap[pair.first].push_back(scriptStringView);
+
+			Script* script = ScriptManager::GetEditableScript(levelName, scriptName);
+
+			if (!script)
 			{
-				for (size_t j = 0; j < jsonLevels[i]["scripts"].size(); j++)
-				{
-					ScriptStringId nameStringId = ScriptStringRegistry::RegisterOrGetStringId(jsonLevels[i]["scripts"][j]);
-					myLevels[pair.first].push_back(ScriptStringRegistry::GetStringFromStringId(nameStringId));
-				}
+				PrintW("[ScriptEditor.cpp] Could not load Editable Script!");
+				continue;
 			}
+
+			//LOAD EDITABLE SCRIPT TO EDITOR
+			EditorScriptData data{ script, {}, ImNodes::EditorContextCreate() };
+			data.latestSavedSequenceNumber = script->GetSequenceNumber();
+			myScripts.insert({ scriptStringView, data });
 		}
-
-	}
-
-	std::filesystem::create_directory(SCRIPT_FILEPATH);
-	for (const auto& entry : std::filesystem::directory_iterator(SCRIPT_FILEPATH))
-	{
-		if (entry.path().extension() != ".json")
-			continue;
-
-		if (entry == SCRIPT_FILEPATH + "Scripts.json")
-			continue;
-
-		std::filesystem::path fileName = entry.path().stem();
-		std::string name = fileName.generic_u8string() + ".json";
-		Script* script = ScriptManager::GetEditableScript(name);
-
-		if (!script)
-		{
-			PrintW("[ScriptEditor.cpp] Could not load Editable Script!");
-			continue;
-		}
-
-		ScriptStringId nameStringId = ScriptStringRegistry::RegisterOrGetStringId(name.c_str());
-		std::string_view nameStringView = ScriptStringRegistry::GetStringFromStringId(nameStringId);
-
-		EditorScriptData data{ script, {}, ImNodes::EditorContextCreate() };
-		data.latestSavedSequenceNumber = script->GetSequenceNumber();
-
-		myScripts.insert({ nameStringView, data });
 	}
 }
 
@@ -143,11 +122,14 @@ ScriptNodeTypeId ShowNodeTypeSelectorForCategory(const ScriptNodeTypeRegistry::C
 
 	for (ScriptNodeTypeId type : category.nodeTypes)
 	{
+		std::string_view tooltip = ScriptNodeTypeRegistry::GetNodeTooltip(type);
 		std::string_view name = ScriptNodeTypeRegistry::GetNodeTypeShortName(type);
+
 		if (ImGui::MenuItem(name.data()))
-		{
 			result = type;
-		}
+
+		ImGui::SetItemTooltip(tooltip.data());
+
 	}
 
 	return result;
@@ -192,15 +174,15 @@ void ScriptEditor::Update(const EditorUpdateContext& aContext)
 				{
 					// just switch to script if one already exists with this filename
 					// TODO: should probably present an error message/warning
-					myActiveScript = scriptName;
+					myCurrentScript = scriptName;
 				}
 				else
 				{
 					ScriptManager::AddEditableScript(scriptName, std::make_unique<Script>());
 
-					myScripts.insert({ scriptName, EditorScriptData{ScriptManager::GetEditableScript(scriptName), {}, ImNodes::EditorContextCreate()} });
-					myOpenScripts.insert({ scriptName, EditorScriptData{ScriptManager::GetEditableScript(scriptName), {}, ImNodes::EditorContextCreate()} });
-					myActiveScript = scriptName;
+					myScripts.insert({ scriptName, EditorScriptData{ScriptManager::GetEditableScript(myCurrentLevel, scriptName), {}, ImNodes::EditorContextCreate()} });
+					myOpenScripts.insert({ scriptName, EditorScriptData{ScriptManager::GetEditableScript(myCurrentLevel, scriptName), {}, ImNodes::EditorContextCreate()} });
+					myCurrentScript = scriptName;
 				}
 
 				ImGui::CloseCurrentPopup();
@@ -216,9 +198,9 @@ void ScriptEditor::Update(const EditorUpdateContext& aContext)
 			ImGui::EndPopup();
 		}
 
-		if (!myActiveScript.empty())
+		if (!myCurrentScript.empty())
 		{
-			EditorScriptData& activeScript = myScripts[myActiveScript];
+			EditorScriptData& activeScript = myScripts[myCurrentScript];
 			ImNodes::EditorContextSet(activeScript.nodeEditorContext);
 
 			Script& script = *activeScript.script;
@@ -391,6 +373,14 @@ void ScriptEditor::Update(const EditorUpdateContext& aContext)
 
 }
 
+std::string ScriptEditor::GetScriptPath()
+{
+	std::string activeLevel(myCurrentLevel);
+	std::string DIRECTORY = activeLevel + SCRIPT_PATH_EXTENSION;
+
+	return RELATIVE_IMPORT_PATH + DIRECTORY;
+}
+
 void ScriptEditor::SelectScript()
 {
 	if (myOpenScripts.empty())
@@ -401,13 +391,13 @@ void ScriptEditor::SelectScript()
 		return;
 	}
 
-	EditorScriptData& activeScriptData = myOpenScripts[myActiveScript];
+	EditorScriptData& activeScriptData = myOpenScripts[myCurrentScript];
 	activeScriptData;
 
 	char nameText[128];
 
 	//TODO TOVE Script: (* after unsaved scripts) Fix this when I figure out exaclty how it works
-	sprintf_s(nameText, "%s", myActiveScript.data());
+	sprintf_s(nameText, "%s", myCurrentScript.data());
 	//if (activeScriptData.latestSavedSequenceNumber == activeScriptData.script->GetSequenceNumber())
 	//	sprintf_s(nameText, "%s", myActiveScript.data());
 	//else
@@ -418,7 +408,7 @@ void ScriptEditor::SelectScript()
 	{
 		for (const auto& pair : myOpenScripts)
 		{
-			bool isSelected = pair.first == myActiveScript;
+			bool isSelected = pair.first == myCurrentScript;
 
 
 			//TODO TOVE Script: (* after unsaved scripts) Fix this when I figure out exaclty how it works
@@ -430,7 +420,7 @@ void ScriptEditor::SelectScript()
 
 			if (ImGui::Selectable(nameText, isSelected))
 			{
-				myActiveScript = pair.first;
+				myCurrentScript = pair.first;
 			}
 
 			if (isSelected)
@@ -447,16 +437,12 @@ void ScriptEditor::SaveButton(EditorScriptData& aActiveScript)
 {
 	Script& script = *aActiveScript.script;
 
-	// TODO: keyboard bindings
-
 	if (ImGui::Button("Save"))
 	{
-		// use GameAssetPath when saving to ensure we always save to the games data path
-		std::string basePath = SCRIPT_FILEPATH;
+		std::string path = GetScriptPath();
 
-		std::filesystem::path scriptPath = std::filesystem::path(basePath) / std::filesystem::path(myActiveScript).replace_extension(".json");
-
-		ScriptManager::SaveLevelScript(myActiveLevel, myActiveScript);
+		std::filesystem::create_directory(path);
+		std::filesystem::path scriptPath = std::filesystem::path(path) / std::filesystem::path(myCurrentScript).replace_extension(".json");
 
 		ScriptJson jsonData;
 		script.WriteToJson(jsonData);
@@ -477,8 +463,7 @@ void ScriptEditor::RevertButton(EditorScriptData& aActiveScript)
 
 	if (ImGui::Button("Revert"))
 	{
-		std::string basePath = SCRIPT_FILEPATH;
-		std::filesystem::path scriptPath = std::filesystem::path(basePath) / std::filesystem::path(myActiveScript).replace_extension(".json");
+		std::filesystem::path scriptPath = std::filesystem::path(GetScriptPath()) / std::filesystem::path(myCurrentScript).replace_extension(".json");
 
 		// TODO: pop up a warning, this clears undo history.
 		CommandManager::Clear();
@@ -801,6 +786,7 @@ void ScriptEditor::RecieveMessage(const FE::Message& aMessage)
 	case FE::eMessageType::NewLevelLoaded:
 	{
 		std::string newLevel = std::any_cast<std::string>(aMessage.myMessage);
+
 		OnNewLevelLoaded(newLevel);
 		break;
 	}
@@ -811,17 +797,17 @@ void ScriptEditor::RecieveMessage(const FE::Message& aMessage)
 
 void ScriptEditor::OnNewLevelLoaded(const std::string& aLevelName)
 {
-	myActiveLevel = aLevelName;
-	myActiveScript = "";
+	ScriptStringId scriptNameId = ScriptStringRegistry::RegisterOrGetStringId(aLevelName.substr(0, aLevelName.find_last_of(".")));
+	myCurrentLevel = ScriptStringRegistry::GetStringFromStringId(scriptNameId);
+	myCurrentScript = "";
 
 	myOpenScripts.clear();
 
-	for (size_t i = 0; i < myLevels[myActiveLevel].size(); i++)
+	for (size_t i = 0; i < myLevelToScriptsMap[myCurrentLevel].size(); i++)
 	{
-		if (myActiveScript.empty())
-			myActiveScript = myLevels[myActiveLevel][i];
+		if (myCurrentScript.empty())
+			myCurrentScript = myLevelToScriptsMap[myCurrentLevel][i];
 
-		myOpenScripts[myLevels[myActiveLevel][i]] = myScripts[myLevels[myActiveLevel][i]];
+		myOpenScripts[myLevelToScriptsMap[myCurrentLevel][i]] = myScripts[myLevelToScriptsMap[myCurrentLevel][i]];
 	}
-
 }

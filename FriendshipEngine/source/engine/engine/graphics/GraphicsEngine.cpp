@@ -21,13 +21,12 @@
 #include "../utility/StringHelper.h"
 #include "../../assets/ShaderDatabase.h"
 #include "RenderTarget.h"
+#include "PostProcess.h"
+#include "Light/LightManager.h"
 
 #define REPORT_DX_WARNINGS
 
 GraphicsEngine* GraphicsEngine::myInstance = nullptr;
-
-ComPtr<ID3D11RenderTargetView>& GraphicsEngine::GetBackBuffer() { return myBackBufferRenderTarget.RTV; }
-ComPtr<ID3D11ShaderResourceView>& GraphicsEngine::GetBackBufferSRV() { return myBackBufferRenderTarget.SRV; }
 
 RenderTarget& GraphicsEngine::GetBackBufferRenderTarget()
 {
@@ -64,8 +63,12 @@ bool GraphicsEngine::Initialize(int aWidth, int aHeight, HWND aHWND)
 	myViewCamera = new Camera();
 
 	auto& device = myDxData.GetDevice();
+
 	auto windowDimensions = myDxData.GetWindowDimensions();
 	auto viewportDimensions = myDxData.GetViewportDimensions();
+	myInternalResolution = myDxData.GetViewportDimensions();
+	myTargetResolution = windowDimensions;
+
 	myViewCamera->SetProjectionMatrix(100.0f, (float)windowDimensions.x, (float)windowDimensions.y, 1.1f, 100000.f);
 	{
 		D3D11_BUFFER_DESC bufferDescription = { 0 };
@@ -149,7 +152,7 @@ void GraphicsEngine::ResetToViewCamera()
 
 void GraphicsEngine::SetUseOfFreeCamera(const bool& aBool)
 {
-	myIsUsingViewCamera = aBool;
+	myIsUsingFreeCamera = aBool;
 }
 
 void GraphicsEngine::SetRenderState(const RenderState& aRenderState)
@@ -205,6 +208,7 @@ void GraphicsEngine::UpdateFrameBuffer()
 	frameBufferData.modelToWorld = myCurrentCamera->GetModelMatrix();
 	frameBufferData.nearPlane = myCurrentCamera->GetNearPlane();
 	frameBufferData.farPlane = myCurrentCamera->GetFarPlane();
+	frameBufferData.depthFadeK = myDepthFadeK;
 
 	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
 	context->Map(myFrameBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
@@ -693,27 +697,108 @@ bool GraphicsEngine::CreateBlendStates()
 	}
 }
 
-bool GraphicsEngine::SetResolution(Vector2i aResolution)
+void GraphicsEngine::SetFullscreen(bool aIsFullscreen, LightManager* aLightManager, PostProcess* aPostProcess)
 {
-	aResolution;
-	//https://stackoverflow.com/questions/27301550/change-resolution-in-directx-11
+	SetResolution(myTargetResolution, aIsFullscreen, aLightManager, aPostProcess);
+}
 
+void GraphicsEngine::SetResolution(
+	const Vector2i& aResolution,
+	LightManager* aLightManager,
+	PostProcess* aPostProcess
+)
+{
+	SetResolution(aResolution, Engine::GetInstance()->myIsFullscreen, aLightManager, aPostProcess);
+}
 
-	//https://learn.microsoft.com/sv-se/windows/win32/direct3darticles/dxgi-best-practices?redirectedfrom=MSDN
-	//DXGI_MODE_DESC newRes = {};
-	//newRes.Width = aResolution.x;
-	//newRes.Height = aResolution.y;
-	//mySwapChain->ResizeTarget(&newRes);
-	//mySwapChain->ResizeBuffers(10, aResolution.x, aResolution.y, DXGI_FORMAT_UNKNOWN, 0);
+void GraphicsEngine::SetResolution(
+	const Vector2i& aResolution,
+	bool aIsFullscreen,
+	LightManager* aLightManager,
+	PostProcess* aPostProcess
+)
+{
+	myTargetResolution = aResolution;
+	Vector2i windowDimensions = myTargetResolution;
+	Vector2i internalResolution = aResolution;
 
+	if (aIsFullscreen)
+	{
+		HMONITOR hmon = MonitorFromWindow(Engine::GetInstance()->GetWindowHandle(), MONITOR_DEFAULTTONEAREST);
+		MONITORINFO mi = { sizeof(mi) };
+		GetMonitorInfo(hmon, &mi);
 
+		int width = mi.rcMonitor.right - mi.rcMonitor.left;
+		int height = mi.rcMonitor.bottom - mi.rcMonitor.top;
 
-	//myWindowDimensions = aResolution;
-	//myViewportDimensions = aResolution;
-	//myBackBufferTextureSize = { static_cast<float>(aResolution.x), static_cast<float>(aResolution.y) };
+		windowDimensions = { width, height };
+		internalResolution = windowDimensions;
+		myTargetResolution = internalResolution;
+	}
 
+	//SetInternalFullscreen(false);
+	SetInternalFullscreen(aIsFullscreen);
+	SetWindowDimensions(windowDimensions);
 
-	return true;
+	if (!aIsFullscreen)
+	{
+		internalResolution = DX().GetViewportDimensions();
+	}
+	SetInternalResolution(internalResolution);
+
+	if (aLightManager)
+	{
+		aLightManager->Init();
+	}
+
+	if (aPostProcess)
+	{
+		aPostProcess->Init();
+	}
+
+	Engine::GetInstance()->myIsFullscreen = aIsFullscreen;
+	//SetInternalFullscreen(aIsFullscreen);
+}
+
+void GraphicsEngine::SetInternalResolution(const Vector2i& aResolution)
+{
+	myBackBufferRenderTarget = RenderTarget::Create(aResolution, DXGI_FORMAT_R8G8B8A8_UNORM);
+	myGBuffer = GBuffer::Create(aResolution);
+	myBackBufferDimensions = aResolution;
+	myInternalResolution = aResolution;
+}
+
+bool GraphicsEngine::SetWindowDimensions(const Vector2i& aResolution)
+{
+	HWND hwnd = Engine::GetInstance()->GetWindowHandle();
+
+	bool result = SetWindowPos(hwnd, HWND_TOP, 0, 0, aResolution.x, aResolution.y, SWP_NOMOVE);
+
+	if (!result)
+	{
+		PrintE("Could not set window dimensions");
+		return false;
+	}
+
+	myDxData.SetWindowDimensions(aResolution);
+	result = myDxData.SetResolution(hwnd);
+
+	if (!result)
+	{
+		PrintE("Could not set back buffer resolution");
+		return false;
+	}
+
+	return result;
+}
+
+void GraphicsEngine::SetInternalFullscreen(bool aIsFullscreen)
+{
+	auto* engine = Engine::GetInstance();
+	if (engine->myIsFullscreen == aIsFullscreen) { return; }
+
+	engine->myIsFullscreen = aIsFullscreen;
+	DX().GetSwapChain()->SetFullscreenState(aIsFullscreen, nullptr);
 }
 
 void GraphicsEngine::SetAsActiveTarget(

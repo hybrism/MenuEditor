@@ -15,6 +15,7 @@
 #include <engine/math/Intersection.h>
 
 #include <imgui/imgui.h>
+#include <random>
 
 // temp?
 #include <assets/AssetDatabase.h>
@@ -22,15 +23,11 @@
 #include "..\component\MeshComponent.h"
 #include <engine/graphics\animation\AnimationController.h>
 #include <physics/PhysXSceneManager.h>
-#include "audio/AudioManager.h"
+#include "audio/NewAudioManager.h"
+#include <engine/graphics/Camera.h>
 
 
-#include <engine/graphics/vfx/VFXManager.h>
-#include <engine/graphics/vfx/VFXDatabase.h>
-#include <engine/graphics/vfx/VisualEffect.h>
-
-
-PlayerSystem::PlayerSystem(World* aWorld, PhysXSceneManager* aPhysXSceneManager) : System(aWorld), manager(*VFXDatabase::GetInstance())
+PlayerSystem::PlayerSystem(World* aWorld, PhysXSceneManager* aPhysXSceneManager) : System(aWorld)
 {
 	myPhysXSceneManager = aPhysXSceneManager;
 
@@ -51,53 +48,7 @@ void PlayerSystem::Init()
 {
 	myMouseSensitivyMultiplier = GraphicsEngine::GetInstance()->DX().GetViewportDimensions().x / 1920.0f;
 
-	VisualEffect testEffect{};
-	float tempDuration = 0.65f;
-	{
-		VisualEffectCell cell;
-		cell.meshId = AssetDatabase::GetMeshIdFromName("sm_aoe1");
-		cell.startTime = 0;
-		cell.duration = tempDuration;
-		cell.transform = DirectX::XMMatrixRotationRollPitchYaw(90 * Deg2Rad, 0, 0);
-		cell.transform.SetPosition({ 100, 0, 0 });
-		cell.type = PsType::TestVFX;
-		testEffect.AddCell(cell);
-	}
-	{
-		VisualEffectCell cell;
-		cell.meshId = AssetDatabase::GetMeshIdFromName("sm_aoe1");
-		cell.startTime = 0.2f;
-		cell.duration = tempDuration;
-		cell.transform = DirectX::XMMatrixRotationRollPitchYaw(90 * Deg2Rad, 0, 0);
-		cell.transform.SetPosition({ 0, 0, 100 });
-		cell.type = PsType::TestVFX;
-		testEffect.AddCell(cell);
-	}
-	{
-		VisualEffectCell cell;
-		cell.meshId = AssetDatabase::GetMeshIdFromName("sm_aoe1");
-		cell.startTime = 0.4f;
-		cell.duration = tempDuration;
-		cell.transform = DirectX::XMMatrixRotationRollPitchYaw(90 * Deg2Rad, 0, 0);
-		cell.transform.SetPosition({ 0, 0, 0 });
-		cell.type = PsType::TestVFX;
-		testEffect.AddCell(cell);
-	}
-	{
-		VisualEffectCell cell;
-		cell.meshId = AssetDatabase::GetMeshIdFromName("sm_aoe1");
-		cell.startTime = 0.6f;
-		cell.duration = tempDuration;
-		cell.transform = DirectX::XMMatrixRotationRollPitchYaw(90 * Deg2Rad, 0, 0);
-		cell.transform.SetPosition({ 0, 0, -100 });
-		cell.type = PsType::TestVFX;
-		testEffect.AddCell(cell);
-	}
 
-	{
-		testEffectId = VFXDatabase::GetInstance()->CreateEffect(testEffect);
-		manager.InsertEffect(testEffectId);
-	}
 
 	for (auto entity : myEntities)
 	{
@@ -107,11 +58,13 @@ void PlayerSystem::Init()
 
 		PxExtendedVec3 vec3 = { playerComponent.SpawnPoint.x,playerComponent.SpawnPoint.y,playerComponent.SpawnPoint.z };
 		playerComponent.controller->setFootPosition(vec3);
-
+		playerComponent.cameraRotation.y = playerComponent.startGameRot.y;
+		transformComponent.transform.SetEulerAngles({ 0.f,playerComponent.startGameRot.y,0.f });
 
 		{
 			myStateMachine.Init();
-			PlayerStateUpdateContext context{ 0, playerComponent, transformComponent, myWorld->GetComponent<AnimationDataComponent>(entity), myPhysXSceneManager };
+			auto& animData = myWorld->GetComponent<AnimationDataComponent>(entity);
+			PlayerStateUpdateContext context{ 0, playerComponent, transformComponent, animData, myPhysXSceneManager, AssetDatabase::GetAnimationController(animData.controllerId) };
 			myStateMachine.SetState(ePlayerClassStates::Airborne, context);
 		}
 
@@ -142,7 +95,7 @@ void PlayerSystem::Init()
 
 #include <engine/math/helper.h>
 float prevY = 0;
-void PlayerSystem::Update(const SceneUpdateContext& aContext)
+void PlayerSystem::Update(SceneUpdateContext& aContext)
 {
 #ifndef _RELEASE
 	if (GraphicsEngine::GetInstance()->GetCamera() != GraphicsEngine::GetInstance()->GetViewCamera())
@@ -158,19 +111,18 @@ void PlayerSystem::Update(const SceneUpdateContext& aContext)
 		TransformComponent& t = myWorld->GetComponent<TransformComponent>(entity);
 		if (p.isDead)
 			Respawn(entity);
-		
 
 
-#ifndef _RELEASE
+
+#ifdef _EDITOR
 		if (!myWorld->TryGetComponent<AnimationDataComponent>(entity))
 		{
 			PrintW("The Player MUST have a a skeletal mesh to function");
 			return;
 		}
 #endif
-		MeshComponent& mesh = myWorld->GetComponent<MeshComponent>(entity);
 		AnimationDataComponent& animationData = myWorld->GetComponent<AnimationDataComponent>(entity);
-		AnimationController* controller = AssetDatabase::GetAnimationController(mesh.id);
+		AnimationController& controller = AssetDatabase::GetAnimationController(animationData.controllerId);
 		//if (InputManager::GetInstance()->IsMouseVisible())
 		//{
 		//	return;
@@ -195,16 +147,35 @@ void PlayerSystem::Update(const SceneUpdateContext& aContext)
 		p.currentPlayerState = myStateMachine.GetCurrentState();
 
 
-		//std::string jumpFilePath = RELATIVE_AUDIO_ASSET_PATH;
-		//jumpFilePath += "Jump.wav";
-		//AudioManager::GetInstance()->PlaySound(jumpFilePath, { 0,0,0 }, 0.2f);
-		// TODO: Add sound to the jump
-		
+
+		if (p.xVelocity.Length() >= PlayerConstants::godSpeedThreshhold)
+		{
+			p.timer.godSpeedTimer += aContext.dt;
+			if (p.timer.godSpeedTimer > 5.f)
+			{
+				p.finalVelocity += {p.xVelocity.x * 0.1f, 0, p.xVelocity.y * 0.1f };
+				p.isGodSpeed = true;
+			}
+		}
+		else
+		{
+			if (p.currentPlayerState != ePlayerClassStates::Vault)
+			{
+				p.timer.godSpeedTimer = 0;
+				p.isGodSpeed = false;
+			}
+		}
+
+		//if (AudioManager::GetInstance()->IsEventPlaying(FSPRO::Event::Freebird))
+		//{
+		//	std::string jumpFilePath = RELATIVE_AUDIO_ASSET_PATH;
+		//	jumpFilePath += "Jump.wav";
+		//	std::cout << "Free the birds!" << std::endl;
+		//}
+
 
 		//p.controller->setFootPosition({ p.vaultLocation.x, p.vaultLocation.y, p.vaultLocation.z });
 		//p.yVelocity = 0;
-
-		TestVfxBlob(aContext.dt);
 
 		{
 			//p.finalVelocity = { p.xVelocity.x, p.yVelocity, p.xVelocity.y };
@@ -222,6 +193,9 @@ void PlayerSystem::Update(const SceneUpdateContext& aContext)
 			p.collision.previousCapsuleNormal = p.collision.capsuleNormal;
 			p.collision.capsuleNormal = { 0, 0, 0 };
 
+
+
+
 			// THIS IS NEEDED, SINCE ALL METRICS ARE DEVELOPED AROUND 60 FPS IT IS MULTIPLIED BY 60 FOR NOW
 			// ADDITIONALLY, WE NEED TO MULTIPLY BY DT TO GET THE CORRECT VELOCITY
 			p.finalVelocity *= 60.0f;
@@ -229,30 +203,50 @@ void PlayerSystem::Update(const SceneUpdateContext& aContext)
 			p.controller->move(PxVec3(p.finalVelocity.x, p.finalVelocity.y, p.finalVelocity.z), 0.01f, aContext.dt, filter);
 		}
 
-
-		animationData.speed = 1.0f;
-		if (controller->GetCurrentState(animationData).GetAnimationIndex() != 0)
-		{
-			animationData.speed = std::min(p.xVelocity.Length(), PlayerConstants::maxSpeed) / PlayerConstants::maxSpeed;
-		}
-
-
 		MeshComponent& meshComponent = myWorld->GetComponent<MeshComponent>(entity);
 
 		float meshHeight = p.currentCameraHeight != PlayerConstants::cameraHeight ? PlayerConstants::meshCrouchHeight : PlayerConstants::meshHeight;
 		meshComponent.offset.SetPosition({ 0, meshHeight, 0 });
-		controller->SetParameter(static_cast<size_t>(PlayerAnimationParameter::eXSpeed), { p.xVelocity.Length() }, animationData, animationData.parameters);
-		controller->SetParameter(static_cast<size_t>(PlayerAnimationParameter::eYSpeed), { p.yVelocity }, animationData, animationData.parameters);
+		controller.SetParameter(static_cast<size_t>(PlayerAnimationParameter::eXSpeed), { p.xVelocity.Length() }, animationData, animationData.parameters);
+		controller.SetParameter(static_cast<size_t>(PlayerAnimationParameter::eYSpeed), { p.yVelocity }, animationData, animationData.parameters);
 		//controller->SetParameter(1, { p.isSliding }, animationData, animationData.parameters);
 
 		auto footPos = p.controller->getFootPosition();
 		t.transform.SetPosition({ (float)footPos.x, (float)footPos.y, (float)footPos.z });
-	}
-}
 
-void PlayerSystem::Render()
-{
-	manager.Render();
+		static float timermax = .45f;
+		static float timercounter = 0;
+		static float extra = 0;
+
+		if (p.currentPlayerState == ePlayerClassStates::Ground && p.finalVelocity.Length() > 0.4f)
+		{
+			timercounter += aContext.dt + (p.finalVelocity.Length() / 3000.f) + extra;
+			extra += aContext.dt / 800;
+			if (timercounter > timermax)
+			{
+				std::random_device rd;
+				std::mt19937 gen(rd());
+				std::uniform_int_distribution<int> dis(1, 50);
+
+				int randomNumber = dis(gen);
+
+
+				timercounter = 0;
+				randomNumber;
+				NewAudioManager::GetInstance()->PlaySound(eSounds::Run, 0.35f, 0.65f + (randomNumber / 100.f)); //(float)randomNumber / 100.f
+				if (extra > 0.01)
+				{
+					extra = 0.01f;
+				}
+			}
+		}
+		else if (p.currentPlayerState == ePlayerClassStates::Ground && p.finalVelocity.Length() < 0.3f)
+		{
+			extra = 0;
+		}
+		NewAudioManager::GetInstance()->SetPlayerListenPosition(t.transform);
+		//std::cout << "Player Pos :" << t.transform.GetPosition().x << "  " << t.transform.GetPosition().y << " \n";
+	}
 }
 
 void PlayerSystem::Input(Entity entity, float)
@@ -280,8 +274,23 @@ void PlayerSystem::Input(Entity entity, float)
 	{
 		p.input.direction += { -right.x, -right.z };
 	}
+	if (im->IsLeftMouseButtonPressed())
+	{
+		float pitch = 0.9f + (GraphicsEngine::GetInstance()->GetCamera()->GetTransform().GetForward().y / 5.f)  ;
 
+
+
+
+		NewAudioManager::GetInstance()->PlayLoopingSound(eDedicatedChannels::Honk, eSounds::Honk, 1.f, pitch);
+	}
 	p.input.hasPressedJump = im->IsKeyPressed(VK_SPACE);
+
+	if (p.input.hasPressedJump && p.currentPlayerState != ePlayerClassStates::Airborne)
+	{
+		NewAudioManager::GetInstance()->PlaySound(eSounds::Jump, 1.0f);
+		//NewAudioManager::GetInstance()->StopMusic();
+	}
+
 	p.input.isHoldingJump = im->IsKeyHeld(VK_SPACE);
 
 	p.input.direction.Normalize();
@@ -306,11 +315,21 @@ void PlayerSystem::CameraMove(Entity entity, float dt)
 	camera_yaw += mouseMovement.x * rotation_rate_x;
 	camera_pitch += mouseMovement.y * rotation_rate_y;
 
-	camera_yaw = std::fmodf(camera_yaw, 360);
-	if (camera_pitch > 90)
-		camera_pitch = 90;
-	else if (camera_pitch < -90)
-		camera_pitch = -90;
+	FriendMath::ClampAngle(camera_yaw);
+
+	//PrintI("CameraAngle: " + std::to_string(camera_yaw));
+
+	if (camera_pitch > 89)
+		camera_pitch = 89;
+	else if (camera_pitch < -89)
+		camera_pitch = -89;
+	//{
+	//	int sign = FriendMath::Sign(camera_pitch);
+	//	if (camera_pitch * sign > 180)
+	//	{
+	//		camera_pitch -= 360 * (int)(abs(camera_pitch / 360) + 1) * sign;
+	//	}
+	//}
 
 	t.transform.SetEulerAngles({ camera_pitch, camera_yaw, 0 });
 }
@@ -381,6 +400,18 @@ void PlayerSystem::Collision(Entity entity, float)
 		}
 	}
 
+	//{
+	//	if ((p.collision.capsuleNormal.x != 0 || p.collision.capsuleNormal.z != 0) && p.collision.capsuleNormal.y < 0.1f)
+	//	{
+	//		PrintI("Capsule Collision" + std::to_string(p.collision.capsuleNormal.x) + " " + std::to_string(p.collision.capsuleNormal.y) + " " + std::to_string(p.collision.capsuleNormal.z));
+	//		Vector2f wallSlow = { p.finalVelocity.x, p.finalVelocity.z };
+	//		wallSlow /= 5.f;
+	//		p.finalVelocity.x -= wallSlow.x;
+	//		p.finalVelocity.z -= wallSlow.y;
+	//	}
+
+	//}
+
 }
 
 void PlayerSystem::VaultCollision(Entity entity, float)
@@ -429,6 +460,7 @@ void PlayerSystem::VaultCollision(Entity entity, float)
 			)
 		{
 			p.isVaultable = vaultHit.block.normal.y > 0.75f;
+			p.vaultRayCastOrigin = { (float)vaultCastOrigin.x, (float)vaultCastOrigin.y, (float)vaultCastOrigin.z };
 			p.vaultLocation = { (float)vaultHit.block.position.x, (float)vaultHit.block.position.y, (float)vaultHit.block.position.z };
 		}
 	}
@@ -437,21 +469,10 @@ void PlayerSystem::VaultCollision(Entity entity, float)
 void PlayerSystem::Respawn(Entity entity)
 {
 	PlayerComponent& p = myWorld->GetComponent<PlayerComponent>(entity);
+	p.cameraRotation = { p.SpawnRot.x, p.SpawnRot.y };
+	p.finalVelocity = { 0, 0, 0 };
 	PxExtendedVec3 vec3 = { p.SpawnPoint.x,p.SpawnPoint.y,p.SpawnPoint.z };
 	p.controller->setFootPosition(vec3);
 	p.isDead = false;
 }
 
-void PlayerSystem::TestVfxBlob(const float& dt)
-{
-	InputManager* im = InputManager::GetInstance();
-	if (im->IsKeyPressed('P'))
-	{
-		manager.Play(0);
-	}
-	else if (im->IsKeyPressed('O'))
-	{
-		manager.Stop(0);
-	}
-	manager.Update(dt);
-}

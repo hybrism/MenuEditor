@@ -3,7 +3,7 @@
 
 #include <engine/Defines.h>
 #include <engine/Engine.h>
-#include <engine/utility/InputManager.h>
+#include <engine\utility\InputManager.h>
 
 #include "Scene.h"
 #include "GameScene.h"
@@ -11,23 +11,24 @@
 
 #include "../factory/ProjectileFactory.h"
 #include "../gui/MenuHandler.h"
-
+#include <engine/graphics/vfx/ParticleSystemManager.h>
+#include <engine/graphics/Light/LightManager.h>
+#include "audio/NewAudioManager.h"
 
 SceneManager::SceneManager()
 {
 	//TODO: Add levels here when we have more
-	myGameLevels[(int)eLevel::FeatureGym] = "lvl_featureGym.json";
-	myGameLevels[(int)eLevel::AssetGym] = "lvl_assetGym.json";
-	myGameLevels[(int)eLevel::Lvl3_FamilyHeirloom] = "lvl_familyHeirloom.json";
-
-
-	myGameLevels[(int)eLevel::AxelFeatureGym] = "lvl_axelFeatureGym.json";
+	myGameLevels[(int)eLevel::FeatureGym] = "lvl_featureGym";
+	myGameLevels[(int)eLevel::Lvl0] = "lvl_0";
+	myGameLevels[(int)eLevel::Lvl1] = "lvl_1";
+	myGameLevels[(int)eLevel::Lvl2] = "lvl_2";
+	myGameLevels[(int)eLevel::Lvl3] = "lvl_3";
 
 	myScenes[(int)eSceneType::MainMenu] = new MainMenuScene(this);
 	myScenes[(int)eSceneType::Game] = new GameScene(this);
 
-	myLoadingScreen = new MENU::MenuHandler();
-
+	//myLoadingScreen = new MENU::MenuHandler();
+	//myIsLoading = false;
 
 #ifdef _EDITOR 
 	myIsPaused = true;
@@ -45,45 +46,48 @@ SceneManager::~SceneManager()
 	}
 }
 
-void SceneManager::Init()
+void SceneManager::Init(SceneUpdateContext& aContext)
 {
 	for (size_t i = 0; i < (int)eSceneType::Count; i++)
 	{
 		myScenes[i]->Init(myPhysXManager);
 	}
 
-	myLoadingScreen->Init("loadingScreen.json");
+	//myLoadingScreen->Init("loadingScreen.json");
 
 #ifdef _EDITOR
-	LoadSceneInternal({ eSceneType::Game, "lvl_featureGym.json" });
-	//LoadSceneInternal({ eSceneType::Game, "lvl_scriptedEventTestScene.json" });
+//#if START_WITH_MAINMENU
+	LoadSceneInternal({ eSceneType::MainMenu, eLevel::None }, aContext);
+//#endif //!START_WITH_MAINMENU
+
+	//LoadSceneInternal({ eSceneType::Game, "lvl_featureGym" }, aContext);
 #endif //!_EDITOR
 
 #ifdef _LAUNCHER
 #if START_WITH_MAINMENU
-	LoadSceneInternal({ eSceneType::MainMenu, eLevel::None });
+	LoadSceneInternal({ eSceneType::MainMenu, eLevel::None }, aContext);
 #else
-	LoadSceneInternal({ eSceneType::Game, eLevel::FeatureGym });
+	LoadSceneInternal({ eSceneType::Game, eLevel::FeatureGym }, aContext);
 #endif //!START_WITH_MAINMENU
 #endif //!_DEBUG
 
 #ifdef _RELEASE
-	LoadSceneInternal({ eSceneType::MainMenu, eLevel::None });
+	LoadSceneInternal({ eSceneType::MainMenu, eLevel::None }, aContext);
 #endif
 }
 
-bool SceneManager::Update(const SceneUpdateContext& aContext)
+bool SceneManager::Update(SceneUpdateContext& aContext)
 {
 	if (mySceneStack.empty())
 		return false;
 
 
-//NOTE: This is _LAUNCHER due to there being a different 'R'-command in GameViewWindow for _EDITOR only 
+	//NOTE: This is _LAUNCHER due to there being a different 'R'-command in GameViewWindow for _EDITOR only 
 #ifndef _LAUNCHER 
 	if (InputManager::GetInstance()->IsKeyPressed('R'))
 	{
 		ReloadCurrentScene();
-}
+	}
 #endif // _LAUNCHER
 
 	if (!GetCurrentScene()->Update(aContext))
@@ -94,17 +98,20 @@ bool SceneManager::Update(const SceneUpdateContext& aContext)
 	return true;
 }
 
-void SceneManager::LateUpdate()
+void SceneManager::LateUpdate(SceneUpdateContext& aContext)
 {
+	myGameTimer = aContext.gameTimer;
+
 	if (mySceneToLoad.sceneType == eSceneType::Count)
 		return;
 
-	if (!LoadSceneInternal(mySceneToLoad))
+	if (!LoadSceneInternal(mySceneToLoad, aContext))
 		return;
 
 	myCurrentScene = mySceneToLoad;
 	GetCurrentScene()->OnEnter();
 	mySceneToLoad = {};
+
 }
 
 void SceneManager::Render()
@@ -112,9 +119,14 @@ void SceneManager::Render()
 	if (mySceneStack.empty())
 		return;
 
+	//if (myIsLoading)
+	//{
+	//	myLoadingScreen->Render();
+	//	return;
+	//}
+
 	GetCurrentScene()->Render();
 
-	myLoadingScreen->Render();
 }
 
 void SceneManager::SetIsPaused(bool aIsPaused)
@@ -122,6 +134,8 @@ void SceneManager::SetIsPaused(bool aIsPaused)
 	myIsPaused = aIsPaused;
 
 	auto im = InputManager::GetInstance();
+	if (im == nullptr) { return; }
+
 	if (myIsPaused)
 		im->UnlockMouseScreen();
 	else
@@ -159,69 +173,74 @@ void SceneManager::ReloadCurrentScene()
 	LoadScene(myCurrentScene);
 }
 
-bool SceneManager::LoadSceneInternal(const SceneParameter& aData)
+std::string SceneManager::GetLevelNameFromSceneParameter(const SceneParameter& aSceneParam)
+{
+	if (std::holds_alternative<eLevel>(aSceneParam.gameLevel))
+	{
+		if (std::get<eLevel>(aSceneParam.gameLevel) == eLevel::None)
+		{
+			return std::string();
+		}
+
+		return myGameLevels[(int)std::get<eLevel>(aSceneParam.gameLevel)];
+	}
+
+	if (std::holds_alternative<std::string>(aSceneParam.gameLevel))
+	{
+		return std::get<std::string>(aSceneParam.gameLevel);
+	}
+
+	return std::string();
+}
+
+bool SceneManager::LoadSceneInternal(const SceneParameter& aData, SceneUpdateContext& aContext)
 {
 	if (aData.sceneType == eSceneType::Count)
 	{
 		PrintE("[SceneManager.cpp] You must specify SceneType in SceneParameter!");
 		return false;
 	}
-
 	if (mySceneStack.empty() || GetCurrentScene()->GetType() != aData.sceneType)
 	{
 		mySceneStack.push(myScenes[(int)aData.sceneType]);
+		GetCurrentScene()->OnEnter();
 	}
 
 	myCurrentScene = aData;
 
-	//TODO: BÖRJAR LADDA EN SCEN I EN TRÅD
-	//TODO: FLYTTA TILL EGEN FUNKTION vvv
-	if (std::holds_alternative<eLevel>(aData.gameLevel))
-	{
-		if (std::get<eLevel>(aData.gameLevel) == eLevel::None)
-		{
-#ifdef _LAUNCHER
-			InputManager::GetInstance()->UnlockMouseScreen();
-#endif
-			return true;
-		}
-
-		LoadLevelInternal(myGameLevels[(int)std::get<eLevel>(aData.gameLevel)]);
-#ifdef _LAUNCHER
-		InputManager::GetInstance()->LockMouseScreen(Engine::GetInstance()->GetWindowHandle());
-#endif
-		return true;
-	}
-
-	if (std::holds_alternative<std::string>(aData.gameLevel))
-	{
-		LoadLevelInternal(std::get<std::string>(aData.gameLevel));
-#ifdef _LAUNCHER
-		InputManager::GetInstance()->LockMouseScreen(Engine::GetInstance()->GetWindowHandle());
-#endif
-		return true;
-	}
-	// ^^^
-
-	//TODO: VISA LOADINGSCREEN PÅ EN ANNAN TRÅD TILLS SCENEN LADDAT KLART
+	LoadLevelInternal(GetLevelNameFromSceneParameter(aData), aContext);
 
 	return true;
 }
 
-void SceneManager::LoadLevelInternal(const std::string& aLevelName)
+void SceneManager::LoadLevelInternal(const std::string& aLevelName, SceneUpdateContext& aContext)
 {
-	AssetDatabase::LoadVertexTextures(aLevelName.substr(0, aLevelName.find_last_of(".")));
+	if (aLevelName.empty())
+		return;
+	NewAudioManager::GetInstance()->LoadLevelSong(aLevelName);
+	std::string levelNameNoExtension = aLevelName.substr(0, aLevelName.find_last_of("."));
+	
+	//using namespace std::chrono_literals;
+	//std::this_thread::sleep_for(1000ms);
 
-	myPhysXManager.Init(); //TODO: Namechange?
+	AssetDatabase::LoadVertexTextures(levelNameNoExtension);
 
-	myUnityImporter.LoadComponents(aLevelName, GetCurrentWorld(), myPhysXManager);
+	aContext.particleSystemManager->Reset();
 
-	GetCurrentScene()->InitScripts(aLevelName);
+	myPhysXManager.Init();
+
+	myUnityImporter.LoadComponents(levelNameNoExtension, GetCurrentWorld(), myPhysXManager, aContext);
+
+	aContext.lightManager->Init();
+
+	auto* scene = GetCurrentScene();
+	scene->InitScripts(levelNameNoExtension);
 
 	//TODO: Move this or rename functions
 	ProjectileFactory::GetInstance().Init(GetCurrentWorld(), 29, myPhysXManager);
 
-	GetCurrentScene()->myWorld->InitSystems();
+	scene->myWorld->InitSystems();
+	scene->myWorld->Update(aContext);
 }
 
 bool SceneManager::GetIsPaused() const
@@ -236,15 +255,6 @@ Scene* SceneManager::GetCurrentScene()
 
 	PrintE("[SceneManager.cpp] SceneStack is empty!");
 	return nullptr;
-}
-
-eLevel SceneManager::GetCurrentLevel()
-{
-	if (!mySceneStack.empty())
-		return mySceneStack.top()->GetLevel();
-
-	PrintE("[SceneManager.cpp] SceneStack is empty!");
-	return eLevel::None;
 }
 
 World* SceneManager::GetCurrentWorld()

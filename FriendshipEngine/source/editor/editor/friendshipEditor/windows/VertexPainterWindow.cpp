@@ -24,6 +24,11 @@
 #include <game/Game.h>
 #include <engine/graphics/Texture.h>
 #include <imgui_internal.h>
+#include <directxtex/DirectXTex.h>
+#include <game/component/MetaDataComponent.h>
+#include <fstream>
+#include <engine/graphics/renderer/DebugRenderer.h>
+//#include <DirectXTex>
 
 static constexpr int MAGIC_NUMBER = 25;
 
@@ -38,14 +43,9 @@ FE::VertexPainterWindow::VertexPainterWindow(const std::string& aHandle, bool aO
 
 FE::VertexPainterWindow::~VertexPainterWindow()
 {
-	for (auto& pair : myTestVertexColors)
-	{
-		for (size_t i = 0; i < pair.first; i++)
-		{
-			delete pair.second[i];
-		}
-	}
-	myTestVertexColors.clear();
+	myIntersectingVerts.clear();
+	myModifiedMeshes.clear();
+	mySelectedEntities.clear();
 }
 
 static size_t GetIndex(const Vector2i& aPos, UINT aPitch, unsigned long long aSize)
@@ -75,6 +75,11 @@ static Entity GetEntityFromEffectTexture(const Vector2i& aPos, UINT aPitch, unsi
 	entity |= a;
 
 	return entity;
+}
+
+void FE::VertexPainterWindow::OnOpen(const EditorUpdateContext& aContext)
+{
+	UpdateSceneDirectory(aContext);
 }
 
 void FE::VertexPainterWindow::Show(const EditorUpdateContext& aContext)
@@ -129,21 +134,13 @@ void FE::VertexPainterWindow::Show(const EditorUpdateContext& aContext)
 	ImGui::End();
 }
 
-#include <directxtex/DirectXTex.h>
-#include <game/component/MetaDataComponent.h>
-//#include <DirectXTex>
-
-void FE::VertexPainterWindow::SaveVertexColors(const EditorUpdateContext& aContext, size_t aMeshId, const size_t aMeshSubIndex)
+void FE::VertexPainterWindow::SaveVertexColors(VertexTexture& aTexture, const EditorUpdateContext& aContext, size_t aMeshId, const size_t aMeshSubIndex)
 {
 	{
 		const UINT width = TEXTURE_SIZE;
 		const UINT height = TEXTURE_SIZE;
 
-		// Define pixel data (RGBA format, 32 bits per pixel)
-		uint32_t* pixelData = myTestVertexColors[aMeshId][aMeshSubIndex]->data();
-
-		// Create a new image
-		DirectX::Image image;
+		DirectX::Image image{};
 		image.format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		image.width = width;
 		image.height = height;
@@ -151,24 +148,51 @@ void FE::VertexPainterWindow::SaveVertexColors(const EditorUpdateContext& aConte
 		image.slicePitch = image.rowPitch * height;
 		image.pixels = new uint8_t[image.slicePitch];
 
-		// Copy the pixel data into the image
-		memcpy(image.pixels, pixelData, image.slicePitch);
+		memcpy(image.pixels, aTexture->data(), image.slicePitch);
 
-		// Save the image to a DDS file
-
-		// TODO: SEPERATE MATERIAL FROM MESH
 
 		auto* mesh = AssetDatabase::GetMesh(aMeshId).meshData[aMeshSubIndex];
 		TextureInfo info = GetTextureInfo(aContext, mesh, aMeshSubIndex);
-		HRESULT hr = DirectX::SaveToDDSFile(
-			image,
-			DirectX::DDS_FLAGS_ALLOW_LARGE_FILES,
-			StringHelper::s2ws(info.texturePath).c_str()
-		);
-		hr;
 
-		SaveVertexBindings(mesh, info);
+		{
+			auto ws = StringHelper::s2ws(info.texturePath);
+
+			// Remove read only attribute due to perforce
+			{
+				std::ifstream stream(ws.c_str());
+				if (stream.good())
+				{
+					SetFileAttributes(ws.c_str(), GetFileAttributes(ws.c_str()) & ~FILE_ATTRIBUTE_READONLY);
+				}
+			}
+
+			HRESULT hr = DirectX::SaveToDDSFile(
+				image,
+				DirectX::DDS_FLAGS_ALLOW_LARGE_FILES,
+				ws.c_str()
+			);
+
+			if (FAILED(hr))
+			{
+				PrintE("Failed to save vertex texture: " + std::to_string(hr));
+				return;
+			}
+		}
+
+		delete[] image.pixels;
+
+		UpdateMeshToCurrentPalette(mesh, info);
 	}
+}
+
+void FE::VertexPainterWindow::WriteToTexture(const EditorUpdateContext& aContext, const SharedMesh* aMesh, const size_t aMeshSubIndex)
+{
+	auto& tdb = AssetDatabase::GetTextureDatabase();
+	VertexTextureCollection& collection = tdb.GetVertexTextureRef(aMesh->GetVertexTextureId());
+	//collection.materials.r.
+	aContext;
+	aMeshSubIndex;
+	collection;
 }
 
 void FE::VertexPainterWindow::UpdateVertexBinding(const EditorUpdateContext&, size_t aMeshId, size_t aMeshSubIndex)
@@ -179,15 +203,72 @@ void FE::VertexPainterWindow::UpdateVertexBinding(const EditorUpdateContext&, si
 
 	VertexTextureCollection& collection = AssetDatabase::GetTextureDatabase().GetVertexTextureRef(vertexIndex);
 
-	delete collection.materials.vertex.texture;
-	collection.materials.vertex.texture = TextureFactory::CreateTexture(collection.materials.vertex.path, false, false);
+	collection.materials.vertex.texture = TextureFactory::CreateDDSTextureWithCPUAccess(collection.materials.vertex.path, collection.materials.vertex.stagingTexture);
 }
 
-void FE::VertexPainterWindow::Save(const EditorUpdateContext& aContext, size_t aMeshId, const size_t aMeshSubIndex)
+void FE::VertexPainterWindow::Save(VertexTexture& aTexture, const EditorUpdateContext& aContext, size_t aMeshId, const size_t aMeshSubIndex)
 {
-	SaveVertexColors(aContext, aMeshId, aMeshSubIndex); // TEMP
+	SaveVertexColors(aTexture, aContext, aMeshId, aMeshSubIndex); // TEMP
 	UpdateVertexBinding(aContext, aMeshId, aMeshSubIndex);
 	std::this_thread::sleep_for(std::chrono::milliseconds(10)); // without this a read access violation occurs
+}
+
+void FE::VertexPainterWindow::SaveAll(const EditorUpdateContext& aContext)
+{
+	if (myModifiedMeshes.size() == 0) { return; }
+
+	auto& tdb = AssetDatabase::GetTextureDatabase();
+	std::string sceneName = aContext.game->GetSceneManager().GetCurrentSceneName();
+
+	if (!std::filesystem::exists(RELATIVE_VERTEX_TEXTURE_ASSET_PATH + sceneName + "/"))
+	{
+		std::filesystem::create_directory(RELATIVE_VERTEX_TEXTURE_ASSET_PATH + sceneName + "/");
+	}
+
+	VertexTexture texture = new std::array<unsigned int, TEXTURE_SIZE* TEXTURE_SIZE>();
+	auto* context = GraphicsEngine::GetInstance()->DX().GetContext();
+
+	// unbind just in case
+	ID3D11ShaderResourceView* nullSRV = nullptr;
+	context->VSSetShaderResources((UINT)VertexShaderTextureSlot::VertexColor, 1, &nullSRV);
+
+	for (ModifiedMesh& meshData : myModifiedMeshes)
+	{
+		for (size_t index = 0; index < meshData.meshSubIndices.size(); ++index)
+		{
+			if (!meshData.meshSubIndices[index]) { continue; }
+
+			SharedMesh* mesh = AssetDatabase::GetMesh(meshData.meshId).meshData[index];
+
+			auto& vertexMaterial = AssetDatabase::GetTextureDatabase().GetVertexTextureRef(mesh->GetVertexTextureId()).materials.vertex;
+			vertexMaterial.stagingTexture->CopyToStaging();
+
+			{
+				D3D11_TEXTURE2D_DESC desc;
+				vertexMaterial.stagingTexture->myTexture->GetDesc(&desc);
+
+				D3D11_MAPPED_SUBRESOURCE stagingResource;
+				vertexMaterial.stagingTexture->Map(stagingResource);
+				{
+					memcpy(texture->data(), stagingResource.pData, static_cast<size_t>(desc.Width) * static_cast<size_t>(desc.Height) * sizeof(uint32_t));
+				}
+				vertexMaterial.stagingTexture->Unmap();
+			}
+
+			texture->at(0) = mesh->GetVertexCount(); // reserving 0, 0
+			Save(texture, aContext, meshData.meshId, index);
+		}
+		meshData.meshSubIndices.clear();
+	}
+
+
+	VertexIndexCollection& collection = aContext.game->GetSceneManager().GetVertexPaintedIndexCollection();
+
+	tdb.ReplaceBinaryVertexPaintedTextureFile(sceneName, collection);
+	AssetDatabase::LoadVertexTextures(sceneName);
+
+	delete texture;
+	myModifiedMeshes.clear();
 }
 
 std::string FE::VertexPainterWindow::GetTexturePath(const EditorUpdateContext& aContext, const SharedMesh* aMesh)
@@ -212,51 +293,172 @@ void FE::VertexPainterWindow::ObjectSelectionModeOnIntersect(const EditorUpdateC
 void FE::VertexPainterWindow::VertexPaintingModeOnIntersect(const EditorUpdateContext& aContext, VertexPaintingToolModeContext& aToolContext)
 {
 	// TODO: RENDER IS IN THE WRONG ORDER:( need to fetch the render order from the mesh instance data
-	if (InputManager::GetInstance()->IsLeftMouseButtonPressed())
+	if (InputManager::GetInstance()->IsLeftMouseButtonDown())
 	{
-		for (auto& pair : myIntersectingVerts)
+		// TODO: CHANGE THIS TO SOME SORT OF EVENT
+		UpdateSceneDirectory(aContext);
+
+		for (auto& [ meshId, pair ] : myIntersectingVerts)
 		{
-			MeshId meshId = pair.first;
-			auto& verts = pair.second;
+			std::vector<IntersectingVerts>& intersectingVerts = pair.intersectingVerts; // each index represents meshSubIndex
+			std::vector<IntersectingVertWorldPositions>& intersectingVertWorldPositions = pair.intersectingVertWorldPositions;
 
-			// TODO: VERTEX COLORS ARE NEVER LOADED ON INIT
-			if (myTestVertexColors.find(meshId) == myTestVertexColors.end())
+			int modfiedMeshIndex = -1;
 			{
-				myTestVertexColors.insert({ meshId, {} });
-				myTestVertexColors[meshId].resize(verts.size());
-
-				for (size_t j = 0; j < verts.size(); j++)
+				for (size_t i = 0; i < myModifiedMeshes.size(); i++)
 				{
-					myTestVertexColors[meshId][j] = new std::array<unsigned int, TEXTURE_SIZE* TEXTURE_SIZE>();
-					myTestVertexColors[meshId][j]->at(0) = AssetDatabase::GetMesh(meshId).meshData[j]->GetVertexCount(); // reserving 0, 0
+					if (myModifiedMeshes[i].meshId == meshId)
+					{
+						modfiedMeshIndex = static_cast<int>(i);
+						break;
+					}
+				}
+
+				if (modfiedMeshIndex == -1)
+				{
+					myModifiedMeshes.push_back(ModifiedMesh{ meshId, {} });
+					myModifiedMeshes.back().meshSubIndices.resize(intersectingVerts.size(), false);
+					modfiedMeshIndex = static_cast<int>(myModifiedMeshes.size()) - 1;
 				}
 			}
 
-			for (size_t meshSubIndex = 0; meshSubIndex < verts.size(); meshSubIndex++)
+			for (size_t meshSubIndex = 0; meshSubIndex < intersectingVerts.size(); meshSubIndex++)
 			{
-				for (size_t intersectingVertIndex = 0; intersectingVertIndex < verts[meshSubIndex].size(); intersectingVertIndex++)
+				myModifiedMeshes[modfiedMeshIndex].meshSubIndices[meshSubIndex] = true;
+
+				SharedMesh* mesh = AssetDatabase::GetMesh(meshId).meshData[meshSubIndex];
+				unsigned int vertexCount = mesh->GetVertexCount();
+
+				std::vector<SRVWriteData> writeData;
+
+				auto& tdb = AssetDatabase::GetTextureDatabase();
+
+				if (tdb.TryGetVertexTextureIndex(mesh->GetFileName(), meshSubIndex) == -1)
 				{
-					unsigned int vertexIndex = verts[meshSubIndex][intersectingVertIndex] + 1; // 0, 0 is reserved for the vertex count
-					unsigned int step = AssetDatabase::GetMesh(meshId).meshData[meshSubIndex]->GetVertexCount() * aToolContext.meshComponent.renderOrder;
-					unsigned int uvLocation[2] = { step % TEXTURE_SIZE, step / TEXTURE_SIZE };
-					uvLocation[1] += static_cast<unsigned int>(vertexIndex) / TEXTURE_SIZE;
-					uvLocation[0] += static_cast<unsigned int>(vertexIndex) % TEXTURE_SIZE;
-
-
-					size_t index = static_cast<size_t>(uvLocation[1]) * TEXTURE_SIZE + static_cast<size_t>(uvLocation[0]);
-					unsigned int& arrayLocation = myTestVertexColors[meshId][meshSubIndex]->at(index);
-					arrayLocation = ColorToUint(myPalette.color);
+					VertexTexture texture = new std::array<unsigned int, TEXTURE_SIZE* TEXTURE_SIZE>();
+					texture->at(0) = mesh->GetVertexCount(); // reserving 0, 0
+					Save(texture, aContext, meshId, meshSubIndex);
+					delete texture;
 				}
 
-				// TEMP SAVE ON EVERY CLICK
-				Save(aContext, meshId, meshSubIndex);
-				auto* mesh = AssetDatabase::GetMesh(meshId).meshData[meshSubIndex];
-				SaveVertexBindings(mesh, GetTextureInfo(aContext, mesh, meshSubIndex));
-				UpdateVertexBinding(aContext, meshId, meshSubIndex);
+				if (aToolContext.meshComponent.vertexPaintedIndex < 0) {
+					VertexIndexCollection& collection = aContext.game->GetSceneManager().GetVertexPaintedIndexCollection();
+					if (collection.indexCounter.size() < meshId + 1)
+					{
+						collection.indexCounter.resize(meshId + 1, 0);
+					}
+
+					aToolContext.meshComponent.vertexPaintedIndex = collection.indexCounter[meshId]++;
+					collection.vertexIndices[aToolContext.entity] = aToolContext.meshComponent.vertexPaintedIndex;
+				}
+
+				for (size_t intersectingVertIndex = 0; intersectingVertIndex < intersectingVerts[meshSubIndex].size(); intersectingVertIndex++)
+				{
+					unsigned int step = vertexCount * aToolContext.meshComponent.vertexPaintedIndex + 1; // 0, 0 is reserved for the vertex count
+					unsigned int uvLocation[2] = { step % TEXTURE_SIZE, step / TEXTURE_SIZE };
+
+					unsigned int vertexIndex = intersectingVerts[meshSubIndex][intersectingVertIndex];
+					uvLocation[0] += vertexIndex;
+					uvLocation[1] += uvLocation[0] / TEXTURE_SIZE;
+					uvLocation[0] %= TEXTURE_SIZE;
+
+					size_t index = static_cast<size_t>(uvLocation[1]) * TEXTURE_SIZE + static_cast<size_t>(uvLocation[0]);
+					Vector3f vertWorldPosition = intersectingVertWorldPositions[meshSubIndex][intersectingVertIndex];
+
+					float distance = (vertWorldPosition - aToolContext.cursorWorldPosition).Length();
+					float ratio = 1.0f - distance / myBrush.size;
+					ratio += myBrush.hardness;
+					ratio = std::clamp(ratio, 0.0f, 1.0f);
+
+					Vector4f finalColor = {
+						myPalette.color.x * myPalette.channelStrength[0] * ratio,
+						myPalette.color.y * myPalette.channelStrength[1] * ratio,
+						myPalette.color.z * myPalette.channelStrength[2] * ratio,
+						myPalette.color.w * myPalette.channelStrength[3] * ratio
+					};
+
+					unsigned int uintColor = ColorToUint(finalColor);
+					writeData.push_back(SRVWriteData{ (unsigned int)index, uintColor });
+
+					UpdateMeshToCurrentPalette(mesh, GetTextureInfo(aContext, mesh, meshSubIndex));
+				}
+
+				// TEMP
+				//Save(aContext, meshId, meshSubIndex);
+				// TODO: WRITE TO SRV
+
+				//{
+				//	DirectX::Image image{};
+				//	image.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				//	image.width = (size_t)texture->GetWidth();
+				//	image.height = (size_t)texture->GetHeight();
+				//	image.rowPitch = image.width * sizeof(uint32_t);
+				//	image.slicePitch = image.rowPitch * image.height;
+				//	image.pixels = new uint8_t[image.slicePitch];
+
+				//	memcpy(image.pixels, myVertexColors[meshId][meshSubIndex]->data(), image.slicePitch);
+
+				//	
+				//}
+
+				if (writeData.size() > 0)
+				{
+
+					auto* ge = GraphicsEngine::GetInstance();
+					auto* context = ge->DX().GetContext();
+
+					// unbind just in case
+					ID3D11ShaderResourceView* nullSRV = nullptr;
+					context->VSSetShaderResources((UINT)VertexShaderTextureSlot::VertexColor, 1, &nullSRV);
+
+					auto& vertexMaterial = tdb.GetVertexTextureRef(mesh->GetVertexTextureId()).materials.vertex;
+					vertexMaterial.stagingTexture->CopyToStaging();
+
+					D3D11_MAPPED_SUBRESOURCE mappedResource;
+					HRESULT hr = context->Map(vertexMaterial.texture->GetTexture().Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+					if (FAILED(hr))
+					{
+						PrintE("[TextureFactory.cpp] Failed to map texture: ");
+						context->Unmap(vertexMaterial.texture->GetTexture().Get(), 0);
+						return;
+					}
+
+					UINT* data = reinterpret_cast<UINT*>(mappedResource.pData);
+
+					{
+						D3D11_MAPPED_SUBRESOURCE stagingResource;
+						D3D11_TEXTURE2D_DESC desc;
+						vertexMaterial.stagingTexture->myTexture->GetDesc(&desc);
+						if (!vertexMaterial.stagingTexture->Map(stagingResource))
+						{
+							PrintE("[TextureFactory.cpp] Failed to map staging texture: ");
+							return;
+						}
+
+						{
+							memcpy(data, stagingResource.pData, static_cast<size_t>(desc.Width) * static_cast<size_t>(desc.Height) * sizeof(uint32_t));
+						}
+						vertexMaterial.stagingTexture->Unmap();
+					}
+
+					for (size_t i = 0; i < writeData.size(); i++)
+					{
+						data[writeData[i].index] = writeData[i].pixel;
+					}
+
+					context->Unmap(vertexMaterial.texture->GetTexture().Get(), 0);
+				}
+
+				writeData.clear();
 			}
 		}
 	}
 }
+
+
+//void Texture::WriteToSRV(SRVWriteData* aRgbaPixels, size_t aSize)
+//{
+//}
 
 void FE::VertexPainterWindow::DrawAllSelectedMeshes(const EditorUpdateContext& aContext)
 {
@@ -278,10 +480,23 @@ void FE::VertexPainterWindow::DrawAllSelectedMeshes(const EditorUpdateContext& a
 	ImGui::EndChild();
 }
 
-void FE::VertexPainterWindow::SaveVertexBindings(
-	SharedMesh* aMesh,
-	const TextureInfo aTextureInfo
-)
+void FE::VertexPainterWindow::SetVertexMaterial(const size_t& aChannelIndex, VertexMaterial& aMaterial) const
+{
+	if (!myPalette.activeChannels[aChannelIndex]) { return; }
+
+	aMaterial.name = myPalette.materials[aChannelIndex].name;
+	aMaterial.id = static_cast<int>(AssetDatabase::GetTextureIndex(aMaterial.name));
+}
+
+void FE::VertexPainterWindow::UpdateVertexMaterialsToCurrentPalette(VertexMaterialCollection& outCollection) const
+{
+	SetVertexMaterial(0, outCollection.r);
+	SetVertexMaterial(1, outCollection.g);
+	SetVertexMaterial(2, outCollection.b);
+	SetVertexMaterial(3, outCollection.a);
+}
+
+void FE::VertexPainterWindow::UpdateMeshToCurrentPalette(SharedMesh* aMesh, const TextureInfo& aInfo)
 {
 	auto& tdb = AssetDatabase::GetTextureDatabase();
 
@@ -294,42 +509,31 @@ void FE::VertexPainterWindow::SaveVertexBindings(
 		collection = &AssetDatabase::GetTextureDatabase().GetVertexTextureRef(static_cast<size_t>(vertexPaintIndex));
 	}
 
-	{
-		if (myPalette.activeChannels[0])
-		{
-			collection->materials.r.name = myPalette.materials[0].name;
-			collection->materials.r.id = static_cast<int>(AssetDatabase::GetTextureIndex(collection->materials.r.name));
-		}
-		if (myPalette.activeChannels[1])
-		{
-			collection->materials.g.name = myPalette.materials[1].name;
-			collection->materials.g.id = static_cast<int>(AssetDatabase::GetTextureIndex(collection->materials.g.name));
-		}
-		if (myPalette.activeChannels[2])
-		{
-			collection->materials.b.name = myPalette.materials[2].name;
-			collection->materials.b.id = static_cast<int>(AssetDatabase::GetTextureIndex(collection->materials.b.name));
-		}
-		if (myPalette.activeChannels[3])
-		{
-			collection->materials.a.name = myPalette.materials[3].name;
-			collection->materials.a.id = static_cast<int>(AssetDatabase::GetTextureIndex(collection->materials.a.name));
-		}
-	}
+	UpdateVertexMaterialsToCurrentPalette(collection->materials);
 
 	if (vertexPaintIndex == -1)
 	{
 		collection->meshName = aMesh->GetFileName();
 
-		collection->subMeshIndex = aTextureInfo.meshSubIndex;
-		collection->materials.vertex.path = aTextureInfo.texturePath;
-		collection->materials.vertex.texture = TextureFactory::CreateTexture(collection->materials.vertex.path, false, false);
+		collection->subMeshIndex = aInfo.meshSubIndex;
+		collection->materials.vertex.path = aInfo.texturePath;
+		collection->materials.vertex.texture = TextureFactory::CreateDDSTextureWithCPUAccess(collection->materials.vertex.path, collection->materials.vertex.stagingTexture);
 
 		aMesh->SetVertexTextureId(tdb.CreateVertexTexture(*collection));
 	}
+}
 
-	tdb.UpdateVertexPaintedTextures(aTextureInfo.sceneName);
-	AssetDatabase::LoadVertexTextures(aTextureInfo.sceneName);
+void FE::VertexPainterWindow::UpdateSceneDirectory(const EditorUpdateContext& aContext)
+{
+	auto sceneName = aContext.game->GetSceneManager().GetCurrentSceneName();
+
+	if (sceneName == myPreviousSceneName) { return;	}
+
+	if (!std::filesystem::exists(RELATIVE_VERTEX_TEXTURE_ASSET_PATH + sceneName + "/"))
+	{
+		std::filesystem::create_directory(RELATIVE_VERTEX_TEXTURE_ASSET_PATH + sceneName + "/");
+	}
+	myPreviousSceneName = sceneName;
 }
 
 FE::TextureInfo FE::VertexPainterWindow::GetTextureInfo(const EditorUpdateContext& aContext, const SharedMesh* aMesh, size_t aMeshSubIndex)
@@ -338,16 +542,33 @@ FE::TextureInfo FE::VertexPainterWindow::GetTextureInfo(const EditorUpdateContex
 	info.sceneName = aContext.game->GetSceneManager().GetCurrentSceneName();
 	info.sceneName = info.sceneName.substr(0, info.sceneName.find_last_of('.'));
 	info.folderPath = RELATIVE_VERTEX_TEXTURE_ASSET_PATH + info.sceneName + "/";
-	if (!std::filesystem::exists(info.folderPath))
-	{
-		std::filesystem::create_directories(info.folderPath);
-	}
 
 	info.texturePath = info.folderPath + aMesh->GetFileName() + "_" + std::to_string(aMeshSubIndex) + ".dds";
 	info.meshSubIndex = aMeshSubIndex;
 
 	return info;
 }
+
+Vector3f FE::VertexPainterWindow::GetVertexWorldPosition(const Vertex& aVertex, World* aWorld, Entity aEntityId)
+{
+	DirectX::XMMATRIX objectWorldTransform = aWorld->GetComponent<TransformComponent>(aEntityId).GetWorldTransform(aWorld, aEntityId);
+	Vector3f objectWorldPosition = { objectWorldTransform.r[3].m128_f32[0], objectWorldTransform.r[3].m128_f32[1], objectWorldTransform.r[3].m128_f32[2] };
+
+	// Convert transform to rotation matrix
+	objectWorldTransform.r[3] = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	objectWorldTransform.r[0].m128_f32[3] = 0.0f;
+	objectWorldTransform.r[1].m128_f32[3] = 0.0f;
+	objectWorldTransform.r[2].m128_f32[3] = 0.0f;
+
+	DirectX::XMVECTOR newCoord = DirectX::XMVector3TransformCoord({ aVertex.position.x, aVertex.position.y, aVertex.position.z }, objectWorldTransform);
+
+	objectWorldPosition.x += newCoord.m128_f32[0];
+	objectWorldPosition.y += newCoord.m128_f32[1];
+	objectWorldPosition.z += newCoord.m128_f32[2];
+
+	return objectWorldPosition;
+}
+
 
 void FE::VertexPainterWindow::UpdateIntersectingVerts(const EditorUpdateContext& aContext)
 {
@@ -357,7 +578,7 @@ void FE::VertexPainterWindow::UpdateIntersectingVerts(const EditorUpdateContext&
 	{
 		auto* instance = GraphicsEngine::GetInstance();
 
-		Vector3f worldPosition{};
+		Vector3f cursorWorldPosition{};
 		Entity entityId = 0;
 
 		// World Position
@@ -368,7 +589,7 @@ void FE::VertexPainterWindow::UpdateIntersectingVerts(const EditorUpdateContext&
 			rt.Map(data);
 			{
 				Vector4f pos = GetColor(screenSpacePosition, data.RowPitch, reinterpret_cast<float*>(data.pData), sizeof(float));
-				worldPosition = { pos.x, pos.y, pos.z };
+				cursorWorldPosition = { pos.x, pos.y, pos.z };
 			}
 			rt.Unmap();
 		}
@@ -393,26 +614,31 @@ void FE::VertexPainterWindow::UpdateIntersectingVerts(const EditorUpdateContext&
 		size_t meshId = meshComponent.id;
 		const SharedMeshPackage& package = AssetDatabase::GetMesh(meshId);
 
+		auto& renderer = GraphicsEngine::GetInstance()->GetDebugRenderer();
+
 		myIntersectingVerts.clear();
 		myIntersectingVerts.insert({ meshId, {} });
-		myIntersectingVerts[meshId].resize(package.meshData.size());
+		myIntersectingVerts[meshId].intersectingVerts.resize(package.meshData.size());
+		myIntersectingVerts[meshId].intersectingVertWorldPositions.resize(package.meshData.size());
+
 		for (size_t meshIndex = 0; meshIndex < package.meshData.size(); meshIndex++)
 		{
 			SharedMesh* mesh = AssetDatabase::GetMesh(meshId).meshData[meshIndex];
 			Vertex* verts = mesh->GetVertices();
 
-			float brushSize = BRUSH_SIZE;
 			for (unsigned int i = 0; i < mesh->GetVertexCount(); i++)
 			{
 				auto& vert = verts[i];
 
-				Vector3f vertPos = { vert.position.x, vert.position.y, vert.position.z };
-				vertPos = vertPos + aContext.world->GetComponent<TransformComponent>(entityId).transform.GetPosition();
+				Vector3f vertPos = GetVertexWorldPosition(vert, aContext.world, entityId);
 
-				float distance = (vertPos - worldPosition).Length();
-				if (distance < brushSize)
+				float distance = (vertPos - cursorWorldPosition).Length();
+				if (distance < myBrush.size)
 				{
-					myIntersectingVerts[meshId][meshIndex].push_back(i);
+					myIntersectingVerts[meshId].intersectingVerts[meshIndex].push_back(i);
+					myIntersectingVerts[meshId].intersectingVertWorldPositions[meshIndex].push_back(vertPos);
+
+					renderer.DrawQuad(vertPos, vert.normal, { 100, 100 }, { 1.0f, 0.0f, 0.0f });
 				}
 			}
 		}
@@ -423,7 +649,7 @@ void FE::VertexPainterWindow::UpdateIntersectingVerts(const EditorUpdateContext&
 			return;
 		}
 
-		VertexPaintingToolModeContext toolContext{ entityId, meshComponent };
+		VertexPaintingToolModeContext toolContext{ cursorWorldPosition, entityId, meshComponent };
 
 		switch (myToolMode)
 		{
@@ -436,7 +662,6 @@ void FE::VertexPainterWindow::UpdateIntersectingVerts(const EditorUpdateContext&
 		default:
 			break;
 		}
-		//TextureFactory::WriteDDSToFile("test.dds", reinterpret_cast<unsigned char*>(myTestVertexColors[meshId]->data()), TEXTURE_SIZE, TEXTURE_SIZE, 4);
 	}
 }
 
@@ -456,6 +681,17 @@ std::string FE::VertexPainterWindow::GetNameFromToolMode(VertexPainterToolMode a
 void FE::VertexPainterWindow::ObjectSelectionMode(const EditorUpdateContext& aContext)
 {
 	aContext;
+
+	static int temp[2] = { 1600, 900 };
+	ImGui::DragInt2("##", &temp[0]);
+
+	if (ImGui::Button("WOWWWWW"))
+	{
+		GraphicsEngine::GetInstance()->SetInternalResolution({ temp[0], temp[1] });
+		aContext.game->GetPostProcess().Init();
+		aContext.game->GetLightManager().Init();
+	}
+	ImGui::DragFloat("DEPTH", &GraphicsEngine::GetInstance()->GetDepthFadeKRef());
 	ImGui::Text("To be implemented!!!");
 }
 
@@ -467,7 +703,7 @@ void FE::VertexPainterWindow::VertexPaintingMode(const EditorUpdateContext& aCon
 	{
 		ImGui::Text("Brush");
 
-		
+
 		{
 			float padding = 15.0f;
 			ImGui::Text("Size");
@@ -475,9 +711,9 @@ void FE::VertexPainterWindow::VertexPaintingMode(const EditorUpdateContext& aCon
 			ImGui::Text("Hardness");
 		}
 		{
-			ImGui::DragFloat("###", &myBrush.size, 1.0f, 1.0f, 1000.0f);
+			ImGui::DragFloat("###brush_size", &myBrush.size, 1.0f, 0.0f, 100000.0f, "%.1f");
 			ImGui::SameLine();
-			ImGui::SliderFloat("###", &myBrush.hardness, 0.0f, 1.0f);
+			ImGui::SliderFloat("###brush_hardness", &myBrush.hardness, 0.0f, 1.0f);
 		}
 	}
 
@@ -533,7 +769,7 @@ void FE::VertexPainterWindow::VertexPaintingMode(const EditorUpdateContext& aCon
 
 			std::string id = "##" + myPalette.materials[i].channelName;
 			ImVec2 combo_pos = ImGui::GetCursorScreenPos();
-			if (ImGui::BeginCombo(id.c_str(), "", ImGuiComboFlags_HeightLarge | ImGuiComboFlags_CustomPreview))
+			if (ImGui::BeginCombo(id.c_str(), "", (int)ImGuiComboFlags_HeightLarge | (int)ImGuiComboFlags_CustomPreview))
 			{
 				auto& ref = AssetDatabase::GetTextureDatabase().GetTexturesRef();
 
@@ -591,6 +827,15 @@ void FE::VertexPainterWindow::VertexPaintingMode(const EditorUpdateContext& aCon
 			ImGui::SetCursorScreenPos(backup_pos);
 		}
 		ImGui::Dummy(ImVec2(0.0f, 0.0f));
+	}
+
+
+	// Save options
+	{
+		if (ImGui::Button("Save All Changes"))
+		{
+			SaveAll(aContext);
+		}
 	}
 }
 

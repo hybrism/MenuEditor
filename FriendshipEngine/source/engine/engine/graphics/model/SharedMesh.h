@@ -57,7 +57,7 @@ public:
 
 #ifdef _EDITOR
 	Vertex* GetVertices() { return myVertices; }
-	unsigned int GetVertexCount() { return myVertexCount; }
+	unsigned int GetVertexCount() const { return myVertexCount; }
 #endif
 protected:
 #ifdef _EDITOR

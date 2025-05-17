@@ -7,7 +7,6 @@
 #include <memory>
 #include <engine/math/Vector.h>
 #include "windows/Window.h"
-#include "../menuEditor/MenuEditor.h"
 
 #include <engine/Defines.h>
 
@@ -39,8 +38,8 @@ private:
 	Game* myGame;
 	bool myFirstFrameSetup;
 
-	void Dockspace();
-	void MenuBar();
+	void Dockspace(EditorUpdateContext aContext);
+	void MenuBar(EditorUpdateContext aContext);
 
 	//This is used for debug-level selector
 	void LoadImportFiles();

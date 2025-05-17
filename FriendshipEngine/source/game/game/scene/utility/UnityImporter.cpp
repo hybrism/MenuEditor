@@ -21,11 +21,11 @@
 #include "../../component/OrbComponent.h"
 #include "../../component/ProjectileComponent.h"
 #include "../../component/DeathZoneComponent.h"
+#include "../../component/SphereColliderComponent.h"
 
 #include "../../factory/ProjectileFactory.h"
 #include "../../component/EventComponent.h"
 
-//#include <engine/graphics/DirectionalLightManager.h>
 #include <engine/graphics/GraphicsEngine.h>
 #include <engine\graphics\Light\LightStructs.h>
 #include <engine/graphics\animation\AnimationController.h>
@@ -34,50 +34,52 @@
 #include "../../utility/JsonUtility.h"
 #include "utility\GameHelperFunctions.h"
 
+#ifndef _EDITOR
+#include <assets/BinaryReader/BinaryVertexPaintingFileFactory.h>
+#endif
+
 static bool hasLoaded = false;
 
-void UnityImporter::LoadComponents(const std::string& aLevelName, World* aWorld, PhysXSceneManager& aPhysXSceneManager)
+void UnityImporter::LoadComponents(
+	const std::string& aLevelName,
+	World* aWorld,
+	PhysXSceneManager& aPhysXSceneManager,
+	SceneUpdateContext& aContext
+)
 {
-	std::string extension = aLevelName.substr(aLevelName.find_last_of(".") + 1);
-	Json content;
+	std::string levelnameWithExtension = aLevelName;
 
-	if (extension == "json")
+	//Add extension if it does not exist
+	size_t n = levelnameWithExtension.rfind(".json");
+	if (n == std::string::npos)
 	{
-		content = JsonUtility::OpenJson(RELATIVE_IMPORT_PATH + aLevelName);
+		levelnameWithExtension += ".json";
 	}
-	else if (extension == "friend")
-	{
-		std::ifstream t(RELATIVE_IMPORT_PATH + aLevelName, std::ios::binary);
 
-		if (!t.is_open())
-		{
-			PrintE("[UnityImporter.cpp] Could not load friend-file! " + aLevelName);
-			return;
-		}
-
-		content = Json::from_bson(t);
-		t.close();
-	}
+	//Go to folder -> find .json
+	std::string fullPath = RELATIVE_IMPORT_PATH + aLevelName + "/" + levelnameWithExtension;
+	Json content = JsonUtility::OpenJson(fullPath);
 
 	aWorld->Reset();
 
 	LoadEntities(content, aWorld);
 	LoadMetaDataComponent(content, aWorld);
 	LoadTransformComponent(content, aWorld);
-	LoadMeshComponent(content, aWorld);
+	LoadMeshComponent(aLevelName, content, aWorld);
 	LoadPlayerComponents(content, aWorld, aPhysXSceneManager);
-	LoadPhysXColliderComponent(content, aWorld, aPhysXSceneManager); // BoxCollider MUST be loaded before entities tries to GetComponent<CollisionData>
+	LoadPhysXColliderComponent(content, aWorld, aPhysXSceneManager);
 	LoadEventColliderComponent(content, aWorld);
 	LoadEventComponent(content, aWorld);
 	LoadCameraComponent(content, aWorld);
 	LoadEnemyComponent(content, aWorld);
 	LoadAnimationComponent(content, aWorld);
-	//LoadPhysXComponent(content, aWorld, aPhysXSceneManager);
 	LoadDirectionalLight(content, aWorld);
 	LoadPointLight(content, aWorld);
 	LoadOrbComponent(content, aWorld);
 	LoadNpcComponent(content, aWorld);
 	LoadDeathZoneComponent(content, aWorld);
+	LoadSphereColliderComponent(content, aWorld);
+	LoadParticleSystemComponent(content, aWorld, aContext);
 
 	unityToEntity.clear();
 
@@ -99,7 +101,7 @@ void UnityImporter::InitializeAnimationControllers()
 {
 	auto anims = AssetDatabase::GetAnimationMap();
 
-	size_t meshId = 0;
+	Skeleton* skeleton = nullptr;
 	AnimationController* controller = nullptr;
 	Animation* anim = nullptr;
 
@@ -112,12 +114,13 @@ void UnityImporter::InitializeAnimationControllers()
 		defaultTransition.transitionOffset = 0.0f;
 		defaultTransition.fixedDuration = false;
 
-		float minRunSpeed = 0.01f;
+		float minRunSpeed = 4.0f;
 		float minFallSpeed = -10.5f;
 
 
-		meshId = AssetDatabase::GetMeshIdFromName("sk_player");
-		controller = AssetDatabase::GetAnimationController(meshId);
+		skeleton = AssetDatabase::GetSkeleton("sk_player");
+		
+		controller = &AssetDatabase::GetAnimationController(skeleton);
 
 		controller->AddParameter("xSpeed", static_cast<size_t>(PlayerAnimationParameter::eXSpeed));
 		controller->AddParameter("ySpeed", static_cast<size_t>(PlayerAnimationParameter::eYSpeed));
@@ -126,32 +129,35 @@ void UnityImporter::InitializeAnimationControllers()
 
 		// Idle
 		{
-			anim = AssetDatabase::GetAnimation(meshId, "a_player_idle");
+			anim = AssetDatabase::GetAnimation(skeleton, "a_player_idle");
 
 			AnimationState state = CreateState(anim);
 
-			AnimationTransition transition = defaultTransition;
-			transition.toStateIndex = static_cast<int>(PlayerAnimationState::eRun);
+			{
+				AnimationTransition transition = defaultTransition;
+				transition.toStateIndex = static_cast<int>(PlayerAnimationState::eRun);
+				transition.duration = 0.3f;
 
-			transition.conditions.push_back(AnimationCondition(
-				controller->GetParameterIndexFromName("xSpeed"),
-				minRunSpeed,
-				AnimationConditionType::eIsGreaterThan)
-			);
+				transition.conditions.push_back(AnimationCondition(
+					controller->GetParameterIndexFromName("xSpeed"),
+					minRunSpeed,
+					AnimationConditionType::eIsGreaterThan)
+				);
 
-			state.AddTransition(transition);
+				state.AddTransition(transition);
+			}
 
 			controller->AddState(state);
 		}
 		// Run
 		{
-			anim = AssetDatabase::GetAnimation(meshId, "a_player_run");
+			anim = AssetDatabase::GetAnimation(skeleton, "a_player_run");
 			AnimationState state = CreateState(anim);
 
 			//// Run to fall
 			{
 				AnimationTransition transition = defaultTransition;
-				transition.duration = 0.4f;
+				transition.duration = 0.1f;
 				transition.toStateIndex = static_cast<int>(PlayerAnimationState::eJumpFall);
 
 				transition.conditions.push_back(AnimationCondition(
@@ -166,6 +172,7 @@ void UnityImporter::InitializeAnimationControllers()
 			// Run to idle
 			{
 				AnimationTransition transition = defaultTransition;
+				transition.duration = 0.3f;
 				transition.toStateIndex = static_cast<int>(PlayerAnimationState::eIdle);
 
 				transition.conditions.push_back(AnimationCondition(
@@ -225,7 +232,7 @@ void UnityImporter::InitializeAnimationControllers()
 
 		// Slide
 		{
-			anim = AssetDatabase::GetAnimation(meshId, "a_player_slide");
+			anim = AssetDatabase::GetAnimation(skeleton, "a_player_slide");
 			AnimationState state = CreateState(anim);
 			state.SetLooping(false);
 
@@ -293,13 +300,15 @@ void UnityImporter::InitializeAnimationControllers()
 
 		// Jump Fall
 		{
-			anim = AssetDatabase::GetAnimation(meshId, "a_player_jumpFall");
+			anim = AssetDatabase::GetAnimation(skeleton, "a_player_jumpFall");
 			AnimationState state = CreateState(anim);
 			state.SetLooping(false);
 
 			// Fall to idle
 			{
 				AnimationTransition transition = defaultTransition;
+				transition.duration = 0.15f;
+				transition.fixedDuration = false;
 				transition.toStateIndex = static_cast<int>(PlayerAnimationState::eIdle);
 
 				transition.conditions.push_back(AnimationCondition(
@@ -321,6 +330,7 @@ void UnityImporter::InitializeAnimationControllers()
 			{
 				AnimationTransition transition = defaultTransition;
 				transition.duration = 0.15f;
+				transition.fixedDuration = false;
 				transition.toStateIndex = static_cast<int>(PlayerAnimationState::eRun);
 
 				transition.conditions.push_back(AnimationCondition(
@@ -342,6 +352,7 @@ void UnityImporter::InitializeAnimationControllers()
 			{
 				AnimationTransition transition = defaultTransition;
 				transition.duration = 0.15f;
+				transition.fixedDuration = false;
 				transition.toStateIndex = static_cast<int>(PlayerAnimationState::eLeftWallRun);
 
 				transition.conditions.push_back(AnimationCondition(
@@ -357,6 +368,7 @@ void UnityImporter::InitializeAnimationControllers()
 			{
 				AnimationTransition transition = defaultTransition;
 				transition.duration = 0.15f;
+				transition.fixedDuration = false;
 				transition.toStateIndex = static_cast<int>(PlayerAnimationState::eRightWallRun);
 
 				transition.conditions.push_back(AnimationCondition(
@@ -373,7 +385,7 @@ void UnityImporter::InitializeAnimationControllers()
 
 		// Left Wall Run
 		{
-			anim = AssetDatabase::GetAnimation(meshId, "a_player_leftWallRun");
+			anim = AssetDatabase::GetAnimation(skeleton, "a_player_leftWallRun");
 			AnimationState state = CreateState(anim);
 
 			// Wall Run to Run
@@ -423,7 +435,7 @@ void UnityImporter::InitializeAnimationControllers()
 
 		// Right Wall Run
 		{
-			anim = AssetDatabase::GetAnimation(meshId, "a_player_rightWallRun");
+			anim = AssetDatabase::GetAnimation(skeleton, "a_player_rightWallRun");
 			AnimationState state = CreateState(anim);
 
 			// Wall Run to Run
@@ -470,26 +482,67 @@ void UnityImporter::InitializeAnimationControllers()
 
 			controller->AddState(state);
 		}
+
+		// Vault
+		{
+			anim = AssetDatabase::GetAnimation(skeleton, "a_player_vault");
+			AnimationState state = CreateState(anim);
+
+			AnimationTransition defaultVaultTransition = defaultTransition;
+			defaultVaultTransition.fixedDuration = true;
+			defaultVaultTransition.duration = 0.1f;
+			defaultVaultTransition.exitTime = 0.5f;
+
+			// Vault to Run
+			{
+				AnimationTransition transition = defaultVaultTransition;
+				transition.toStateIndex = static_cast<int>(PlayerAnimationState::eRun);
+
+				transition.conditions.push_back(AnimationCondition(
+					controller->GetParameterIndexFromName("xSpeed"),
+					minRunSpeed,
+					AnimationConditionType::eIsGreaterThan)
+				);
+
+				state.AddTransition(transition);
+			}
+
+			// Vault to Idle
+			{
+				AnimationTransition transition = defaultVaultTransition;
+				transition.toStateIndex = static_cast<int>(PlayerAnimationState::eIdle);
+
+				transition.conditions.push_back(AnimationCondition(
+					controller->GetParameterIndexFromName("xSpeed"),
+					minRunSpeed,
+					AnimationConditionType::eIsLessThan)
+				);
+
+				state.AddTransition(transition);
+			}
+
+			controller->AddState(state);
+		}
 	}
 
 	// Enemy
 	{
-		meshId = AssetDatabase::GetMeshIdFromName("sk_enemy");
-		controller = AssetDatabase::GetAnimationController(meshId);
+		skeleton = AssetDatabase::GetSkeleton("sk_enemy");
+		controller = &AssetDatabase::GetAnimationController(skeleton);
 
 		controller->AddParameter("state", 0);
 
 		// Recoil Down
 		{
-			anim = AssetDatabase::GetAnimation(meshId, "a_enemy_recoilDown");
+			anim = AssetDatabase::GetAnimation(skeleton, "a_enemy_recoilDown");
 			AnimationState state = CreateState(anim);
-		//	state.SetLooping(false);
+			//	state.SetLooping(false);
 			controller->AddState(state);
 		}
 
 		// Recoil Front
 		{
-			anim = AssetDatabase::GetAnimation(meshId, "a_enemy_recoilFront");
+			anim = AssetDatabase::GetAnimation(skeleton, "a_enemy_recoilFront");
 			AnimationState state = CreateState(anim);
 
 			controller->AddState(state);
@@ -499,14 +552,14 @@ void UnityImporter::InitializeAnimationControllers()
 	//NPC
 
 	{
-		meshId = AssetDatabase::GetMeshIdFromName("sk_npc");
-		controller = AssetDatabase::GetAnimationController(meshId);
+		skeleton = AssetDatabase::GetSkeleton("sk_npc");
+		controller = &AssetDatabase::GetAnimationController(skeleton);
 
 		controller->AddParameter("state", 0);
 
 		// walk
 		{
-			anim = AssetDatabase::GetAnimation(meshId, "a_npc_walk");
+			anim = AssetDatabase::GetAnimation(skeleton, "a_npc_walk");
 			AnimationState state = CreateState(anim);
 			state.SetLooping(true);
 
@@ -532,7 +585,7 @@ void UnityImporter::InitializeAnimationControllers()
 
 		// dead
 		{
-			anim = AssetDatabase::GetAnimation(meshId, "a_npc_dead");
+			anim = AssetDatabase::GetAnimation(skeleton, "a_npc_dead");
 			AnimationState state = CreateState(anim);
 			state.SetLooping(false);
 
@@ -638,14 +691,16 @@ void UnityImporter::LoadMetaDataComponent(const Json& aJson, World* aWorld)
 		Entity entity = unityToEntity.at(unityID);
 		std::string name = n["name"];
 
+
 		MetaDataComponent& metaData = aWorld->AddComponent<MetaDataComponent>(entity);
 		std::strcpy(metaData.name, name.c_str());
+		metaData.size = (unsigned int)std::min(name.size(), ARRAYSIZE(metaData.name));
 		metaData.unityID = unityID;
 	}
 #endif
 }
 
-void UnityImporter::LoadMeshComponent(const Json& aJson, World* aWorld)
+void UnityImporter::LoadMeshComponent(const std::string& aLevelName, const Json& aJson, World* aWorld)
 {
 #ifndef _RELEASE
 	if (!DoesContain(aJson, "meshFilters"))
@@ -654,16 +709,34 @@ void UnityImporter::LoadMeshComponent(const Json& aJson, World* aWorld)
 	}
 #endif
 
+#ifdef _EDITOR
+	myVertexPaintedIndexCounter = BinaryVertexPaintingFileFactory::LoadVertexIndicesFromFile(aLevelName);
+	VertexIndexCollection& collection = myVertexPaintedIndexCounter;
+#else
+	VertexIndexCollection collection = BinaryVertexPaintingFileFactory::LoadVertexIndicesFromFile(aLevelName);
+#endif
 	for (auto& m : aJson["meshFilters"])
 	{
 		Entity entity = unityToEntity.at(m["entityID"]);
-		size_t meshID = m["meshID"];
+		size_t unityMeshID = m["meshID"];
 
 		auto& mesh = aWorld->AddComponent<MeshComponent>(entity);
-		mesh.id = AssetDatabase::GetMeshIdFromUnityId(meshID);
+		mesh.id = AssetDatabase::GetMeshIdFromUnityId(unityMeshID);
 
 		auto& package = AssetDatabase::GetMesh(mesh.id);
 		mesh.type = package.skeleton ? MeshType::Skeletal : MeshType::Static;
+		
+		for (size_t i = 0; i < package.meshData.size(); i++)
+		{
+			if (AssetDatabase::GetTextureDatabase().TryGetVertexTextureIndex(package.name, i) >= 0)
+			{
+				if (collection.vertexIndices.find(entity) != collection.vertexIndices.end())
+				{
+					mesh.vertexPaintedIndex = collection.vertexIndices[entity];
+					break;
+				}
+			}
+		}
 	}
 }
 
@@ -722,8 +795,6 @@ void UnityImporter::LoadEventColliderComponent(const Json& aJson, World* aWorld)
 	for (auto& event : aJson["eventColliderComponents"])
 	{
 		Entity id = unityToEntity.at(event["entityID"]);
-		Entity id1 = event["entityID"];
-		id1;
 		Vector3f pos = GetVector3f(event["pivot"]);
 		Vector3f size;
 		size.x = event["size"]["x"];
@@ -732,8 +803,9 @@ void UnityImporter::LoadEventColliderComponent(const Json& aJson, World* aWorld)
 		size = size * 100.f;
 
 		ColliderComponent& collider = aWorld->AddComponent<ColliderComponent>(id);
+
 		collider.extents = size / 2.0f;
-		collider.aabb3D.InitWithMinAndMax(Vector3f{0,0,0}, size);
+		collider.aabb3D.InitWithMinAndMax(Vector3f{ 0,0,0 }, size);
 
 		CollisionDataComponent& collisionData = aWorld->AddComponent<CollisionDataComponent>(id);
 		collisionData.type = eCollisionType::Trigger;
@@ -806,6 +878,10 @@ void UnityImporter::LoadPlayerComponents(const Json& aJson, World* aWorld, PhysX
 		auto& transformComponent = aWorld->GetComponent<TransformComponent>(player);
 		playerComponent.controller = aPhysXSceneManager.CreateCharacterController(transformComponent.transform, &playerComponent.callbackWrapper);
 		playerComponent.SpawnPoint = transformComponent.transform.GetPosition();
+
+		playerComponent.startGameRot.x = transformComponent.transform.GetEulerRotation().x;
+		playerComponent.startGameRot.y = transformComponent.transform.GetEulerRotation().y;
+
 		if (!aWorld->HasComponent<MeshComponent>(player))
 		{
 			auto& meshComponent = aWorld->AddComponent<MeshComponent>(player);
@@ -813,13 +889,21 @@ void UnityImporter::LoadPlayerComponents(const Json& aJson, World* aWorld, PhysX
 			meshComponent.shouldDisregardDepth = true;
 			meshComponent.type = MeshType::Skeletal;
 
-			auto& animComponent = aWorld->AddComponent<AnimationDataComponent>(player);
+		}
+		auto& meshComponent = aWorld->GetComponent<MeshComponent>(player);
+		meshComponent.shouldDisregardDepth = true;
 
-			if (AssetDatabase::GetAnimations(meshComponent.id).size() == 0) { continue; }
+		if (!aWorld->HasComponent<AnimationDataComponent>(player))
+		{
+			auto& animComponent = aWorld->AddComponent<AnimationDataComponent>(player);
+			Skeleton* skeleton = AssetDatabase::GetSkeleton(meshComponent.id);
+
+			animComponent.controllerId = (int)AssetDatabase::GetAnimationController(skeleton).GetId();
+
+			if (AssetDatabase::GetAnimations(skeleton).size() == 0) { continue; }
 
 			animComponent.currentStateIndex = 0;
 		}
-		aWorld->GetComponent<MeshComponent>(player).shouldDisregardDepth = true;
 	}
 }
 void UnityImporter::LoadAnimationComponent(const Json& aJson, World* aWorld)
@@ -834,15 +918,20 @@ void UnityImporter::LoadAnimationComponent(const Json& aJson, World* aWorld)
 	for (auto& animationDataComponent : aJson["animationComponents"])
 	{
 		Entity id = unityToEntity.at(animationDataComponent["entityID"]);
+		if (aWorld->HasComponent<AnimationDataComponent>(id)) { continue; }
+
 		auto& mesh = aWorld->GetComponent<MeshComponent>(id);
 		auto& component = aWorld->AddComponent<AnimationDataComponent>(id);
+		Skeleton* skeleton = AssetDatabase::GetSkeleton(mesh.id);
 
-		if (AssetDatabase::GetAnimations(mesh.id).size() == 0) { continue; }
+		component.controllerId = AssetDatabase::GetAnimationController(skeleton).GetId();
+
+		if (AssetDatabase::GetAnimations(skeleton).size() == 0) { continue; }
 
 		component.currentStateIndex = 0;
 
 #ifndef _RELEASE
-		if (AssetDatabase::DoesAnimationControllerExist(mesh.id)) { continue; }
+		if (AssetDatabase::DoesAnimationControllerExist(skeleton)) { continue; }
 
 		PrintW("We have animations but no controller!");
 
@@ -966,9 +1055,9 @@ void UnityImporter::LoadDeathZoneComponent(const Json& aJson, World* aWorld)
 		deathZone.overlapPos.x = d["myPos"]["x"];
 		deathZone.overlapPos.y = d["myPos"]["y"];
 		deathZone.overlapPos.z = d["myPos"]["z"];
-		
+
 		deathZone.overlapPos *= 100.f;
-		
+
 		Vector3f size;
 		size.x = d["myScale"]["x"];
 		size.y = d["myScale"]["y"];
@@ -977,10 +1066,10 @@ void UnityImporter::LoadDeathZoneComponent(const Json& aJson, World* aWorld)
 		Vector3f colliderSize = size / 2.f;
 		deathZone.myScale = colliderSize;
 
-	/*	DirectX::XMMATRIX myMatrix = aWorld->GetComponent<TransformComponent>(entity).GetWorldTransform(aWorld, entity);
-		Vector3f myPos = { myMatrix.r[3].m128_f32[0],myMatrix.r[3].m128_f32[1] ,myMatrix.r[3].m128_f32[2] };
+		/*	DirectX::XMMATRIX myMatrix = aWorld->GetComponent<TransformComponent>(entity).GetWorldTransform(aWorld, entity);
+			Vector3f myPos = { myMatrix.r[3].m128_f32[0],myMatrix.r[3].m128_f32[1] ,myMatrix.r[3].m128_f32[2] };
 
-		deathZone.StartPos = myPos;*/
+			deathZone.StartPos = myPos;*/
 
 	}
 
@@ -1030,13 +1119,76 @@ void UnityImporter::LoadNpcComponent(const Json& aJson, World* aWorld)
 	}
 }
 
+void UnityImporter::LoadSphereColliderComponent(const Json& aJson, World* aWorld)
+{
+#ifndef _RELEASE
+	if (!DoesContain(aJson, "sphereColliders"))
+	{
+		return;
+	}
+#endif
+	for (auto& sphere : aJson["sphereColliders"])
+	{
+		Entity id = unityToEntity.at(sphere["entityID"]);
+		auto& transform = aWorld->GetComponent<TransformComponent>(id).GetWorldTransform(aWorld, id);;
+
+		auto& comp = aWorld->AddComponent<SphereColliderComponent>(id);
+		comp.radius = (float)sphere["radius"] * 500.f;  //Increase or Decrease this amount depending on how big the spheres of the culled object should be.
+		comp.center.x =(float)sphere["centerOffset"]["x"] * 100;
+		comp.center.y =(float)sphere["centerOffset"]["y"] * 100;
+		comp.center.z =(float)sphere["centerOffset"]["z"] * 100;
+		comp.center.x += transform.r[3].m128_f32[0];
+		comp.center.y += transform.r[3].m128_f32[1];
+		comp.center.z += transform.r[3].m128_f32[2];
+	}
+}
+
+
+#include <engine/graphics/vfx/ParticleSystemManager.h>
+void UnityImporter::LoadParticleSystemComponent(const Json& aJson, World* aWorld, SceneUpdateContext& aContext)
+{
+	if (!DoesContain(aJson, "particleSystemComponents"))
+	{
+		return;
+	}
+	aWorld;
+	for (auto& particle : aJson["particleSystemComponents"])
+	{
+		Entity entity = unityToEntity.at(particle["entityID"]);
+
+		Transform& transform = aWorld->GetComponent<TransformComponent>(entity).transform;
+
+		Vector3f offset = {
+			(float)particle["offset"]["x"],
+			(float)particle["offset"]["y"],
+			(float)particle["offset"]["z"]
+		};
+
+		ParticleEmitter emitter;
+		emitter.spawnAngle = 90.0f;
+		emitter.spawnRadius = 150.0f;
+		emitter.spawnRate = 100.0f;
+		emitter.lifeSpan = 1.0f;
+		emitter.speed = 100.0f;
+		emitter.size = 1.0f;
+		emitter.sizeVariation = 0.1f;
+
+		emitter.position = transform.GetPosition() + offset;
+		emitter.velocity = { 0, 10, 0 };
+		emitter.color = Vector4f(255.0f / 255.0f, 221.0f / 255.0f, 99.0f / 255.0f, 1);
+
+		size_t id = aContext.particleSystemManager->InsertEffect(emitter);
+		aContext.particleSystemManager->Play(id);
+	}
+}
+
 void UnityImporter::LoadDirectionalLight(const Json& aJson, World* aWorld)
 {
 	if (!DoesContain(aJson, "directionalLightComponentData"))
 	{
 		return;
 	}
-	aWorld;
+
 	for (auto& dirLight : aJson["directionalLightComponentData"])
 	{
 		Entity entity = unityToEntity.at(dirLight["entityID"]);
@@ -1044,12 +1196,14 @@ void UnityImporter::LoadDirectionalLight(const Json& aJson, World* aWorld)
 		Vector3f direction = aWorld->GetComponent<TransformComponent>(entity).transform.GetForward();
 
 		Vector3f color = {
-			color.x = dirLight["color"]["x"],
-			color.y = dirLight["color"]["y"],
-			color.z = dirLight["color"]["z"]
+			color.x = (float)dirLight["color"]["x"],
+			color.y = (float)dirLight["color"]["y"],
+			color.z = (float)dirLight["color"]["z"]
 		};
 
-		DirectionalLight dirrLight(direction, color, 1.5f);
+		float intensity = dirLight["intensity"];
+
+		DirectionalLight dirrLight(direction, color, intensity);
 		dirrLight.myTransform = aWorld->GetComponent<TransformComponent>(entity).transform;
 		AssetDatabase::StoreDirectionalLight(dirrLight);
 	}
@@ -1061,15 +1215,15 @@ void UnityImporter::LoadPointLight(const Json& aJson, World* aWorld)
 	{
 		return;
 	}
-
+	AssetDatabase::ClearPointLight();
 	for (auto& pointLight : aJson["lightComponents"])
 	{
 		Entity entity = unityToEntity.at(pointLight["entityID"]);
 
 		Vector3f color = {
-			color.x = pointLight["color"]["x"] * 255.f,
-			color.y = pointLight["color"]["y"] * 255.f,
-			color.z = pointLight["color"]["z"] * 255.f
+			color.x = (float)pointLight["color"]["x"] * 255.f,
+			color.y = (float)pointLight["color"]["y"] * 255.f,
+			color.z = (float)pointLight["color"]["z"] * 255.f
 		};
 		float intensity;
 		intensity = pointLight["intensity"] * 100.f;

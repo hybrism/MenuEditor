@@ -32,7 +32,7 @@ void Application::Run()
 {
 	while (BeginFrame())
 	{
-		Update(GetTimer().GetDeltaTime());
+		Update(GetTimer().GetDeltaTime(),GetTimer().GetTotalTime());
 		Render();
 		EndFrame();
 	}

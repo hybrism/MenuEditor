@@ -102,7 +102,7 @@ PixelOutput main(FullscreenVertexOutput input)
     float3 pixelNormal = UnpackNormal(aNormalTexture.Sample(aDefaultSampler, scaledUV).xyz);
     float3 vertexNormal = aVertexNormalTexture.Sample(aDefaultSampler, scaledUV).xyz;
     
-    float3 cameraPosition = modelToWorld[3].xyz;
+    float3 cameraPosition = GetCameraPosition();
     float3 toEye = normalize(cameraPosition - worldPosition.xyz);
     
     //MATERIAL
@@ -114,6 +114,7 @@ PixelOutput main(FullscreenVertexOutput input)
     //EMISSIVE
     float4 effects = aEffectsTexture.Sample(aDefaultSampler, scaledUV).rgba;
     float1 emissive = effects.r;
+    float3 emissiveAlbedo = albedo.rgb * emissive;
     //float1 heightDP = effects.g;
     
     //LIGHT
@@ -143,9 +144,7 @@ PixelOutput main(FullscreenVertexOutput input)
     //float3 directionalLightProjectedPosition = directionalLightProjectedPositionTemp.xyz / directionalLightProjectedPositionTemp.w;
     //float shadowFactor = 1.0f;
     
-
-    float3 emissiveAlbedo = albedo.rgb * emissive;
-    float3 radiance = ambiance + emissiveAlbedo + pointLight.rgb + directionalLight.rgb * shadow.r;
+    float3 radiance = ambiance + pointLight.rgb + directionalLight.rgb * shadow.r * (1.0f - emissive) + emissiveAlbedo;
     result.color.rgb = radiance;
     result.color.a = albedo.a;
     

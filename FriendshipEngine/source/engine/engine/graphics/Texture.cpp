@@ -2,6 +2,7 @@
 #include "Texture.h"
 #include "GraphicsEngine.h"
 #include "RenderDefines.h"
+#include <d3d11.h>
 
 Texture::Texture(ComPtr<ID3D11ShaderResourceView> aShaderResourceView)
 {
@@ -12,7 +13,7 @@ Texture::Texture(ComPtr<ID3D11ShaderResourceView> aShaderResourceView)
 	myTexture = nullptr;
 }
 
-Texture::Texture(ComPtr<ID3D11ShaderResourceView> aShaderResourceView, const int& aWidth, const int& aHeight)
+Texture::Texture(ComPtr<ID3D11ShaderResourceView> aShaderResourceView, const unsigned int& aWidth, const unsigned int& aHeight)
 {
 	myShaderResourceView = aShaderResourceView;
 	myWidth = aWidth;
@@ -21,12 +22,21 @@ Texture::Texture(ComPtr<ID3D11ShaderResourceView> aShaderResourceView, const int
 	myTexture = nullptr;
 }
 
+Texture::Texture(ComPtr<ID3D11ShaderResourceView> aShaderResourceView, const unsigned int& aWidth, const unsigned int& aHeight, ComPtr<ID3D11Texture2D> aTexture)
+{
+	myShaderResourceView = aShaderResourceView;
+	myWidth = aWidth;
+	myHeight = aHeight;
+	myTexture = aTexture;
+	myRgbaPixels = nullptr;
+}
+
 Texture::Texture(
 	ComPtr<ID3D11ShaderResourceView> aShaderResourceView,
-	const int& aWidth,
-	const int& aHeight,
+	const unsigned int& aWidth,
+	const unsigned int& aHeight,
 	unsigned char* aRgbaPixels,
-	ID3D11Texture2D* aTexture
+	ComPtr<ID3D11Texture2D> aTexture
 )
 {
 	myShaderResourceView = aShaderResourceView;
@@ -36,7 +46,20 @@ Texture::Texture(
 	myTexture = aTexture;
 }
 
-Texture::~Texture() = default;
+Texture::~Texture()
+{
+	delete[] myRgbaPixels;
+
+	if (myTexture)
+	{
+		myTexture->Release();
+	}
+
+	if (myShaderResourceView)
+	{
+		myShaderResourceView->Release();
+	}
+}
 
 void Texture::Bind(const PixelShaderTextureSlot& aSlot) const
 {
@@ -52,9 +75,9 @@ void Texture::Bind(const unsigned int& aSlot, bool aShouldBindToPixelShader) con
 {
 	auto* context = GraphicsEngine::GetInstance()->DX().GetContext();
 
-	if (myTexture != nullptr)
+	if (myTexture != nullptr && myRgbaPixels != nullptr)
 	{
-		context->UpdateSubresource(myTexture, 0, nullptr, (void*)myRgbaPixels, myWidth * 4, myWidth * myHeight * 4);
+		context->UpdateSubresource(myTexture.Get(), 0, nullptr, (void*)myRgbaPixels, myWidth * 4, myWidth * myHeight * 4);
 	}
 
 	if (aShouldBindToPixelShader)
@@ -84,3 +107,29 @@ Vector2f Texture::GetTextureSize() const
 
 	return size;
 }
+
+#ifdef _EDITOR
+#include <engine/utility/Error.h>
+
+void Texture::WriteToSRV(uint32_t* aRgbaPixels, unsigned int aOffsetWidth, unsigned int aOffsetHeight)
+{
+	auto* ge = GraphicsEngine::GetInstance();
+	auto context = ge->DX().GetContext();
+
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = context->Map(myTexture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(hr))
+	{
+		PrintE("[TextureFactory.cpp] Failed to map texture: ");
+		return;
+	}
+
+	UINT* data = reinterpret_cast<UINT*>(mappedResource.pData);
+	for (UINT i = aOffsetWidth + aOffsetHeight * myWidth; i < myWidth * myHeight; ++i)
+	{
+		data[i] = aRgbaPixels[i];
+	}
+
+	context->Unmap(myTexture.Get(), 0);
+}
+#endif

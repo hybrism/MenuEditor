@@ -52,7 +52,9 @@ void MeshDrawer::InternalDraw(
 	const PixelShader* aPixelShader
 )
 {
-	myCurrentInstanceBuffer = &myInstanceBuffer;
+	assert(aInstances[0].data.type != InstanceDataType::Count && "Instance data was not properly initialized");
+	
+	myCurrentInstanceBuffer = &myInstanceBuffer[(int)aInstances[0].data.type];
 	if (aVertexShader->GetInstanceBuffer().HasBuffer())
 	{
 		myCurrentInstanceBuffer = &aVertexShader->GetInstanceBuffer();
@@ -65,9 +67,9 @@ void MeshDrawer::InternalDraw(
 	{
 		aSharedData.BindTextures();
 
-		unsigned int strides[2] { aSharedData.GetVertexSize(), myCurrentInstanceBuffer->myStride };
-		unsigned int offsets[2] { 0, myCurrentInstanceBuffer->myOffset };
-		ID3D11Buffer* bufferContainer[2] { aSharedData.GetVertexBuffer(), myCurrentInstanceBuffer->myBuffer.Get() };
+		unsigned int strides[2]{ aSharedData.GetVertexSize(), myCurrentInstanceBuffer->myStride };
+		unsigned int offsets[2]{ 0, myCurrentInstanceBuffer->myOffset };
+		ID3D11Buffer* bufferContainer[2]{ aSharedData.GetVertexBuffer(), myCurrentInstanceBuffer->myBuffer.Get() };
 
 		context->IASetVertexBuffers(0, 2, bufferContainer, strides, offsets);
 		context->IASetIndexBuffer(aSharedData.GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
@@ -109,14 +111,41 @@ void MeshDrawer::Init()
 {
 	D3D11_BUFFER_DESC objectBufferDesc;
 	objectBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	objectBufferDesc.ByteWidth = sizeof(StaticMeshInstanceData) * BATCH_SIZE;
 	objectBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	objectBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	objectBufferDesc.MiscFlags = 0;
 	objectBufferDesc.StructureByteStride = 0;
 
-	myInstanceBuffer.Init(objectBufferDesc, sizeof(StaticMeshInstanceData));
-	myCurrentInstanceBuffer = &myInstanceBuffer;
+	for (size_t i = 0; i < (int)InstanceDataType::Count; i++)
+	{
+		size_t size = 0;
+
+		switch ((InstanceDataType)i)
+		{
+		case InstanceDataType::SkeletalMesh:
+			size = sizeof(MeshDrawerInstanceData::skeletalMeshData);
+			break;
+		case InstanceDataType::StaticMesh:
+			size = sizeof(MeshDrawerInstanceData::staticMeshData);
+			break;
+		case InstanceDataType::VfxMesh:
+			size = sizeof(MeshDrawerInstanceData::vfxMeshData);
+			break;
+		case InstanceDataType::Particle:
+			size = sizeof(MeshDrawerInstanceData::particleData);
+			break;
+		default:
+			throw; // Should never happen
+			break;
+		}
+
+		size += sizeof(MeshDrawerInstanceData::transform);
+
+		objectBufferDesc.ByteWidth = static_cast<UINT>(size * BATCH_SIZE);
+
+		myInstanceBuffer[i].Init(objectBufferDesc, static_cast<UINT>(size));
+	}
+	myCurrentInstanceBuffer = &myInstanceBuffer[0];
 }
 
 void MeshDrawer::Draw(

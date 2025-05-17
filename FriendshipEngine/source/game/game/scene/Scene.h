@@ -15,9 +15,14 @@ public:
 	Scene(SceneManager* aSceneManager)
 		: mySceneManager(aSceneManager)
 	{}
+	virtual ~Scene()
+	{
+		myScripts.clear();
+		mySceneManager = nullptr;
+	}
 
 	virtual void Init(PhysXSceneManager& aPhysXManager) { aPhysXManager; }
-	virtual bool Update(const SceneUpdateContext& dt) { dt; return true; }
+	virtual bool Update(SceneUpdateContext& dt) { dt; return true; }
 	virtual void Render() { __noop; }
 
 	virtual void OnEnter() { __noop; }

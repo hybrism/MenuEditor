@@ -6,6 +6,7 @@ namespace FE
 	class Observer
 	{
 	public:
+		virtual ~Observer() = default;
 		virtual void RecieveMessage(const Message& aMessage) = 0;
 	};
 }

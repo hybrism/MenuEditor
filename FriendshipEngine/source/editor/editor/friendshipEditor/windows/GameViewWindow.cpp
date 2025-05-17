@@ -7,6 +7,7 @@
 #include <engine/utility/Error.h>
 #include <imgui/imgui.h>
 #include <game/Game.h>
+#include "../editor/editor/FreeCameraHandler.h"
 
 FE::GameViewWindow::GameViewWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
 	: WindowBase(aHandle, aOpen, aFlags)
@@ -49,6 +50,12 @@ void FE::GameViewWindow::Show(const EditorUpdateContext& aContext)
 		if (ImGui::Button("Play", buttonSize))
 		{
 			InputManager::GetInstance()->LockMouseScreen(Engine::GetInstance()->GetWindowHandle());
+
+			if (aContext.freeCamHandler != nullptr)
+			{
+				aContext.freeCamHandler->ActivatePlayMode();
+			}
+
 			sceneManager.SetIsPaused(false);
 		}
 

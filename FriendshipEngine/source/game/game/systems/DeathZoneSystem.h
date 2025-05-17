@@ -12,7 +12,7 @@ public:
 	~DeathZoneSystem() override;
 
 	void Init() override;
-	void Update(const SceneUpdateContext& dt) override;
+	void Update(SceneUpdateContext& dt) override;
 
 
 private:

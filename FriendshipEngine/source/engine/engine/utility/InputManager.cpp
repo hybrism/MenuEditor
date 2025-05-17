@@ -37,7 +37,7 @@ void InputManager::Init()
 	myMouse->SetVisible(true);
 	ShowCursor(true);
 
-	myMouseIsVisible = false;
+	myMouseIsVisible = true;
 }
 
 bool InputManager::IsMouseVisible()
@@ -112,10 +112,10 @@ void InputManager::LockMouseScreen(HWND mWindow)
 
 	ClipCursor(&rect);
 	myMouse->SetMode(DirectX::Mouse::MODE_RELATIVE);
-	if (IsMouseVisible())
+
+	if (myMouseIsVisible)
 	{
 		ShowCursor(0);
-		myMouse->SetVisible(false);
 		myMouseIsVisible = false;
 	}
 }
@@ -124,13 +124,13 @@ void InputManager::UnlockMouseScreen()
 {
 	ClipCursor(nullptr);
 	myMouse->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
-	if (!IsMouseVisible())
+
+	if (!myMouseIsVisible)
 	{
 		ShowCursor(1);
-		myMouse->SetVisible(true);
 		myMouseIsVisible = true;
 	}
-	//myMouse->IsVisible();
+
 }
 
 void InputManager::Update()

@@ -5,6 +5,7 @@
 #include <engine/graphics/Animation/AnimationController.h>
 #include "../component/PlayerComponent.h"
 #include "../component/AnimationDataComponent.h"
+#include "audio/NewAudioManager.h"
 
 PlayerSlideState::PlayerSlideState(PlayerStateMachine* aStateMachine) : PlayerState(aStateMachine)
 {
@@ -15,14 +16,18 @@ void PlayerSlideState::OnEnter(PlayerStateUpdateContext& aContext)
 	PlayerComponent& p = aContext.playerComponent;
 	p.xVelocity += p.xVelocity.GetNormalized() * PlayerConstants::slideSpeedBoost;
 	p.controller->resize(0.0f);
+	p.controller->setStepOffset(STEP_OFFSET_SLIDE);
 	p.currentCameraHeight = PlayerConstants::cameraCrouchHeight;
-
-	aContext.animationController->SetParameter(static_cast<size_t>(PlayerAnimationParameter::eIsSliding), { true }, aContext.animationDataComponent, aContext.animationDataComponent.parameters);
+	p.timer.slideTimer = 0;
+	aContext.animationController.SetParameter(static_cast<size_t>(PlayerAnimationParameter::eIsSliding), { true }, aContext.animationDataComponent, aContext.animationDataComponent.parameters);
+	NewAudioManager::GetInstance()->PlaySound(eSounds::Slide, 0.3f);
 }
 
 void PlayerSlideState::OnExit(PlayerStateUpdateContext& aContext)
 {
-	aContext.animationController->SetParameter(static_cast<size_t>(PlayerAnimationParameter::eIsSliding), { false }, aContext.animationDataComponent, aContext.animationDataComponent.parameters);
+	PlayerComponent& p = aContext.playerComponent;
+	p.controller->setStepOffset(STEP_OFFSET);
+	aContext.animationController.SetParameter(static_cast<size_t>(PlayerAnimationParameter::eIsSliding), { false }, aContext.animationDataComponent, aContext.animationDataComponent.parameters);
 
 }
 
@@ -44,14 +49,22 @@ void PlayerSlideState::Update(PlayerStateUpdateContext& aContext)
 
 	bool canUncrouch = CanUncrouch(aContext);
 	float friction = PlayerConstants::slideFriction;
-	if (p.xVelocity.Length() - friction < 0.01f)
+
+	if (p.timer.slideTimer < PlayerConstants::slideTimeUntilFriction)
 	{
-		p.xVelocity = { 0, 0 };
+		p.timer.slideTimer += dt;
 	}
 	else
 	{
-		Vector2f r = p.xVelocity.GetNormalized() * friction;
-		p.xVelocity -= r;
+		if (p.xVelocity.Length() - friction < 0.01f)
+		{
+			p.xVelocity = { 0, 0 };
+		}
+		else
+		{
+			Vector2f r = p.xVelocity.GetNormalized() * friction;
+			p.xVelocity -= r;
+		}
 	}
 
 	if (p.input.hasPressedJump && canUncrouch)
@@ -67,8 +80,8 @@ void PlayerSlideState::Update(PlayerStateUpdateContext& aContext)
 
 	if (canUncrouch &&
 		!p.input.isHoldingCrouch &&
-		p.xVelocity.Length() < PlayerConstants::slideSpeedThreshold
-	)
+		p.timer.slideTimer > PlayerConstants::slideTimeUntilFriction
+		)
 	{
 		myStateMachine->SetState(ePlayerClassStates::Ground, aContext);
 		return;

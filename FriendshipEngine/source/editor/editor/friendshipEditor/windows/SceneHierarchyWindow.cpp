@@ -6,6 +6,7 @@
 #include <shared/postMaster/PostMaster.h>
 #include <ecs/World.h>
 #include <game/component/MetaDataComponent.h>
+#include <format>
 
 FE::SceneHierarchyWindow::SceneHierarchyWindow(const std::string& aHandle, bool aOpen, ImGuiWindowFlags aFlags)
 	: WindowBase(aHandle, aOpen, aFlags)
@@ -39,15 +40,33 @@ void FE::SceneHierarchyWindow::Show(const EditorUpdateContext& aContext)
 			{
 				auto& data = aContext.world->GetComponent<MetaDataComponent>(entity);
 
-				std::string displayName = "[" + std::to_string(entity) + "] " + data.name;
-
-				if (displayName.find(mySceneHierarchySearchWord) != std::string::npos)
+				if (mySceneHierarchySearchWord.size() > 0)
 				{
-					if (ImGui::Selectable(displayName.c_str(), mySelectedEntity == entity))
-					{
-						mySelectedEntity = entity;
-						PushInspectorWindow(entity);
-					}
+					std::string displayName = data.name;
+
+					if (displayName.find(mySceneHierarchySearchWord) == std::string::npos) { continue; }
+				}
+
+				bool result = false;
+
+				ImGui::PushID((int)entity);
+
+				if (data.size == 0)
+				{
+					result = ImGui::Selectable("##", mySelectedEntity == entity);
+				}
+				else
+				{
+				std::string name = "[" + std::to_string(entity) + "] ";
+				name += data.name;
+					result = ImGui::Selectable(name.c_str(), mySelectedEntity == entity);
+				}
+				ImGui::PopID();
+
+				if (result)
+				{
+					mySelectedEntity = entity;
+					PushInspectorWindow(entity);
 				}
 			}
 

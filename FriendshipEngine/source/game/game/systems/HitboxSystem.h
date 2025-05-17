@@ -11,7 +11,7 @@ public:
 
 
 	// Inherited via System
-	virtual void Update(const SceneUpdateContext& dt) override;
+	virtual void Update(SceneUpdateContext& dt) override;
 
 };
 

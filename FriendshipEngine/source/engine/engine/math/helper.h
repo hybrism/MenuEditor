@@ -59,6 +59,21 @@ public:
 		return a + t * (b - a);
 	}
 
+	/// <summary>
+	/// -180 to 180 deg
+	/// </summary>
+	/// <returns>true when clamping occurs</returns>
+	static bool ClampAngle(float& outValue)
+	{
+		int sign = FriendMath::Sign(outValue);
+		if (outValue * sign > 180)
+		{
+			outValue -= 360 * (int)(abs(outValue / 360) + 1) * sign;
+			return true;
+		}
+		return false;
+	}
+
 	static std::vector<float> Upsample2X(const std::vector<float>& input, int resolution)
 	{
 		std::vector<float> output(2 * resolution * 2 * resolution);

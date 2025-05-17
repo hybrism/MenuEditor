@@ -13,7 +13,7 @@ struct MeshComponent : public Component<MeshComponent>
 	size_t id = 0;
 	MeshType type = MeshType::Static;
 	Transform offset{};
-	unsigned int renderOrder = 0;
+	int vertexPaintedIndex = -1;
 	bool shouldDisregardDepth = false;
 	bool shouldRender = true;
 };

@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 
 #include "../../math/Vector.h"
 #include "../../math/Matrix.h"
@@ -19,10 +20,10 @@ struct TextureRect
 
 struct ClipValue
 {
-	float left = 0.f;
-	float right = 0.f;
-	float down = 0.f;
-	float upper = 0.f;
+	float left;
+	float right;
+	float down;
+	float upper;
 };
 
 struct SpriteInstanceData
@@ -54,6 +55,6 @@ struct Sprite3DInstanceData
 
 struct SpriteSharedData
 {
-	Texture* texture = nullptr;
+	std::shared_ptr<Texture> texture = nullptr;
 	VertexShader* myCustomShader = nullptr;
 };

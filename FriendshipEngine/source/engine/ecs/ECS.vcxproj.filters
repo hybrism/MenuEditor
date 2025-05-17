@@ -22,6 +22,9 @@
     <ClInclude Include="component\ComponentManager.h">
       <Filter>component</Filter>
     </ClInclude>
+    <ClInclude Include="component\ComponentSignature.h">
+      <Filter>component</Filter>
+    </ClInclude>
     <ClInclude Include="component\IComponentContainer.h">
       <Filter>component</Filter>
     </ClInclude>
@@ -31,7 +34,10 @@
     <ClInclude Include="entity\EntityManager.h">
       <Filter>entity</Filter>
     </ClInclude>
-    <ClInclude Include="entity\EntitySignatureManager.h">
+    <ClInclude Include="entity\EntitySignature.h">
+      <Filter>entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\EntitySignatureContainer.h">
       <Filter>entity</Filter>
     </ClInclude>
     <ClInclude Include="system\System.h">

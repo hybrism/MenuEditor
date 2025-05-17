@@ -17,7 +17,7 @@ public:
 	~ModelViewerLauncher() override;
 
 	void Init(HINSTANCE hInstance, WNDPROC wndProc) override;
-	void Update(const float& dt);
+	void Update(const float& aDt, const double& aTotalTime) override;
 	void Render();
 
 private:

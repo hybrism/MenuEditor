@@ -15,7 +15,7 @@ HitboxSystem::HitboxSystem(World* aWorld) : System(aWorld)
 
 }
 
-void HitboxSystem::Update(const SceneUpdateContext& aContext)
+void HitboxSystem::Update(SceneUpdateContext& aContext)
 {
 	for (Entity entity : myEntities)
 	{

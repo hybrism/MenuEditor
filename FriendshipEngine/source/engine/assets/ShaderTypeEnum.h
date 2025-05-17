@@ -2,6 +2,9 @@
 
 enum class VsType
 {
+	DebugLine3D,
+	DebugLine2D,
+
 	// pbr
 	DefaultPBR,
 	SkinnedPBR,
@@ -17,6 +20,7 @@ enum class VsType
 
 	// vfx
 	DefaultVFX,
+	Particle,
 
 	Count
 };
@@ -34,6 +38,7 @@ enum class PsType
 	PostProcess,
 	ToneMap,
 	Vignette,
+	Speedlines,
 
 	// sprite
 	Sprite,
@@ -45,12 +50,16 @@ enum class PsType
 	DebugLightSphere,
 
 	// vfx
-	TestVFX,
+	Aoe1,
+	Aoe2,
+	Aoe3,
 
 	//Light
 	DirectionalLight,
 	LightBounds,
 	SkyBox,
+
+	Particle,
 
 	Count
 };

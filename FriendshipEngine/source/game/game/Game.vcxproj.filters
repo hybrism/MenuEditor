@@ -61,6 +61,9 @@
     <ClInclude Include="audio\FMODImplementation.h">
       <Filter>audio</Filter>
     </ClInclude>
+    <ClInclude Include="audio\NewAudioManager.h">
+      <Filter>audio</Filter>
+    </ClInclude>
     <ClInclude Include="collision\Bitmask.h">
       <Filter>collision</Filter>
     </ClInclude>
@@ -116,6 +119,9 @@
       <Filter>component</Filter>
     </ClInclude>
     <ClInclude Include="component\ScriptableEventComponent.h">
+      <Filter>component</Filter>
+    </ClInclude>
+    <ClInclude Include="component\SphereColliderComponent.h">
       <Filter>component</Filter>
     </ClInclude>
     <ClInclude Include="component\TransformComponent.h">
@@ -214,6 +220,9 @@
     </ClInclude>
     <ClInclude Include="scene\SceneManager.h">
       <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\utility\GameTimer.h">
+      <Filter>scene\utility</Filter>
     </ClInclude>
     <ClInclude Include="scene\utility\UnityImporter.h">
       <Filter>scene\utility</Filter>
@@ -320,6 +329,9 @@
     <ClCompile Include="audio\FMODImplementation.cpp">
       <Filter>audio</Filter>
     </ClCompile>
+    <ClCompile Include="audio\NewAudioManager.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
     <ClCompile Include="collision\Bitmask.cpp">
       <Filter>collision</Filter>
     </ClCompile>
@@ -392,6 +404,9 @@
     </ClCompile>
     <ClCompile Include="scene\SceneManager.cpp">
       <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\utility\GameTimer.cpp">
+      <Filter>scene\utility</Filter>
     </ClCompile>
     <ClCompile Include="scene\utility\UnityImporter.cpp">
       <Filter>scene\utility</Filter>

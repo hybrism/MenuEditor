@@ -29,48 +29,49 @@ void AnimatorSystem::Init()
 	{
 		auto& animData = myWorld->GetComponent<AnimationDataComponent>(entity);
 		size_t meshId = myWorld->GetComponent<MeshComponent>(entity).id;
+		Skeleton* skeleton = AssetDatabase::GetSkeleton(meshId);
 
-		if (!AssetDatabase::DoesAnimationControllerExist(meshId)) { continue; }
+		if (!AssetDatabase::DoesAnimationControllerExist(skeleton)) { continue; }
 
-		auto* controller = AssetDatabase::GetAnimationController(meshId);
+		auto& controller = AssetDatabase::GetAnimationController(animData.controllerId);
 
-		animData.currentStateIndex = controller->GetDefaultStateIndex();
+		animData.currentStateIndex = controller.GetDefaultStateIndex();
 	}
 }
 
 // TODO: Add time, transitions etc to animation data component and use that instead of multiple animation players
-void AnimatorSystem::Update(const SceneUpdateContext& aContext)
+void AnimatorSystem::Update(SceneUpdateContext& aContext)
 {
 	for (auto& entity : myEntities)
 	{
 		auto& animData = myWorld->GetComponent<AnimationDataComponent>(entity);
 		size_t meshId = myWorld->GetComponent<MeshComponent>(entity).id;
 
-		if (!AssetDatabase::DoesAnimationControllerExist(meshId)) { continue; }
+		if (animData.controllerId < 0) { continue; }
 
-		auto* controller = AssetDatabase::GetAnimationController(meshId);
+		auto& controller = AssetDatabase::GetAnimationController(animData.controllerId);
 
 		// Prevents crash if no animation states are added to skinned mesh, though this should never happen
 #ifndef _RELEASE
-		if (!controller->HasAnimationStates())
+		if (!controller.HasAnimationStates())
 		{
 			continue;
 		}
 #endif
-		int currentAnimIndex = controller->GetCurrentAnimationIndex(animData);
+		int currentAnimIndex = controller.GetCurrentAnimationIndex(animData);
 		
 		if (currentAnimIndex < 0) { continue; }
 
-		Animation* animation = AssetDatabase::GetAnimation(meshId, currentAnimIndex);
+		Animation* animation = AssetDatabase::GetAnimation(AssetDatabase::GetSkeleton(meshId), currentAnimIndex);
 
-		controller->Update(aContext.dt, *animation, animData);
+		controller.Update(aContext.dt, *animation, animData);
 
 		AnimationState* toState = nullptr;
 		if (animData.IsTransitioning())
 		{
-			toState = &controller->GetState(animData.nextStateIndex);
+			toState = &controller.GetState(animData.nextStateIndex);
 		}
 
-		myAnimationPlayer->UpdatePose(aContext.dt, meshId, animData, controller->GetCurrentState(animData), toState);
+		myAnimationPlayer->UpdatePose(aContext.dt, meshId, animData, controller.GetCurrentState(animData), toState);
 	}
 }

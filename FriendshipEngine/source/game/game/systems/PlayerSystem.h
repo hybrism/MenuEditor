@@ -11,7 +11,6 @@ enum class ePlayerState;
 class PhysXSceneManager;
 
 
-#include <engine/graphics/vfx/VFXManager.h>
 #include "../playerStates/PlayerStateMachine.h"
 
 class PlayerSystem : public System<PlayerSystem>
@@ -21,18 +20,13 @@ public:
 	~PlayerSystem() override;
 
 	void Init() override;
-	void Update(const SceneUpdateContext& dt) override;
-	void Render() override;
+	void Update(SceneUpdateContext& dt) override;
 private:
 	void Input(Entity entity, float dt);
 	void CameraMove(Entity entity, float dt);
 	void Collision(Entity entity, float dt);
 	void VaultCollision(Entity entity, float dt);
 	void Respawn(Entity entity);
-
-	VFXManager manager;
-	vfxid_t testEffectId;
-	void TestVfxBlob(const float& dt);
 
 	PhysXSceneManager* myPhysXSceneManager;
 	float myMouseSensitivyMultiplier = 1.0f;

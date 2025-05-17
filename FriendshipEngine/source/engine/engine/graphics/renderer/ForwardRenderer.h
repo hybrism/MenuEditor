@@ -22,8 +22,6 @@ public:
 	void Render(Mesh* aMesh, const MeshInstanceRenderData& aInstanceData, BlendState aBlendState = BlendState::Disabled);
 	void Render(SkeletalMesh* aMesh, const MeshInstanceRenderData& aInstanceData, BlendState aBlendState = BlendState::Disabled);
 
-	// TODO: add support to disable shadows on one instance
-	void DoShadowRenderPass();
 	void DoRenderPass();
 	void Clear();
 private:

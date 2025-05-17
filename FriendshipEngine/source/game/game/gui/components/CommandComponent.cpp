@@ -2,10 +2,15 @@
 
 #include <variant>
 
+#include "../../audio/NewAudioManager.h"
+
 #include "CommandComponent.h"
 #include "CommandFunctions.h"
 
 #include <engine/utility/Error.h>
+#include <engine/graphics/Camera.h>
+#include <engine/graphics/GraphicsEngine.h>
+#include <engine/Engine.h>
 
 #include "../MenuObject.h"
 
@@ -18,6 +23,10 @@ MENU::CommandComponent::CommandComponent(MenuObject& aParent, unsigned int aID)
 
 void MENU::CommandComponent::Execute(CommandData aData, const MenuUpdateContext& aContext)
 {
+#ifdef _RELEASE
+	NewAudioManager::GetInstance()->PlaySound(eSounds::MenyNavigation, 0.5f);
+#endif
+
 	if (!myCommand)
 	{
 		PrintW("No command set!");
@@ -50,6 +59,30 @@ void MENU::CommandComponent::SetCommandType(eCommandType aType)
 		break;
 	case MENU::eCommandType::QuitGame:
 		myCommand = QuitGameCommand;
+		break;
+	case MENU::eCommandType::Headbob:
+	{
+		myCommand = HeadbobCommand;
+
+		auto& camera = *GraphicsEngine::GetInstance()->GetCamera();
+		myCommandData.data = &camera.GetHeadBobBool();
+		break;
+	}
+	case MENU::eCommandType::Fullscreen:
+		myCommand = FullscreenCommand;
+
+		myCommandData.data = &Engine::GetInstance()->myIsFullscreen;
+		break;
+	case MENU::eCommandType::Resolution:
+		myCommand = ResolutionCommand;
+
+		myCommandData.data = &GraphicsEngine::GetInstance()->GetInternalResolution();
+		break;
+	case MENU::eCommandType::SfxVolume:
+		myCommand = SfxVolumeCommand;
+		break;
+	case MENU::eCommandType::MusicVolume:
+		myCommand = MusicVolumeCommand;
 		break;
 	default:
 		break;

@@ -28,7 +28,13 @@ void MENU::SpriteComponent::Render()
 	GraphicsEngine::GetInstance()->GetSpriteRenderer().DrawSprite(myTextures[(int)myParent.GetState()].shared, myInstance);
 }
 
-Texture* MENU::SpriteComponent::GetTexture(ObjectState aType) const
+void MENU::SpriteComponent::OnResize(const Vector2f& aScale)
+{
+	myInstance.size = { aScale.x * myInitialSize.x, aScale.y * myInitialSize.y };
+	myInstance.position = { aScale.x * myInitialPosition.x, aScale.y * myInitialPosition.y };
+}
+
+std::shared_ptr<Texture> MENU::SpriteComponent::GetTexture(ObjectState aType) const
 {
 	return myTextures[(int)aType].shared.texture;
 }
@@ -57,6 +63,7 @@ std::string MENU::SpriteComponent::GetTexturePath(ObjectState aType)
 void MENU::SpriteComponent::SetPosition(const Vector2f& aPosition)
 {
 	myPosition = aPosition;
+	myInitialPosition = aPosition;
 }
 
 void MENU::SpriteComponent::SetPivot(const Vector2f& aPivot)
@@ -67,6 +74,7 @@ void MENU::SpriteComponent::SetPivot(const Vector2f& aPivot)
 void MENU::SpriteComponent::SetSize(const Vector2f& aSize)
 {
 	myInstance.size = aSize;
+	myInitialSize = aSize;
 }
 
 void MENU::SpriteComponent::SetScaleMultiplier(const Vector2f& aScaleMultiplier)
@@ -94,13 +102,14 @@ void MENU::SpriteComponent::SetIsHidden(bool aIsHidden)
 	myInstance.isHidden = aIsHidden;
 }
 
-
-
-void MENU::SpriteComponent::SetTexture(Texture* aTexture, const std::string& aTextureName, ObjectState aType)
+void MENU::SpriteComponent::SetTexture(std::shared_ptr<Texture> aTexture, const std::string& aTextureName, ObjectState aType)
 {
 	myTextures[(int)aType].fileName = aTextureName;
 	myTextures[(int)aType].shared.texture = aTexture;
 
 	if (aType == ObjectState::Default)
+	{
 		myInstance.size = myTextures[(int)aType].shared.texture->GetTextureSize();
+		myInitialSize = myInstance.size;
+	}
 }

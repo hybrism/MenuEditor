@@ -12,12 +12,15 @@ void PlayerCrouchState::OnEnter(PlayerStateUpdateContext& aContext)
 {
 	PlayerComponent& p = aContext.playerComponent;
 	p.controller->resize(0.0f);
+	p.controller->setStepOffset(STEP_OFFSET_SLIDE);
+
 	p.currentCameraHeight = PlayerConstants::cameraCrouchHeight;
 }
 
-void PlayerCrouchState::OnExit(PlayerStateUpdateContext&)
+void PlayerCrouchState::OnExit(PlayerStateUpdateContext& aContext)
 {
-
+	PlayerComponent& p = aContext.playerComponent;
+	p.controller->setStepOffset(STEP_OFFSET);
 }
 
 void PlayerCrouchState::Update(PlayerStateUpdateContext& aContext)
@@ -68,9 +71,9 @@ void PlayerCrouchState::Update(PlayerStateUpdateContext& aContext)
 	}
 
 	float length = p.xVelocity.Length();
-	if (length > PlayerConstants::maxSpeed * PlayerConstants::crouchSpeedMultiplier)
+	if (length > PlayerConstants::groundMaxSpeed * PlayerConstants::crouchSpeedMultiplier)
 	{
-		float delta = length - PlayerConstants::maxSpeed * PlayerConstants::crouchSpeedMultiplier;
+		float delta = length - PlayerConstants::groundMaxSpeed * PlayerConstants::crouchSpeedMultiplier;
 		p.xVelocity -= p.xVelocity.GetNormalized() * delta * 0.3f; // vad är det här????
 	}
 
@@ -101,7 +104,8 @@ bool PlayerCrouchState::CanUncrouch(PlayerStateUpdateContext& aContext)
 	if (aContext.playerComponent.collision.groundNormal.LengthSqr() > 0)
 	{
 		return !aContext.physXSceneManager->GetScene()->overlap(
-			physx::PxSphereGeometry(CHARACTER_RADIUS - 1 + HEAD_BONK_OFFSET),
+			//physx::PxSphereGeometry(CHARACTER_RADIUS - 1 + HEAD_BONK_OFFSET),
+			physx::PxSphereGeometry(CHARACTER_RADIUS - 1),
 			shapePose,
 			hit,
 			physx::PxQueryFilterData(PxQueryFlag::eANY_HIT | physx::PxQueryFlag::eSTATIC)

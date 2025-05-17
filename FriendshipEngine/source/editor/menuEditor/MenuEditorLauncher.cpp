@@ -92,9 +92,9 @@ void MenuEditorLauncher::Init(HINSTANCE hInstance, WNDPROC wndProc)
 }
 
 
-void MenuEditorLauncher::Update(const float& dt)
+void MenuEditorLauncher::Update(const float& dt, const double& totalTime)
 {
-	::Application::Update(dt);
+	::Application::Update(dt, totalTime);
 	ImGuiHandler::Update();
 
 	InputManager::GetInstance()->Update();

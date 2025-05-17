@@ -18,25 +18,30 @@ DeferredRenderer::DeferredRenderer(MeshDrawer& aMeshDrawer) : myMeshDrawer(aMesh
 DeferredRenderer::~DeferredRenderer()
 {
 	Clear();
+	myStaticMeshes.clear();
+	mySkeletalMeshes.clear();
+	myDisregardDepthMeshes.clear();
 }
 
 void DeferredRenderer::Render(Mesh* aMesh, MeshInstanceRenderData aInstanceData)
 {
-	if (std::holds_alternative<StaticMeshInstanceData>(aInstanceData.data))
+	if (aInstanceData.data.type == InstanceDataType::SkeletalMesh)
 	{
-		std::get<StaticMeshInstanceData>(aInstanceData.data).entityData.y = static_cast<unsigned int>(myStaticMeshes[aMesh].size());
+		aInstanceData.data.staticMeshData.entityData.y = 0;
 	}
-	myStaticMeshes[aMesh].push_back(aInstanceData);
+
+	AddToRenderContainer(aMesh, aInstanceData, &myStaticMeshes);
 }
 
 void DeferredRenderer::Render(SkeletalMesh* aMesh, const MeshInstanceRenderData& aInstanceData, bool aShouldDisregardDepth)
 {
 	if (aShouldDisregardDepth)
 	{
-		myDisregardDepthMeshes[aMesh].push_back(aInstanceData);
+		AddToRenderContainer(aMesh, aInstanceData, &myDisregardDepthMeshes);
 		return;
 	}
-	mySkeletalMeshes[aMesh].push_back(aInstanceData);
+
+	AddToRenderContainer(aMesh, aInstanceData, &mySkeletalMeshes);
 }
 
 void DeferredRenderer::DoShadowRenderPass()
@@ -61,13 +66,33 @@ void DeferredRenderer::DoFinalPass()
 
 void DeferredRenderer::Clear()
 {
-	for (auto& mesh : myStaticMeshes)
+	for (auto& [mesh, data] : myStaticMeshes)
 	{
-		mesh.second.clear();
+		data.size = 0;
 	}
-	myStaticMeshes.clear();
-	mySkeletalMeshes.clear();
-	myDisregardDepthMeshes.clear();
+	for (auto& [mesh, data] : mySkeletalMeshes)
+	{
+		data.size = 0;
+	}
+	for (auto& [mesh, data] : myDisregardDepthMeshes)
+	{
+		data.size = 0;
+	}
+}
+
+void DeferredRenderer::AddToRenderContainer(SharedMesh* aMesh, MeshInstanceRenderData aInstanceData, void* aContainer)
+{
+	StaticData& container = (*(std::unordered_map<SharedMesh*, StaticData>*)aContainer)[aMesh];
+	size_t& size = container.size;
+	if (size + 1 >= container.data.size())
+	{
+		container.data.push_back(aInstanceData);
+		++size;
+		return;
+	}
+
+	container.data[size] = aInstanceData;
+	++size;
 }
 
 void DeferredRenderer::PrepareGBuffer()
@@ -89,75 +114,79 @@ void DeferredRenderer::PrepareGBuffer()
 
 void DeferredRenderer::RenderMeshes(bool aUsePixelShader)
 {
-	for (auto& mesh : myStaticMeshes)
+	for (auto& [staticMesh, instances ] : myStaticMeshes)
 	{
-		const Mesh* staticMesh = mesh.first;
-		std::vector<MeshInstanceRenderData>& instances = mesh.second;
+		if (instances.size == 0) { continue; }
 
 		if (!aUsePixelShader)
 		{
-			myMeshDrawer.Draw(*staticMesh, instances.data(), instances.size(), ShaderDatabase::GetVertexShader(instances[0].vsType), nullptr);
+			myMeshDrawer.Draw(*staticMesh, instances.data.data(), instances.size, ShaderDatabase::GetVertexShader(instances.data[0].vsType), nullptr);
 			continue;
 		}
-		myMeshDrawer.Draw(*staticMesh, instances.data(), instances.size(), ShaderDatabase::GetVertexShader(instances[0].vsType), ShaderDatabase::GetPixelShader(instances[0].psType));
+
+		myMeshDrawer.Draw(
+			*staticMesh,
+			instances.data.data(),
+			instances.size,
+			ShaderDatabase::GetVertexShader(instances.data[0].vsType),
+			ShaderDatabase::GetPixelShader(instances.data[0].psType)
+		);
 	}
 
 	// We don't support instancing for skeletal meshes yet
-	for (auto& mesh : mySkeletalMeshes)
+	for (auto& [ mesh, instances ] : mySkeletalMeshes)
 	{
-		SkeletalMesh* skeletalMesh = mesh.first;
-		std::vector<MeshInstanceRenderData>& instances = mesh.second;
+		SkeletalMesh* skeletalMesh = (SkeletalMesh*)mesh;
 
-		for (size_t i = 0; i < instances.size(); i++)
+		for (size_t i = 0; i < instances.size; i++)
 		{
-			auto& data = std::get<SkeletalMeshInstanceData>(instances[i].data);
+			SkeletalMeshInstanceData& data = instances.data[i].data.skeletalMeshData;
 			skeletalMesh->SetPose(data.pose);
 
-			const VertexShader* vs = ShaderDatabase::GetVertexShader(instances[i].vsType);
+			const VertexShader* vs = ShaderDatabase::GetVertexShader(instances.data[i].vsType);
 			const PixelShader* ps = nullptr;
 
 			if (aUsePixelShader)
 			{
-				ps = ShaderDatabase::GetPixelShader(instances[i].psType);
+				ps = ShaderDatabase::GetPixelShader(instances.data[i].psType);
 			}
 
 			skeletalMesh->Render(
-				data.transform.GetMatrix(), 
+				instances.data[i].data.transform.GetMatrix(),
 				vs,
 				ps,
-				instances[i].renderMode
+				instances.data[i].renderMode
 			);
 		}
 	}
 
 	auto* ge = GraphicsEngine::GetInstance();
 	DepthStencilState previousState = ge->GetRenderState().depthStencilState;
-	for (auto& mesh : myDisregardDepthMeshes)
+	for (auto& [mesh, instances] : myDisregardDepthMeshes)
 	{
-		SkeletalMesh* skeletalMesh = mesh.first;
-		std::vector<MeshInstanceRenderData>& instances = mesh.second;
+		SkeletalMesh* skeletalMesh = (SkeletalMesh*)mesh;
 
-		for (size_t i = 0; i < instances.size(); i++)
+		for (size_t i = 0; i < instances.size; i++)
 		{
-			auto& data = std::get<SkeletalMeshInstanceData>(instances[i].data);
+			SkeletalMeshInstanceData& data = instances.data[i].data.skeletalMeshData;
 			skeletalMesh->SetPose(data.pose);
 
-			const VertexShader* vs = ShaderDatabase::GetVertexShader(instances[i].vsType);
+			const VertexShader* vs = ShaderDatabase::GetVertexShader(instances.data[i].vsType);
 			const PixelShader* ps = nullptr;
 
 			if (aUsePixelShader)
 			{
-				ps = ShaderDatabase::GetPixelShader(instances[i].psType);
+				ps = ShaderDatabase::GetPixelShader(instances.data[i].psType);
 			}
 
-			Transform copy = data.transform;
+			Transform copy = instances.data[i].data.transform;
 			copy.Translate(copy.GetForward() * 10.0f);
 			ge->SetDepthStencilState(DepthStencilState::Disabled);
 			skeletalMesh->Render(
 				copy.GetMatrix(),
 				vs,
 				ps,
-				instances[i].renderMode
+				instances.data[i].renderMode
 			);
 		}
 	}

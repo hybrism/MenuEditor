@@ -15,29 +15,35 @@ void FE::LightManagerWindow::Show(const EditorUpdateContext& aContext)
 		return;
 	aContext;
 
-	auto& dLight = aContext.game->GetLightManager().GetDirectionalLight();
+	auto& lightManager = aContext.game->GetLightManager();
+	auto& dLight = lightManager.GetDirectionalLight();
 	auto& pData = aContext.game->GetPostProcess().GetBufferData();
+	auto& lightData = lightManager.GetLightDataRef();
 	static Vector3<float> rots = dLight.myEuler;
 
 	if (ImGui::Begin(myData.handle.c_str(), &myData.isOpen, myData.flags))
 	{
 		if (ImGui::DragFloat("xRot", &rots.x))
 		{
-			aContext.game->GetLightManager().GetDirectionalLight().myEuler.x = rots.x;
-			aContext.game->GetLightManager().GetDirectionalLight().myDirectionalLightCamera->GetTransform().SetEulerAngles(rots);
+			dLight.myEuler.x = rots.x;
+			dLight.myDirectionalLightCamera->GetTransform().SetEulerAngles(rots);
 		}
 		if (ImGui::DragFloat("yRot", &rots.y))
 		{
-			aContext.game->GetLightManager().GetDirectionalLight().myEuler.y = rots.y;
-			aContext.game->GetLightManager().GetDirectionalLight().myDirectionalLightCamera->GetTransform().SetEulerAngles(rots);
+			dLight.myEuler.y = rots.y;
+			dLight.myDirectionalLightCamera->GetTransform().SetEulerAngles(rots);
 		}
-		if (ImGui::Button("Use Shadows"))
-		{
-			aContext.game->GetLightManager().myDoNotUseShadows = !aContext.game->GetLightManager().myDoNotUseShadows;
-		} 
 		ImGui::DragFloat("Directional Intensity", &dLight.myIntensity, 0.05f, 0.0f);
 		ImGui::DragFloat("Ambient Intensity", &dLight.myAmbientIntensity, 0.05f, 0.0f);
-	
+
+		bool useShadows = lightData.useShadows == 0;
+		if (ImGui::Checkbox("Use Shadows", &useShadows))
+		{
+			lightData.useShadows = (int)!useShadows;
+		}
+		ImGui::DragFloat("Shadow Bias", &lightData.shadowBias, 0.00001f, 0.0f, 1.0f, "%f");
+		ImGui::DragFloat("Shadow Offset Scale", &lightData.shadowOffsetScale, 0.00001f, 0.0f, 1.0f, "%f");
+
 		ImGui::Separator();
 
 		ImGui::Text("Vignette");
@@ -46,6 +52,9 @@ void FE::LightManagerWindow::Show(const EditorUpdateContext& aContext)
 		ImGui::DragFloat("Strength", &pData.vignetteStrength, 0.1f, 0.0f, 100.0f);
 		ImGui::DragFloat("Curvature", &pData.vignetteCurvature, 0.1f, 0.0f, 100.0f);
 		ImGui::ColorEdit3("Color", &pData.vignetteColor.myValues[0]);
+
+		ImGui::Text("Speed Lines");
+		ImGui::DragFloat("Speed Lines Strength", &pData.speedLineRadiusAddition, 0.1f, -500.0f, 500.0f);
 
 	}
 	ImGui::End();

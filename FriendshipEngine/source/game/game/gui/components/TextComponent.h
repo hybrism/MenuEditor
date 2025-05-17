@@ -11,12 +11,13 @@ namespace MENU
 	class MenuObject;
 	class TextComponent : public MenuComponent
 	{
-
 	public:
 		TextComponent(MenuObject& aParent, unsigned int aID);
 
 		virtual void Update(const MenuUpdateContext& aContext) override;
 		virtual void Render() override;
+
+		void OnResize(const Vector2f&) override;
 
 		void UpdatePosition() override;
 

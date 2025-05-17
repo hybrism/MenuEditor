@@ -5,15 +5,13 @@
 
 struct ColliderComponent;
 
-class DebugLine;
-
 class CollisionSystem : public System<CollisionSystem>
 {
 public:
 	CollisionSystem(World* aWorld);
 	~CollisionSystem() override;
 
-	void Update(const SceneUpdateContext&) override;
+	void Update(SceneUpdateContext&) override;
 	void Render() override;
 
 private:
@@ -29,9 +27,7 @@ private:
 	Ray<float> CreateRayFromMousePosition();
 
 private:
-	const float myDistanceToCheckCollision = 300.f;
+	const float myDistanceToCheckCollision = 100000.f;
 
 	std::map<eCollisionLayer, Bitmask> myCollisionLayers;
-
-	std::vector<DebugLine> myLines;
 };

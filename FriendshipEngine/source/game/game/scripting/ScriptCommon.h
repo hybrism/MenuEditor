@@ -41,7 +41,7 @@ enum class ScriptLinkDataType
 	Count
 };
 
-static const char* ScriptLinkDataTypeNames[(size_t)ScriptLinkDataType::Count] =
+constexpr const char* ScriptLinkDataTypeNames[(size_t)ScriptLinkDataType::Count] =
 {
 	"Unknown",
 	"Flow",

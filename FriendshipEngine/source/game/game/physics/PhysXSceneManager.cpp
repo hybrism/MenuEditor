@@ -159,7 +159,7 @@ physx::PxController* PhysXSceneManager::CreateCharacterController(Transform& aTr
 
 	desc.reportCallback = aHitReport;
 	desc.scaleCoeff = 1.0f;
-	desc.slopeLimit = cos(30.0f * Deg2Rad);
+	desc.slopeLimit = cos(35.0f * Deg2Rad);
 	desc.stepOffset = STEP_OFFSET;
 	desc.upDirection = physx::PxVec3(0.0f, 1.0f, 0.0f);
 	desc.userData = nullptr;

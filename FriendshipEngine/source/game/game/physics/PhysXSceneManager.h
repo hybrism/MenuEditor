@@ -6,6 +6,7 @@
 static const float GRAVITY = -9.82f;
 //static constexpr float STEP_OFFSET = 0.5f * 100;
 static constexpr float STEP_OFFSET = 50.f;
+static constexpr float STEP_OFFSET_SLIDE = 15.f;
 //static constexpr float HEAD_BONK_OFFSET = 0.25f * 100;
 static constexpr float HEAD_BONK_OFFSET = 25.f;
 //static constexpr float CHARACTER_RADIUS = (0.5f * 100) - HEAD_BONK_OFFSET;

@@ -24,8 +24,6 @@ MENU::MenuHandler::~MenuHandler()
 void MENU::MenuHandler::Init(const std::string& aMenuFile)
 {
 	//TODO:  ViewPort != RenderSize, add get RenderSize to graphicsengine 23.f is the height of menubar?
-	Vector2i viewport = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
-	myRenderSize = { (float)viewport.x, (float)viewport.y + 23.f };
 	LoadFromJson(aMenuFile);
 }
 
@@ -70,7 +68,12 @@ void MENU::MenuHandler::Render()
 	}
 }
 
-void MENU::MenuHandler::AddNewState(const std::string& aName)
+void MENU::MenuHandler::OnResize(const Vector2i& aNewRenderSize)
+{
+	myObjectManager.OnResize(aNewRenderSize);
+}
+
+MENU::MenuState& MENU::MenuHandler::AddNewState(const std::string& aName)
 {
 	MenuState newState;
 
@@ -78,7 +81,8 @@ void MENU::MenuHandler::AddNewState(const std::string& aName)
 	newState.id = myIDManager.GetFreeID();
 
 	myStates.push_back(newState);
-	myStateStack.push(&myStates[myStates.size() - 1]);
+
+	return myStates[myStates.size() - 1];
 }
 
 void MENU::MenuHandler::RemoveState(ID aID)
@@ -106,6 +110,18 @@ void MENU::MenuHandler::PushState(ID aID)
 	}
 }
 
+void MENU::MenuHandler::PushState(const std::string& aStateName)
+{
+	for (size_t i = 0; i < myStates.size(); i++)
+	{
+		if (myStates[i].name == aStateName)
+		{
+			myStateStack.push(&myStates[i]);
+			return;
+		}
+	}
+}
+
 void MENU::MenuHandler::PopState()
 {
 	if (myStateStack.empty())
@@ -130,6 +146,11 @@ MENU::MenuObject& MENU::MenuHandler::GetObjectFromIndex(ID aIndex)
 	return myObjectManager.GetObjectFromID(GetCurrentState().objectIds[aIndex]);
 }
 
+MENU::MenuObject& MENU::MenuHandler::GetObjectFromName(const std::string& aName)
+{
+	return myObjectManager.GetObjectFromName(aName);
+}
+
 MENU::MenuObject& MENU::MenuHandler::CreateNewObject(const Vector2f& aPosition)
 {
 	MenuObject& newObject = myObjectManager.CreateNew(myIDManager.GetFreeID(), aPosition);
@@ -141,6 +162,17 @@ MENU::MenuObject& MENU::MenuHandler::CreateNewObject(const Vector2f& aPosition)
 MENU::MenuState& MENU::MenuHandler::GetCurrentState()
 {
 	assert(!myStateStack.empty() && "StateStack is empty!");
+
+	return *myStateStack.top();
+}
+
+MENU::MenuState& MENU::MenuHandler::GetStateFromID(MENU::ID aID)
+{
+	for (size_t i = 0; i < myStates.size(); i++)
+	{
+		if (myStates[i].id == aID)
+			return myStates[i];
+	}
 
 	return *myStateStack.top();
 }
@@ -256,7 +288,7 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 		MenuObject& obj = myObjectManager.CreateNew(myIDManager.UseID(id));
 
 		obj.SetName(menuFile["objectID"][i]["name"]);
-		obj.SetPosition(JsonToScreen(menuFile["objectID"][i]["position"]));
+		obj.SetPosition(JsonToScreen(menuFile["objectID"][i]["position"]), true);
 	}
 
 	nlohmann::json spriteComponents = menuFile["spriteComponents"];
@@ -319,6 +351,7 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 		text.SetIsCentered(textComponents[i]["isCentered"]);
 	}
 
+	//GraphicsEngine::GetInstance()->GetSpriteRenderer().GetTextService()
 	nlohmann::json colliderComponents = menuFile["colliderComponents"];
 	for (size_t i = 0; i < colliderComponents.size(); i++)
 	{
@@ -343,6 +376,13 @@ void MENU::MenuHandler::LoadFromJson(const std::string& aMenuFile)
 
 			if (commandComponents[i]["commandData"].is_number_integer())
 				command.SetCommandData({ commandComponents[i]["commandData"].get<ID>() });
+
+			if (command.GetCommandType() == eCommandType::Resolution)
+				if (commandComponents[i]["commandData"].is_number_integer())
+					command.SetCommandData({ commandComponents[i]["commandData"].get<int>() });
+
+			if (commandComponents[i]["commandData"].is_number_float())
+				command.SetCommandData({ commandComponents[i]["commandData"].get<float>() });
 		}
 	}
 
@@ -418,8 +458,9 @@ Vector2f MENU::MenuHandler::JsonToScreen(nlohmann::json aJson)
 {
 	Vector2f screen = JsonToVec2(aJson);
 
-	screen.x *= myRenderSize.x;
-	screen.y *= myRenderSize.y;
+	Vector2i viewport = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
+	screen.x *= viewport.x;
+	screen.y *= viewport.y;
 
 	return screen;
 }
@@ -556,6 +597,12 @@ void MENU::MenuHandler::SaveToJson()
 			if (std::holds_alternative<ID>(command.GetCommandData().data))
 				commandEntry["commandData"] = std::get<ID>(command.GetCommandData().data);
 
+			if (std::holds_alternative<float>(command.GetCommandData().data))
+				commandEntry["commandData"] = std::get<float>(command.GetCommandData().data);
+
+			if (std::holds_alternative<int>(command.GetCommandData().data))
+				commandEntry["commandData"] = std::get<int>(command.GetCommandData().data);
+
 			commandComponents.push_back(commandEntry);
 		}
 
@@ -648,6 +695,7 @@ nlohmann::json MENU::MenuHandler::Vec2ToJson(const Vector2f& aVec)
 
 nlohmann::json MENU::MenuHandler::ScreenToJson(const Vector2f& aPosition)
 {
-	Vector2f screenPos = { aPosition.x / myRenderSize.x, aPosition.y / myRenderSize.y };
+	Vector2i viewport = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
+	Vector2f screenPos = { aPosition.x / viewport.x, aPosition.y / viewport.y };
 	return Vec2ToJson(screenPos);
 }

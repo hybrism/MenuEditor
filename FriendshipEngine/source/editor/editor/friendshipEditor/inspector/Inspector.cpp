@@ -239,7 +239,7 @@ void FE::Inspector::DisplayPlayerData(World* aWorld)
 
 			ImGui::SeparatorText("Ground Movement");
 			ImGui::DragFloat("Acceleration Speed", &PlayerConstants::accelerationSpeed);
-			ImGui::DragFloat("Max Speed", &PlayerConstants::maxSpeed);
+			ImGui::DragFloat("Max Speed", &PlayerConstants::groundMaxSpeed);
 			ImGui::DragFloat("Crouch Speed Multiplier", &PlayerConstants::crouchSpeedMultiplier);
 			ImGui::DragFloat("Jump Speed", &PlayerConstants::jumpSpeed);
 			ImGui::DragFloat("Friction", &PlayerConstants::friction);
@@ -253,13 +253,16 @@ void FE::Inspector::DisplayPlayerData(World* aWorld)
 			ImGui::SeparatorText("Wall Run");
 			ImGui::DragFloat("Wall Jump Speed", &PlayerConstants::wallJumpSpeed);
 			ImGui::DragFloat("Wall Jump Height", &PlayerConstants::wallJumpHeight);
+			ImGui::DragFloat("Wall Jump OutSpeed", &PlayerConstants::wallJumpOutSpeed);
 			ImGui::DragFloat("Min Wall Run Speed", &PlayerConstants::minWallRunSpeed);
 			ImGui::DragFloat("Wall Run Wall Detection Magnet Speed", &PlayerConstants::wallRunWallDetectionMagnetSpeed);
+			ImGui::DragFloat("Wall Gravity Multiplier", &PlayerConstants::wallRunGravityMultiplier);
 
 			ImGui::SeparatorText("Slide");
 			ImGui::DragFloat("Slide Speed Threshold", &PlayerConstants::slideSpeedThreshold);
 			ImGui::DragFloat("Slide Speed Boost", &PlayerConstants::slideSpeedBoost);
 			ImGui::DragFloat("Slide Friction", &PlayerConstants::slideFriction);
+			ImGui::DragFloat("Slide Time Until Friction", &PlayerConstants::slideTimeUntilFriction);
 
 			ImGui::SeparatorText("Camera");
 			ImGui::DragFloat("Camera Crouch Height", &PlayerConstants::cameraCrouchHeight);

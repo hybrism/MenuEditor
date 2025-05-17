@@ -22,21 +22,31 @@ TextureDatabase::TextureDatabase()
 
 TextureDatabase::~TextureDatabase()
 {
-	for (auto& collection : myTextures)
-	{
-		delete collection.albedoTexture.texture;
-		delete collection.materialTexture.texture;
-		delete collection.normalTexture.texture;
-		delete collection.emissiveTexture.texture;
-	}
-
-	for (auto& spriteTexture : mySpriteTextures)
-	{
-		delete spriteTexture.texture;
-	}
-
 	myTextures.clear();
-	mySpriteTextures.clear();
+}
+
+size_t TextureDatabase::GetTextureIndex(const std::string& aMaterialName)
+{
+	std::string findStr = StringHelper::ToLower(aMaterialName.c_str());
+	assert(myMaterialNameToTextureIndex.find(findStr) != myMaterialNameToTextureIndex.end() && "Material name does not exist");
+	return myMaterialNameToTextureIndex.at(findStr);
+}
+
+bool TextureDatabase::DoesTextureExist(const std::string& aMaterialName)
+{
+	std::string findStr = StringHelper::ToLower(aMaterialName.c_str());
+	return myMaterialNameToTextureIndex.find(findStr) != myMaterialNameToTextureIndex.end();
+}
+
+std::shared_ptr<Texture> TextureDatabase::GetOrLoadSpriteTexture(const std::string& aTextureName)
+{
+	if (!myTextureNameToSpriteTextureIndex.contains(aTextureName))
+	{
+		mySpriteTextures.push_back({ aTextureName, TextureFactory::CreateTexture(RELATIVE_SPRITE_ASSET_PATH + aTextureName, false) });
+		myTextureNameToSpriteTextureIndex[aTextureName] = mySpriteTextures.size() - 1;
+	}
+
+	return mySpriteTextures[myTextureNameToSpriteTextureIndex[aTextureName]].texture;
 }
 
 void TextureDatabase::ReadTextures(const nlohmann::json& jsonObject)
@@ -67,6 +77,7 @@ void TextureDatabase::ReadTextures(const nlohmann::json& jsonObject)
 				materialName.erase(materialName.begin() + n, materialName.end());
 			}
 
+			materialName = StringHelper::ToLower(materialName);
 			myMaterialNameToTextureIndex.insert({ materialName, textureId });
 		}
 
@@ -78,7 +89,6 @@ void TextureDatabase::ReadTextures(const nlohmann::json& jsonObject)
 				{ json["normalPath"].get<std::string>(), TextureFactory::CreateTexture(json["normalPath"].get<std::string>()) },
 				{ json["materialPath"].get<std::string>(), TextureFactory::CreateTexture(json["materialPath"].get<std::string>()) },
 				{ json["fxPath"].get<std::string>(), TextureFactory::CreateTexture(json["fxPath"].get<std::string>()) },
-				//{ TextureFactory::CreateTexture(vertexTexturePath, false, false), vertexTexturePath }
 			}
 		);
 	}
@@ -99,12 +109,7 @@ void TextureDatabase::LoadVertexTextures(const std::string& aSceneName)
 		return;
 	}
 
-	for (auto& data : myVertexTextures)
-	{
-		delete data.materials.vertex.texture;
-	}
 	myVertexTextures.clear();
-
 	myVertexTextures = BinaryVertexPaintingFileFactory::LoadVertexDefinitionsFromFile(folderPath);
 
 	myMeshNameToVertexTextureIndex.clear();
@@ -129,6 +134,7 @@ void TextureDatabase::LoadVertexTextures(const std::string& aSceneName)
 }
 
 #ifdef _EDITOR
+// TODO: MOVE THIS TO VERTEX PAINTER CLASS
 unsigned int TextureDatabase::CreateVertexTexture(const VertexTextureCollection& aCollection)
 {
 	for (size_t i = 0; i < myVertexTextures.size(); i++)
@@ -141,10 +147,13 @@ unsigned int TextureDatabase::CreateVertexTexture(const VertexTextureCollection&
 		}
 	}
 	myVertexTextures.push_back(aCollection);
+	std::string meshName = myVertexTextures.back().meshName + "_" + std::to_string(myVertexTextures.back().subMeshIndex);
+	myMeshNameToVertexTextureIndex.insert({ meshName, myVertexTextures.size() - 1 });
 	return static_cast<unsigned int>(myVertexTextures.size() - 1);
 }
 
-void TextureDatabase::UpdateVertexPaintedTextures(const std::string& aSceneName)
+// TODO: MOVE THIS TO VERTEX PAINTER CLASS
+void TextureDatabase::ReplaceBinaryVertexPaintedTextureFile(const std::string& aSceneName, const VertexIndexCollection& aCollection)
 {
 	std::string folderPath = std::string(RELATIVE_VERTEX_TEXTURE_ASSET_PATH) + aSceneName + "/";
 
@@ -161,32 +170,20 @@ void TextureDatabase::UpdateVertexPaintedTextures(const std::string& aSceneName)
 		
 		if (v.subMeshIndex == 0)
 		{
-			VertexTextureCollectionImport imp;
+			data.push_back({});
+			VertexTextureCollectionImport& imp = data.back();
 
 			imp.meshName = v.meshName;
 			imp.sceneName = aSceneName;
 
 			imp.materials.push_back(v.materials);
-
-			data.push_back(imp);
 		}
 		else
 		{
 			data[index].materials.push_back(v.materials);
 		}
 	}
-
 	BinaryVertexPaintingFileFactory::WriteCollectionToFile(data, folderPath);
+	BinaryVertexPaintingFileFactory::WriteVertexIndicesToFile(aSceneName, aCollection);
 }
 #endif
-
-Texture* TextureDatabase::GetOrLoadSpriteTexture(const std::string& aTextureName)
-{
-	if (!myTextureNameToSpriteTextureIndex.contains(aTextureName))
-	{
-		mySpriteTextures.push_back({ aTextureName, TextureFactory::CreateTexture(RELATIVE_SPRITE_ASSET_PATH + aTextureName, false) });
-		myTextureNameToSpriteTextureIndex[aTextureName] = mySpriteTextures.size() - 1;
-	}
-
-	return mySpriteTextures[myTextureNameToSpriteTextureIndex[aTextureName]].texture;
-}

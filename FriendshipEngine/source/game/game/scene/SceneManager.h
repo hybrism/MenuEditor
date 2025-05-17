@@ -1,8 +1,7 @@
 #pragma once
 #include <stack>
-#include <string>
-#include <array>
 #include <variant>
+//#include <thread>
 
 #include "utility/UnityImporter.h"
 #include "../physics/PhysXSceneManager.h"
@@ -16,6 +15,7 @@ namespace MENU
 }
 
 class Scene;
+class GameTimer;
 
 struct SceneParameter
 {
@@ -29,9 +29,9 @@ public:
 	SceneManager();
 	~SceneManager();
 
-	void Init();
-	bool Update(const SceneUpdateContext& dt);
-	void LateUpdate();
+	void Init(SceneUpdateContext&);
+	bool Update(SceneUpdateContext&);
+	void LateUpdate(SceneUpdateContext&);
 	void Render();
 
 	void SetIsPaused(bool aIsPaused);
@@ -44,10 +44,14 @@ public:
 	bool GetIsPaused() const;
 	World* GetCurrentWorld();
 	Scene* GetCurrentScene();
-	eLevel GetCurrentLevel();
 	std::string GetCurrentSceneName();
 
+#ifdef _EDITOR
+	VertexIndexCollection& GetVertexPaintedIndexCollection() { return myUnityImporter.GetVertexPaintedIndexCollection(); }
+#endif
 private:
+	//std::thread myLevelLoadingThread;
+
 	UnityImporter myUnityImporter;
 	PhysXSceneManager myPhysXManager;
 
@@ -62,8 +66,12 @@ private:
 	ScriptManager myScriptManager;
 	bool myIsPaused;
 
-	MENU::MenuHandler* myLoadingScreen;
+	//bool myIsLoading;
+	GameTimer* myGameTimer;
 
-	bool LoadSceneInternal(const SceneParameter& aScene);
-	void LoadLevelInternal(const std::string& aSceneName);
+	//MENU::MenuHandler* myLoadingScreen;
+
+	bool LoadSceneInternal(const SceneParameter& aScene, SceneUpdateContext&);
+	void LoadLevelInternal(const std::string& aSceneName, SceneUpdateContext&);
+	std::string GetLevelNameFromSceneParameter(const SceneParameter& aSceneParam);
 };

@@ -2,6 +2,8 @@
 #include <engine/math/Vector.h>
 
 class SceneManager;
+class PostProcess;
+class LightManager;
 
 namespace MENU
 {
@@ -11,6 +13,8 @@ namespace MENU
 	{
 		SceneManager* sceneManager = nullptr;
 		MenuHandler* menuHandler = nullptr;
+		PostProcess* postProcess = nullptr;
+		LightManager* lightManager = nullptr;
 		float dt;
 		Vector2f mousePosition;
 		Vector2f mouseDelta;

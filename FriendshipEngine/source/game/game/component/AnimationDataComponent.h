@@ -8,4 +8,5 @@
 struct AnimationDataComponent : public Component<AnimationDataComponent>, public AnimationData
 {
 	AnimationDataParameterContainer parameters;
+	int controllerId = -1;
 };

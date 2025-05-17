@@ -14,7 +14,7 @@ struct PlayerStateUpdateContext
 	TransformComponent& transformComponent;
 	AnimationDataComponent& animationDataComponent;
 	PhysXSceneManager* physXSceneManager;
-	AnimationController* animationController;
+	AnimationController& animationController;
 };
 
 class PlayerState

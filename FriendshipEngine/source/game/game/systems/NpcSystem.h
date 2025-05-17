@@ -15,7 +15,7 @@ public:
 	NpcSystem(World* aWorld);
 	
 	void Init() override;
-	void Update(const SceneUpdateContext& dt) override;
+	void Update(SceneUpdateContext& dt) override;
 	void FollowPath(const float& dt);
 	void ActivateGroup(int aGroupID);
 

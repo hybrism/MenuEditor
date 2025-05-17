@@ -150,10 +150,12 @@
     <ClInclude Include="component\Component.h" />
     <ClInclude Include="component\ComponentContainer.h" />
     <ClInclude Include="component\ComponentManager.h" />
+    <ClInclude Include="component\ComponentSignature.h" />
     <ClInclude Include="component\IComponentContainer.h" />
     <ClInclude Include="entity\Entity.h" />
     <ClInclude Include="entity\EntityManager.h" />
-    <ClInclude Include="entity\EntitySignatureManager.h" />
+    <ClInclude Include="entity\EntitySignature.h" />
+    <ClInclude Include="entity\EntitySignatureContainer.h" />
     <ClInclude Include="system\System.h" />
     <ClInclude Include="system\SystemManager.h" />
   </ItemGroup>

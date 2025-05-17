@@ -1,6 +1,16 @@
 {
     "meshes": [
         {
+            "meshID": 1282066132,
+            "assetPath": "Meshes/AssetGym/sm_skipperFloor_100x100.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1391688723,
+            "assetPath": "Meshes/Buildings/Ground/sm_buildingBlockCobble_10x10x14.fbx",
+            "defaultTextureID": -1
+        },
+        {
             "meshID": 1734886493,
             "assetPath": "Meshes/Buildings/Ground/sm_ground_4x4.fbx",
             "defaultTextureID": -1
@@ -18,6 +28,26 @@
         {
             "meshID": 1819594586,
             "assetPath": "Meshes/Buildings/PlasterWood/Decoratives/sm_chimney_b.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 2104763079,
+            "assetPath": "Meshes/Buildings/PlasterWood/Edge Trims/sm_woodTrim_10m.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1446351372,
+            "assetPath": "Meshes/Buildings/PlasterWood/Edge Trims/sm_woodTrim_2m.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 928368271,
+            "assetPath": "Meshes/Buildings/PlasterWood/Edge Trims/sm_woodTrim_5m.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1249959128,
+            "assetPath": "Meshes/Buildings/PlasterWood/Edge Trims/sm_woodTrim_corner.fbx",
             "defaultTextureID": -1
         },
         {
@@ -173,7 +203,7 @@
         {
             "meshID": -678365601,
             "assetPath": "Meshes/Buildings/Stone/Castle/castleTower_roof.fbx",
-            "defaultTextureID": 9
+            "defaultTextureID": 10
         },
         {
             "meshID": 1733274033,
@@ -231,6 +261,11 @@
             "defaultTextureID": -1
         },
         {
+            "meshID": 2006547658,
+            "assetPath": "Meshes/Buildings/Stone/Castle/sm_castleWall_edgeREVERSED.fbx",
+            "defaultTextureID": -1
+        },
+        {
             "meshID": -978278894,
             "assetPath": "Meshes/Buildings/Stone/Castle/sm_castleWall_innerCorner.fbx",
             "defaultTextureID": -1
@@ -283,6 +318,21 @@
         {
             "meshID": 1110387602,
             "assetPath": "Meshes/Buildings/Stone/Facades/sm_stonepillar_7.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1356208601,
+            "assetPath": "Meshes/Buildings/Stone/Facades/sm_stoneTrim_10m.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1840974936,
+            "assetPath": "Meshes/Buildings/Stone/Facades/sm_stoneTrim_2m.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -82867753,
+            "assetPath": "Meshes/Buildings/Stone/Facades/sm_stoneTrim_5m.fbx",
             "defaultTextureID": -1
         },
         {
@@ -388,7 +438,7 @@
         {
             "meshID": -1785670986,
             "assetPath": "Meshes/FOR MAIN MENU PICTURE/map.fbx",
-            "defaultTextureID": -1
+            "defaultTextureID": 30
         },
         {
             "meshID": 1445252827,
@@ -396,13 +446,93 @@
             "defaultTextureID": -1
         },
         {
-            "meshID": -342816387,
-            "assetPath": "Meshes/FOR MAIN MENU PICTURE/sm_flagTriangle.fbx",
+            "meshID": 273886412,
+            "assetPath": "Meshes/FOR MAIN MENU PICTURE/Window.fbx",
             "defaultTextureID": -1
         },
         {
-            "meshID": 273886412,
-            "assetPath": "Meshes/FOR MAIN MENU PICTURE/Window.fbx",
+            "meshID": 199965557,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_craneWithPlatform_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -771503406,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_jumpableFence_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -772263810,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_openDoorframe_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1983845344,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_planks_2m_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1977008994,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_planks_4m_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1142536059,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_plankToBeCut_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -909093950,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_platformRound_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1822133963,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_platformSquare_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1975874593,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_ramp_1x15_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1704812822,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_ramp_1x1_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1706072597,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_ramp_1x2_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1001656687,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_rope_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1630261969,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_scaffolding_2m_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1724120266,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_scaffolding_3m_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1621623161,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_scaffolding_4m_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 810303276,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_slidableFence_red.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -254424707,
+            "assetPath": "Meshes/Gameplay Assets/red version/sm_table_red.fbx",
             "defaultTextureID": -1
         },
         {
@@ -433,6 +563,11 @@
         {
             "meshID": 218821310,
             "assetPath": "Meshes/Gameplay Assets/sm_connectingWallWood_2m.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 917692204,
+            "assetPath": "Meshes/Gameplay Assets/sm_craneWallrunPlatform.fbx",
             "defaultTextureID": -1
         },
         {
@@ -573,7 +708,7 @@
         {
             "meshID": 1583828603,
             "assetPath": "Meshes/Gameplay Assets/sm_table.fbx",
-            "defaultTextureID": -1
+            "defaultTextureID": 55
         },
         {
             "meshID": 1722560315,
@@ -583,7 +718,7 @@
         {
             "meshID": -1701995052,
             "assetPath": "Meshes/Gameplay Assets/sm_washLine.fbx",
-            "defaultTextureID": -1
+            "defaultTextureID": 35
         },
         {
             "meshID": -1956428321,
@@ -701,6 +836,31 @@
             "defaultTextureID": -1
         },
         {
+            "meshID": -1645705028,
+            "assetPath": "Meshes/Projectile/sm_arrow.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -932554009,
+            "assetPath": "Meshes/Projectile/sm_arrowBroken.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -26385665,
+            "assetPath": "Meshes/Setdressing/Mountains/sm_mountain_1.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -26386820,
+            "assetPath": "Meshes/Setdressing/Mountains/sm_mountain_2.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -26387843,
+            "assetPath": "Meshes/Setdressing/Mountains/sm_mountain_3.fbx",
+            "defaultTextureID": -1
+        },
+        {
             "meshID": -2019206176,
             "assetPath": "Meshes/Setdressing/Pennants/sm_pennants_12_a.fbx",
             "defaultTextureID": -1
@@ -726,8 +886,18 @@
             "defaultTextureID": -1
         },
         {
+            "meshID": 1221822306,
+            "assetPath": "Meshes/Setdressing/posters/All Levels/sm_poster_adBrunch.fbx",
+            "defaultTextureID": -1
+        },
+        {
             "meshID": -2015095403,
             "assetPath": "Meshes/Setdressing/posters/All Levels/sm_poster_adGuard.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1794393954,
+            "assetPath": "Meshes/Setdressing/posters/All Levels/sm_poster_adJam.fbx",
             "defaultTextureID": -1
         },
         {
@@ -743,6 +913,21 @@
         {
             "meshID": 1646360699,
             "assetPath": "Meshes/Setdressing/posters/All Levels/sm_poster_adStone.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1251000625,
+            "assetPath": "Meshes/Setdressing/posters/All Levels/sm_poster_constructionAhead.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1044077993,
+            "assetPath": "Meshes/Setdressing/posters/All Levels/sm_poster_winner01.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1044085286,
+            "assetPath": "Meshes/Setdressing/posters/All Levels/sm_poster_winner02.fbx",
             "defaultTextureID": -1
         },
         {
@@ -783,6 +968,61 @@
         {
             "meshID": 7352859,
             "assetPath": "Meshes/Setdressing/posters/Level 3/sm_poster_lvl3wanted3.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -2074610461,
+            "assetPath": "Meshes/Setdressing/rubble/sm_planksRubble_01.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -2074609306,
+            "assetPath": "Meshes/Setdressing/rubble/sm_planksRubble_02.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -2074608283,
+            "assetPath": "Meshes/Setdressing/rubble/sm_planksRubble_03.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -2074607128,
+            "assetPath": "Meshes/Setdressing/rubble/sm_planksRubble_04.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -2074614553,
+            "assetPath": "Meshes/Setdressing/rubble/sm_planksRubble_05.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 536985778,
+            "assetPath": "Meshes/Setdressing/rubble/sm_rubblePile_1.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1344846487,
+            "assetPath": "Meshes/Setdressing/rubble/sm_rubblePile_2.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1263776252,
+            "assetPath": "Meshes/Setdressing/rubble/sm_rubblePile_3.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 293775073,
+            "assetPath": "Meshes/Setdressing/rubble/sm_rubblePile_4.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 212704838,
+            "assetPath": "Meshes/Setdressing/rubble/sm_rubblePile_5.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1020565547,
+            "assetPath": "Meshes/Setdressing/rubble/sm_rubblePile_6.fbx",
             "defaultTextureID": -1
         },
         {
@@ -831,29 +1071,29 @@
             "defaultTextureID": -1
         },
         {
-            "meshID": -946906563,
-            "assetPath": "Meshes/Setdressing/SignsFlags/sm_shopSign_04.fbx",
-            "defaultTextureID": -1
-        },
-        {
-            "meshID": -946905540,
-            "assetPath": "Meshes/Setdressing/SignsFlags/sm_shopSign_05.fbx",
-            "defaultTextureID": -1
-        },
-        {
             "meshID": 1704687615,
             "assetPath": "Meshes/Setdressing/sm_barrel.fbx",
-            "defaultTextureID": 16
+            "defaultTextureID": 38
         },
         {
             "meshID": 1413027249,
             "assetPath": "Meshes/Setdressing/sm_basket_01.fbx",
-            "defaultTextureID": 17
+            "defaultTextureID": 39
+        },
+        {
+            "meshID": 1523193635,
+            "assetPath": "Meshes/Setdressing/sm_bench.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -221224477,
+            "assetPath": "Meshes/Setdressing/sm_bigFLowers.fbx",
+            "defaultTextureID": -1
         },
         {
             "meshID": -623211425,
             "assetPath": "Meshes/Setdressing/sm_bucket.fbx",
-            "defaultTextureID": 18
+            "defaultTextureID": 40
         },
         {
             "meshID": -1912897843,
@@ -863,12 +1103,12 @@
         {
             "meshID": 1065693602,
             "assetPath": "Meshes/Setdressing/sm_chair.fbx",
-            "defaultTextureID": -1
+            "defaultTextureID": 41
         },
         {
             "meshID": -18395486,
             "assetPath": "Meshes/Setdressing/sm_crate_01.fbx",
-            "defaultTextureID": 19
+            "defaultTextureID": 42
         },
         {
             "meshID": 1893251512,
@@ -886,19 +1126,34 @@
             "defaultTextureID": -1
         },
         {
+            "meshID": 48877345,
+            "assetPath": "Meshes/Setdressing/sm_fountain.fbx",
+            "defaultTextureID": -1
+        },
+        {
             "meshID": 1411917535,
             "assetPath": "Meshes/Setdressing/sm_ladder.fbx",
-            "defaultTextureID": 22
+            "defaultTextureID": 46
+        },
+        {
+            "meshID": -1434014335,
+            "assetPath": "Meshes/Setdressing/sm_lantern_a.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1890951782,
+            "assetPath": "Meshes/Setdressing/sm_lantern_b.fbx",
+            "defaultTextureID": -1
         },
         {
             "meshID": -1642745122,
             "assetPath": "Meshes/Setdressing/sm_marketstall01.fbx",
-            "defaultTextureID": 23
+            "defaultTextureID": 48
         },
         {
             "meshID": -1947928808,
             "assetPath": "Meshes/Setdressing/sm_mug.fbx",
-            "defaultTextureID": 24
+            "defaultTextureID": 50
         },
         {
             "meshID": 1261099145,
@@ -911,8 +1166,23 @@
             "defaultTextureID": -1
         },
         {
+            "meshID": -375083984,
+            "assetPath": "Meshes/Setdressing/sm_shadeSpace.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -337647111,
+            "assetPath": "Meshes/Setdressing/sm_shadeSpacePart.fbx",
+            "defaultTextureID": -1
+        },
+        {
             "meshID": 1512228460,
             "assetPath": "Meshes/Setdressing/sm_stool.fbx",
+            "defaultTextureID": 54
+        },
+        {
+            "meshID": -266416566,
+            "assetPath": "Meshes/Setdressing/sm_storageBuilding.fbx",
             "defaultTextureID": -1
         },
         {
@@ -923,7 +1193,7 @@
         {
             "meshID": 557870216,
             "assetPath": "Meshes/Setdressing/sm_vase.fbx",
-            "defaultTextureID": -1
+            "defaultTextureID": 56
         },
         {
             "meshID": 1687640420,
@@ -938,6 +1208,31 @@
         {
             "meshID": 1687642598,
             "assetPath": "Meshes/Setdressing/sm_vines_03.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1305726583,
+            "assetPath": "Meshes/Setdressing/sm_vinesCorner_01.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1305727738,
+            "assetPath": "Meshes/Setdressing/sm_vinesCorner_02.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1132099098,
+            "assetPath": "Meshes/Setdressing/sm_vinesStraight_01.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1269675461,
+            "assetPath": "Meshes/Setdressing/sm_vineStrip_01.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 1732950513,
+            "assetPath": "Meshes/Setdressing/sm_weaponDisplay.fbx",
             "defaultTextureID": -1
         },
         {
@@ -996,8 +1291,68 @@
             "defaultTextureID": -1
         },
         {
+            "meshID": 843021626,
+            "assetPath": "Meshes/Skeletal Meshes/sk_bear_01.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 197301387,
+            "assetPath": "Meshes/Skeletal Meshes/sk_bear_02.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 116231152,
+            "assetPath": "Meshes/Skeletal Meshes/sk_bear_03.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 599810921,
+            "assetPath": "Meshes/Skeletal Meshes/sk_bear_04.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 843797650,
+            "assetPath": "Meshes/Skeletal Meshes/sk_bearEnemy_01.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 843790357,
+            "assetPath": "Meshes/Skeletal Meshes/sk_bearEnemy_02.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1766107103,
+            "assetPath": "Meshes/Skeletal Meshes/sk_bird_01.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1120386864,
+            "assetPath": "Meshes/Skeletal Meshes/sk_bird_02.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -1039316629,
+            "assetPath": "Meshes/Skeletal Meshes/sk_bird_03.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": 2123509018,
+            "assetPath": "Meshes/Skeletal Meshes/sk_bird_04.fbx",
+            "defaultTextureID": -1
+        },
+        {
             "meshID": -253768702,
             "assetPath": "Meshes/Skeletal Meshes/sk_enemy.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -863546949,
+            "assetPath": "Meshes/Skeletal Meshes/sk_enemyBird_01.fbx",
+            "defaultTextureID": -1
+        },
+        {
+            "meshID": -863539656,
+            "assetPath": "Meshes/Skeletal Meshes/sk_enemyBird_02.fbx",
             "defaultTextureID": -1
         },
         {
@@ -1008,12 +1363,7 @@
         {
             "meshID": 1852826273,
             "assetPath": "Meshes/Skeletal Meshes/sk_player.fbx",
-            "defaultTextureID": -1
-        },
-        {
-            "meshID": 2032625024,
-            "assetPath": "Meshes/sm_arrow.fbx",
-            "defaultTextureID": -1
+            "defaultTextureID": 28
         },
         {
             "meshID": -2001646120,
@@ -1023,27 +1373,32 @@
         {
             "meshID": 1080082061,
             "assetPath": "Meshes/UI/sm_gooseCutout.fbx",
-            "defaultTextureID": 29
+            "defaultTextureID": 59
         },
         {
             "meshID": -1959499876,
             "assetPath": "Meshes/UI/sm_speechBubble_01.fbx",
-            "defaultTextureID": 30
+            "defaultTextureID": 60
         },
         {
             "meshID": -1959494629,
             "assetPath": "Meshes/UI/sm_speechBubble_02.fbx",
-            "defaultTextureID": 31
+            "defaultTextureID": 61
         },
         {
             "meshID": -1959493606,
             "assetPath": "Meshes/UI/sm_speechBubble_03.fbx",
-            "defaultTextureID": 32
+            "defaultTextureID": 62
         },
         {
             "meshID": -1959496807,
             "assetPath": "Meshes/UI/sm_speechBubble_04.fbx",
-            "defaultTextureID": 33
+            "defaultTextureID": 63
+        },
+        {
+            "meshID": -1959495784,
+            "assetPath": "Meshes/UI/sm_speechBubble_05.fbx",
+            "defaultTextureID": 64
         },
         {
             "meshID": -1993816594,
@@ -1094,251 +1449,475 @@
     "textures": [
         {
             "textureID": 0,
+            "albedoPath": "Textures/AssetGym/t_skipperGrid_c.dds",
+            "fxPath": "Textures/AssetGym/t_skipperGrid_fx.dds",
+            "materialPath": "Textures/AssetGym/t_skipperGrid_m.dds",
+            "normalPath": "Textures/AssetGym/t_skipperGrid_n.dds"
+        },
+        {
+            "textureID": 1,
             "albedoPath": "Textures/Buildings/Clocktower/t_clock_c.dds",
             "fxPath": "Textures/Buildings/Clocktower/t_clock_fx.dds",
             "materialPath": "Textures/Buildings/Clocktower/t_clock_m.dds",
             "normalPath": "Textures/Buildings/Clocktower/t_clock_n.dds"
         },
         {
-            "textureID": 1,
+            "textureID": 2,
             "albedoPath": "Textures/Buildings/Clocktower/t_metalDetailing_c.dds",
             "fxPath": "Textures/Buildings/Clocktower/t_metalDetailing_fx.dds",
             "materialPath": "Textures/Buildings/Clocktower/t_metalDetailing_m.dds",
             "normalPath": "Textures/Buildings/Clocktower/t_metalDetailing_n.dds"
         },
         {
-            "textureID": 2,
+            "textureID": 3,
             "albedoPath": "Textures/Buildings/Clocktower/t_onlyWood_c.dds",
             "fxPath": "Textures/Buildings/Clocktower/t_onlyWood_fx.dds",
             "materialPath": "Textures/Buildings/Clocktower/t_onlyWood_m.dds",
             "normalPath": "Textures/Buildings/Clocktower/t_onlyWood_n.dds"
         },
         {
-            "textureID": 3,
+            "textureID": 4,
             "albedoPath": "Textures/Buildings/Clocktower/t_stainedGlass_c.dds",
             "fxPath": "Textures/Buildings/Clocktower/t_stainedGlass_fx.dds",
             "materialPath": "Textures/Buildings/Clocktower/t_stainedGlass_m.dds",
             "normalPath": "Textures/Buildings/Clocktower/t_stainedGlass_n.dds"
         },
         {
-            "textureID": 4,
+            "textureID": 5,
             "albedoPath": "Textures/Buildings/Clocktower/t_stonePlain_c.dds",
             "fxPath": "Textures/Buildings/Clocktower/t_stonePlain_fx.dds",
             "materialPath": "Textures/Buildings/Clocktower/t_stonePlain_m.dds",
             "normalPath": "Textures/Buildings/Clocktower/t_stonePlain_n.dds"
         },
         {
-            "textureID": 5,
+            "textureID": 6,
             "albedoPath": "Textures/Buildings/cobblestone/t_cobblestone_c.dds",
             "fxPath": "Textures/Buildings/cobblestone/t_cobblestone_fx.dds",
             "materialPath": "Textures/Buildings/cobblestone/t_cobblestone_m.dds",
             "normalPath": "Textures/Buildings/cobblestone/t_cobblestone_n.dds"
         },
         {
-            "textureID": 6,
+            "textureID": 7,
             "albedoPath": "Textures/Buildings/PlasterWood/Bricks/t_housebricks_c.dds",
             "fxPath": "Textures/Buildings/PlasterWood/Bricks/t_housebricks_fx.dds",
             "materialPath": "Textures/Buildings/PlasterWood/Bricks/t_housebricks_m.dds",
             "normalPath": "Textures/Buildings/PlasterWood/Bricks/t_housebricks_n.dds"
         },
         {
-            "textureID": 7,
+            "textureID": 8,
             "albedoPath": "Textures/Buildings/PlasterWood/Facade Trimsheet/t_woodPlanks_c.dds",
             "fxPath": "Textures/Buildings/PlasterWood/Facade Trimsheet/t_woodPlanks_fx.dds",
             "materialPath": "Textures/Buildings/PlasterWood/Facade Trimsheet/t_woodPlanks_m.dds",
             "normalPath": "Textures/Buildings/PlasterWood/Facade Trimsheet/t_woodPlanks_n.dds"
         },
         {
-            "textureID": 8,
+            "textureID": 9,
             "albedoPath": "Textures/Buildings/PlasterWood/Plaster/t_plaster_c.dds",
             "fxPath": "Textures/Buildings/PlasterWood/Plaster/t_plaster_fx.dds",
             "materialPath": "Textures/Buildings/PlasterWood/Plaster/t_plaster_m.dds",
             "normalPath": "Textures/Buildings/PlasterWood/Plaster/t_plaster_n.dds"
         },
         {
-            "textureID": 9,
+            "textureID": 10,
             "albedoPath": "Textures/Buildings/PlasterWood/Roof/t_roof_c.dds",
             "fxPath": "Textures/Buildings/PlasterWood/Roof/t_roof_fx.dds",
             "materialPath": "Textures/Buildings/PlasterWood/Roof/t_roof_m.dds",
             "normalPath": "Textures/Buildings/PlasterWood/Roof/t_roof_n.dds"
         },
         {
-            "textureID": 10,
+            "textureID": 11,
             "albedoPath": "Textures/Buildings/Stone/StoneTiles/t_stoneTiles_c.dds",
             "fxPath": "Textures/Buildings/Stone/StoneTiles/t_stoneTiles_fx.dds",
             "materialPath": "Textures/Buildings/Stone/StoneTiles/t_stoneTiles_m.dds",
             "normalPath": "Textures/Buildings/Stone/StoneTiles/t_stoneTiles_n.dds"
         },
         {
-            "textureID": 11,
+            "textureID": 12,
             "albedoPath": "Textures/Buildings/Stone/StoneTrim/t_stoneTrim_c.dds",
             "fxPath": "Textures/Buildings/Stone/StoneTrim/t_stoneTrim_fx.dds",
             "materialPath": "Textures/Buildings/Stone/StoneTrim/t_stoneTrim_m.dds",
             "normalPath": "Textures/Buildings/Stone/StoneTrim/t_stoneTrim_n.dds"
         },
         {
-            "textureID": 12,
+            "textureID": 13,
+            "albedoPath": "Textures/Characters/t_ballista_c.dds",
+            "fxPath": "Textures/Characters/t_ballista_fx.dds",
+            "materialPath": "Textures/Characters/t_ballista_m.dds",
+            "normalPath": "Textures/Characters/t_ballista_n.dds"
+        },
+        {
+            "textureID": 14,
+            "albedoPath": "Textures/Characters/t_enemyarmor_c.dds",
+            "fxPath": "Textures/Characters/t_enemyarmor_fx.dds",
+            "materialPath": "Textures/Characters/t_enemyarmor_m.dds",
+            "normalPath": "Textures/Characters/t_enemyarmor_n.dds"
+        },
+        {
+            "textureID": 15,
             "albedoPath": "Textures/Characters/t_enemybody_c.dds",
             "fxPath": "Textures/Characters/t_enemybody_fx.dds",
             "materialPath": "Textures/Characters/t_enemybody_m.dds",
             "normalPath": "Textures/Characters/t_enemybody_n.dds"
         },
         {
-            "textureID": 13,
-            "albedoPath": "Textures/Props/t_propTrim_c.dds",
-            "fxPath": "Textures/Props/t_propTrim_fx.dds",
-            "materialPath": "Textures/Props/t_propTrim_m.dds",
-            "normalPath": "Textures/Props/t_propTrim_n.dds"
+            "textureID": 16,
+            "albedoPath": "Textures/Characters/t_headBear_01_c.dds",
+            "fxPath": "Textures/Characters/t_headBear_01_fx.dds",
+            "materialPath": "Textures/Characters/t_headBear_01_m.dds",
+            "normalPath": "Textures/Characters/t_headBear_01_n.dds"
         },
         {
-            "textureID": 14,
+            "textureID": 17,
+            "albedoPath": "Textures/Characters/t_headBear_02_c.dds",
+            "fxPath": "Textures/Characters/t_headBear_02_fx.dds",
+            "materialPath": "Textures/Characters/t_headBear_02_m.dds",
+            "normalPath": "Textures/Characters/t_headBear_02_n.dds"
+        },
+        {
+            "textureID": 18,
+            "albedoPath": "Textures/Characters/t_headBear_03_c.dds",
+            "fxPath": "Textures/Characters/t_headBear_03_fx.dds",
+            "materialPath": "Textures/Characters/t_headBear_03_m.dds",
+            "normalPath": "Textures/Characters/t_headBear_03_n.dds"
+        },
+        {
+            "textureID": 19,
+            "albedoPath": "Textures/Characters/t_headBear_04_c.dds",
+            "fxPath": "Textures/Characters/t_headBear_04_fx.dds",
+            "materialPath": "Textures/Characters/t_headBear_04_m.dds",
+            "normalPath": "Textures/Characters/t_headBear_04_n.dds"
+        },
+        {
+            "textureID": 20,
+            "albedoPath": "Textures/Characters/t_headBird_01_c.dds",
+            "fxPath": "Textures/Characters/t_headBird_01_fx.dds",
+            "materialPath": "Textures/Characters/t_headBird_01_m.dds",
+            "normalPath": "Textures/Characters/t_headBird_01_n.dds"
+        },
+        {
+            "textureID": 21,
+            "albedoPath": "Textures/Characters/t_headBird_02_c.dds",
+            "fxPath": "Textures/Characters/t_headBird_02_fx.dds",
+            "materialPath": "Textures/Characters/t_headBird_02_m.dds",
+            "normalPath": "Textures/Characters/t_headBird_02_n.dds"
+        },
+        {
+            "textureID": 22,
+            "albedoPath": "Textures/Characters/t_headBird_03_c.dds",
+            "fxPath": "Textures/Characters/t_headBird_03_fx.dds",
+            "materialPath": "Textures/Characters/t_headBird_03_m.dds",
+            "normalPath": "Textures/Characters/t_headBird_03_n.dds"
+        },
+        {
+            "textureID": 23,
+            "albedoPath": "Textures/Characters/t_headBird_04_c.dds",
+            "fxPath": "Textures/Characters/t_headBird_04_fx.dds",
+            "materialPath": "Textures/Characters/t_headBird_04_m.dds",
+            "normalPath": "Textures/Characters/t_headBird_04_n.dds"
+        },
+        {
+            "textureID": 24,
+            "albedoPath": "Textures/Characters/t_npcOutfit_01_c.dds",
+            "fxPath": "Textures/Characters/t_npcOutfit_01_fx.dds",
+            "materialPath": "Textures/Characters/t_npcOutfit_01_m.dds",
+            "normalPath": "Textures/Characters/t_npcOutfit_01_n.dds"
+        },
+        {
+            "textureID": 25,
+            "albedoPath": "Textures/Characters/t_npcOutfit_02_c.dds",
+            "fxPath": "Textures/Characters/t_npcOutfit_02_fx.dds",
+            "materialPath": "Textures/Characters/t_npcOutfit_02_m.dds",
+            "normalPath": "Textures/Characters/t_npcOutfit_02_n.dds"
+        },
+        {
+            "textureID": 26,
+            "albedoPath": "Textures/Characters/t_npcOutfit_03_c.dds",
+            "fxPath": "Textures/Characters/t_npcOutfit_03_fx.dds",
+            "materialPath": "Textures/Characters/t_npcOutfit_03_m.dds",
+            "normalPath": "Textures/Characters/t_npcOutfit_03_n.dds"
+        },
+        {
+            "textureID": 27,
+            "albedoPath": "Textures/Characters/t_npcOutfit_04_c.dds",
+            "fxPath": "Textures/Characters/t_npcOutfit_04_fx.dds",
+            "materialPath": "Textures/Characters/t_npcOutfit_04_m.dds",
+            "normalPath": "Textures/Characters/t_npcOutfit_04_n.dds"
+        },
+        {
+            "textureID": 28,
+            "albedoPath": "Textures/Characters/t_player_c.dds",
+            "fxPath": "Textures/Characters/t_player_fx.dds",
+            "materialPath": "Textures/Characters/t_player_m.dds",
+            "normalPath": "Textures/Characters/t_player_n.dds"
+        },
+        {
+            "textureID": 29,
+            "albedoPath": "Textures/FOR MAIN MENU/t_board_c.dds",
+            "fxPath": "Textures/FOR MAIN MENU/t_board_fx.dds",
+            "materialPath": "Textures/FOR MAIN MENU/t_board_m.dds",
+            "normalPath": "Textures/FOR MAIN MENU/t_board_n.dds"
+        },
+        {
+            "textureID": 30,
+            "albedoPath": "Textures/FOR MAIN MENU/t_map_c.dds",
+            "fxPath": "Textures/FOR MAIN MENU/t_map_fx.dds",
+            "materialPath": "Textures/FOR MAIN MENU/t_map_m.dds",
+            "normalPath": "Textures/FOR MAIN MENU/t_map_n.dds"
+        },
+        {
+            "textureID": 31,
+            "albedoPath": "Textures/Props/t_fences_c.dds",
+            "fxPath": "Textures/Props/t_fences_fx.dds",
+            "materialPath": "Textures/Props/t_fences_m.dds",
+            "normalPath": "Textures/Props/t_fences_n.dds"
+        },
+        {
+            "textureID": 32,
+            "albedoPath": "Textures/Props/t_propRed_c.dds",
+            "fxPath": "Textures/Props/t_propRed_fx.dds",
+            "materialPath": "Textures/Props/t_propRed_m.dds",
+            "normalPath": "Textures/Props/t_propRed_n.dds"
+        },
+        {
+            "textureID": 33,
+            "albedoPath": "Textures/Props/t_proptrim_c.dds",
+            "fxPath": "Textures/Props/t_proptrim_fx.dds",
+            "materialPath": "Textures/Props/t_proptrim_m.dds",
+            "normalPath": "Textures/Props/t_proptrim_n.dds"
+        },
+        {
+            "textureID": 34,
+            "albedoPath": "Textures/Props/t_stoneRamps_c.dds",
+            "fxPath": "Textures/Props/t_stoneRamps_fx.dds",
+            "materialPath": "Textures/Props/t_stoneRamps_m.dds",
+            "normalPath": "Textures/Props/t_stoneRamps_n.dds"
+        },
+        {
+            "textureID": 35,
+            "albedoPath": "Textures/Props/t_washLine_c.dds",
+            "fxPath": "Textures/Props/t_washLine_fx.dds",
+            "materialPath": "Textures/Props/t_washLine_m.dds",
+            "normalPath": "Textures/Props/t_washLine_n.dds"
+        },
+        {
+            "textureID": 36,
             "albedoPath": "Textures/Setdressing/Pennants/t_pennants_c.dds",
             "fxPath": "Textures/Setdressing/Pennants/t_pennants_fx.dds",
             "materialPath": "Textures/Setdressing/Pennants/t_pennants_m.dds",
             "normalPath": "Textures/Setdressing/Pennants/t_pennants_n.dds"
         },
         {
-            "textureID": 15,
+            "textureID": 37,
             "albedoPath": "Textures/Setdressing/Posters/t_posters_c.dds",
             "fxPath": "Textures/Setdressing/Posters/t_posters_fx.dds",
             "materialPath": "Textures/Setdressing/Posters/t_posters_m.dds",
             "normalPath": "Textures/Setdressing/Posters/t_posters_n.dds"
         },
         {
-            "textureID": 16,
+            "textureID": 38,
             "albedoPath": "Textures/Setdressing/t_barrel_c.dds",
             "fxPath": "Textures/Setdressing/t_barrel_fx.dds",
             "materialPath": "Textures/Setdressing/t_barrel_m.dds",
             "normalPath": "Textures/Setdressing/t_barrel_n.dds"
         },
         {
-            "textureID": 17,
+            "textureID": 39,
             "albedoPath": "Textures/Setdressing/t_basket_01_c.dds",
             "fxPath": "Textures/Setdressing/t_basket_01_fx.dds",
             "materialPath": "Textures/Setdressing/t_basket_01_m.dds",
             "normalPath": "Textures/Setdressing/t_basket_01_n.dds"
         },
         {
-            "textureID": 18,
+            "textureID": 40,
             "albedoPath": "Textures/Setdressing/t_bucket_c.dds",
             "fxPath": "Textures/Setdressing/t_bucket_fx.dds",
             "materialPath": "Textures/Setdressing/t_bucket_m.dds",
             "normalPath": "Textures/Setdressing/t_bucket_n.dds"
         },
         {
-            "textureID": 19,
+            "textureID": 41,
+            "albedoPath": "Textures/Setdressing/t_chair_c.dds",
+            "fxPath": "Textures/Setdressing/t_chair_fx.dds",
+            "materialPath": "Textures/Setdressing/t_chair_m.dds",
+            "normalPath": "Textures/Setdressing/t_chair_n.dds"
+        },
+        {
+            "textureID": 42,
             "albedoPath": "Textures/Setdressing/t_crate_01_c.dds",
             "fxPath": "Textures/Setdressing/t_crate_01_fx.dds",
             "materialPath": "Textures/Setdressing/t_crate_01_m.dds",
             "normalPath": "Textures/Setdressing/t_crate_01_n.dds"
         },
         {
-            "textureID": 20,
+            "textureID": 43,
             "albedoPath": "Textures/Setdressing/t_flagframes_c.dds",
             "fxPath": "Textures/Setdressing/t_flagFrames_fx.dds",
             "materialPath": "Textures/Setdressing/t_flagframes_m.dds",
             "normalPath": "Textures/Setdressing/t_flagframes_n.dds"
         },
         {
-            "textureID": 21,
+            "textureID": 44,
+            "albedoPath": "Textures/Setdressing/t_flags_c.dds",
+            "fxPath": "Textures/Setdressing/t_flags_fx.dds",
+            "materialPath": "Textures/Setdressing/t_flags_m.dds",
+            "normalPath": "Textures/Setdressing/t_flags_n.dds"
+        },
+        {
+            "textureID": 45,
             "albedoPath": "Textures/Setdressing/t_flowers_c.dds",
             "fxPath": "Textures/Setdressing/t_flowers_fx.dds",
             "materialPath": "Textures/Setdressing/t_flowers_m.dds",
             "normalPath": "Textures/Setdressing/t_flowers_n.dds"
         },
         {
-            "textureID": 22,
+            "textureID": 46,
             "albedoPath": "Textures/Setdressing/t_ladder_c.dds",
             "fxPath": "Textures/Setdressing/t_ladder_fx.dds",
             "materialPath": "Textures/Setdressing/t_ladder_m.dds",
             "normalPath": "Textures/Setdressing/t_ladder_n.dds"
         },
         {
-            "textureID": 23,
+            "textureID": 47,
+            "albedoPath": "Textures/Setdressing/t_lanterns_c.dds",
+            "fxPath": "Textures/Setdressing/t_lanterns_fx.dds",
+            "materialPath": "Textures/Setdressing/t_lanterns_m.dds",
+            "normalPath": "Textures/Setdressing/t_lanterns_n.dds"
+        },
+        {
+            "textureID": 48,
             "albedoPath": "Textures/Setdressing/t_marketstall01_c.dds",
             "fxPath": "Textures/Setdressing/t_marketstall01_fx.dds",
             "materialPath": "Textures/Setdressing/t_marketstall01_m.dds",
             "normalPath": "Textures/Setdressing/t_marketstall01_n.dds"
         },
         {
-            "textureID": 24,
+            "textureID": 49,
+            "albedoPath": "Textures/Setdressing/t_mountains_c 1.dds",
+            "fxPath": "Textures/Setdressing/t_mountains_fx 1.dds",
+            "materialPath": "Textures/Setdressing/t_mountains_m 1.dds",
+            "normalPath": "Textures/Setdressing/t_mountains_n 1.dds"
+        },
+        {
+            "textureID": 50,
             "albedoPath": "Textures/Setdressing/t_mug_c.dds",
             "fxPath": "Textures/Setdressing/t_mug_fx.dds",
             "materialPath": "Textures/Setdressing/t_mug_m.dds",
             "normalPath": "Textures/Setdressing/t_mug_n.dds"
         },
         {
-            "textureID": 25,
+            "textureID": 51,
             "albedoPath": "Textures/Setdressing/t_sacks_c.dds",
             "fxPath": "Textures/Setdressing/t_sacks_fx.dds",
             "materialPath": "Textures/Setdressing/t_sacks_m.dds",
             "normalPath": "Textures/Setdressing/t_sacks_n.dds"
         },
         {
-            "textureID": 26,
+            "textureID": 52,
             "albedoPath": "Textures/Setdressing/t_shopsigns_c.dds",
             "fxPath": "Textures/Setdressing/t_shopSigns_fx.dds",
             "materialPath": "Textures/Setdressing/t_shopsigns_m.dds",
             "normalPath": "Textures/Setdressing/t_shopsigns_n.dds"
         },
         {
-            "textureID": 27,
+            "textureID": 53,
+            "albedoPath": "Textures/Setdressing/t_stoneRubble_c.dds",
+            "fxPath": "Textures/Setdressing/t_stoneRubble_fx.dds",
+            "materialPath": "Textures/Setdressing/t_stoneRubble_m.dds",
+            "normalPath": "Textures/Setdressing/t_stoneRubble_n.dds"
+        },
+        {
+            "textureID": 54,
+            "albedoPath": "Textures/Setdressing/t_stool_c.dds",
+            "fxPath": "Textures/Setdressing/t_stool_fx.dds",
+            "materialPath": "Textures/Setdressing/t_stool_m.dds",
+            "normalPath": "Textures/Setdressing/t_stool_n.dds"
+        },
+        {
+            "textureID": 55,
+            "albedoPath": "Textures/Setdressing/t_table_c.dds",
+            "fxPath": "Textures/Setdressing/t_table_fx.dds",
+            "materialPath": "Textures/Setdressing/t_table_m.dds",
+            "normalPath": "Textures/Setdressing/t_table_n.dds"
+        },
+        {
+            "textureID": 56,
+            "albedoPath": "Textures/Setdressing/t_vase_c.dds",
+            "fxPath": "Textures/Setdressing/t_vase_fx.dds",
+            "materialPath": "Textures/Setdressing/t_vase_m.dds",
+            "normalPath": "Textures/Setdressing/t_vase_n.dds"
+        },
+        {
+            "textureID": 57,
             "albedoPath": "Textures/Setdressing/t_vines_c.dds",
             "fxPath": "Textures/Setdressing/t_vines_fx.dds",
             "materialPath": "Textures/Setdressing/t_vines_m.dds",
             "normalPath": "Textures/Setdressing/t_vines_n.dds"
         },
         {
-            "textureID": 28,
+            "textureID": 58,
             "albedoPath": "Textures/Setdressing/t_windowShutters_c.dds",
             "fxPath": "Textures/Setdressing/t_windowShutters_fx.dds",
             "materialPath": "Textures/Setdressing/t_windowShutters_m.dds",
             "normalPath": "Textures/Setdressing/t_windowShutters_n.dds"
         },
         {
-            "textureID": 29,
+            "textureID": 59,
             "albedoPath": "Textures/UI/t_gooseCutout_c.dds",
             "fxPath": "Textures/UI/t_gooseCutout_fx.dds",
             "materialPath": "Textures/UI/t_gooseCutout_m.dds",
             "normalPath": "Textures/UI/t_gooseCutout_n.dds"
         },
         {
-            "textureID": 30,
+            "textureID": 60,
             "albedoPath": "Textures/UI/t_speechBubble_01_c.dds",
             "fxPath": "Textures/UI/t_speechBubble_01_fx.dds",
             "materialPath": "Textures/UI/t_speechBubble_01_m.dds",
             "normalPath": "Textures/UI/t_speechBubble_01_n.dds"
         },
         {
-            "textureID": 31,
+            "textureID": 61,
             "albedoPath": "Textures/UI/t_speechBubble_02_c.dds",
             "fxPath": "Textures/UI/t_speechBubble_02_fx.dds",
             "materialPath": "Textures/UI/t_speechBubble_02_m.dds",
             "normalPath": "Textures/UI/t_speechBubble_02_n.dds"
         },
         {
-            "textureID": 32,
+            "textureID": 62,
             "albedoPath": "Textures/UI/t_speechBubble_03_c.dds",
             "fxPath": "Textures/UI/t_speechBubble_03_fx.dds",
             "materialPath": "Textures/UI/t_speechBubble_03_m.dds",
             "normalPath": "Textures/UI/t_speechBubble_03_n.dds"
         },
         {
-            "textureID": 33,
+            "textureID": 63,
             "albedoPath": "Textures/UI/t_speechBubble_04_c.dds",
             "fxPath": "Textures/UI/t_speechBubble_04_fx.dds",
             "materialPath": "Textures/UI/t_speechBubble_04_m.dds",
             "normalPath": "Textures/UI/t_speechBubble_04_n.dds"
+        },
+        {
+            "textureID": 64,
+            "albedoPath": "Textures/UI/t_speechBubble_05_c.dds",
+            "fxPath": "Textures/UI/t_speechBubble_05_fx.dds",
+            "materialPath": "Textures/UI/t_speechBubble_05_m.dds",
+            "normalPath": "Textures/UI/t_speechBubble_05_n.dds"
+        },
+        {
+            "textureID": 65,
+            "albedoPath": "Textures/VertexPaint/t_plasterVertexPaint_c.dds",
+            "fxPath": "Textures/VertexPaint/t_plasterVertexPaint_fx.dds",
+            "materialPath": "Textures/VertexPaint/t_plasterVertexPaint_m.dds",
+            "normalPath": "Textures/VertexPaint/t_plasterVertexPaint_n.dds"
         }
     ],
     "animations": [
         {
-            "meshID": -253768702,
+            "meshID": -863539656,
             "assetPath": "Animations/a_enemy_recoilDown.fbx",
             "name": "recoilDown"
         },
         {
-            "meshID": -253768702,
+            "meshID": -863539656,
             "assetPath": "Animations/a_enemy_recoilFront.fbx",
             "name": "recoilFront"
         },

@@ -7,7 +7,7 @@ public:
 	static float cameraCrouchHeight;
 	static float meshHeight;
 	static float meshCrouchHeight;
-	static float maxSpeed;
+	static float groundMaxSpeed;
 	static float accelerationSpeed;
 	static float jumpSpeed;
 	static float friction;
@@ -22,10 +22,23 @@ public:
 	static float wallRunFriction;
 	static float wallJumpSpeed;
 	static float wallJumpHeight;
+	static float wallJumpOutSpeed;
 	static float wallRunGravityMultiplier;
 	static float crouchSpeedMultiplier;
 	static float vaultRange;
 	static float slideSpeedBoost;
 	static float slideFriction;
 	static float slideSpeedThreshold;
+	static float slideTimeUntilFriction;
+	static float coyoteJumpMaxTime;
+	static float godSpeedMultiplier;
+	static float godSpeedThreshhold;
+	static float wallRunFallDamping;
+	static float airMaxSpeed;
+
+	//static float coyoteJumpTimer;
+	//static float godSpeedTimer;
+	//static float slideTimer;
+
+
 };

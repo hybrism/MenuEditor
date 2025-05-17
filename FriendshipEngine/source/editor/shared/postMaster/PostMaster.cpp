@@ -3,6 +3,18 @@
 
 FE::PostMaster* FE::PostMaster::myInstance = nullptr;
 
+FE::PostMaster::~PostMaster()
+{
+	for (auto& observer : myObservers)
+	{
+		for (auto& observerInstance : observer.second)
+		{
+			delete observerInstance;
+		}
+		observer.second.clear();
+	}
+}
+
 FE::PostMaster* FE::PostMaster::GetInstance()
 {
 	if (myInstance == nullptr)

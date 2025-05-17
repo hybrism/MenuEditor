@@ -3,6 +3,10 @@
 #include "PlayerStateMachine.h"
 #include "../component/PlayerComponent.h"
 #include <physics/PhysXSceneManager.h>
+#include <engine/graphics/Animation/AnimationController.h>
+#include "../component/AnimationDataComponent.h"
+#include "audio/NewAudioManager.h"
+#include <iostream>
 
 PlayerGroundState::PlayerGroundState(PlayerStateMachine* aStateMachine) : PlayerState(aStateMachine)
 {
@@ -16,8 +20,9 @@ void PlayerGroundState::OnEnter(PlayerStateUpdateContext& aContext)
 	//p.finalVelocity = { p.xVelocity.x, p.yVelocity, p.xVelocity.y };
 }
 
-void PlayerGroundState::OnExit(PlayerStateUpdateContext&)
+void PlayerGroundState::OnExit(PlayerStateUpdateContext& aContext)
 {
+	aContext.animationDataComponent.speed = 1.0f;
 }
 
 void PlayerGroundState::Update(PlayerStateUpdateContext& aContext)
@@ -91,16 +96,17 @@ void PlayerGroundState::Update(PlayerStateUpdateContext& aContext)
 	}
 
 	float length = p.xVelocity.Length();
-	if (length > PlayerConstants::maxSpeed)
+	if (length > PlayerConstants::groundMaxSpeed)
 	{
-		//float delta = length - p.maxSpeed;
+		//float delta = length - p.groundMaxSpeed;
 		//delta = std::min(delta, p.groundedMaxSpeedCorrectionAmount);
 		//p.xVelocity -= p.xVelocity.GetNormalized() * delta;
 		p.xVelocity.Normalize();
-		p.xVelocity *= PlayerConstants::maxSpeed;
+		p.xVelocity *= PlayerConstants::groundMaxSpeed;
 	}
 
 	p.finalVelocity = { p.xVelocity.x, p.yVelocity, p.xVelocity.y };
+
 
 	if (p.xVelocity.LengthSqr() > 0)
 	{
@@ -115,6 +121,13 @@ void PlayerGroundState::Update(PlayerStateUpdateContext& aContext)
 		Vector3f projectedPoint = (playerVelocity)-(p.collision.groundNormal * dist);
 
 		p.finalVelocity = projectedPoint;
+
+		
+	}
+
+	if (aContext.animationDataComponent.currentStateIndex == (int)PlayerAnimationState::eRun)
+	{
+		aContext.animationDataComponent.speed = std::min(std::max(p.xVelocity.Length(), 0.2f), PlayerConstants::groundMaxSpeed) / PlayerConstants::groundMaxSpeed;
 	}
 }
 

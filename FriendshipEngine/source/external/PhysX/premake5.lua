@@ -2,7 +2,7 @@ project "PhysX"
 	location "%{dirs.localdir}"
 		
 	language "C++"
-	cppdialect "C++17"
+	cppdialect "C++20"
 	kind "StaticLib"
 
 	targetdir ("%{dirs.lib}")

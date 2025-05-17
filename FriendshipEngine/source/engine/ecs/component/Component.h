@@ -1,11 +1,8 @@
 #pragma once
-#include <bitset>
-
-#ifndef _RELEASE
+#ifdef _EDITOR
 #include "../entity/Entity.h"
 #endif
 
-constexpr unsigned long MAX_COMPONENTS = 64;
 typedef unsigned long int cid_t;
 
 template<typename T>
@@ -21,9 +18,8 @@ private:
 	static cid_t componentId;
 public:
 	Component() = default;
-#ifndef _RELEASE
+#ifdef _EDITOR
 	Entity myOwner = 0;
-	EntityData* myOwnerData = nullptr;
 #endif
 private:
 	Component(const Component& aComponent) = default;

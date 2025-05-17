@@ -2,15 +2,13 @@
 
 #include "FMODImplementation.h"
 #include <engine/math/Transform.h>
+#include <fmod/fmod_studio_guids.hpp>
 
 
 
 class AudioManager
 {
 public:
-
-
-
 	static int ErrorCheck(FMOD_RESULT result)
 	{
 		if (result != FMOD_OK)
@@ -35,22 +33,22 @@ public:
 	void Update();
 
 	void LoadBank(const std::string& strBankName, FMOD_STUDIO_LOAD_BANK_FLAGS flags);
-	void LoadEvent(const std::string& strEventName);
+	void LoadEvent(const FMOD_GUID& aID);
 	void LoadSound(const std::string& strSoundName, bool is3D = true, bool isLooping = false, bool isStream = false);
 	void UnLoadSound(const std::string& strSoundName);
 
 	void Set3dListenerAndOrientation(const Vector3f aPos = Vector3f{ 0,0,0 }, float aVolume = 0);
 	int PlaySound(const std::string& strSoundName, const Vector3f& vPosition, float fVolumedB);
-	void PlayEvent(const std::string& strEventName);
-	void StopEvent(const std::string& strEventName, bool stopImmediate);
+	void PlayEvent(const FMOD_GUID& eID);
+	void StopEvent(const FMOD_GUID& eID, bool stopImmediate);
 	void StopChannel(int channelID);
-	void GetEventParameter(const std::string& strEventName, const std::string& strParameterName, float* parameter);
-	void SetEventParameter(const std::string& strEventName, const std::string& strParameterName, float fValue);
+	void GetEventParameter(const FMOD_GUID& eID, const std::string& strParameterName, float* parameter);
+	void SetEventParameter(const FMOD_GUID& eID, const std::string& strParameterName, float fValue);
 	void StopAllChannels();
 	void SetChannel3dPosition(int aChannelID, const Vector3f& aPosition);
 	void SetChannelVolume(int aChannelID, float aVolume);
 	bool IsChannelPlaying(int nChannelId) const;
-	bool IsEventPlaying(const std::string& strEventName) const;
+	bool IsEventPlaying(const FMOD_GUID& eID) const;
 
 	void SetPlayerListenPosition(const Transform& aPos);
 	FMOD_VECTOR Vector3ToFmod(const Vector3f& aPosition);

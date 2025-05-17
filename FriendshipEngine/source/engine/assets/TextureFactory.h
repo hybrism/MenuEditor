@@ -1,6 +1,11 @@
 #pragma once
 #include <wrl/client.h>
 
+#ifdef _EDITOR
+#include <engine/graphics/StagingTexture.h>
+#include <memory>
+#endif
+
 using Microsoft::WRL::ComPtr;
 struct ID3D11ShaderResourceView;
 
@@ -49,10 +54,14 @@ public:
 	TextureFactory() = delete;
 	~TextureFactory() = delete;
 
-	static Texture* CreateTexture(const std::string& aTexturePath, const bool& aUseRelative = true, bool aShouldPrintError = true);
-	static bool CreateDDSTexture(const std::wstring& aPath, ComPtr<ID3D11Resource>& outTexture, ComPtr<ID3D11ShaderResourceView>& outShaderResourceView);
+	static std::shared_ptr<Texture> CreateTexture(const std::string& aTexturePath, const bool& aUseRelative = true, bool aShouldPrintError = true);
+#ifdef _EDITOR
+    static std::shared_ptr<Texture> CreateDDSTextureWithCPUAccess(const std::string& aTexturePath, std::shared_ptr<StagingTexture>& outStagingTexture);
+    static void UpdateTextureWithCPUAccess(std::shared_ptr<Texture> aTexture, const unsigned char* aData);
+#endif
+    static bool CreateDDSTexture(const std::wstring& aPath, ComPtr<ID3D11Resource>& outTexture, ComPtr<ID3D11ShaderResourceView>& outShaderResourceView);
 	static bool CreateDDSTexture(const std::wstring& aPath, ComPtr<ID3D11ShaderResourceView>& outShaderResourceView);
 	static void WriteDDSToFile(const std::wstring& aPath, const char* aData, const int& aWidth, const int& aHeight);
 private:
-	static bool CreatePNGTexture(const std::string& aPath, Texture*& outTexture);
+	static bool CreatePNGTexture(const std::string& aPath, std::shared_ptr<Texture>& outTexture);
 };

@@ -74,10 +74,8 @@ LRESULT CALLBACK WndProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In
 			DragQueryFileW(hDropInfo, i, filename, filename_len);
 		}
 
-		if (filename > 0 && Utility::IsFbx(filename))
+		if (filename != nullptr && Utility::IsFbx(filename))
 		{
-			Print("You dropped a FBX!");
-
 			FE::PostMaster::GetInstance()->SendMessage({ FE::eMessageType::MeshDropped, StringHelper::ws2s(filename) });
 		}
 
@@ -133,14 +131,14 @@ void ModelViewerLauncher::Init(HINSTANCE hInstance, WNDPROC wndProc)
 }
 
 
-void ModelViewerLauncher::Update(const float& dt)
+void ModelViewerLauncher::Update(const float& aDt, const double&)
 {
-	::Application::Update(dt);
+	::Application::Update(aDt, GetTimer().GetTotalTime());
 	ImGuiHandler::Update();
 
 	InputManager::GetInstance()->Update();
 
-	myModelViewer.Update(dt);
+	myModelViewer.Update(aDt);
 }
 
 void ModelViewerLauncher::Render()
@@ -156,7 +154,6 @@ void ModelViewerLauncher::Render()
 	// Shadows
 	myLightManager.BeginShadowRendering();
 	deferred.DoShadowRenderPass();
-	forward.DoShadowRenderPass();
 	myLightManager.EndShadowRendering();
 
 	if ((ge->GetDrawCalls() - prevDrawCalls) > 0)
@@ -203,8 +200,6 @@ void ModelViewerLauncher::Render()
 		ID3D11ShaderResourceView* nullSRV = nullptr;
 		context->PSSetShaderResources(0, 1, &nullSRV);
 	}
-
-	myModelViewer.RenderImGui();
 
 	ImGuiHandler::Render();
 }

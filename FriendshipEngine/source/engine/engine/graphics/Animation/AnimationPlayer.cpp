@@ -18,11 +18,11 @@ void AnimationPlayer::UpdatePose(
 
 	const SharedMeshPackage& meshPackage = AssetDatabase::GetMesh(aMeshId);
 
-	Pose pose = InternalUpdateAndGetPose(aDeltaTime, aMeshId, 0, meshPackage, aData, aFromState);
+	Pose pose = InternalUpdateAndGetPose(aDeltaTime, 0, meshPackage, aData, aFromState);
 
 	if (aToState != nullptr)
 	{
-		Pose toPose = InternalUpdateAndGetPose(aDeltaTime, aMeshId, 1, meshPackage, aData, *aToState);
+		Pose toPose = InternalUpdateAndGetPose(aDeltaTime, 1, meshPackage, aData, *aToState);
 		pose = GetInterpolatedPose(pose, toPose, *meshPackage.skeleton, aData.blendFactor);
 	}
 
@@ -60,18 +60,16 @@ void AnimationPlayer::SetFrame(AnimationData& aData, const Animation& aAnimation
 	aData.nextStateIndex = aData.currentStateIndex;
 }
 
-#include <iostream>
 Pose AnimationPlayer::InternalUpdateAndGetPose(
 	const float& aDeltaTime,
-	size_t aMeshId,
 	size_t aTimeIndex,
 	const SharedMeshPackage& aMeshPackage,
 	AnimationData& aData,
 	const AnimationState& aState
 ) const
 {
-	Animation* animation = AssetDatabase::GetAnimation(aMeshId, aState.GetAnimationIndex());
 	Skeleton* skeleton = aMeshPackage.skeleton;
+	Animation* animation = AssetDatabase::GetAnimation(skeleton, aState.GetAnimationIndex());
 
 	float& time = aData.time[aTimeIndex];
 	time += aDeltaTime * aData.speed;

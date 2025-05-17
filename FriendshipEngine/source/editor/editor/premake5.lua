@@ -29,8 +29,7 @@ project "Editor"
 	}
 
 	links {
-		"DirectXTex.lib",
-		"DirectXTex_Spectre.lib",
+		"DirectXTex.lib"
 	}
 	--verify_or_create_settings("Game")
 

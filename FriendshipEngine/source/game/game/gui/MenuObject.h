@@ -23,7 +23,7 @@ namespace MENU
 		template<class T>
 		T& AddComponent();
 
-		void RemoveComponent(const ID aID);
+		void AddComponentOfType(ComponentType aType);
 
 		template<class T>
 		T& GetComponent();
@@ -31,19 +31,21 @@ namespace MENU
 		template<class T>
 		std::vector<std::shared_ptr<MenuComponent>> GetComponents();
 
+		void RemoveComponent(const ID aID);
+
 		template<class T>
 		bool HasComponent();
 
-		void AddComponentOfType(ComponentType aType);
-
 		virtual void Update(const MenuUpdateContext& aContext);
 		virtual void Render();
+
+		void OnResize(const Vector2i& aNewRenderSize);
 
 		bool IsHovered();
 		bool IsPressed();
 
 		void SetName(const std::string& aName) { myName = aName; }
-		void SetPosition(const Vector2f& aPosition);
+		void SetPosition(const Vector2f& aPosition, bool aIsInitialPosition = false);
 
 		const ID GetID() const { return myID; }
 		const ObjectState GetState() { return myState; }
@@ -53,14 +55,16 @@ namespace MENU
 	private:
 		MenuObject() = delete;
 
+		std::string myName;
 		std::vector<std::shared_ptr<MenuComponent>> myComponents;
 
-		ObjectState myState;
-
-		const ID myID;
-		ID myComponentIDCounter = 0;
-		std::string myName;
+		Vector2i myTargetRenderSize;
+		Vector2f myInitialPosition;
 		Vector2f myPosition;
+		ObjectState myState;
+		const ID myID;
+
+		ID myComponentIDCounter = 0;
 	};
 }
 

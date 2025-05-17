@@ -1,33 +1,37 @@
 #pragma once
 
+#define SHOULD_TRACK_ENTITIES 1
+
 #include "entity/Entity.h"
 #include "entity/EntityManager.h"
-#include "entity/EntitySignatureManager.h"
 #include "../../game/game/scene/SceneCommon.h"
 
 #include "component/ComponentManager.h"
 #include "system/SystemManager.h"
 #include <cassert>
 
-#ifndef _RELEASE
+#ifdef _EDITOR
 #include <vector>
+
+#if SHOULD_TRACK_ENTITIES
+#include <unordered_set>
+#endif
 #endif
 
 // ACTS AS ADAPTER FOR ALL MANAGERS
 class World
 {
 public:
-	World() = default;
+	World();
 	~World();
 
 	void Reset();
 	void Init();
-	void Update(const SceneUpdateContext& aDeltaTime);
+	void Update(SceneUpdateContext& aDeltaTime);
 	void Render();
 
 	// Entity Adapter
 	Entity CreateEntity();
-	Entity CreateEntityAtID(const eid_t& aEntityID);
 	void DestroyEntity(const Entity& aEntity);
 
 	void SetPlayerEntityID(const eid_t& aPlayerEntityID) { myPlayerEntityID = aPlayerEntityID; };
@@ -50,6 +54,18 @@ public:
 	template<typename T>
 	T& GetComponent(const Entity& aEntity);
 
+	template<typename... Components> requires (sizeof...(Components) != 1)
+		decltype(auto) get(Entity aEntity) const
+	{
+		//static_assert(details::is_subset_of<std::tuple<std::remove_const_t<_Cs>...>, std::tuple<Cs...> >);
+		//assert(contains(aEntity));
+
+		//if constexpr (sizeof...(_Cs) == 0)
+		//	return std::forward_as_tuple(std::get<component_pool<Cs>*>(pools)->get(aEntity)...);
+		//else
+		return std::forward_as_tuple(myComponentManager->GetComponent<Components>(aEntity) ...);
+	}
+
 	// System Adapter
 	template<typename T, typename... Param>
 	T* RegisterSystem(Param... aParams);
@@ -71,15 +87,15 @@ public:
 	template<typename T>
 	bool HasComponent(const Entity& aEntity) const
 	{
-		return myComponentManager->HasComponent<T>(aEntity, myEntitySignatureManager);
+		return myComponentManager->HasComponent<T>(aEntity);
 	}
 
-#ifndef _RELEASE
+#ifdef _EDITOR
 	template<typename T>
 	T* TryGetComponent(const Entity& aEntity);
 #endif
 
-#ifndef _RELEASE
+#ifdef _EDITOR
 	std::vector<Entity>& GetEntities() { return myEntities; }
 #endif
 
@@ -97,14 +113,16 @@ private:
 	size_t myMarkedDeleteCount = 0;
 
 	EntityManager* myEntityManager = nullptr;
-	EntitySignatureManager* myEntitySignatureManager = nullptr;
 	SystemManager* mySystemManager = nullptr;
 	ComponentManager* myComponentManager = nullptr;
 
 	eid_t myPlayerEntityID = INVALID_ENTITY;
 
-#ifndef _RELEASE
+#ifdef _EDITOR
 	std::vector<Entity> myEntities = {};
+#if SHOULD_TRACK_ENTITIES
+	std::unordered_set<Entity> myLifetimeEntityCount;
+#endif
 #endif
 };
 
@@ -117,7 +135,7 @@ void World::RegisterComponent(size_t aMaxSize)
 template<typename T>
 T& World::AddComponent(const Entity& aEntity)
 {
-	T& component = myComponentManager->AddComponent<T>(aEntity, myEntitySignatureManager);
+	T& component = myComponentManager->AddComponent<T>(aEntity);
 	UpdateSignature<T>(aEntity, true);
 	return component;
 }
@@ -125,14 +143,14 @@ T& World::AddComponent(const Entity& aEntity)
 template<typename T>
 void World::RemoveComponent(const Entity& aEntity)
 {
-	myComponentManager->RemoveComponent<T>(aEntity, myEntitySignatureManager);
+	myComponentManager->RemoveComponent<T>(aEntity);
 	UpdateSignature<T>(aEntity, false);
 }
 
 template<typename T>
 inline T& World::GetComponent(const Entity& aEntity)
 {
-	return myComponentManager->GetComponent<T>(aEntity, myEntitySignatureManager);
+	return myComponentManager->GetComponent<T>(aEntity);
 }
 
 template<typename T, typename... Param>
@@ -158,6 +176,8 @@ inline T* World::RegisterSystem(const ComponentSignature& aSignature, Param... a
 template<typename T>
 inline void World::SetSystemSignature(const ComponentSignature& aSignature)
 {
+	// TODO: set the entity container within the system to be equal
+	// to the size of the smallest component in the signature
 	mySystemManager->SetSignature<T>(aSignature);
 }
 
@@ -170,14 +190,14 @@ inline cid_t World::GetComponentSignatureID()
 template<typename T>
 void World::UpdateSignature(const Entity& aEntity, const bool& aValue)
 {
-	myEntitySignatureManager->UpdateComponentSignature(aEntity, myComponentManager->GetComponentSignatureID<T>(), aValue);
-	mySystemManager->OnEntitySignatureChanged(aEntity, myEntitySignatureManager->GetComponentSignature(aEntity));
+	myComponentManager->UpdateComponentSignature<T>(aEntity, aValue);
+	mySystemManager->OnEntitySignatureChanged(aEntity, myComponentManager->GetEntitySignature(aEntity));
 }
 
-#ifndef _RELEASE
+#ifdef _EDITOR
 template<typename T>
 inline T* World::TryGetComponent(const Entity& aEntity)
 {
-	return myComponentManager->TryGetComponent<T>(aEntity, myEntitySignatureManager);
+	return myComponentManager->TryGetComponent<T>(aEntity);
 }
 #endif

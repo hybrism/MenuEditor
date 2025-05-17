@@ -135,18 +135,7 @@ public:
 
 		auto& transformComponent = aContext.GetUpdateContext().world->GetComponent<TransformComponent>(entity);
 
-		DirectX::XMMATRIX transform = transformComponent.GetWorldTransform(aContext.GetUpdateContext().world, entity);
-		
-		float pitch = asinf(transform.r[2].m128_f32[1]);
-		float yaw = atan2f(transform.r[2].m128_f32[0], transform.r[2].m128_f32[2]);
-		float roll = atan2f(transform.r[0].m128_f32[1], transform.r[1].m128_f32[1]);
-
-		Vector3f rotation =
-		{
-			roll * Rad2Deg,
-			pitch * Rad2Deg,
-			yaw * Rad2Deg
-		};
+		Vector3f rotation = transformComponent.transform.GetEulerRotation();
 
 		return { rotation };
 	}

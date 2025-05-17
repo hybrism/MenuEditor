@@ -38,13 +38,14 @@ public:
 	);
 	bool BeginFrame();
 	void EndFrame();
+
+	bool myIsFullscreen = false;
 private:
 	Engine(const Engine&) = delete;
 	Engine(Timer* aTimer);
 	Engine() = delete;
 
 	bool myShouldExit = false;
-	bool myIsFullscreen = false;
 	int myWindowWidth = 0;
 	int myWindowHeight = 0;
 	int myViewPortWidth = 0;

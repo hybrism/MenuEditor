@@ -6,15 +6,22 @@
 #include <assets/AssetDatabase.h>
 #include <assets/ShaderDatabase.h>
 #include "../model/Mesh.h"
+#include "ParticleSystemManager.h"
 
-VFXManager::VFXManager(VFXDatabase& aDatabase)
-	: myVfxDatabase(&aDatabase)
-{ }
+VFXManager::VFXManager(ParticleSystemManager& aParticleSystemManager)
+{
+	myParticleSystemManager = &aParticleSystemManager;
+	myActiveVFX.resize(VFX_MANAGER_DEFAULT_EFFECTS_SIZE);
+	myActiveVFXCount = 0;
+
+	myVfxDatabase = VFXDatabase::GetInstance();
+}
 
 VFXManager::~VFXManager() { }
 
 size_t VFXManager::InsertEffect(const vfxid_t& aData)
 {
+	// skrik till DW när det krashar :)
 	myActiveVFX[myActiveVFXCount] = VFXData{};
 	myActiveVFX[myActiveVFXCount].visualEffectId = aData;
 	++myActiveVFXCount;
@@ -58,15 +65,44 @@ void VFXManager::Update(const float& dt)
 			{
 				if (cell.startTime > vfx.time) { continue; }
 				vfx.cellHasStarted[i] = true;
-				vfx.activeMeshes[i] = (int)cell.meshId;
+
+				// Since the VisualEffectData and ParticleEmitterData both have their meshId or particleEmitterIndex on the same
+				// memory location, it will result in the activeMeshes[i] to be either one of them depending on the input type
+				vfx.activeMeshes[i] = cell.meshId;
 				vfx.activeMeshesTime[i] = 0;
+
+				// Skapa once??
+				if (cell.effectType.type == VisualEffectType::ParticleEmitter)
+				{
+					ParticleEmitter emitter;
+					emitter.spawnAngle = 90.0f;
+					emitter.spawnRadius = 100.0f;
+					emitter.spawnRate = 250.0f;
+					emitter.lifeSpan = 1.0f;
+					emitter.speed = 100.0f;
+					emitter.size = 1.0f;
+					emitter.sizeVariation = 0.1f;
+
+					emitter.position = cell.transform.GetPosition();
+					emitter.velocity = { 0, 10, 0 };
+					emitter.color = Vector4f(255.0f / 255.0f, 221.0f / 255.0f, 99.0f / 255.0f, 1);
+
+					vfx.activeMeshes[i] = (int)myParticleSystemManager->InsertEffect(emitter);
+				}
 			}
+
 
 			vfx.activeMeshesTime[i] += dt;
 
 			//UPPDATERA TRANSFORMENS POSITION??
 			if (cell.startTime + cell.duration <= vfx.time)
 			{
+				// Ta Bort
+				if (cell.effectType.type == VisualEffectType::ParticleEmitter && vfx.activeMeshes[i] >= 0)
+				{
+					myParticleSystemManager->RemoveEmitter((size_t)vfx.activeMeshes[i]);
+				}
+
 				vfx.activeMeshes[i] = -1;
 				vfx.activeMeshesTime[i] = 0;
 			}
@@ -89,38 +125,39 @@ void VFXManager::Render()
 		{
 			if (vfx.activeMeshes[i] <= 0) { continue; }
 
-			const SharedMeshPackage& package = AssetDatabase::GetMesh(vfx.activeMeshes[i]);
-
-			DirectX::XMMATRIX matrix = vfx.worldTransform.GetMatrix();
-
 			const VisualEffect& effect = myVfxDatabase->GetEffect(vfx.visualEffectId);
 			const VisualEffectCell& cell = effect.GetCell(i);
-			
-			for (SharedMesh* mesh : package.meshData)
+
+			switch (cell.effectType.type)
 			{
-				//MeshInstanceRenderData instanceData;
-				//instanceData.renderMode = RenderMode::TRIANGLELIST;
-				//instanceData.vsType = VsType::DefaultVFX;
-				//instanceData.psType = cell.type;
-				//instanceData.transform = Transform(cell.transform.GetMatrix() * matrix);
+				case VisualEffectType::VFX:
+				{
+					const SharedMeshPackage& package = AssetDatabase::GetMesh(vfx.activeMeshes[i]);
 
-				//VfxMeshInstanceData data{};
-				//data.transform = instanceData.transform;
-				//data.time = vfx.activeMeshesTime[i];
-				VfxMeshInstanceData instanceData;
-				instanceData.transform = Transform(cell.transform.GetMatrix() * matrix);// , vfx.activeMeshesTime[i] };
-				instanceData.time = vfx.activeMeshesTime[i];
+					DirectX::XMMATRIX matrix = vfx.worldTransform.GetMatrix();
 
-				forward.Render(
-					static_cast<Mesh*>(mesh),
+					for (SharedMesh* mesh : package.meshData)
 					{
-						instanceData,
-						VsType::DefaultVFX,
-						cell.type,
-						RenderMode::TRIANGLELIST
-					},
-					BlendState::AlphaBlend
-				);
+						VfxMeshInstanceData instanceData;
+						instanceData.time = vfx.activeMeshesTime[i];
+
+						forward.Render(
+							static_cast<Mesh*>(mesh),
+							{
+								MeshDrawerInstanceData(Transform(cell.transform.GetMatrix() * matrix), instanceData),
+								VsType::DefaultVFX,
+								cell.effectType.psType,
+								RenderMode::TRIANGLELIST
+							},
+							BlendState::AlphaBlend
+						);
+					}
+					break;
+				}
+				case VisualEffectType::ParticleEmitter:
+				{
+					break;
+				}
 			}
 		}
 	}

@@ -31,7 +31,7 @@ void PhysXSystem::Init()
 
 }
 
-void PhysXSystem::Update(const SceneUpdateContext& aContext)
+void PhysXSystem::Update(SceneUpdateContext& aContext)
 {
 	myPhysXSceneManager->Update(aContext.dt);
 

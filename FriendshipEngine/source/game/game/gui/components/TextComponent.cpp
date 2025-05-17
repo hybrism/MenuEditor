@@ -33,6 +33,17 @@ void MENU::TextComponent::Render()
 	myText.Render();
 }
 
+void MENU::TextComponent::OnResize(const Vector2f& aScale)
+{
+	Vector2i dimensions = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
+	Vector2f positionRatio = { myInitialPosition.x / dimensions.x, myInitialPosition.y / dimensions.y };
+
+	myText.SetScale(aScale.y);
+	myPosition = { myInitialPosition.x * aScale.x, myInitialPosition.y * aScale.y };
+
+	UpdatePosition();
+}
+
 void MENU::TextComponent::UpdatePosition()
 {
 	if (myIsCentered)
@@ -109,6 +120,7 @@ void MENU::TextComponent::SetText(const std::string& aText)
 void MENU::TextComponent::SetPosition(const Vector2f& aPosition)
 {
 	myPosition = aPosition;
+	myInitialPosition = aPosition;
 
 	UpdatePosition();
 }

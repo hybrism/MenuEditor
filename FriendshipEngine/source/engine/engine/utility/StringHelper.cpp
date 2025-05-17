@@ -2,6 +2,9 @@
 #include "StringHelper.h"
 #include <locale>
 #include <codecvt>
+#include <algorithm>
+#include <cctype>
+#include <string>
 
 #pragma warning(disable : 4996)
 
@@ -59,4 +62,11 @@ std::string StringHelper::GetMaterialNameFromPath(std::string aPath)
 	name = name.substr(0, name.rfind("_"));
 	
 	return name;
+}
+
+std::string StringHelper::ToLower(std::string aValue)
+{
+	std::transform(aValue.begin(), aValue.end(), aValue.begin(),
+		[](unsigned char c) { return std::tolower(c); });
+	return aValue;
 }

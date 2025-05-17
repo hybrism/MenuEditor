@@ -57,6 +57,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CoreTypes.h" />
     <ClInclude Include="Defines.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Paths.h" />
@@ -129,6 +130,9 @@
     <ClInclude Include="graphics\PrimitiveMeshes\CubePrimitive.h">
       <Filter>graphics\PrimitiveMeshes</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\PrimitiveMeshes\QuadPrimitive.h">
+      <Filter>graphics\PrimitiveMeshes</Filter>
+    </ClInclude>
     <ClInclude Include="graphics\PrimitiveMeshes\SpherePrimitive.h">
       <Filter>graphics\PrimitiveMeshes</Filter>
     </ClInclude>
@@ -171,6 +175,9 @@
     <ClInclude Include="graphics\renderer\ForwardRenderer.h">
       <Filter>graphics\renderer</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\renderer\FrustumCulling.h">
+      <Filter>graphics\renderer</Filter>
+    </ClInclude>
     <ClInclude Include="graphics\renderer\Renderer.h">
       <Filter>graphics\renderer</Filter>
     </ClInclude>
@@ -183,6 +190,9 @@
     <ClInclude Include="graphics\sprite\SpriteDrawer.h">
       <Filter>graphics\sprite</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\vfx\ParticleSystemManager.h">
+      <Filter>graphics\vfx</Filter>
+    </ClInclude>
     <ClInclude Include="graphics\vfx\VFXDatabase.h">
       <Filter>graphics\vfx</Filter>
     </ClInclude>
@@ -190,6 +200,9 @@
       <Filter>graphics\vfx</Filter>
     </ClInclude>
     <ClInclude Include="graphics\vfx\VisualEffect.h">
+      <Filter>graphics\vfx</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\vfx\VisualEffectFactory.h">
       <Filter>graphics\vfx</Filter>
     </ClInclude>
     <ClInclude Include="math\AABB3D.h">
@@ -340,6 +353,9 @@
     <ClCompile Include="graphics\PrimitiveMeshes\CubePrimitive.cpp">
       <Filter>graphics\PrimitiveMeshes</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\PrimitiveMeshes\QuadPrimitive.cpp">
+      <Filter>graphics\PrimitiveMeshes</Filter>
+    </ClCompile>
     <ClCompile Include="graphics\PrimitiveMeshes\SpherePrimitive.cpp">
       <Filter>graphics\PrimitiveMeshes</Filter>
     </ClCompile>
@@ -373,16 +389,25 @@
     <ClCompile Include="graphics\renderer\ForwardRenderer.cpp">
       <Filter>graphics\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\renderer\FrustumCulling.cpp">
+      <Filter>graphics\renderer</Filter>
+    </ClCompile>
     <ClCompile Include="graphics\renderer\SpriteRenderer.cpp">
       <Filter>graphics\renderer</Filter>
     </ClCompile>
     <ClCompile Include="graphics\sprite\SpriteDrawer.cpp">
       <Filter>graphics\sprite</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\vfx\ParticleSystemManager.cpp">
+      <Filter>graphics\vfx</Filter>
+    </ClCompile>
     <ClCompile Include="graphics\vfx\VFXDatabase.cpp">
       <Filter>graphics\vfx</Filter>
     </ClCompile>
     <ClCompile Include="graphics\vfx\VFXManager.cpp">
+      <Filter>graphics\vfx</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\vfx\VisualEffectFactory.cpp">
       <Filter>graphics\vfx</Filter>
     </ClCompile>
     <ClCompile Include="math\Transform.cpp">
@@ -427,7 +452,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\common\2d_debug_line.hlsl">
+    <FxCompile Include="shaders\common\2d_debug_line_VS.hlsl">
+      <Filter>shaders\common</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\common\3d_debug_line_VS.hlsl">
       <Filter>shaders\common</Filter>
     </FxCompile>
     <FxCompile Include="shaders\common\debug_line_PS.hlsl">
@@ -455,6 +483,9 @@
       <Filter>shaders\fullscreen</Filter>
     </FxCompile>
     <FxCompile Include="shaders\fullscreen\post_process_VS.hlsl">
+      <Filter>shaders\fullscreen</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\fullscreen\post_process_speedlines_PS.hlsl">
       <Filter>shaders\fullscreen</Filter>
     </FxCompile>
     <FxCompile Include="shaders\fullscreen\post_process_tone_map_PS.hlsl">
@@ -505,7 +536,22 @@
     <FxCompile Include="shaders\sprite\sprite_PS.hlsl">
       <Filter>shaders\sprite</Filter>
     </FxCompile>
-    <FxCompile Include="shaders\vfx\test_vfx_PS.hlsl">
+    <FxCompile Include="shaders\sprite\sprite_VS.hlsl">
+      <Filter>shaders\sprite</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\vfx\aoe1_PS.hlsl">
+      <Filter>shaders\vfx</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\vfx\aoe2_PS.hlsl">
+      <Filter>shaders\vfx</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\vfx\aoe3_PS.hlsl">
+      <Filter>shaders\vfx</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\vfx\particle_PS.hlsl">
+      <Filter>shaders\vfx</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\vfx\particle_VS.hlsl">
       <Filter>shaders\vfx</Filter>
     </FxCompile>
     <FxCompile Include="shaders\vfx\vfx_default_VS.hlsl">

@@ -37,9 +37,9 @@ void Launcher::Init(HINSTANCE hInstance, WNDPROC wndProc)
 	myGameApplication->Init(hInstance, wndProc);
 }
 
-void Launcher::Update(const float& dt)
+void Launcher::Update(const float& dt,const double& aTotalTime)
 {
-	myGameApplication->Update(dt);
+	myGameApplication->Update(dt, aTotalTime);
 }
 
 void Launcher::Render()

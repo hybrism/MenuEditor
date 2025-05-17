@@ -18,6 +18,11 @@ namespace MENU
 		ResumeGame,
 		BackToMainMenu,
 		QuitGame,
+		Headbob,
+		Fullscreen,
+		Resolution,
+		SfxVolume,
+		MusicVolume,
 
 		Count
 	};
@@ -30,13 +35,18 @@ namespace MENU
 		"Resume Game",
 		"Back to Main Menu",
 		"Quit Game",
+		"Headbob",
+		"Fullscreen",
+		"Resolution",
+		"Sfx Volume",
+		"Music Volume",
 
 		"(None)"
 	};
-	
+
 	struct CommandData
 	{
-		std::variant<std::monostate, std::string, ID> data;
+		std::variant<std::monostate, std::string, ID, bool*, float, int, Vector2i*> data;
 	};
 
 	class CommandComponent : public MenuComponent

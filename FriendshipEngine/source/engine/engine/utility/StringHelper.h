@@ -13,4 +13,5 @@ public:
 	static std::string GetFileName(std::string aString);
 	static std::string GetNameFromPath(std::string aPath);
 	static std::string GetMaterialNameFromPath(std::string aPath);
+	static std::string ToLower(std::string aValue);
 };

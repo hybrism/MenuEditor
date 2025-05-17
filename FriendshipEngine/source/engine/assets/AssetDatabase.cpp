@@ -5,7 +5,6 @@
 #include "ModelFactory.h"
 #include "AnimationFactory.h"
 #include "TextureFactory.h"
-#include <engine/graphics/animation/AnimationController.h>
 #include <engine/graphics/Texture.h>
 #include "engine\graphics\PrimitiveMeshes\SpherePrimitive.h"
 #include "engine\graphics\PrimitiveMeshes\CubePrimitive.h"
@@ -13,6 +12,7 @@
 
 #undef snprintf
 #include <nlohmann/json.hpp>
+#include <engine/graphics/PrimitiveMeshes/QuadPrimitive.h>
 
 AssetDatabase* AssetDatabase::myInstance = nullptr;
 
@@ -20,34 +20,70 @@ AssetDatabase* AssetDatabase::myInstance = nullptr;
 
 AssetDatabase::AssetDatabase()
 {
-	SpherePrimitive sphere;
-	sphere.ConstructSphere();
+	// Cube primitive
+	{
+		CubePrimitive cube;
+		cube.ConstructCube();
 
-	SharedMeshPackage spherePackage;
-	spherePackage.meshData.push_back(sphere.GetMesh());
-
-
-	myMeshNameToMeshId.insert({ "PrimitiveSphere", (int)PrimitiveMeshID::Sphere });
-	myUnityMeshIdToMeshId.insert({ (int)PrimitiveMeshID::Sphere,  (int)PrimitiveMeshID::Sphere });
-	myMeshes.push_back(spherePackage);
-	myMeshPaths.push_back("NoPath");
+		SharedMeshPackage cubePackage;
+		cubePackage.meshData.push_back(cube.GetMesh());
 
 
-	CubePrimitive cube;
-	cube.ConstructCube();
+		myMeshNameToMeshId.insert({ "PrimitiveCube", (int)PrimitiveMeshID::Cube });
+		myUnityMeshIdToMeshId.insert({ (int)PrimitiveMeshID::Cube,  (int)PrimitiveMeshID::Cube });
+		myMeshes.push_back(cubePackage);
+		myMeshPaths.push_back("NoPath");
+	}
 
-	SharedMeshPackage cubePackage;
-	cubePackage.meshData.push_back(cube.GetMesh());
+	// Quad primitive
+	{
+		QuadPrimitive quad;
+		quad.Construct();
+
+		SharedMeshPackage quadPackage;
+		quadPackage.meshData.push_back(quad.GetMesh());
+
+		myMeshNameToMeshId.insert({ "PrimitiveQuad", (int)PrimitiveMeshID::Quad });
+		myUnityMeshIdToMeshId.insert({ (int)PrimitiveMeshID::Quad,  (int)PrimitiveMeshID::Quad });
+		myMeshes.push_back(quadPackage);
+		myMeshPaths.push_back("NoPath");
+	}
+
+	// Sphere primitive
+	{
+		SpherePrimitive sphere;
+		sphere.ConstructSphere();
+
+		SharedMeshPackage spherePackage;
+		spherePackage.meshData.push_back(sphere.GetMesh());
 
 
-	myMeshNameToMeshId.insert({ "PrimitiveCube", (int)PrimitiveMeshID::Cube });
-	myUnityMeshIdToMeshId.insert({ (int)PrimitiveMeshID::Cube,  (int)PrimitiveMeshID::Cube });
-	myMeshes.push_back(cubePackage);
-	myMeshPaths.push_back("NoPath");
+		myMeshNameToMeshId.insert({ "PrimitiveSphere", (int)PrimitiveMeshID::Sphere });
+		myUnityMeshIdToMeshId.insert({ (int)PrimitiveMeshID::Sphere,  (int)PrimitiveMeshID::Sphere });
+		myMeshes.push_back(spherePackage);
+		myMeshPaths.push_back("NoPath");
+	}
 }
 
 AssetDatabase::~AssetDatabase()
 {
+	myMeshNameToMeshId.clear();
+	myUnityMeshIdToMeshId.clear();
+	myUnityMeshIdToMeshId.clear();
+	mySkeletonToAnimationControllerId.clear();
+	myAnimationNameToIndex.clear();
+	myMeshPaths.clear();
+
+	for (auto& pair : myAnimations)
+	{
+		for (auto& animation : pair.second)
+		{
+			delete animation;
+			animation = nullptr;
+		}
+		pair.second.clear();
+	}
+
 	for (auto& pair : myMeshes)
 	{
 		for (auto& mesh : pair.meshData)
@@ -64,19 +100,27 @@ AssetDatabase::~AssetDatabase()
 
 		pair.name = "";
 	}
-	myMeshes.clear();
 
-	for (auto& pair : myAnimationControllers)
-	{
-		delete pair.second;
-	}
 	myAnimationControllers.clear();
+	myStoredPointLightInformation.clear();
 }
 
-void AssetDatabase::CreateAnimationController(const size_t& aMeshId)
+int AssetDatabase::CreateAnimationController(const Skeleton* aSkeleton)
 {
-	assert(!DoesAnimationControllerExist(aMeshId) && "Animation controller already exists");
-	myInstance->myAnimationControllers.insert({ aMeshId, new AnimationController(myInstance, aMeshId) });
+	assert(!DoesAnimationControllerExist(aSkeleton) && "Animation controller already exists");
+
+	int index = CreateAnimationController();
+
+	myInstance->mySkeletonToAnimationControllerId.insert({ aSkeleton->name, index });
+
+	return index;
+}
+
+int AssetDatabase::CreateAnimationController()
+{
+	int id = (int)myInstance->myAnimationControllers.size();
+	myInstance->myAnimationControllers.push_back(AnimationController(myInstance, id));
+	return id;
 }
 
 nlohmann::json AssetDatabase::OpenJson(std::string aJsonPath)
@@ -163,19 +207,29 @@ void AssetDatabase::ReadMeshes(const nlohmann::json& jsonObject)
 		myMeshes.push_back(package);
 		myMeshPaths.push_back(metaData.path);
 
+		int textureId = json["defaultTextureID"].get<int>();
+
 		if (package.skeleton != nullptr)
 		{
-			myAnimations.insert({ meshId, {} });
-			CreateAnimationController(meshId);
+			myAnimations.insert({ package.skeleton->name, {} });
+			if (DoesAnimationControllerExist(package.skeleton) == false)
+			{
+				CreateAnimationController(package.skeleton);
+			}
 		}
 
-		int textureId = json["defaultTextureID"].get<int>();
 
 		for (auto& mesh : package.meshData)
 		{
-			if (mesh->GetMaterialName().length() == 0 && textureId != -1)
+			if (myTextureDatabase.DoesTextureExist(mesh->GetMaterialName()))
+			{
+				size_t index = myTextureDatabase.GetTextureIndex(mesh->GetMaterialName());
+				mesh->SetTextures(GetTextures(index));
+			}
+			else if (textureId != -1)
 			{
 				auto& textures = GetTextures(textureId);
+				
 				mesh->SetTextures(textures);
 			}
 		}
@@ -196,15 +250,13 @@ void AssetDatabase::ReadAnimations(const nlohmann::json& jsonObject)
 		meshId = myUnityMeshIdToMeshId[meshId];
 
 		Animation* animation = AnimationFactory::LoadAnimation(RELATIVE_ASSET_PATH + path, this);
-
-
-
-		if (myAnimations.find(meshId) == myAnimations.end())
+		Skeleton* skeleton = AssetDatabase::GetMesh(meshId).skeleton;
+		if (myAnimations.find(skeleton->name) == myAnimations.end())
 		{
-			myAnimations.insert({ meshId, {} });
+			myAnimations.insert({ skeleton->name, {} });
 		}
-		myAnimations.at(meshId).push_back(animation);
-		size_t animationIndex = myAnimations[meshId].size() - 1;
+		myAnimations.at(skeleton->name).push_back(animation);
+		size_t animationIndex = myAnimations[skeleton->name].size() - 1;
 
 		//myAnimationNameToIndex.insert({ name, animationIndex });
 		myAnimationNameToIndex.insert({ animation->name, animationIndex });
@@ -215,7 +267,7 @@ void AssetDatabase::ReadAnimations(const nlohmann::json& jsonObject)
 	{
 		if (pair.second.size() == 0)
 		{
-			PrintE("Skeletal mesh is missing animations after import: " + myMeshPaths.at(pair.first));
+			PrintE("Skeletal mesh is missing animations after import with skeleton \"" + pair.first + "\"");
 		}
 	}
 #endif
@@ -254,7 +306,9 @@ DirectionalLight& AssetDatabase::GetDirectionalLight()
 	return myInstance->myStoredDirectionalLightInformation;
 }
 
-std::vector<PointLight>& AssetDatabase::GetPointLight()
+std::vector<PointLight> AssetDatabase::GetPointLight()
 {
 	return myInstance->myStoredPointLightInformation;
 }
+
+

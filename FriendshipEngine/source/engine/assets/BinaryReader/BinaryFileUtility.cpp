@@ -42,6 +42,11 @@ void BinaryFileUtility::WriteSizeTToFile(std::ofstream& aFile, size_t aSize)
 	aFile.write(reinterpret_cast<const char*>(&aSize), sizeof(size_t));
 }
 
+void BinaryFileUtility::WriteUintToFile(std::ofstream& aFile, unsigned int aValue)
+{
+	aFile.write(reinterpret_cast<const char*>(&aValue), sizeof(unsigned int));
+}
+
 void BinaryFileUtility::ReadBoneFromFile(std::ifstream& file, Skeleton* aSkeleton, Bone& outBone)
 {
 	Bone& b = outBone;
@@ -63,6 +68,11 @@ void BinaryFileUtility::ReadBoneFromFile(std::ifstream& file, Skeleton* aSkeleto
 void BinaryFileUtility::ReadSizeTFromFile(std::ifstream& aFile, size_t& outValue)
 {
 	aFile.read(reinterpret_cast<char*>(&outValue), sizeof(size_t));
+}
+
+void BinaryFileUtility::ReadUintFromFile(std::ifstream& aFile, unsigned int& outValue)
+{
+	aFile.read(reinterpret_cast<char*>(&outValue), sizeof(unsigned int));
 }
 
 std::string BinaryFileUtility::GetModelFileName(const std::string& aName)

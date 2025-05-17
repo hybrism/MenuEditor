@@ -1,9 +1,12 @@
 #include "pch.h"
+
 #include "CollisionSystem.h"
 #include <ecs/World.h>
 #include <engine/utility/Error.h>
 #include <engine/math/Vector3.h>
+
 #include <fmod/fmod.h>
+
 #include "..\component\TransformComponent.h"
 #include "..\component\ColliderComponent.h"
 #include "..\component\CollisionDataComponent.h"
@@ -11,6 +14,7 @@
 
 #include <engine/graphics/Camera.h>
 #include <engine/graphics/GraphicsEngine.h>
+#include <engine/graphics/renderer/DebugRenderer.h>
 #include <engine/utility/InputManager.h>
 #include <engine/math/Intersection.h>
 
@@ -29,7 +33,7 @@ CollisionSystem::~CollisionSystem()
 {
 }
 
-void CollisionSystem::Update(const SceneUpdateContext& /*dt*/)
+void CollisionSystem::Update(SceneUpdateContext& /*dt*/)
 {
 	Entity playerID = myWorld->GetPlayerEntityID();
 	if (playerID == INVALID_ENTITY)
@@ -65,7 +69,7 @@ void CollisionSystem::Update(const SceneUpdateContext& /*dt*/)
 
 void CollisionSystem::Render()
 {
-#ifndef _RELEASE
+#ifdef _EDITOR
 	DrawAllColliders();
 #endif
 }
@@ -99,15 +103,15 @@ bool CollisionSystem::IsColliding(Entity aFirstEntityIndex, Entity aSecondEntity
 	secondMax += secondTransform.transform.GetPosition();
 
 	if (firstMax.x > secondMin.x &&
-			firstMin.x < secondMax.x &&
-			firstMax.y > secondMin.y &&
-			firstMin.y < secondMax.y &&
-			firstMax.z > secondMin.z &&
-			firstMin.z < secondMax.z) 
+		firstMin.x < secondMax.x &&
+		firstMax.y > secondMin.y &&
+		firstMin.y < secondMax.y &&
+		firstMax.z > secondMin.z &&
+		firstMin.z < secondMax.z)
 	{
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -128,7 +132,7 @@ bool CollisionSystem::LayerCheck(Entity aFirstEntity, Entity aSecondEntity)
 
 void CollisionSystem::DrawAllColliders()
 {
-	myLines.clear();
+	auto& dbg = GraphicsEngine::GetInstance()->GetDebugRenderer();
 
 	for (auto& entity : myEntities)
 	{
@@ -142,27 +146,22 @@ void CollisionSystem::DrawAllColliders()
 		max += transform.transform.GetPosition();
 
 		if (collisionData.isColliding)
-			collider.color = { 1.f, 0.f, 0.f, 1.f };
+			collider.color = { 1.f, 0.f, 0.f };
 		else
-			collider.color = { 1.f, 1.f, 1.f, 1.f };
+			collider.color = { 1.f, 1.f, 1.f };
 
-		myLines.push_back(DebugLine(Vector3f{ min.x, min.y, min.z }, Vector3f{ min.x, min.y, max.z }, collider.color));
-		myLines.push_back(DebugLine(Vector3f{ min.x, min.y, max.z }, Vector3f{ max.x, min.y, max.z }, collider.color));
-		myLines.push_back(DebugLine(Vector3f{ max.x, min.y, max.z }, Vector3f{ max.x, min.y, min.z }, collider.color));
-		myLines.push_back(DebugLine(Vector3f{ max.x, min.y, min.z }, Vector3f{ min.x, min.y, min.z }, collider.color));
-		myLines.push_back(DebugLine(Vector3f{ min.x, min.y, min.z }, Vector3f{ min.x, max.y, min.z }, collider.color));
-		myLines.push_back(DebugLine(Vector3f{ min.x, min.y, max.z }, Vector3f{ min.x, max.y, max.z }, collider.color));
-		myLines.push_back(DebugLine(Vector3f{ max.x, min.y, max.z }, Vector3f{ max.x, max.y, max.z }, collider.color));
-		myLines.push_back(DebugLine(Vector3f{ max.x, min.y, min.z }, Vector3f{ max.x, max.y, min.z }, collider.color));
-		myLines.push_back(DebugLine(Vector3f{ min.x, max.y, min.z }, Vector3f{ min.x, max.y, max.z }, collider.color));
-		myLines.push_back(DebugLine(Vector3f{ min.x, max.y, max.z }, Vector3f{ max.x, max.y, max.z }, collider.color));
-		myLines.push_back(DebugLine(Vector3f{ max.x, max.y, max.z }, Vector3f{ max.x, max.y, min.z }, collider.color));
-		myLines.push_back(DebugLine(Vector3f{ max.x, max.y, min.z }, Vector3f{ min.x, max.y, min.z }, collider.color));
-	}
-
-	for (size_t i = 0; i < myLines.size(); i++)
-	{
-		myLines[i].DrawLine();
+		dbg.DrawLine({ min.x, min.y, min.z }, { min.x, min.y, max.z }, collider.color);
+		dbg.DrawLine({ min.x, min.y, max.z }, { max.x, min.y, max.z }, collider.color);
+		dbg.DrawLine({ max.x, min.y, max.z }, { max.x, min.y, min.z }, collider.color);
+		dbg.DrawLine({ max.x, min.y, min.z }, { min.x, min.y, min.z }, collider.color);
+		dbg.DrawLine({ min.x, min.y, min.z }, { min.x, max.y, min.z }, collider.color);
+		dbg.DrawLine({ min.x, min.y, max.z }, { min.x, max.y, max.z }, collider.color);
+		dbg.DrawLine({ max.x, min.y, max.z }, { max.x, max.y, max.z }, collider.color);
+		dbg.DrawLine({ max.x, min.y, min.z }, { max.x, max.y, min.z }, collider.color);
+		dbg.DrawLine({ min.x, max.y, min.z }, { min.x, max.y, max.z }, collider.color);
+		dbg.DrawLine({ min.x, max.y, max.z }, { max.x, max.y, max.z }, collider.color);
+		dbg.DrawLine({ max.x, max.y, max.z }, { max.x, max.y, min.z }, collider.color);
+		dbg.DrawLine({ max.x, max.y, min.z }, { min.x, max.y, min.z }, collider.color);
 	}
 }
 

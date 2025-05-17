@@ -10,7 +10,7 @@ float DebugCamera::Multiplier() const
 {
 	return 1 + myData.myMoveMultiplier * static_cast<int>(myActiveMultiplier);
 }
-#include <iostream>
+
 void DebugCamera::Update(float aDeltaTime)
 {
 	InputManager* im = InputManager::GetInstance();
@@ -54,8 +54,6 @@ void DebugCamera::Update(float aDeltaTime)
 
 		Vector2f currentMousePos = im->GetCurrentMousePositionVector2f();
 
-
-		std::cout << currentMousePos.x << " - " << currentMousePos.y << "\n";
 
 		static Vector2f priorMousePos = currentMousePos;
 		Vector2f mouseMovement = priorMousePos - currentMousePos;

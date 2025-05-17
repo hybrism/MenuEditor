@@ -28,3 +28,6 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <wrl/client.h>
+
+//Internal
+#include "CoreTypes.h"

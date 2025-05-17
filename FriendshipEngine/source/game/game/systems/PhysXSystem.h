@@ -16,7 +16,7 @@ public:
 	~PhysXSystem() override;
 
 	void Init();
-	void Update(const SceneUpdateContext& dt) override;
+	void Update(SceneUpdateContext& dt) override;
 
 	//Quaternion conversion to matrix
 	void QuatToMat(PhysXComponent& aPhysX, TransformComponent& aTransform);

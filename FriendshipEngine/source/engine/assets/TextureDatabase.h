@@ -4,10 +4,13 @@
 #include <vector>
 
 #include "AssetDefines.h"
-
 #include <nlohmann\json_fwd.hpp>
 
 class TextureFactory;
+
+#ifdef _EDITOR
+struct VertexIndexCollection;
+#endif
 
 class TextureDatabase
 {
@@ -16,12 +19,6 @@ public:
 	~TextureDatabase();
 
 #ifdef _EDITOR
-	// WARNING: may cause memory leaks if not handled properly
-	void ModifyTextures(const size_t& aId, const TextureCollection& aTextureCollection)
-	{
-		myTextures[aId] = aTextureCollection;
-	}
-
 	VertexTextureCollection& GetVertexTextureRef(const size_t& aId)
 	{
 		assert(myVertexTextures.size() > aId && "ID does not exist");
@@ -31,7 +28,7 @@ public:
 	unsigned int CreateVertexTexture(const VertexTextureCollection& aCollection);
 
 	//void UpdateVertexPaintedTexture(const size_t& aTextureId, const size_t& aMeshId, const size_t& aMeshDataIndex);
-	void UpdateVertexPaintedTextures(const std::string& aSceneName);
+	void ReplaceBinaryVertexPaintedTextureFile(const std::string& aSceneName, const VertexIndexCollection& aCollection);
 
 	std::vector<TextureCollection>& GetTexturesRef() { return myTextures; }
 #endif
@@ -49,18 +46,9 @@ public:
 		return myVertexTextures.at(aId);
 	}
 
-	Texture* GetOrLoadSpriteTexture(const std::string& aTextureName);
+	size_t GetTextureIndex(const std::string& aMaterialName);
 
-	size_t GetTextureIndex(const std::string& aMaterialName)
-	{
-		assert(myMaterialNameToTextureIndex.find(aMaterialName) != myMaterialNameToTextureIndex.end() && "Material name does not exist");
-		return myMaterialNameToTextureIndex.at(aMaterialName);
-	}
-
-	bool DoesTextureExist(const std::string& aMaterialName)
-	{
-		return myMaterialNameToTextureIndex.find(aMaterialName) != myMaterialNameToTextureIndex.end();
-	}
+	bool DoesTextureExist(const std::string& aMaterialName);
 
 	int TryGetVertexTextureIndex(const std::string& aMeshName, const size_t aIndex)
 	{
@@ -69,10 +57,11 @@ public:
 
 		return static_cast<int>(myMeshNameToVertexTextureIndex.at(meshName));
 	}
+	
+	std::shared_ptr<Texture> GetOrLoadSpriteTexture(const std::string& aTextureName);
 
 	void ReadTextures(const nlohmann::json& jsonObject);
 	void LoadVertexTextures(const std::string& aSceneName);
-
 private:
 	std::vector<TextureCollection> myTextures; // TODO: Change vertex color texture save locations to a separate vector that updates once for each scene
 	std::vector<VertexTextureCollection> myVertexTextures; // TODO: Change vertex color texture save locations to a separate vector that updates once for each scene
@@ -80,6 +69,5 @@ private:
 
 	std::unordered_map<std::string, size_t> myMaterialNameToTextureIndex;
 	std::unordered_map<std::string, size_t> myMeshNameToVertexTextureIndex;
-
 	std::unordered_map<std::string, size_t> myTextureNameToSpriteTextureIndex;
 };

@@ -11,8 +11,8 @@ public:
 	~MenuEditorLauncher() override;
 
 	void Init(HINSTANCE hInstance, WNDPROC wndProc) override;
-	void Update(const float& dt);
-	void Render();
+	void Update(const float& dt, const double& totalTime) override;
+	void Render() override;
 
 private:
 	bool BeginFrame() override;

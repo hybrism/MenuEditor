@@ -40,13 +40,6 @@ void ForwardRenderer::Render(SkeletalMesh* aMesh, const MeshInstanceRenderData& 
 	mySkeletalMeshes[(size_t)aBlendState][aMesh].push_back(aInstanceData);
 }
 
-void ForwardRenderer::DoShadowRenderPass()
-{
-	//auto* lightManager = GraphicsEngine::GetInstance()->GetDirectionalLightManager();
-	RenderMeshes(false);
-	//lightManager->EndShadowRendering(); // TODO: OBS: ORDNINGEN ?R DEPENDANT P? ATT DEN K?R EFTER DEFERRED: FIXA DETTA SEN PLS
-}
-
 void ForwardRenderer::DoRenderPass()
 {
 	GraphicsEngine* ge = GraphicsEngine::GetInstance();
@@ -104,8 +97,8 @@ void ForwardRenderer::RenderMeshes(bool aUsePixelShader)
 				std::sort(instances.begin(), instances.end(),
 					[cameraPosition](const MeshInstanceRenderData& v0, const MeshInstanceRenderData& v1)
 					{
-						Vector3f delta0 = std::get<VfxMeshInstanceData>(v0.data).transform.GetPosition() - cameraPosition;
-						Vector3f delta1 = std::get<VfxMeshInstanceData>(v1.data).transform.GetPosition() - cameraPosition;
+						Vector3f delta0 = v0.data.transform.GetPosition() - cameraPosition;
+						Vector3f delta1 = v1.data.transform.GetPosition() - cameraPosition;
 						return delta0.Length() > delta1.Length();
 					});
 			}
@@ -127,7 +120,7 @@ void ForwardRenderer::RenderMeshes(bool aUsePixelShader)
 
 			for (size_t i = 0; i < instances.size(); i++)
 			{
-				auto& data = std::get<SkeletalMeshInstanceData>(instances[i].data);
+				SkeletalMeshInstanceData& data = instances[i].data.skeletalMeshData;
 				skeletalMesh->SetPose(data.pose);
 
 				const VertexShader* vs = ShaderDatabase::GetVertexShader(instances[i].vsType);
@@ -139,7 +132,7 @@ void ForwardRenderer::RenderMeshes(bool aUsePixelShader)
 				}
 
 				skeletalMesh->Render(
-					data.transform.GetMatrix(),
+					instances[i].data.transform.GetMatrix(),
 					vs,
 					ps,
 					instances[i].renderMode

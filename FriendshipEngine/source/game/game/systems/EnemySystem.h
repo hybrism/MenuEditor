@@ -18,7 +18,7 @@ public:
 	EnemySystem(World* aWorld, PhysXSceneManager* aPhysXSceneManager);
 	~EnemySystem() override;
 
-	void Update(const SceneUpdateContext& aContext) override;
+	void Update(SceneUpdateContext& aContext) override;
 	void AimAtPlayer(TransformComponent& aTransform,const float& aDT,EnemyComponent& aEnemy);
 	Vector3f CreateCircleOffsetDir(const float& aLength,EnemyComponent& aEnemy);
 	bool isPlayerOverlaping(EnemyComponent& aEnemy);

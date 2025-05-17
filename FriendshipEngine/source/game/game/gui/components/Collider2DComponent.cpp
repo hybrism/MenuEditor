@@ -28,6 +28,14 @@ void MENU::Collider2DComponent::Render()
 		RenderColliders();
 }
 
+void MENU::Collider2DComponent::OnResize(const Vector2f& aScale)
+{
+	mySize = { aScale.x * myInitialSize.x, aScale.y * myInitialSize.y };
+	myPosition = { myInitialPosition.x * aScale.x, myInitialPosition.y * aScale.y };
+	
+	UpdateMinMax();
+}
+
 void MENU::Collider2DComponent::UpdatePosition()
 {
 	UpdateMinMax();
@@ -77,6 +85,7 @@ void MENU::Collider2DComponent::SetPosition(const Vector2f& aPosition)
 void MENU::Collider2DComponent::SetSize(const Vector2f& aSize)
 {
 	mySize = aSize;
+	myInitialSize = aSize;
 	UpdateMinMax();
 }
 

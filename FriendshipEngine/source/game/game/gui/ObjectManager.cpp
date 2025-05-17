@@ -26,6 +26,14 @@ void MENU::ObjectManager::Render()
 	}
 }
 
+void MENU::ObjectManager::OnResize(const Vector2i& aNewRenderSize)
+{
+	for (size_t i = 0; i < myObjects.size(); i++)
+	{
+		myObjects[i]->OnResize(aNewRenderSize);
+	}
+}
+
 MENU::MenuObject& MENU::ObjectManager::CreateNew(ID aID, const Vector2f& aPosition)
 {
 	assert(aID != INVALID_ID && "ID is not valid!");
@@ -45,6 +53,18 @@ MENU::MenuObject& MENU::ObjectManager::GetObjectFromID(ID aID)
 	}
 
 	assert("No object with this ID exists!");
+	return *myObjects.front();
+}
+
+MENU::MenuObject& MENU::ObjectManager::GetObjectFromName(const std::string& aName)
+{
+	for (size_t i = 0; i < myObjects.size(); i++)
+	{
+		if (myObjects[i]->GetName() == aName)
+			return *myObjects[i];
+	}
+
+	assert("No object with this name exists!");
 	return *myObjects.front();
 }
 

@@ -49,7 +49,10 @@ public:
 	
 
 	DirectionalLight& GetDirectionalLight() { return *myDirectionalLight; }
-	bool myDoNotUseShadows = false;
+
+#ifdef _EDITOR
+	LightBufferData& GetLightDataRef() { return myLightData; }
+#endif
 private:
 	LightBufferData myLightData;
 	ComPtr<ID3D11Buffer> myLightBuffer;

@@ -31,10 +31,27 @@ enum class PixelShaderTextureSlot : int
 	DirectionalLight = 9,
 	LightBound = 10,
 
+	DepthBuffer = 14,
+
 	VertexAlbedoR = 16,
-	VertexAlbedoG = 17,
-	VertexAlbedoB = 18,
-	VertexAlbedoA = 19,
+	VertexNormalR,
+	VertexMaterialR,
+	VertexEmissiveR,
+
+	VertexAlbedoG,
+	VertexNormalG,
+	VertexMaterialG,
+	VertexEmissiveG,
+
+	VertexAlbedoB,
+	VertexNormalB,
+	VertexMaterialB,
+	VertexEmissiveB,
+
+	VertexAlbedoA,
+	VertexNormalA,
+	VertexMaterialA,
+	VertexEmissiveA,
 };
 
 enum class ShaderDataBufferIndex

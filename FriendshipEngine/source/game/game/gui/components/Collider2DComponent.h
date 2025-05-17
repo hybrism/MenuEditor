@@ -13,6 +13,8 @@ namespace MENU
 		void Update(const MenuUpdateContext& aContext) override;
 		void Render() override;
 
+		void OnResize(const Vector2f& aScale) override;
+
 		void UpdatePosition();
 
 		bool CheckCollision(const MenuUpdateContext& aContext);
@@ -31,6 +33,7 @@ namespace MENU
 		Vector2f myMin;
 		Vector2f myMax;
 		Vector2f mySize;
+		Vector2f myInitialSize;
 
 		bool myIsHovered;
 		bool myIsPressed;

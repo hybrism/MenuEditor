@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "ProjectileFactory.h"
 #include <assets/AssetDatabase.h>
+#include "audio/NewAudioManager.h"
+
 
 ProjectileFactory::ProjectileFactory() = default;
 ProjectileFactory::~ProjectileFactory() = default;
@@ -124,6 +126,8 @@ void ProjectileFactory::ShootArrow(Vector3f aStartPos, Vector3f aDir)
 
 
 	physX.dynamicPhysX->addForce(PxVec3(aDir.x, aDir.y, aDir.z) * 100000, PxForceMode::eIMPULSE);
+	NewAudioManager::GetInstance()->PlaySound(eSounds::ArrowLand, 500.f, proj.position);
+	std::cout << "Arrow Shoot Pos :" << proj.position.x << "  " << proj.position.y << " \n";
 }
 
 void ProjectileFactory::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
@@ -142,8 +146,10 @@ void ProjectileFactory::onContact(const PxContactPairHeader& pairHeader, const P
 			{
 				Entity& entity = (Entity&)arrow->userData;
 				auto& projComp = myWorld->GetComponent<ProjectileComponent>(entity);
+				auto& projPos = myWorld->GetComponent<TransformComponent>(entity);
 				projComp.hit = true;
 
+				NewAudioManager::GetInstance()->PlaySound(eSounds::ArrowShoot, 100.f, projPos.transform.GetPosition());
 			}
 		}
 		/*

@@ -8133,7 +8133,8 @@ class lexer : public lexer_base<BasicJsonType>
                     }
                 }
             }
-
+#pragma warning(push)
+#pragma warning(disable : 26819 28020)
             // multi-line comments skip input until */ is read
             case '*':
             {
@@ -8175,6 +8176,7 @@ class lexer : public lexer_base<BasicJsonType>
                 error_message = "invalid comment; expecting '/' or '*' after '/'";
                 return false;
             }
+#pragma warning(pop)
         }
     }
 

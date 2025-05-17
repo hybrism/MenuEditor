@@ -11,8 +11,7 @@
 
 struct StaticMeshInstanceData
 {
-	Transform transform{};
-	Vector2ui entityData{ INVALID_ENTITY, 0 }; // x = entityID, y = renderOrder
+	Vector2i entityData{ INVALID_ENTITY, -1 }; // x = entityID, y = renderOrder
 };
 
 // TODO: find way to use this in instanced data?
@@ -23,14 +22,81 @@ struct SkeletalMeshInstanceData : public StaticMeshInstanceData
 
 struct VfxMeshInstanceData
 {
-	Transform transform{};
 	float time = 0.0f;
 };
 
-typedef std::variant<
-	VfxMeshInstanceData,
-	StaticMeshInstanceData,
-	SkeletalMeshInstanceData> MeshDrawerInstanceData;
+struct ParticleInstanceData
+{
+	Vector4f color = { 1, 1, 1, 1 };
+	float time = 0.0f;
+};
+
+// ENUM ALIGNMENT IS NEEDED TO ALIGN WITH THE UNION TYPE
+enum class InstanceDataType
+{
+	SkeletalMesh,
+	StaticMesh,
+	VfxMesh,
+	Particle,
+	Count
+};
+
+struct MeshDrawerInstanceData
+{
+	Transform transform{};
+	union
+	{
+		SkeletalMeshInstanceData skeletalMeshData; // largest element
+		StaticMeshInstanceData staticMeshData;
+		VfxMeshInstanceData vfxMeshData;
+		ParticleInstanceData particleData;
+	};
+
+	// This needs to be after these elements to enforce block memory layout
+	InstanceDataType type = InstanceDataType::Count;
+
+	MeshDrawerInstanceData()
+	{
+		memset(&skeletalMeshData, 0, sizeof(skeletalMeshData));
+	}
+
+	MeshDrawerInstanceData(const Transform& transform, const SkeletalMeshInstanceData& aSkeletalMeshData)
+		: transform(transform)
+	{
+		skeletalMeshData = aSkeletalMeshData;
+		type = InstanceDataType::SkeletalMesh;
+	}
+
+	MeshDrawerInstanceData(const Transform& transform, const StaticMeshInstanceData& aStaticMeshData)
+		: transform(transform)
+	{
+		memset(&skeletalMeshData, 0, sizeof(skeletalMeshData));
+		staticMeshData = aStaticMeshData;
+		type = InstanceDataType::StaticMesh;
+	}
+
+	MeshDrawerInstanceData(const Transform& transform, const VfxMeshInstanceData& aVfxMeshData)
+		: transform(transform)
+	{
+		memset(&skeletalMeshData, 0, sizeof(skeletalMeshData));
+		vfxMeshData = aVfxMeshData;
+		type = InstanceDataType::VfxMesh;
+	}
+
+	MeshDrawerInstanceData(const Transform& transform, const ParticleInstanceData& aParticleData)
+		: transform(transform)
+	{
+		memset(&skeletalMeshData, 0, sizeof(skeletalMeshData));
+		particleData = aParticleData;
+		type = InstanceDataType::Particle;
+	}
+};
+
+//typedef std::variant<
+//	VfxMeshInstanceData,
+//	ParticleInstanceData,
+//	StaticMeshInstanceData,
+//	SkeletalMeshInstanceData> MeshDrawerInstanceData;
 
 // TODO: Support different shaders for each mesh
 struct MeshInstanceRenderData

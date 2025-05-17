@@ -15,6 +15,105 @@
 #include "BinaryFileUtility.h"
 #include <ModelFactory.h>
 
+VertexIndexCollection BinaryVertexPaintingFileFactory::LoadVertexIndicesFromFile(const std::string& aSceneName)
+{
+	std::string folderPath = std::string(RELATIVE_VERTEX_TEXTURE_ASSET_PATH) + aSceneName + "/";
+	std::string path = folderPath + vertexIndexDefinitionsName;
+	if (!std::filesystem::exists(path))
+	{
+		PrintW("Vertex texture definitions does not exist for current scene: " + path);
+		return {};
+	}
+
+	std::ifstream file(path, std::ios::binary | std::ios::in);
+
+	if (!file.is_open()) {
+		PrintE("Error opening file for reading: " + path);
+		return {};
+	}
+
+	VertexIndexCollection collection{};
+
+	// vertex indices
+	{
+		size_t size = 0;
+		file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
+
+		for (size_t i = 0; i < size; i++)
+		{
+			eid_t entity = 0;
+			unsigned int index = 0;
+			file.read(reinterpret_cast<char*>(&entity), sizeof(eid_t));
+			file.read(reinterpret_cast<char*>(&index), sizeof(unsigned int));
+			collection.vertexIndices[entity] = index;
+		}
+	}
+
+	// index counter
+	{
+		size_t size = 0;
+		file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
+
+		collection.indexCounter.resize(size, 0);
+
+		for (size_t i = 0; i < size; i++)
+		{
+			BinaryFileUtility::ReadUintFromFile(file, collection.indexCounter[i]);
+		}
+	}
+
+	file.close();
+
+	return collection;
+}
+
+void BinaryVertexPaintingFileFactory::WriteVertexIndicesToFile(const std::string& aSceneName, const VertexIndexCollection& aCollection)
+{
+	std::string folderPath = std::string(RELATIVE_VERTEX_TEXTURE_ASSET_PATH) + aSceneName + "/";
+	std::string path = folderPath + vertexIndexDefinitionsName;
+	std::ofstream file(path, std::ios::binary | std::ios::out);
+
+	if (!file.is_open()) {
+		PrintE("Vertex Index Defines does not exist for scene. Generating file...");
+
+		if (!std::filesystem::exists(folderPath)) {
+			std::filesystem::create_directory(folderPath);
+		}
+
+		file.open(path, std::ios::binary | std::ios::out | std::ios::trunc);
+		if (!file.is_open()) {
+			PrintE("Error creating file: " + path);
+			return;
+		}
+	}
+
+
+	// vertex indices
+	{
+		size_t size = aCollection.vertexIndices.size();
+		file.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
+
+		for (auto& pair : aCollection.vertexIndices)
+		{
+			file.write(reinterpret_cast<const char*>(&pair.first), sizeof(eid_t));
+			file.write(reinterpret_cast<const char*>(&pair.second), sizeof(unsigned int));
+		}
+	}
+
+	// index counter
+	{
+		size_t size = aCollection.indexCounter.size();
+		file.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
+
+		for (size_t i = 0; i < size; i++)
+		{
+			BinaryFileUtility::WriteUintToFile(file, aCollection.indexCounter[i]);
+		}
+	}
+
+	file.close();
+}
+
 std::string BinaryVertexPaintingFileFactory::GetSceneName(const std::string& aFilePath)
 {
 	std::string sceneName = aFilePath;
@@ -107,7 +206,9 @@ std::vector<VertexTextureCollection> BinaryVertexPaintingFileFactory::LoadVertex
 
 		for (size_t j = 0; j < count; j++)
 		{
-			VertexTextureCollection textureCollection;
+			data.push_back({});
+
+			VertexTextureCollection& textureCollection = data.back();
 
 			textureCollection.meshName = meshName;
 			textureCollection.subMeshIndex = j;
@@ -117,7 +218,11 @@ std::vector<VertexTextureCollection> BinaryVertexPaintingFileFactory::LoadVertex
 				std::string scenePath = RELATIVE_VERTEX_TEXTURE_ASSET_PATH + sceneName + "/" + textureCollection.meshName + "_" + std::to_string(j) + ".dds";
 
 				textureCollection.materials.vertex.path = scenePath;
+#ifdef _EDITOR
+				textureCollection.materials.vertex.texture = TextureFactory::CreateDDSTextureWithCPUAccess(scenePath, textureCollection.materials.vertex.stagingTexture);
+#else
 				textureCollection.materials.vertex.texture = TextureFactory::CreateTexture(scenePath, false, false);
+#endif
 			}
 			// materials
 			{
@@ -153,7 +258,6 @@ std::vector<VertexTextureCollection> BinaryVertexPaintingFileFactory::LoadVertex
 				}
 			}
 
-			data.push_back(textureCollection);
 		}
 	}
 

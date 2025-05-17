@@ -1,7 +1,6 @@
-#include "common.hlsli"
+#include "../vfx/vfx_common.hlsli"
 
-
-PixelOutput main(PixelInputType input)
+PixelOutput main(ParticlePixelInputType input)
 {
     PixelOutput result;
 

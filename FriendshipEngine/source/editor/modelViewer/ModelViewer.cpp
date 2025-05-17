@@ -46,7 +46,10 @@ ModelViewer::ModelViewer()
 	}
 }
 
-ModelViewer::~ModelViewer() {}
+ModelViewer::~ModelViewer()
+{
+
+}
 
 void ModelViewer::Init(LightManager* aLightManager)
 {
@@ -88,19 +91,19 @@ void ModelViewer::Init(LightManager* aLightManager)
 	myMeshes[(int)eMeshType::Floor].mesh = CreateMeshAndGetTextures(RELATIVE_MODELVIEWER_ASSET_PATH + (std::string)"models/sm_floor.fbx");
 	myMeshes[(int)eMeshType::Floor].instance.vsType = VsType::DefaultPBRInstanced;
 	myMeshes[(int)eMeshType::Floor].instance.psType = PsType::GBuffer;
-	myMeshes[(int)eMeshType::Floor].instance.data = StaticMeshInstanceData();
+	myMeshes[(int)eMeshType::Floor].instance.data = MeshDrawerInstanceData(Transform(), StaticMeshInstanceData());
+
 	myMeshes[(int)eMeshType::Gizmo].mesh = CreateMeshAndGetTextures(RELATIVE_MODELVIEWER_ASSET_PATH + (std::string)"models/sm_gizmo.fbx");
 	myMeshes[(int)eMeshType::Gizmo].instance.vsType = VsType::DefaultPBRInstanced;
 	myMeshes[(int)eMeshType::Gizmo].instance.psType = PsType::GBuffer;
 	myMeshes[(int)eMeshType::Gizmo].instance.data = myMeshes[(int)eMeshType::Floor].instance.data;
 
-	myMeshes[(int)eMeshType::Display].instance.data = StaticMeshInstanceData();
+	myMeshes[(int)eMeshType::Display].instance.data = MeshDrawerInstanceData(Transform(), StaticMeshInstanceData());
 }
 
 void ModelViewer::Update(float dt)
 {
-	RotateCameraWithMouse(dt);
-	CameraUpdate(dt);
+	CameraMovement(dt);
 
 	ModelWindow();
 }
@@ -127,7 +130,7 @@ void ModelViewer::Render()
 			{
 				auto skeletalMesh = static_cast<SkeletalMesh*>(myMeshes[i].mesh.meshData[j]);
 				skeletalMesh->Render(
-					std::get<StaticMeshInstanceData>(myMeshes[i].instance.data).transform.GetMatrix(),
+					myMeshes[i].instance.data.transform.GetMatrix(),
 					skeletalMesh->GetVertexShader(),
 					skeletalMesh->GetPixelShader()
 				);
@@ -141,11 +144,6 @@ void ModelViewer::Render()
 		}
 	}
 
-	//SettingsWindow();
-}
-
-void ModelViewer::RenderImGui()
-{
 	SettingsWindow();
 }
 
@@ -156,12 +154,10 @@ void ModelViewer::RecieveMessage(const FE::Message& aMessage)
 	case FE::eMessageType::MeshDropped:
 	{
 		std::string filename = std::any_cast<std::string>(aMessage.myMessage);
-		PrintI(filename);
-
 		myMeshes[(int)eMeshType::Display].mesh = CreateMeshAndGetTextures(filename);
 		myMeshes[(int)eMeshType::Display].instance.psType = PsType::GBuffer;
 		myMeshes[(int)eMeshType::Display].instance.vsType = VsType::DefaultPBRInstanced;
-		myMeshes[(int)eMeshType::Display].instance.data = StaticMeshInstanceData();
+		myMeshes[(int)eMeshType::Display].instance.data = MeshDrawerInstanceData(Transform(), StaticMeshInstanceData());
 		myMeshes[(int)eMeshType::Gizmo].instance.data = myMeshes[(int)eMeshType::Display].instance.data;
 
 		myLoadedMeshes.push_back(myMeshes[(int)eMeshType::Display]);
@@ -180,30 +176,6 @@ void ModelViewer::ModelWindow()
 	ImGui::DockSpaceOverViewport(nullptr, ImGuiDockNodeFlags_PassthruCentralNode);
 	if (ImGui::Begin("ModelViewer", 0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar))
 	{
-		//ImVec2 region = ImGui::GetContentRegionAvail();
-		//ImVec2 screenCursorPos = ImGui::GetCursorScreenPos();
-		//Vector2i dimensions = GraphicsEngine::GetInstance()->DX().GetViewportDimensions();
-
-		//float aspectRatio = (float)dimensions.x / (float)dimensions.y;
-		//if (region.x / region.y > aspectRatio)
-		//{
-		//	region.x = region.y * aspectRatio;
-		//}
-		//else
-		//{
-		//	region.y = region.x / aspectRatio;
-		//}
-
-		//ImVec2 vMin = ImGui::GetWindowContentRegionMin();
-		//ImVec2 vMax = ImVec2(vMin.x + region.x, vMin.y + region.y);
-		//ImVec2 wPos = ImGui::GetWindowPos();
-
-		//ImVec2 vMinWin = wPos + vMin;
-		//ImVec2 vMaxWin = wPos + vMax;
-
-		//ImDrawList* tDrawList = ImGui::GetWindowDrawList();
-		//tDrawList->AddImage(GraphicsEngine::GetInstance()->GetBackBufferSRV().Get(), vMinWin, vMaxWin);
-
 		HandleWarningPopups();
 	}
 	ImGui::End();
@@ -336,14 +308,14 @@ void ModelViewer::MeshAndTexturesData()
 
 	if (ImGui::BeginPopup("Mesh and Textures"))
 	{
-		StaticMeshInstanceData& instanceData = std::get<StaticMeshInstanceData>(myMeshes[(int)eMeshType::Display].instance.data);
-		Vector3f position = instanceData.transform.GetPosition();
+		Transform& transform = myMeshes[(int)eMeshType::Display].instance.data.transform;
+		Vector3f position = transform.GetPosition();
 
 		//MESH
 		ImGui::SeparatorText("Mesh"); ImGui::Spacing();
 		if (ImGui::DragFloat3("Mesh position", &position.x))
 		{
-			instanceData.transform.SetPosition(position);
+			transform.SetPosition(position);
 			myMeshes[(int)eMeshType::Gizmo].instance.transform = myMeshes[(int)eMeshType::Display].instance.transform;
 		}
 
@@ -482,8 +454,7 @@ void ModelViewer::SetAllValuesToDefault()
 
 void ModelViewer::SetMeshToDefault()
 {
-	StaticMeshInstanceData& instanceData = std::get<StaticMeshInstanceData>(myMeshes[(int)eMeshType::Display].instance.data);
-	instanceData.transform.SetPosition({ 0.f, 0.f, 0.f });
+	myMeshes[(int)eMeshType::Display].instance.data.transform.SetPosition({ 0.f, 0.f, 0.f });
 
 	myMeshes[(int)eMeshType::Gizmo].instance.transform = myMeshes[(int)eMeshType::Display].instance.transform;
 }
@@ -507,7 +478,6 @@ void ModelViewer::SetCameraToDefault()
 SharedMeshPackage ModelViewer::CreateMeshAndGetTextures(const std::string& aFilePath)
 {
 	MeshDataPackage meshInformation = ModelFactory::LoadMeshFromFBX(aFilePath);
-
 	SharedMeshPackage meshes = ModelFactory::GetSharedMeshFromPackage(meshInformation, false);
 
 	for (size_t i = 0; i < meshes.meshData.size(); i++)
@@ -519,21 +489,21 @@ SharedMeshPackage ModelViewer::CreateMeshAndGetTextures(const std::string& aFile
 		meshes.meshData[i]->SetVertexShader(ShaderDatabase::GetVertexShader(VsType::DefaultPBRInstanced));
 		meshes.meshData[i]->SetPixelShader(ShaderDatabase::GetPixelShader(PsType::MissingTextureLegacy));
 
-		if (CouldFindTextures(textures))
-		{
-			meshes.meshData[i]->SetTextures(textures);
-			meshes.meshData[i]->SetPixelShader(ShaderDatabase::GetPixelShader(PsType::GBuffer));
-		}
-		else
+		if (!CouldFindTextures(textures))
 		{
 			myPopups[(int)eWindowType::MissingTexturePopup] = true;
+			return meshes;
 		}
+
+		meshes.meshData[i]->SetTextures(textures);
+		meshes.meshData[i]->SetPixelShader(ShaderDatabase::GetPixelShader(PsType::GBuffer));
 
 		if (meshes.skeleton != nullptr)
 		{
 			meshes.meshData[i]->SetVertexShader(ShaderDatabase::GetVertexShader(VsType::SkinnedPBR));
 		}
 	}
+
 	return meshes;
 }
 
@@ -682,7 +652,7 @@ void ModelViewer::RotateCameraWithMouse(float dt)
 	myPreviousMousePosition = myCurrentMousePosition;
 }
 
-void ModelViewer::CameraUpdate(float dt)
+void ModelViewer::CameraMovement(float dt)
 {
 	auto graphicsEngine = GraphicsEngine::GetInstance();
 	auto camera = graphicsEngine->GetCamera();
@@ -714,4 +684,5 @@ void ModelViewer::CameraUpdate(float dt)
 
 	camera->GetTransform().Translate(direction * movement);
 
+	RotateCameraWithMouse(dt);
 }

@@ -14,7 +14,12 @@ project "Assets"
 	pchheader "pch.h"
 	pchsource ("pch.cpp")
 
-	links { "external", "engine", "ecs" }
+	links {
+		"external",
+		"engine",
+		"ecs",
+		"DirectXTex.lib"
+	}
 
 	includedirs
 	{

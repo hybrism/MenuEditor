@@ -22,7 +22,7 @@ void DeathZoneSystem::Init()
 
 }
 
-void DeathZoneSystem::Update(const SceneUpdateContext& dt)
+void DeathZoneSystem::Update(SceneUpdateContext& dt)
 {
 	UNREFERENCED_PARAMETER(dt);
 

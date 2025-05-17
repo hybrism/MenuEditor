@@ -6,63 +6,55 @@
 
 #include "Entity.h"
 #include "../component/Component.h"
-#include "EntitySignatureManager.h"
 
 class EntityManager
 {
 public:
-	EntityManager()
+	EntityManager() : myFrontIndex(0), myBackIndex(0), mySize(0)
 	{
+		myFreeEntities = new eid_t[MAX_ENTITIES];
 		Reset();
 	}
 
 	~EntityManager()
 	{
-		myFreeEntities = {};
+		delete[] myFreeEntities;
 		mySize = 0;
+		myFrontIndex = 0;
+		myBackIndex = 0;
 	}
 
 	void Reset()
 	{
-		myFreeEntities = {};
+		mySize = 0;
+		myFrontIndex = 0;
+		myBackIndex = 0;
 		for (eid_t i = 0; i < MAX_ENTITIES; ++i)
 		{
-			myFreeEntities.insert(myFreeEntities.begin() + i, i + INVALID_ENTITY + 1);
+			DestroyEntity(i + INVALID_ENTITY + 1);
 		}
-		mySize = 0;
 	}
 
 	Entity CreateEntity()
 	{
-		assert(mySize < MAX_ENTITIES && "Too many entities in existence.");
-
-		eid_t id = myFreeEntities.front();
-		myFreeEntities.pop_front();
-		++mySize;
-
-		return Entity(id);
-	}
-
-	Entity CreateEntityAtID(const eid_t& aEntity)
-	{
-		assert(aEntity < MAX_ENTITIES && "Entity out of range.");
-		assert(mySize < MAX_ENTITIES && "Too many entities in existence.");
-		assert(std::find(myFreeEntities.begin(), myFreeEntities.end(), aEntity) != myFreeEntities.end() && "Entity already in use.");
-
-		myFreeEntities.erase(std::remove(myFreeEntities.begin(), myFreeEntities.end(), aEntity), myFreeEntities.end());
-
-		return aEntity;
-	}
-
-	void DestroyEntity(const Entity& aEntity, EntitySignatureManager* aEntitySignatureManager)
-	{
-		assert(aEntity < MAX_ENTITIES && "Entity out of range.");
-
-		aEntitySignatureManager->ResetComponentSignature(aEntity);
-		myFreeEntities.insert(myFreeEntities.end(), aEntity);
+		assert(mySize > 0 && "No entities to pop.");
+		eid_t entity = myFreeEntities[myFrontIndex];
+		myFrontIndex = (myFrontIndex + 1) % MAX_ENTITIES;
 		--mySize;
+		return entity;
+	}
+
+	void DestroyEntity(const Entity& aEntity)
+	{
+		assert(mySize < MAX_ENTITIES && "Too many entities in existence.");
+
+		myFreeEntities[myBackIndex] = aEntity;
+		myBackIndex = (myBackIndex + 1) % MAX_ENTITIES;
+		++mySize;
 	}
 private:
-	std::deque<eid_t> myFreeEntities;
+	eid_t* myFreeEntities;
+	size_t myFrontIndex;
+	size_t myBackIndex;
 	size_t mySize;
 };

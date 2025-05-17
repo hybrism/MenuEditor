@@ -9,12 +9,9 @@ namespace MENU
 	{
 
 	public:
-		virtual void Update(const MenuUpdateContext& aContext) 
-		{ 
-		
-			aContext; 
-		};
-		virtual void Render() {};
+		virtual void Update(const MenuUpdateContext& aContext) { aContext; }
+		virtual void Render() { __noop; };
+		virtual void OnResize(const Vector2f& aScale) { aScale; };
 
 		MenuObject& GetParent() const { return myParent; }
 		ComponentType GetType() const { return myType; }
@@ -38,6 +35,7 @@ namespace MENU
 		const ComponentType myType;
 		const unsigned int myID;
 		Vector2f myPosition;
+		Vector2f myInitialPosition;
 
 	public:
 		std::string myName;
